@@ -5,6 +5,7 @@ import { useParams, useSelectedLayoutSegment } from "next/navigation"
 import { useFormatter, useLocale } from "next-intl"
 
 import { bi, type Bi } from "@/lib/mock/bi"
+import { applyForm } from "../edit/apply"
 import { usePatientsStore } from "../store"
 import { patientRecord, recordSummary } from "./record"
 
@@ -14,9 +15,14 @@ export type PatientTab = (typeof PATIENT_TABS)[number]
 /** Current patient (from the session store, so VIP / ban changes show) + its page record. */
 export function usePatient() {
   const { id } = useParams<{ id: string }>()
-  const { get } = usePatientsStore()
+  const { get, savedForm } = usePatientsStore()
   const patient = get(id)
-  const record = React.useMemo(() => (patient ? patientRecord(patient) : null), [patient])
+  const form = savedForm(id)
+  const record = React.useMemo(() => {
+    if (!patient) return null
+    const r = patientRecord(patient)
+    return form ? applyForm(r, form) : r
+  }, [patient, form])
   const summary = React.useMemo(() => (record ? recordSummary(record) : null), [record])
   return patient && record && summary ? { patient, record, summary } : null
 }

@@ -456,5 +456,137 @@
       "allStaff": "All staff",
       "all": "All"
     }
+  },
+  "edit": {
+    "title": "Edit patient",
+    "crumb": "Edit",
+    "back": "Back to patient",
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "sectionsLabel": "Form sections",
+    "complete": "Complete",
+    "missing": "Missing",
+    "sections": {
+      "personal": {
+        "title": "Personal info",
+        "description": "Name, gender and date of birth"
+      },
+      "contact": {
+        "title": "Contact",
+        "description": "How we reach the patient and send reminders"
+      },
+      "identity": {
+        "title": "Identity",
+        "description": "Needed for insurance claims and reports"
+      },
+      "address": {
+        "title": "Address",
+        "description": "Home address for visits and invoices"
+      },
+      "insurance": {
+        "title": "Insurance",
+        "description": "Coverage used for billing"
+      },
+      "guardian": {
+        "title": "Guardian",
+        "description": "Required while the patient is under 18"
+      },
+      "medical": {
+        "title": "Medical basics",
+        "description": "Shown to the care team on every visit"
+      }
+    },
+    "guardianNotice": "{name} is {age}, so a guardian must approve visits and treatment.",
+    "fields": {
+      "nameEn": "Full name (English)",
+      "nameAr": "Full name (Arabic)",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "birthDate": "Date of birth",
+      "birthPlaceholder": "Pick a date",
+      "age": "{age, plural, one {# year old} other {# years old}}",
+      "nationality": "Nationality",
+      "classification": "Classification",
+      "mobile": "Mobile",
+      "whatsapp": "WhatsApp",
+      "sameWhatsapp": "WhatsApp is the same as mobile",
+      "email": "Email",
+      "language": "Preferred language",
+      "smsReminders": "SMS reminders",
+      "smsRemindersHint": "A day before each visit",
+      "whatsappMessages": "WhatsApp messages",
+      "whatsappMessagesHint": "Results and invoices",
+      "idType": "ID type",
+      "idNumber": "ID number",
+      "idPlaceholder": "10 digits",
+      "passportPlaceholder": "6–9 letters or digits",
+      "city": "City",
+      "district": "District",
+      "street": "Street & building",
+      "streetPlaceholder": "e.g. King Fahd Rd, Bldg 12",
+      "postal": "Postal code",
+      "postalPlaceholder": "5 digits",
+      "insurer": "Provider",
+      "insuranceClass": "Class",
+      "policy": "Policy number",
+      "expiry": "Expiry date",
+      "selfPay": "Self-pay (no insurance)",
+      "guardianName": "Guardian name",
+      "guardianRelation": "Relation",
+      "guardianMobile": "Guardian mobile",
+      "guardianId": "Guardian national ID",
+      "bloodType": "Blood type",
+      "clinic": "Preferred clinic",
+      "allergies": "Allergies",
+      "addAllergy": "Add allergy…",
+      "conditions": "Chronic conditions",
+      "addCondition": "Add condition…",
+      "remove": "Remove {name}",
+      "notes": "Notes for the care team",
+      "choose": "Choose…"
+    },
+    "errors": {
+      "required": "Required.",
+      "idRequired": "Required — enter the 10-digit national ID.",
+      "streetRequired": "Required for home visits and invoices.",
+      "mobile": "Enter a Saudi mobile, e.g. +966 5X XXX XXXX.",
+      "email": "Enter a valid email address.",
+      "nationalId": "National ID is 10 digits starting with 1.",
+      "iqama": "Iqama number is 10 digits starting with 2.",
+      "passport": "Passport number is 6–9 letters or digits.",
+      "postal": "Postal code is 5 digits.",
+      "birthFuture": "Date of birth can't be in the future.",
+      "nameArabic": "Write the name in Arabic letters."
+    },
+    "summary": {
+      "title": "{count, plural, one {# required field is missing} other {# required fields are missing}}",
+      "titleInvalid": "{count, plural, one {Fix # field before saving} other {Fix # fields before saving}}",
+      "item": "{field} — {section}",
+      "first": "Go to first field"
+    },
+    "completeness": {
+      "title": "Profile completeness",
+      "count": "{done} of {total} required fields",
+      "left": "{count, plural, =0 {All done} one {# field left} other {# fields left}}",
+      "go": "Go to field"
+    },
+    "duplicate": {
+      "title": "Possible duplicate",
+      "text": "Same mobile as MRN {mrn} · {name}. Review it before saving.",
+      "action": "Review & merge"
+    },
+    "updated": "Last updated {date} · {by}",
+    "unsaved": {
+      "title": "Discard your changes?",
+      "text": "{count, plural, one {You edited # field. If you leave now it won't be saved.} other {You edited # fields. If you leave now they won't be saved.}}",
+      "keep": "Keep editing",
+      "discard": "Discard changes"
+    },
+    "saved": "Patient updated",
+    "savedText": "{name}'s details were saved.",
+    "noChanges": "Nothing to save",
+    "noChangesText": "You haven't changed anything yet."
   }
 }

@@ -456,5 +456,137 @@
       "allStaff": "كل الموظفين",
       "all": "الكل"
     }
+  },
+  "edit": {
+    "title": "تعديل بيانات المريض",
+    "crumb": "تعديل",
+    "back": "ارجع لملف المريض",
+    "cancel": "إلغاء",
+    "save": "احفظ التعديلات",
+    "saving": "نحفظ…",
+    "sectionsLabel": "أقسام النموذج",
+    "complete": "مكتمل",
+    "missing": "ناقص",
+    "sections": {
+      "personal": {
+        "title": "البيانات الشخصية",
+        "description": "الاسم والجنس وتاريخ الميلاد"
+      },
+      "contact": {
+        "title": "التواصل",
+        "description": "كيف نتواصل مع المريض ونرسل التذكيرات"
+      },
+      "identity": {
+        "title": "الهوية",
+        "description": "مطلوبة لمطالبات التأمين والتقارير"
+      },
+      "address": {
+        "title": "العنوان",
+        "description": "عنوان السكن للزيارات والفواتير"
+      },
+      "insurance": {
+        "title": "التأمين",
+        "description": "التغطية اللي نحاسب عليها"
+      },
+      "guardian": {
+        "title": "ولي الأمر",
+        "description": "مطلوب لأن المريض أقل من 18 سنة"
+      },
+      "medical": {
+        "title": "المعلومات الطبية الأساسية",
+        "description": "تظهر للفريق الطبي في كل زيارة"
+      }
+    },
+    "guardianNotice": "{name} عمره {age} سنة، فلازم ولي أمره يوافق على الزيارات والعلاج.",
+    "fields": {
+      "nameEn": "الاسم بالإنجليزي",
+      "nameAr": "الاسم بالعربي",
+      "gender": "الجنس",
+      "male": "ذكر",
+      "female": "أنثى",
+      "birthDate": "تاريخ الميلاد",
+      "birthPlaceholder": "اختر التاريخ",
+      "age": "{age, plural, one {عمره سنة} two {عمره سنتين} few {عمره # سنوات} other {عمره # سنة}}",
+      "nationality": "الجنسية",
+      "classification": "التصنيف",
+      "mobile": "الجوال",
+      "whatsapp": "واتساب",
+      "sameWhatsapp": "الواتساب نفس رقم الجوال",
+      "email": "الإيميل",
+      "language": "لغة التواصل",
+      "smsReminders": "تذكير برسالة نصية",
+      "smsRemindersHint": "قبل كل موعد بيوم",
+      "whatsappMessages": "رسائل واتساب",
+      "whatsappMessagesHint": "النتايج والفواتير",
+      "idType": "نوع الهوية",
+      "idNumber": "رقم الهوية",
+      "idPlaceholder": "10 أرقام",
+      "passportPlaceholder": "6 إلى 9 حروف أو أرقام",
+      "city": "المدينة",
+      "district": "الحي",
+      "street": "الشارع والمبنى",
+      "streetPlaceholder": "مثال: طريق الملك فهد، مبنى 12",
+      "postal": "الرمز البريدي",
+      "postalPlaceholder": "5 أرقام",
+      "insurer": "شركة التأمين",
+      "insuranceClass": "الفئة",
+      "policy": "رقم البوليصة",
+      "expiry": "تاريخ الانتهاء",
+      "selfPay": "دفع شخصي (بدون تأمين)",
+      "guardianName": "اسم ولي الأمر",
+      "guardianRelation": "صلة القرابة",
+      "guardianMobile": "جوال ولي الأمر",
+      "guardianId": "هوية ولي الأمر",
+      "bloodType": "فصيلة الدم",
+      "clinic": "العيادة المفضلة",
+      "allergies": "الحساسية",
+      "addAllergy": "أضف حساسية…",
+      "conditions": "الأمراض المزمنة",
+      "addCondition": "أضف مرض…",
+      "remove": "شيل {name}",
+      "notes": "ملاحظات للفريق الطبي",
+      "choose": "اختر…"
+    },
+    "errors": {
+      "required": "مطلوب.",
+      "idRequired": "مطلوب: دخّل رقم الهوية (10 أرقام).",
+      "streetRequired": "مطلوب للزيارات المنزلية والفواتير.",
+      "mobile": "دخّل رقم جوال سعودي، مثل ‎+966 5X XXX XXXX.",
+      "email": "دخّل إيميل صحيح.",
+      "nationalId": "رقم الهوية الوطنية 10 أرقام ويبدأ بـ 1.",
+      "iqama": "رقم الإقامة 10 أرقام ويبدأ بـ 2.",
+      "passport": "رقم الجواز من 6 إلى 9 حروف أو أرقام.",
+      "postal": "الرمز البريدي 5 أرقام.",
+      "birthFuture": "تاريخ الميلاد ما يصير يكون بالمستقبل.",
+      "nameArabic": "اكتب الاسم بالحروف العربية."
+    },
+    "summary": {
+      "title": "{count, plural, one {فيه حقل مطلوب فاضي} two {فيه حقلين مطلوبين فاضيين} few {فيه # حقول مطلوبة فاضية} other {فيه # حقل مطلوب فاضي}}",
+      "titleInvalid": "{count, plural, one {صحّح حقل واحد قبل الحفظ} two {صحّح حقلين قبل الحفظ} few {صحّح # حقول قبل الحفظ} other {صحّح # حقل قبل الحفظ}}",
+      "item": "{field} — {section}",
+      "first": "روح لأول حقل"
+    },
+    "completeness": {
+      "title": "اكتمال الملف",
+      "count": "{done} من {total} حقول مطلوبة",
+      "left": "{count, plural, =0 {كل شي مكتمل} one {باقي حقل واحد} two {باقي حقلين} few {باقي # حقول} other {باقي # حقل}}",
+      "go": "روح للحقل"
+    },
+    "duplicate": {
+      "title": "مكرر محتمل",
+      "text": "نفس رقم الجوال لملف {mrn} · {name}. راجعه قبل ما تحفظ.",
+      "action": "راجع وادمج"
+    },
+    "updated": "آخر تحديث {date} · {by}",
+    "unsaved": {
+      "title": "تلغي التعديلات؟",
+      "text": "{count, plural, one {عدّلت حقل واحد، لو طلعت الحين ما راح ينحفظ.} two {عدّلت حقلين، لو طلعت الحين ما راح تنحفظ.} few {عدّلت # حقول، لو طلعت الحين ما راح تنحفظ.} other {عدّلت # حقل، لو طلعت الحين ما راح تنحفظ.}}",
+      "keep": "كمّل تعديل",
+      "discard": "ألغِ التعديلات"
+    },
+    "saved": "انحفظت بيانات المريض",
+    "savedText": "انحفظت تعديلات ملف {name}.",
+    "noChanges": "ما فيه شي ينحفظ",
+    "noChangesText": "ما غيّرت أي شي للحين."
   }
 }

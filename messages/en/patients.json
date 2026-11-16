@@ -1,9 +1,217 @@
 {
   "title": "Patients",
   "addPatient": "Add patient",
+  "export": "Export",
   "description": {
     "list": "All patients across your branches: profiles, data quality and visits.",
     "reports": "Detailed patient reports you can filter, print and export.",
     "payments": "Payment history and transactions for every patient."
+  },
+  "kpi": {
+    "total": "Total patients",
+    "newThisMonth": "New this month",
+    "vip": "VIP patients",
+    "incomplete": "Incomplete records",
+    "vsLastMonth": "vs last month",
+    "thisMonth": "this month",
+    "thisWeek": "this week"
+  },
+  "gender": {
+    "title": "Patients by gender",
+    "description": "All registered patients",
+    "patients": "patients",
+    "male": "Male",
+    "female": "Female",
+    "unset": "Not set",
+    "short": {
+      "male": "M",
+      "female": "F",
+      "unset": "—"
+    },
+    "single": {
+      "male": "Male",
+      "female": "Female"
+    }
+  },
+  "ages": {
+    "title": "Age groups",
+    "description": "Share of patients per group",
+    "children": "Children",
+    "youth": "Youth",
+    "adults": "Adults",
+    "seniors": "Seniors"
+  },
+  "regions": {
+    "title": "Patients by region",
+    "description": "Country, region and city"
+  },
+  "list": {
+    "search": "Search name, MRN, phone or ID…",
+    "searchShort": "Search name, MRN, phone…",
+    "filters": "Filters",
+    "chips": {
+      "all": "All",
+      "vip": "VIP",
+      "banned": "Banned",
+      "incomplete": "Incomplete",
+      "duplicate": "Possible duplicates",
+      "duplicateShort": "Duplicates"
+    },
+    "columns": {
+      "patient": "Patient",
+      "phone": "Phone",
+      "region": "Region",
+      "tags": "Tags",
+      "lastVisit": "Last visit",
+      "visits": "Visits",
+      "actions": "Actions"
+    },
+    "mrnLine": "MRN {mrn} · {sex} · {age}",
+    "mrn": "MRN {mrn}",
+    "lastVisitLine": "Last visit {date}",
+    "selectAll": "Select all on this page",
+    "selectRow": "Select {name}",
+    "viewPatient": "View {name}",
+    "rowActions": "Actions for {name}",
+    "loadMore": "Load more",
+    "noResultsTitle": "No matching patients",
+    "noResultsText": "Try another name, MRN or phone, or clear the filters."
+  },
+  "tags": {
+    "vip": "VIP",
+    "incomplete": "Incomplete",
+    "duplicate": "Duplicate?",
+    "banned": "Banned"
+  },
+  "filters": {
+    "title": "Filters",
+    "description": "Narrow the patients list",
+    "gender": "Gender",
+    "all": "All",
+    "male": "Male",
+    "female": "Female",
+    "ageFrom": "Age from",
+    "ageTo": "Age to",
+    "region": "Region",
+    "allRegions": "All regions",
+    "branch": "Branch",
+    "allBranches": "All branches",
+    "lastVisit": "Last visit",
+    "pickRange": "Any date",
+    "days": "{n} days",
+    "tags": "Tags",
+    "tagVip": "VIP",
+    "tagIncomplete": "Incomplete record",
+    "tagDuplicate": "Possible duplicate",
+    "tagBanned": "Banned",
+    "reset": "Reset",
+    "show": "{count, plural, one {Show # patient} other {Show # patients}}"
+  },
+  "branches": {
+    "main": "Al Noor Clinics · Main",
+    "olaya": "Al Noor Clinic · Olaya branch",
+    "jeddah": "Al Noor Clinic · Jeddah branch"
+  },
+  "rowMenu": {
+    "view": "View profile",
+    "edit": "Edit details",
+    "book": "Book visit",
+    "vip": "Mark as VIP",
+    "unvip": "Remove VIP",
+    "merge": "Merge with another file",
+    "ban": "Ban patient",
+    "archive": "Archive file"
+  },
+  "ban": {
+    "title": "Ban {name}?",
+    "description": "They won't be able to book online. Staff can still see the file.",
+    "reason": "Reason",
+    "noShows": "Repeated no-shows",
+    "noShowsHint": "5 missed visits in 6 months",
+    "unpaid": "Unpaid balance",
+    "abusive": "Abusive behaviour",
+    "other": "Other",
+    "note": "Note (internal)",
+    "notePlaceholder": "Add context for your team…",
+    "notify": "Notify the patient by SMS",
+    "confirm": "Ban patient",
+    "done": "{name} is banned",
+    "doneText": "Online booking is blocked for this file."
+  },
+  "archive": {
+    "title": "Archive this file?",
+    "description": "The file is hidden from lists and search. Records are kept as required by MOH.",
+    "patient": "Patient",
+    "upcoming": "Upcoming visits",
+    "upcomingValue": "{count, plural, =0 {None} one {# · will be cancelled} other {# · will be cancelled}}",
+    "balance": "Balance due",
+    "understand": "I understand upcoming visits will be cancelled",
+    "confirm": "Archive file",
+    "done": "File archived",
+    "doneText": "{name} is hidden from lists and search."
+  },
+  "vipToast": {
+    "on": "Marked as VIP",
+    "off": "VIP removed",
+    "text": "{name}'s file was updated."
+  },
+  "exportDialog": {
+    "title": "Export",
+    "description": "Patients list · {count} rows",
+    "format": "Format",
+    "excel": "Excel (.xlsx)",
+    "excelHint": "Best for filtering and sharing",
+    "pdf": "PDF",
+    "pdfHint": "Ready to print",
+    "csv": "CSV",
+    "period": "Period",
+    "columns": "Columns",
+    "colName": "Name & MRN",
+    "colContact": "Contact",
+    "colLastVisit": "Last visit",
+    "colTags": "Tags",
+    "confirm": "Export",
+    "started": "Export started",
+    "startedText": "We'll let you know when your {format} file is ready.",
+    "downloaded": "Export ready",
+    "downloadedText": "{count} rows saved as CSV."
+  },
+  "sheet": {
+    "label": "Patient profile",
+    "openFull": "Open full page",
+    "edit": "Edit",
+    "book": "Book",
+    "years": "{n} yrs",
+    "missingTitle": "Missing data",
+    "missingText": "National ID and address are missing.",
+    "completeNow": "Complete now",
+    "duplicateTitle": "Possible duplicate",
+    "duplicateText": "Same phone as MRN {mrn} · {name}.",
+    "reviewMerge": "Review & merge",
+    "facts": {
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "nationalId": "National ID",
+      "birth": "Date of birth",
+      "nationality": "Nationality",
+      "region": "Region",
+      "insurance": "Insurance",
+      "classification": "Classification",
+      "registered": "Registered",
+      "bloodType": "Blood type"
+    },
+    "tabs": {
+      "visits": "Visits · {count}",
+      "payments": "Payments",
+      "activity": "Activity",
+      "files": "Files"
+    },
+    "sar": "SAR {amount}",
+    "noVisits": "No visits yet",
+    "paidVisit": "Visit payment",
+    "activityRegistered": "File created by {by}",
+    "activityVisit": "Visit on {date}",
+    "noFiles": "No files yet",
+    "noFilesText": "Upload lab results, scans or documents for this patient."
   }
 }

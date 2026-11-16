@@ -1,31 +1,58 @@
-import { getTranslations } from "next-intl/server"
+"use client"
 
+import * as React from "react"
+import { useTranslations } from "next-intl"
+
+import { Link } from "@/i18n/navigation"
 import { Icon } from "@/components/ds/icon"
-import { SkeletonRow } from "@/components/ds/states"
 import { Button } from "@/components/ui/button"
 import { ModuleTabsNav, PageContainer, PageHeader } from "@/components/shell/page"
+import { allPatients, filterPatients } from "@/modules/patients/data"
+import { ExportDialog } from "@/modules/patients/list/export-dialog"
+import { useListQuery } from "@/modules/patients/list/use-list-query"
+import { usePatientsStore } from "@/modules/patients/store"
 
-/** Shared Patients module frame (page header + module tabs). Tab bodies arrive in step 6. */
-export async function PatientsFrame({ tab }: { tab: "list" | "reports" | "payments" }) {
-  const t = await getTranslations("patients")
+/**
+ * Shared Patients module frame: page header (Export → dialog, Add patient → wizard) + module tabs
+ * (Patients list · count / Reports / Payments).
+ */
+export function PatientsFrame({ tab, children }: { tab: "list" | "reports" | "payments"; children?: React.ReactNode }) {
+  const t = useTranslations("patients")
+  const { patients } = usePatientsStore()
+  const [exportOpen, setExportOpen] = React.useState(false)
+  const total = patients.length || allPatients().length
+
   return (
     <PageContainer>
       <PageHeader
         title={t("title")}
         description={t(`description.${tab}`)}
         actions={
-          <Button>
-            <Icon name="user-add" />
-            {t("addPatient")}
-          </Button>
+          <>
+            <Button variant="outline" onClick={() => setExportOpen(true)}>
+              <Icon name="export" size={20} />
+              {t("export")}
+            </Button>
+            <Button asChild>
+              <Link href="/patients/new">
+                <Icon name="user-add" size={20} />
+                {t("addPatient")}
+              </Link>
+            </Button>
+          </>
         }
       />
-      <ModuleTabsNav module="patients" counts={{ list: "1,284" }} />
-      <div className="overflow-hidden rounded-xl border">
-        {[0, 1, 2, 3, 4].map((i) => (
-          <SkeletonRow key={i} />
-        ))}
-      </div>
+      <ModuleTabsNav module="patients" counts={{ list: total.toLocaleString("en-US") }} />
+      {children}
+      {exportOpen && <ExportRows open={exportOpen} onOpenChange={setExportOpen} />}
     </PageContainer>
   )
+}
+
+/** Export uses the list's current filters when on the list tab. */
+function ExportRows({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  const { patients } = usePatientsStore()
+  const { query } = useListQuery()
+  const rows = React.useMemo(() => filterPatients(patients, query, "en"), [patients, query])
+  return <ExportDialog open={open} onOpenChange={onOpenChange} rows={rows} />
 }

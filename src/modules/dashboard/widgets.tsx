@@ -24,6 +24,7 @@ import { Icon } from "@/components/ds/icon"
 import { ProgressField } from "@/components/ds/module-controls"
 import { StatCard } from "@/components/ds/stat-card"
 import { StatusBadge } from "@/components/ds/status-badge"
+import { Widget, WidgetMenu } from "@/components/ds/widget"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
@@ -32,54 +33,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 /* ------------------------------------------------------------------ shared */
-
-/** Widget card (Widgets page): rounded-xl, border, p-6, gap-5; header = title 18 SemiBold + description 12 muted + action at the end. */
-function Widget({
-  title,
-  description,
-  action,
-  className,
-  children,
-}: {
-  title: React.ReactNode
-  description?: React.ReactNode
-  action?: React.ReactNode
-  className?: string
-  children: React.ReactNode
-}) {
-  return (
-    <section className={cn("@container/widget flex min-w-0 flex-col gap-5 rounded-xl border bg-card p-6 text-card-foreground", className)}>
-      <header className="flex items-start gap-3">
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h2 className="text-lg font-semibold">{title}</h2>
-          {description && <p className="text-xs text-muted-foreground">{description}</p>}
-        </div>
-        {action}
-      </header>
-      {children}
-    </section>
-  )
-}
-
-/** Ghost "more" menu on widget headers (not specified in the design beyond the button; offers Refresh). */
-function WidgetMenu() {
-  const t = useTranslations("common.widget")
-  return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label={t("more")}>
-          <Icon name="more" size={16} />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem>
-          <Icon name="refresh" size={16} />
-          {t("refresh")}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
 
 function useElementWidth<T extends HTMLElement>() {
   const ref = React.useRef<T>(null)
@@ -420,7 +373,7 @@ export function BedsWidget({ className }: { className?: string }) {
           <ChartContainer config={config} className="aspect-square size-42">
             <PieChart>
               <ChartTooltip content={<ChartTooltipContent nameKey="id" hideLabel />} />
-              <Pie data={data} dataKey="used" nameKey="id" innerRadius={55} outerRadius={84} paddingAngle={1.5} startAngle={90} endAngle={-270} stroke="none">
+              <Pie data={data} dataKey="used" nameKey="id" innerRadius={55} outerRadius={84} paddingAngle={1.5} startAngle={90} endAngle={-270} stroke="none" isAnimationActive={false}>
                 {data.map((d) => (
                   <Cell key={d.id} fill={`var(--color-${d.id})`} />
                 ))}

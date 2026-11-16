@@ -1,7 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { useFormatter, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
+
+import { useDates } from "@/i18n/dates"
 import type { DateRange } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
@@ -33,7 +35,7 @@ export function DatePicker({
   id?: string
 }) {
   const t = useTranslations("common.actions")
-  const format = useFormatter()
+  const dates = useDates()
   const [open, setOpen] = React.useState(false)
   const [draft, setDraft] = React.useState<Date | undefined>(value)
 
@@ -48,14 +50,14 @@ export function DatePicker({
       <PopoverTrigger asChild>
         <button type="button" className={cn(triggerClass, className)} data-placeholder={!value || undefined} {...aria}>
           <Icon name="calendar-2" size={16} className="text-muted-foreground" />
-          <span className="flex-1 truncate tabular-nums">{value ? format.dateTime(value, "short") : placeholder}</span>
+          <span className="flex-1 truncate tabular-nums">{value ? dates.short(value) : placeholder}</span>
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-76 gap-3 shadow-md">
         <Calendar mode="single" selected={draft} onSelect={setDraft} defaultMonth={draft} />
         <div className="flex items-center gap-2">
           <span className="min-w-0 flex-1 text-xs text-muted-foreground tabular-nums">
-            {draft && format.dateTime(draft, "weekday")}
+            {draft && dates.weekday(draft)}
           </span>
           <Button
             size="sm"
@@ -79,6 +81,7 @@ export function DateRangePicker({
   placeholder,
   daysLabel,
   className,
+  ...aria
 }: {
   value?: DateRange
   onChange: (r: DateRange | undefined) => void
@@ -86,13 +89,17 @@ export function DateRangePicker({
   /** e.g. (n) => t("days", { n }) — module supplies the plural string. */
   daysLabel: (days: number) => string
   className?: string
+  id?: string
+  "aria-invalid"?: boolean
+  "aria-describedby"?: string
+  "aria-required"?: boolean
 }) {
   const t = useTranslations("common.actions")
-  const format = useFormatter()
+  const dates = useDates()
   const [open, setOpen] = React.useState(false)
   const [draft, setDraft] = React.useState<DateRange | undefined>(value)
   const label = (r?: DateRange) =>
-    r?.from && r.to ? format.dateTimeRange(r.from, r.to, "short") : r?.from ? format.dateTime(r.from, "short") : ""
+    r?.from && r.to ? dates.range(r.from, r.to) : r?.from ? dates.short(r.from) : ""
   const days = draft?.from && draft.to ? Math.round((+draft.to - +draft.from) / 86_400_000) + 1 : 0
 
   return (
@@ -104,7 +111,7 @@ export function DateRangePicker({
       }}
     >
       <PopoverTrigger asChild>
-        <button type="button" className={cn(triggerClass, className)} data-placeholder={!value?.from || undefined}>
+        <button type="button" className={cn(triggerClass, className)} data-placeholder={!value?.from || undefined} {...aria}>
           <Icon name="calendar-2" size={16} className="text-muted-foreground" />
           <span className="flex-1 truncate tabular-nums">{label(value) || placeholder}</span>
         </button>

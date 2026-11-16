@@ -1,9 +1,217 @@
 {
   "title": "المرضى",
   "addPatient": "أضف مريض",
+  "export": "تصدير",
   "description": {
     "list": "كل مرضاك في الفروع: ملفاتهم وجودة بياناتهم وزياراتهم.",
     "reports": "تقارير المرضى التفصيلية، تقدر تفلترها وتطبعها وتصدّرها.",
     "payments": "سجل المدفوعات والعمليات المالية لكل مريض."
+  },
+  "kpi": {
+    "total": "عدد المرضى",
+    "newThisMonth": "جدد هالشهر",
+    "vip": "مرضى VIP",
+    "incomplete": "ملفات ناقصة",
+    "vsLastMonth": "عن الشهر اللي فات",
+    "thisMonth": "هالشهر",
+    "thisWeek": "هالأسبوع"
+  },
+  "gender": {
+    "title": "المرضى حسب الجنس",
+    "description": "كل المرضى المسجلين",
+    "patients": "مريض",
+    "male": "ذكور",
+    "female": "إناث",
+    "unset": "غير محدد",
+    "short": {
+      "male": "ذكر",
+      "female": "أنثى",
+      "unset": "—"
+    },
+    "single": {
+      "male": "ذكر",
+      "female": "أنثى"
+    }
+  },
+  "ages": {
+    "title": "الفئات العمرية",
+    "description": "نسبة المرضى في كل فئة",
+    "children": "أطفال",
+    "youth": "شباب",
+    "adults": "بالغين",
+    "seniors": "كبار سن"
+  },
+  "regions": {
+    "title": "المرضى حسب المنطقة",
+    "description": "حسب الدولة والمنطقة والمدينة"
+  },
+  "list": {
+    "search": "دوّر بالاسم أو رقم الملف أو الجوال أو الهوية…",
+    "searchShort": "دوّر بالاسم أو رقم الملف أو الجوال…",
+    "filters": "فلترة",
+    "chips": {
+      "all": "الكل",
+      "vip": "VIP",
+      "banned": "محظورين",
+      "incomplete": "بياناتهم ناقصة",
+      "duplicate": "مكررين محتملين",
+      "duplicateShort": "مكررين"
+    },
+    "columns": {
+      "patient": "المريض",
+      "phone": "الجوال",
+      "region": "المنطقة",
+      "tags": "التصنيف",
+      "lastVisit": "آخر زيارة",
+      "visits": "الزيارات",
+      "actions": "إجراءات"
+    },
+    "mrnLine": "MRN {mrn} · {sex} · {age}",
+    "mrn": "MRN {mrn}",
+    "lastVisitLine": "آخر زيارة {date}",
+    "selectAll": "حدد كل اللي في هالصفحة",
+    "selectRow": "حدد {name}",
+    "viewPatient": "افتح ملف {name}",
+    "rowActions": "إجراءات {name}",
+    "loadMore": "اعرض أكثر",
+    "noResultsTitle": "ما فيه مرضى مطابقين",
+    "noResultsText": "جرّب اسم أو رقم ملف أو جوال ثاني، أو امسح الفلاتر."
+  },
+  "tags": {
+    "vip": "VIP",
+    "incomplete": "بياناته ناقصة",
+    "duplicate": "مكرر محتمل",
+    "banned": "محظور"
+  },
+  "filters": {
+    "title": "الفلاتر",
+    "description": "ضيّق قائمة المرضى",
+    "gender": "الجنس",
+    "all": "الكل",
+    "male": "ذكر",
+    "female": "أنثى",
+    "ageFrom": "العمر من",
+    "ageTo": "إلى",
+    "region": "المنطقة",
+    "allRegions": "كل المناطق",
+    "branch": "الفرع",
+    "allBranches": "كل الفروع",
+    "lastVisit": "آخر زيارة",
+    "pickRange": "أي تاريخ",
+    "days": "{n} يوم",
+    "tags": "التصنيفات",
+    "tagVip": "VIP",
+    "tagIncomplete": "بيانات ناقصة",
+    "tagDuplicate": "مكرر محتمل",
+    "tagBanned": "محظور",
+    "reset": "إعادة ضبط",
+    "show": "اعرض {count} مريض"
+  },
+  "branches": {
+    "main": "عيادات النور · الرئيسي",
+    "olaya": "عيادة النور · فرع العليا",
+    "jeddah": "عيادة النور · فرع جدة"
+  },
+  "rowMenu": {
+    "view": "افتح الملف",
+    "edit": "عدّل البيانات",
+    "book": "احجز موعد",
+    "vip": "حطّه VIP",
+    "unvip": "شيل VIP",
+    "merge": "ادمجه مع ملف ثاني",
+    "ban": "احظر المريض",
+    "archive": "أرشف الملف"
+  },
+  "ban": {
+    "title": "تحظر {name}؟",
+    "description": "ما راح يقدر يحجز أونلاين، والموظفين يقدرون يشوفون ملفه.",
+    "reason": "السبب",
+    "noShows": "غياب متكرر",
+    "noShowsHint": "5 مواعيد فاتته خلال 6 شهور",
+    "unpaid": "مبالغ ما انسددت",
+    "abusive": "سلوك مسيء",
+    "other": "سبب ثاني",
+    "note": "ملاحظة داخلية",
+    "notePlaceholder": "اكتب تفاصيل لفريقك…",
+    "notify": "بلّغ المريض برسالة",
+    "confirm": "احظر المريض",
+    "done": "انحظر {name}",
+    "doneText": "الحجز الأونلاين صار مقفول لهالملف."
+  },
+  "archive": {
+    "title": "تأرشف الملف؟",
+    "description": "الملف يختفي من القوائم والبحث، والسجلات تنحفظ حسب متطلبات وزارة الصحة.",
+    "patient": "المريض",
+    "upcoming": "مواعيد جاية",
+    "upcomingValue": "{count, plural, =0 {ما فيه} other {# · بيتلغى}}",
+    "balance": "المستحق",
+    "understand": "فاهم إن المواعيد الجاية بتتلغى",
+    "confirm": "أرشف الملف",
+    "done": "انأرشف الملف",
+    "doneText": "ملف {name} اختفى من القوائم والبحث."
+  },
+  "vipToast": {
+    "on": "صار VIP",
+    "off": "انشال VIP",
+    "text": "انحدّث ملف {name}."
+  },
+  "exportDialog": {
+    "title": "تصدير",
+    "description": "قائمة المرضى · {count} صف",
+    "format": "الصيغة",
+    "excel": "Excel (.xlsx)",
+    "excelHint": "الأفضل للفلترة والمشاركة",
+    "pdf": "PDF",
+    "pdfHint": "جاهز للطباعة",
+    "csv": "CSV",
+    "period": "الفترة",
+    "columns": "الأعمدة",
+    "colName": "الاسم ورقم الملف",
+    "colContact": "التواصل",
+    "colLastVisit": "آخر زيارة",
+    "colTags": "التصنيفات",
+    "confirm": "صدّر",
+    "started": "بدأ التصدير",
+    "startedText": "بنبلغك لما يجهز ملف {format}.",
+    "downloaded": "التصدير جاهز",
+    "downloadedText": "انحفظ {count} صف بصيغة CSV."
+  },
+  "sheet": {
+    "label": "ملف المريض",
+    "openFull": "افتح الملف كامل",
+    "edit": "تعديل",
+    "book": "احجز موعد",
+    "years": "{n} سنة",
+    "missingTitle": "بيانات ناقصة",
+    "missingText": "رقم الهوية والعنوان ناقصين.",
+    "completeNow": "كمّلها الحين",
+    "duplicateTitle": "مكرر محتمل",
+    "duplicateText": "نفس رقم الجوال لملف {mrn} · {name}.",
+    "reviewMerge": "راجع وادمج",
+    "facts": {
+      "phone": "الجوال",
+      "whatsapp": "واتساب",
+      "nationalId": "رقم الهوية",
+      "birth": "تاريخ الميلاد",
+      "nationality": "الجنسية",
+      "region": "المنطقة",
+      "insurance": "التأمين",
+      "classification": "التصنيف",
+      "registered": "تاريخ التسجيل",
+      "bloodType": "فصيلة الدم"
+    },
+    "tabs": {
+      "visits": "الزيارات · {count}",
+      "payments": "المدفوعات",
+      "activity": "السجل",
+      "files": "الملفات"
+    },
+    "sar": "{amount} ر.س",
+    "noVisits": "ما فيه زيارات للحين",
+    "paidVisit": "دفعة زيارة",
+    "activityRegistered": "انفتح الملف بواسطة {by}",
+    "activityVisit": "زيارة يوم {date}",
+    "noFiles": "ما فيه ملفات للحين",
+    "noFilesText": "ارفع نتايج تحاليل أو أشعة أو مستندات للمريض."
   }
 }

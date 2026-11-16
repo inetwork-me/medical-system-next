@@ -623,7 +623,7 @@ const fmtSize = (bytes: number) => (bytes >= 1e6 ? `${(bytes / 1e6).toFixed(1)} 
 export function FilesTab() {
   const t = useTranslations("patients.page.files")
   const dates = useDates()
-  const { b } = useText()
+  const { b, locale } = useText()
   const [group, setGroup] = React.useState<"all" | FileGroup>("all")
   const overlay = useOverlay()
   const data = usePatient()
@@ -685,14 +685,31 @@ export function FilesTab() {
                 <bdi dir="ltr" className="truncate text-sm font-medium rtl:text-right">
                   {f.name}
                 </bdi>
+                {/* Design (Widget / Patient Tab · Files): EN "Category · PDF · 412 KB · date" / "Uploaded by …";
+                    AR "التصنيف · التاريخ" / "PDF · 412 KB · رفعه …". */}
                 <span className="truncate text-xs text-muted-foreground tabular-nums">
-                  {t(`category.${f.category}`)} ·{" "}
-                  <bdi dir="ltr">
-                    {f.ext} · {f.size}
-                  </bdi>{" "}
-                  · {dates.short(f.date)}
+                  {locale === "ar" ? (
+                    <>
+                      {t(`category.${f.category}`)} · {dates.short(f.date)}
+                    </>
+                  ) : (
+                    <>
+                      {t(`category.${f.category}`)} · {f.ext} · {f.size} · {dates.short(f.date)}
+                    </>
+                  )}
                 </span>
-                <span className="truncate text-xs text-muted-foreground">{t("uploadedBy", { by: b(f.by) })}</span>
+                <span className="truncate text-xs text-muted-foreground tabular-nums">
+                  {locale === "ar" ? (
+                    <>
+                      <bdi dir="ltr">
+                        {f.ext} · {f.size}
+                      </bdi>{" "}
+                      · {t("uploadedBy", { by: b(f.by) })}
+                    </>
+                  ) : (
+                    t("uploadedBy", { by: b(f.by) })
+                  )}
+                </span>
               </button>
               <Button variant="ghost" size="icon-sm" aria-label={t("download", { name: f.name })} onClick={() => toast(t("download", { name: f.name }))}>
                 <Icon name="document-download" size={16} />

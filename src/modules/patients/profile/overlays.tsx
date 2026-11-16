@@ -15,7 +15,7 @@ import { RadioOption } from "@/components/ds/radio-option"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { Segmented } from "@/components/ds/segmented"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { DropZone, UploadItem } from "@/components/ds/upload"
+import { DropZone, UploadItem, toMb } from "@/components/ds/upload"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -946,8 +946,8 @@ function Upload({ patient, initial, onClose }: { patient: Patient; initial?: Fil
           name={i.name}
           state={i.progress < 100 ? "uploading" : "complete"}
           progress={i.progress}
-          doneMb={((i.bytes * (i.progress / 100)) / 1e6).toFixed(1)}
-          totalMb={size(i.bytes)}
+          doneMb={toMb((i.bytes * i.progress) / 100)}
+          totalMb={toMb(i.bytes)}
           onRemove={() => setItems((x) => x.filter((y) => y.id !== i.id))}
         />
       ))}

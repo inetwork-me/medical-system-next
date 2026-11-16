@@ -59,16 +59,13 @@ export function DropZone({
         "group/drop flex w-full cursor-pointer flex-col items-center gap-3 rounded-xl border-[1.5px] border-dashed border-input bg-card p-8 text-center transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
         "data-[state=over]:border-primary data-[state=over]:bg-accent",
         "data-[state=error]:border-destructive data-[state=error]:bg-destructive-soft",
-        className
+        className,
       )}
     >
       <span className="flex size-12 items-center justify-center rounded-full bg-muted text-foreground group-data-[state=error]/drop:bg-card group-data-[state=error]/drop:text-destructive group-data-[state=over]/drop:bg-card">
         <Icon name={state === "error" ? "danger" : "document-upload"} size={24} />
       </span>
-      <span
-        className={cn("text-sm font-medium", state === "error" ? "text-destructive" : "text-foreground")}
-        aria-live="polite"
-      >
+      <span className={cn("text-sm font-medium", state === "error" ? "text-destructive" : "text-foreground")} aria-live="polite">
         {state === "over" ? t("dropActive") : state === "error" ? t("dropError") : t("dropTitle")}
       </span>
       {state !== "over" && (
@@ -93,6 +90,9 @@ export function DropZone({
   )
 }
 
+/** Bytes → the MB number the Upload Item copy expects ("3.8"; the unit is in the message). */
+export const toMb = (bytes: number) => (bytes <= 0 ? "0.0" : Math.max(0.1, bytes / 1e6).toFixed(1))
+
 /**
  * DS sheet 08 · Upload Item: card row, p-3, gap-3, rounded-lg, border; 40px file tile (accent / destructive-soft),
  * name 14 Medium, progress + "x MB of y MB" while uploading, tick when complete, retry when failed.
@@ -109,7 +109,9 @@ export function UploadItem({
   name: string
   state: "uploading" | "complete" | "error"
   progress?: number
+  /** MB as a bare number ("2.4") — the unit comes from the message. Use toMb(bytes). */
   doneMb?: string
+  /** MB as a bare number ("3.8"). Use toMb(bytes). */
   totalMb: string
   onRemove?: () => void
   onRetry?: () => void
@@ -117,24 +119,20 @@ export function UploadItem({
   const t = useTranslations("common")
   const error = state === "error"
   return (
-    <div
-      data-slot="upload-item"
-      data-state={state}
-      className={cn("flex items-center gap-3 rounded-lg border bg-card p-3", error && "border-destructive")}
-    >
+    <div data-slot="upload-item" data-state={state} className={cn("flex items-center gap-3 rounded-lg border bg-card p-3", error && "border-destructive")}>
       <span
         className={cn(
           "flex size-10 shrink-0 items-center justify-center rounded-md",
-          error ? "bg-destructive-soft text-destructive" : "bg-accent text-primary"
+          error ? "bg-destructive-soft text-destructive" : "bg-accent text-primary",
         )}
       >
         <Icon name="document-text" size={20} />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex items-center gap-2">
-          <bdi className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{name}</bdi>
-          {state === "uploading" && <span className="text-xs font-medium text-muted-foreground tabular-nums">{progress}%</span>}
-          {state === "complete" && <Icon name="tick-circle" size={16} className="text-success" />}
+          <bdi className="min-w-0 truncate text-sm font-medium text-foreground">{name}</bdi>
+          {state === "complete" && <Icon name="tick-circle" size={16} className="shrink-0 text-success" />}
+          {state === "uploading" && <span className="ms-auto text-xs font-medium text-muted-foreground tabular-nums">{progress}%</span>}
         </div>
         {state === "uploading" && <Progress value={progress} aria-label={name} />}
         <p className={cn("text-xs", error ? "text-destructive" : "text-muted-foreground")}>

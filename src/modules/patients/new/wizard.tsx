@@ -11,7 +11,7 @@ import { parseDay, useDates } from "@/i18n/dates"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { DatePicker } from "@/components/ds/pickers"
 import { Segmented } from "@/components/ds/segmented"
-import { DropZone, UploadItem } from "@/components/ds/upload"
+import { DropZone, UploadItem, toMb } from "@/components/ds/upload"
 import { MobileActionBar, PageContainer } from "@/components/shell/page"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -544,7 +544,7 @@ function StepCard({
         (card ? (
           <UploadItem name={card.name} state="complete" totalMb={card.size} onRemove={() => setCard(null)} />
         ) : (
-          <DropZone multiple={false} onFiles={([f]) => setCard({ name: f.name, size: `${(f.size / 1e6).toFixed(1)} MB` })} />
+          <DropZone multiple={false} onFiles={([f]) => setCard({ name: f.name, size: toMb(f.size) })} />
         ))}
       <div className="grid gap-4 @min-[30rem]/sec:grid-cols-2">
         {step === 1 && (

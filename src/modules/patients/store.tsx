@@ -17,6 +17,8 @@ type Store = {
   archive: (id: string) => void
   /** Save from the Edit page: list fields (name, mobile, tags…) + the full form for the patient page. */
   save: (id: string, fields: Partial<Patient>, form: EditForm) => void
+  /** Add-patient wizard: create a file (shown first in the list); returns its MRN. */
+  add: (patient: Omit<Patient, "id" | "mrn">, form: EditForm) => string
   /** Last saved edit form for a patient (this session). */
   savedForm: (id: string) => EditForm | undefined
   get: (id: string) => Patient | undefined
@@ -26,18 +28,19 @@ const Ctx = React.createContext<Store | null>(null)
 
 export function PatientsStoreProvider({ children }: { children: React.ReactNode }) {
   const [overrides, setOverrides] = React.useState<Record<string, Override>>({})
+  const [added, setAdded] = React.useState<Patient[]>([])
   const base = React.useMemo(() => allPatients(), [])
 
   const patients = React.useMemo(
     () =>
-      base
+      [...added, ...base]
         .filter((p) => !overrides[p.id]?.archived)
         .map((p) => {
           const o = overrides[p.id]
           if (!o) return p
           return { ...p, ...o.fields, ...(o.tags ? { tags: o.tags } : {}) }
         }),
-    [base, overrides]
+    [base, added, overrides]
   )
 
   const store = React.useMemo<Store>(
@@ -48,9 +51,16 @@ export function PatientsStoreProvider({ children }: { children: React.ReactNode 
       save: (id, fields, form) =>
         setOverrides((o) => ({ ...o, [id]: { ...o[id], fields: { ...o[id]?.fields, ...fields }, form, ...(fields.tags ? { tags: fields.tags } : {}) } })),
       savedForm: (id) => overrides[id]?.form,
+      add: (patient, form) => {
+        // Next file number after the design's latest sample (MRN 004912 for the first new patient).
+        const mrn = String(4912 + added.length).padStart(6, "0")
+        setAdded((a) => [{ ...patient, id: mrn, mrn }, ...a])
+        setOverrides((o) => ({ ...o, [mrn]: { form } }))
+        return mrn
+      },
       get: (id) => patients.find((p) => p.id === id),
     }),
-    [patients, overrides]
+    [patients, overrides, added.length]
   )
 
   return <Ctx.Provider value={store}>{children}</Ctx.Provider>

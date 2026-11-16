@@ -305,7 +305,9 @@
       "value": "{kg} kg",
       "since": "since {date}",
       "note": "since {date} · {note}",
-      "label": "Weight"
+      "label": "Weight",
+      "empty": "No weight recorded yet",
+      "emptyText": "It shows here after the first visit."
     },
     "visitsChart": {
       "title": "Visits per month",
@@ -545,7 +547,20 @@
       "addCondition": "Add condition…",
       "remove": "Remove {name}",
       "notes": "Notes for the care team",
-      "choose": "Choose…"
+      "choose": "Choose…",
+      "payment": "Payment",
+      "insurancePay": "Insurance",
+      "selfPayShort": "Self-pay",
+      "noAllergies": "No known allergies",
+      "emergencyName": "Emergency contact",
+      "emergencyMobile": "Emergency mobile",
+      "consent": "The patient agreed to the privacy and data-sharing policy.",
+      "welcomeSms": "Send a welcome SMS with the file number.",
+      "bloodUnknown": "Unknown",
+      "idHelper": "We check it against existing files.",
+      "adult": "{age, plural, one {# year old · adult} other {# years old · adult}}",
+      "minor": "{age, plural, one {# year old · minor} other {# years old · minor}}",
+      "insuranceCard": "Insurance card"
     },
     "errors": {
       "required": "Required.",
@@ -558,7 +573,8 @@
       "passport": "Passport number is 6–9 letters or digits.",
       "postal": "Postal code is 5 digits.",
       "birthFuture": "Date of birth can't be in the future.",
-      "nameArabic": "Write the name in Arabic letters."
+      "nameArabic": "Write the name in Arabic letters.",
+      "consent": "The patient must agree before you create the file."
     },
     "summary": {
       "title": "{count, plural, one {# required field is missing} other {# required fields are missing}}",
@@ -588,5 +604,99 @@
     "savedText": "{name}'s details were saved.",
     "noChanges": "Nothing to save",
     "noChangesText": "You haven't changed anything yet."
+  },
+  "new": {
+    "title": "Add new patient",
+    "crumb": "New patient",
+    "mobileTitle": "New patient",
+    "saveDraft": "Save draft",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "create": "Create patient",
+    "stepOf": "Step {n} of {total}",
+    "step": "Step {n}",
+    "progress": "Progress",
+    "steps": {
+      "s1": "Personal & ID",
+      "s2": "Contact & address",
+      "s3": "Insurance & medical",
+      "s4": "Review"
+    },
+    "forms": {
+      "s1": {
+        "title": "Personal details & ID",
+        "description": "As written on the national ID or iqama"
+      },
+      "s2": {
+        "title": "Contact & address",
+        "description": "How we reach the patient and where they live"
+      },
+      "s3": {
+        "title": "Insurance & medical",
+        "description": "Billing and what the care team should know"
+      }
+    },
+    "guardianInfo": "Guardian details are asked only for patients under 18.",
+    "guardianNeeded": "The patient is under 18, so add a guardian who approves visits and treatment.",
+    "review": {
+      "edit": "Edit",
+      "name": "Name",
+      "genderAge": "Gender · age",
+      "birth": "Date of birth",
+      "nationality": "Nationality",
+      "id": "{type}",
+      "mobile": "Mobile",
+      "email": "Email",
+      "address": "Address",
+      "reminders": "Reminders",
+      "remindersNone": "None",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp",
+      "insurance": "Insurance",
+      "selfPay": "Self-pay",
+      "policy": "Policy",
+      "allergies": "Allergies",
+      "noneKnown": "None known",
+      "notRecorded": "Not recorded",
+      "emergency": "Emergency contact",
+      "emergencyMobile": "Emergency mobile",
+      "guardian": "Guardian",
+      "guardianMobile": "Guardian mobile"
+    },
+    "summary": {
+      "newPatient": "New patient",
+      "mrnAfter": "MRN after saving",
+      "meta": "{gender} · {age} · {nationality}",
+      "noMatch": "No matching files",
+      "noMatchText": "We checked the ID and mobile against {count} files.",
+      "tip": "Tip",
+      "tipText": "You can save a draft and finish later. Required fields are marked *.",
+      "years": "{n} yrs"
+    },
+    "duplicate": {
+      "title": "Possible duplicate found",
+      "byId": "{name} · MRN {mrn} · same national ID {id}",
+      "byMobile": "{name} · MRN {mrn} · same mobile {mobile}",
+      "lastVisit": "Last visit {date} · {branch}",
+      "noVisit": "No visits yet",
+      "open": "Open existing file",
+      "continue": "Not the same person · continue"
+    },
+    "stepErrors": "{count, plural, one {Fix # field to continue} other {Fix # fields to continue}}",
+    "draft": "Draft saved",
+    "draftText": "Finish it later from Patients › Drafts.",
+    "draftRestored": "Draft restored",
+    "draftRestoredText": "We filled in the form you saved earlier.",
+    "done": {
+      "title": "Patient added",
+      "text": "{name}'s file is ready and a welcome SMS with the file number was sent.",
+      "textNoSms": "{name}'s file is ready.",
+      "fileNumber": "File number",
+      "book": "Book first visit",
+      "another": "Add another patient",
+      "list": "Back to patients list",
+      "open": "Open patient file"
+    }
   }
 }

@@ -1,16 +1,12 @@
 import { getTranslations } from "next-intl/server"
 
-import { EmptyState } from "@/components/ds/states"
-import { PageContainer } from "@/components/shell/page"
+import { NewPatientWizard } from "@/modules/patients/new/wizard"
 
-/** Placeholder until this Patients screen is built (next slices of the Patients module). */
-export default async function Page() {
-  const t = await getTranslations("shell")
-  return (
-    <PageContainer>
-      <div className="rounded-xl border bg-card">
-        <EmptyState icon="profile-2user" title={t("placeholder.title", { module: t("nav.patients") })} description={t("placeholder.description")} className="py-16" />
-      </div>
-    </PageContainer>
-  )
+export async function generateMetadata() {
+  return { title: (await getTranslations("patients.new"))("title") }
+}
+
+/** Patients · New patient (Step 1–4 + Duplicate found + Done). */
+export default function NewPatientPage() {
+  return <NewPatientWizard />
 }

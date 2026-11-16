@@ -656,7 +656,9 @@ function derive(p: Patient, details: PatientDetails): Omit<PatientRecord, "detai
   // Weight: template trend for the last 12 months around a typical weight for the age.
   const w0 = baseWeight(p.age, p.gender, rand())
   const growing = p.age < 18
-  const weight = Array.from({ length: 12 }, (_, i) => ({
+  // No completed visit yet (e.g. a file created today) → no measurements at all.
+  const measured = visits.some((v) => v.status === "completed")
+  const weight = Array.from({ length: measured ? 12 : 0 }, (_, i) => ({
     month: monthIso(i - 11),
     kg: Math.round((w0 - (growing ? (11 - i) * 0.4 : 0) + (growing ? 0 : Math.sin(i * 1.3 + rand()) * 0.8)) * 2) / 2,
   }))
@@ -666,7 +668,7 @@ function derive(p: Patient, details: PatientDetails): Omit<PatientRecord, "detai
     .reverse()
   const history = recentVisits.map((v) => {
     const m = weight.find((w) => w.month.slice(0, 7) === v.date.slice(0, 7))
-    return { date: v.date, kg: m?.kg ?? weight[0].kg }
+    return { date: v.date, kg: m?.kg ?? weight[0]?.kg ?? 0 }
   })
 
   const activity: ActivityItem[] = [
@@ -719,7 +721,7 @@ function derive(p: Patient, details: PatientDetails): Omit<PatientRecord, "detai
     diagnoses: [],
     medications: [],
     vitals: {
-      weight: weight[11].kg,
+      weight: weight.at(-1)?.kg ?? null,
       height: null,
       bmi: null,
       spo2: null,

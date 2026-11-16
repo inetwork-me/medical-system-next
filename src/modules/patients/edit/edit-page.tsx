@@ -1,34 +1,29 @@
 "use client"
 
 import * as React from "react"
-import { useRouter as useRawRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
 import { Link, useRouter } from "@/i18n/navigation"
 import { useDates, parseDay } from "@/i18n/dates"
-import { Field } from "@/components/ds/field"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { DatePicker } from "@/components/ds/pickers"
-import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { Segmented } from "@/components/ds/segmented"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
 import { MobileActionBar, PageContainer } from "@/components/shell/page"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import type { Patient, Tag } from "../data"
 import { usePatient, useText } from "../profile/use-patient"
 import { usePatientsStore } from "../store"
+import { UnsavedDialog, useLeaveGuard } from "./leave-guard"
+import { ChipsField, F, FormCtx, SelectField, SwitchRow, TextField, useFormCtx, type FormCtxValue } from "./fields"
 import {
   CITY_REGION,
   CORE_REQUIRED,
-  OPTIONS,
   SECTIONS,
   ageFrom,
   changedFields,
@@ -38,9 +33,9 @@ import {
   toLocal,
   validate,
   type EditForm,
+  type AnyKey,
   type ErrorKey,
   type FieldKey,
-  type OptionKey,
   type SectionKey,
 } from "./form"
 
@@ -68,32 +63,24 @@ export function EditPatient() {
 
 type Data = NonNullable<ReturnType<typeof usePatient>>
 
-type Ctx = {
-  form: EditForm
-  set: <K extends FieldKey>(k: K, v: EditForm[K]) => void
-  touch: (k: FieldKey) => void
-  error: (k: FieldKey) => ErrorKey | undefined
-}
-const FormCtx = React.createContext<Ctx | null>(null)
-const useForm = () => React.useContext(FormCtx)!
 
 function EditForm_({ patient: p, record }: { patient: Patient; record: Data["record"] }) {
   const t = useTranslations("patients.edit")
   const { b, locale } = useText()
   const router = useRouter()
-  const rawRouter = useRawRouter()
   const { save, savedForm } = usePatientsStore()
   const [initial] = React.useState<EditForm>(() => savedForm(p.id) ?? initialForm(p, record, locale))
   const [form, setForm] = React.useState(initial)
-  const [touched, setTouched] = React.useState<Set<FieldKey>>(() => new Set())
+  const [touched, setTouched] = React.useState<Set<string>>(() => new Set())
   const [submitted, setSubmitted] = React.useState(false)
-  const [pending, setPending] = React.useState<string | null>(null)
-  const leaving = React.useRef(false)
   const summaryRef = React.useRef<HTMLDivElement>(null)
 
   const errors = validate(form)
   const initiallyMissing = React.useMemo(() => new Set(Object.keys(validate(initial)) as FieldKey[]), [initial])
-  const shown = (k: FieldKey) => errors[k] && (submitted || touched.has(k) || initiallyMissing.has(k)) ? errors[k] : undefined
+  const shown = (k: AnyKey) => {
+    const e = errors[k as FieldKey]
+    return e && (submitted || touched.has(k) || initiallyMissing.has(k as FieldKey)) ? e : undefined
+  }
   const changed = changedFields(form, initial)
   const dirty = changed.length > 0
   const age = ageFrom(form.birthDate)
@@ -101,7 +88,7 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
   const sections = SECTIONS.filter((s) => s.key !== "guardian" || minor)
   const visibleErrors = (Object.keys(errors) as FieldKey[]).filter((k) => sections.some((s) => s.key === sectionOf(k)))
 
-  const ctx: Ctx = {
+  const ctx: FormCtxValue = {
     form,
     set: (k, v) =>
       setForm((f) => {
@@ -115,32 +102,9 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
     error: shown,
   }
 
-  // Leave guard: in-app links ask first while there are unsaved edits; reload / close uses the browser prompt.
-  React.useEffect(() => {
-    if (!dirty) return
-    const onClick = (e: MouseEvent) => {
-      if (leaving.current || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null
-      if (!a || a.target === "_blank" || a.hasAttribute("download")) return
-      const url = new URL(a.href, window.location.href)
-      if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return
-      e.preventDefault()
-      e.stopPropagation()
-      setPending(url.pathname + url.search)
-    }
-    const onUnload = (e: BeforeUnloadEvent) => {
-      if (!leaving.current) e.preventDefault()
-    }
-    document.addEventListener("click", onClick, true)
-    window.addEventListener("beforeunload", onUnload)
-    return () => {
-      document.removeEventListener("click", onClick, true)
-      window.removeEventListener("beforeunload", onUnload)
-    }
-  }, [dirty])
-
   const back = `/patients/${p.id}`
-  const leave = () => (dirty ? setPending("__back__") : router.push(back))
+  const guard = useLeaveGuard(dirty)
+  const leave = () => guard.leave(`/${locale}${back}`)
 
   const goTo = (k: FieldKey) => {
     const el = document.getElementById(`field-${k}`)
@@ -185,17 +149,9 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
       },
       form
     )
-    leaving.current = true
+    guard.allow()
     toast.success(t("saved"), { description: t("savedText", { name: b({ en: nameEn, ar: form.nameAr.trim() }) }) })
     router.push(back)
-  }
-
-  const discard = () => {
-    leaving.current = true
-    const target = pending
-    setPending(null)
-    if (target === "__back__" || !target) router.push(back)
-    else rawRouter.push(target)
   }
 
   return (
@@ -284,25 +240,7 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
         </Button>
       </MobileActionBar>
 
-      <ResponsiveDialog
-        open={pending !== null}
-        onOpenChange={(o) => !o && setPending(null)}
-        icon="warning-2"
-        tone="warning"
-        width="sm:max-w-110"
-        title={t("unsaved.title")}
-        description={t("unsaved.text", { count: changed.length })}
-        secondary={
-          <Button variant="outline" onClick={() => setPending(null)}>
-            {t("unsaved.keep")}
-          </Button>
-        }
-        primary={
-          <Button variant="destructive" onClick={discard}>
-            {t("unsaved.discard")}
-          </Button>
-        }
-      />
+      <UnsavedDialog guard={guard} count={changed.length} />
     </FormCtx.Provider>
   )
 }
@@ -495,7 +433,7 @@ function Section({ sectionKey, icon, missing, children }: { sectionKey: SectionK
 
 function SectionFields({ sectionKey }: { sectionKey: SectionKey }) {
   const t = useTranslations("patients.edit.fields")
-  const { form, set } = useForm()
+  const { form, set } = useFormCtx()
   const age = ageFrom(form.birthDate)
   switch (sectionKey) {
     case "personal":
@@ -609,154 +547,4 @@ function SectionFields({ sectionKey }: { sectionKey: SectionKey }) {
         </>
       )
   }
-}
-
-type Control = { id: string; "aria-invalid"?: boolean; "aria-describedby"?: string; "aria-required"?: boolean }
-
-/** Field wrapper: label, control, helper / error; anchor id for "Go to field". */
-function F({
-  k,
-  required,
-  helper,
-  wide,
-  children,
-}: {
-  k: FieldKey
-  required?: boolean
-  helper?: React.ReactNode
-  wide?: boolean
-  children: (c: Control) => React.ReactNode
-}) {
-  const t = useTranslations("patients.edit")
-  const { error } = useForm()
-  const err = error(k)
-  return (
-    <div id={`field-${k}`} className={cn("scroll-mt-24", wide && "@min-[30rem]/sec:col-span-2")}>
-      <Field label={t(`fields.${k}`)} required={required} helper={helper} error={err && t(`errors.${err}`)}>
-        {children}
-      </Field>
-    </div>
-  )
-}
-
-function TextField({
-  k,
-  required,
-  icon,
-  ...props
-}: { k: FieldKey; required?: boolean; icon?: IconName } & Omit<React.ComponentProps<typeof Input>, "value" | "onChange" | "id">) {
-  const { form, set, touch } = useForm()
-  return (
-    <F k={k} required={required}>
-      {(c) => (
-        <Input
-          {...c}
-          {...props}
-          value={form[k] as string}
-          onChange={(e) => set(k, e.target.value as never)}
-          onBlur={() => touch(k)}
-          startIcon={icon ? <Icon name={icon} size={16} /> : undefined}
-        />
-      )}
-    </F>
-  )
-}
-
-function SelectField({ k, options, required, disabled }: { k: FieldKey; options: OptionKey; required?: boolean; disabled?: boolean }) {
-  const t = useTranslations("patients.edit.fields")
-  const { form, set, touch } = useForm()
-  const { b } = useText()
-  return (
-    <F k={k} required={required}>
-      {(c) => (
-        <Select
-          value={(form[k] as string) || undefined}
-          onValueChange={(v) => {
-            set(k, v as never)
-            touch(k)
-          }}
-          disabled={disabled}
-        >
-          <SelectTrigger {...c} className="w-full">
-            <SelectValue placeholder={t("choose")} />
-          </SelectTrigger>
-          <SelectContent>
-            {OPTIONS[options].map((o) => (
-              <SelectItem key={o.value} value={o.value}>
-                {b(o.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-    </F>
-  )
-}
-
-function SwitchRow({ k, hint }: { k: "smsReminders" | "whatsappMessages" | "selfPay"; hint?: string }) {
-  const t = useTranslations("patients.edit.fields")
-  const { form, set } = useForm()
-  const id = `switch-${k}`
-  return (
-    <div className={cn("flex items-center gap-3 rounded-lg border p-3", k === "selfPay" && "@min-[30rem]/sec:col-span-2")}>
-      <label htmlFor={id} className="flex min-w-0 flex-1 cursor-pointer flex-col gap-0.5">
-        <span className="text-sm font-medium">{t(k)}</span>
-        {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
-      </label>
-      <Switch id={id} checked={form[k]} onCheckedChange={(v) => set(k, v)} />
-    </div>
-  )
-}
-
-const CHIP = {
-  destructive: "bg-destructive-soft text-destructive-soft-foreground",
-  warning: "bg-warning-soft text-warning-soft-foreground",
-} as const
-
-/** Chips input (sheet 10 style): soft chips with a remove button; Enter or comma adds, Backspace on empty removes the last. */
-function ChipsField({ k, tone, add }: { k: "allergies" | "conditions"; tone: keyof typeof CHIP; add: string }) {
-  const t = useTranslations("patients.edit.fields")
-  const { form, set } = useForm()
-  const [draft, setDraft] = React.useState("")
-  const items = form[k]
-  const commit = (raw = draft) => {
-    const v = raw.trim().replace(/[,،]$/, "").trim()
-    if (v && !items.includes(v)) set(k, [...items, v])
-    setDraft("")
-  }
-  return (
-    <F k={k} wide>
-      {(c) => (
-        <div className="flex min-h-9 flex-wrap items-center gap-1.5 rounded-md border border-input bg-card px-2 py-1.5 shadow-xs has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-[3px] has-[input:focus-visible]:ring-ring/50">
-          {items.map((x) => (
-            <span key={x} className={cn("inline-flex h-6 items-center gap-1 rounded-sm ps-2 pe-1 text-xs font-medium", CHIP[tone])}>
-              {x}
-              <button
-                type="button"
-                aria-label={t("remove", { name: x })}
-                onClick={() => set(k, items.filter((y) => y !== x))}
-                className="cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-              >
-                <Icon name="close-circle" size={14} />
-              </button>
-            </span>
-          ))}
-          <input
-            {...c}
-            value={draft}
-            onChange={(e) => (/[,،]$/.test(e.target.value) ? commit(e.target.value) : setDraft(e.target.value))}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                commit()
-              } else if (e.key === "Backspace" && !draft && items.length) set(k, items.slice(0, -1))
-            }}
-            onBlur={() => commit()}
-            placeholder={add}
-            className="h-6 w-0 min-w-28 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground md:text-sm"
-          />
-        </div>
-      )}
-    </F>
-  )
 }

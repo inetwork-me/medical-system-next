@@ -120,6 +120,16 @@ export function WeightTrend({ className }: { className?: string }) {
   const data = usePatient()
   if (!data) return null
   const all = data.record.weight
+  if (!all.length) {
+    return (
+      <PCard className={className} title={t("title")}>
+        <div className="rounded-lg bg-muted p-4 text-center">
+          <p className="text-sm font-medium">{t("empty")}</p>
+          <p className="text-xs text-muted-foreground">{t("emptyText")}</p>
+        </div>
+      </PCard>
+    )
+  }
   const series = all.slice(range === "12" ? 0 : 6).map((w) => ({
     month: w.month,
     label: dates.month(w.month),

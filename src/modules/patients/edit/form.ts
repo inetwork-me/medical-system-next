@@ -45,6 +45,19 @@ export type EditForm = {
 }
 
 export type FieldKey = keyof EditForm
+
+/** Extra fields of the Add-patient wizard. */
+export type NewExtras = {
+  payment: "insurance" | "selfPay"
+  noAllergies: boolean
+  emergencyName: string
+  emergencyMobile: string
+  consent: boolean
+  welcomeSms: boolean
+}
+export type FullForm = EditForm & NewExtras
+export type PatientForm = EditForm & Partial<NewExtras>
+export type AnyKey = keyof FullForm
 export type SectionKey = "personal" | "contact" | "identity" | "address" | "insurance" | "guardian" | "medical"
 
 export const SECTIONS: { key: SectionKey; icon: IconName; fields: FieldKey[] }[] = [
@@ -100,6 +113,7 @@ export const OPTIONS = {
   insuranceClass: [o("a", "Class A", "فئة A"), o("b", "Class B", "فئة B"), o("c", "Class C", "فئة C"), o("vip", "VIP", "VIP")],
   guardianRelation: [o("father", "Father", "الأب"), o("mother", "Mother", "الأم"), o("brother", "Brother", "الأخ"), o("sister", "Sister", "الأخت"), o("other", "Other", "أخرى")],
   bloodType: ["A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−"].map((v) => o(v, v, v)),
+  bloodTypeOrUnknown: [o("unknown", "Unknown", "ما نعرف"), ...["A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−"].map((v) => o(v, v, v))],
   clinic: [
     o("pediatrics", "Pediatrics", "الأطفال"),
     o("family", "Family medicine", "طب الأسرة"),
@@ -218,6 +232,7 @@ export type ErrorKey =
   | "postal"
   | "birthFuture"
   | "nameArabic"
+  | "consent"
 
 export function validate(f: EditForm): Partial<Record<FieldKey, ErrorKey>> {
   const e: Partial<Record<FieldKey, ErrorKey>> = {}

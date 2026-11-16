@@ -142,6 +142,19 @@ function generate(): Patient[] {
       registered: iso(regDate < last ? regDate : last),
     })
   }
+  // The design's "duplicate found" sample: an existing file for Sultan Al-Mutairi (Add-patient wizard, step 1).
+  const k = out.findIndex((p) => p.gender === "male" && p.age >= 30 && p.age <= 45 && p.region === "riyadh" && !p.tags.length)
+  out[k] = {
+    ...out[k],
+    id: "004650",
+    mrn: "004650",
+    initials: "SM",
+    name: { en: "Sultan Al-Mutairi", ar: "سلطان المطيري" },
+    age: 38,
+    branch: "olaya",
+    lastVisit: "2025-03-12",
+    registered: "2023-06-04",
+  }
   // Pair suspected duplicates with a neighbour record (same mobile in the data-quality report).
   out.forEach((p, i) => {
     if (p.tags.includes("duplicate")) p.duplicateOf = out[(i + 1) % out.length].mrn
@@ -276,7 +289,7 @@ export function patientDetails(p: Patient): PatientDetails {
     : undefined
   return {
     whatsapp: p.mobile,
-    nationalId: incomplete ? null : `1${Math.floor(rand() * 1e9).toString().padStart(9, "0")}`,
+    nationalId: incomplete ? null : p.id === "004650" ? "1087334902" : `1${Math.floor(rand() * 1e9).toString().padStart(9, "0")}`,
     birthDate,
     nationality: { en: "Saudi", ar: "سعودي" },
     district: incomplete && p.id !== "004891" ? null : p.id === "004891" ? { en: "Al Malqa", ar: "الملقا" } : null,
@@ -287,4 +300,20 @@ export function patientDetails(p: Patient): PatientDetails {
     visitsList,
     duplicate: dup,
   }
+}
+
+/* ---------------------------------------------------------------- duplicate lookup (Add patient) */
+
+let idIndex: Map<string, string> | null = null
+/** Existing patient with this national ID / iqama (digits only), if any. */
+export function findByNationalId(id: string, list: Patient[]) {
+  if (!idIndex) {
+    idIndex = new Map()
+    for (const p of allPatients()) {
+      const n = patientDetails(p).nationalId
+      if (n) idIndex.set(n, p.id)
+    }
+  }
+  const hit = idIndex.get(id.replace(/\D/g, ""))
+  return hit ? list.find((p) => p.id === hit) : undefined
 }

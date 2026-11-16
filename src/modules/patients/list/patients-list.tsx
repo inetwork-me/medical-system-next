@@ -224,7 +224,7 @@ function useRowText(p: Patient) {
     name: bi(p.name, locale),
     mrnLine: t("list.mrnLine", { mrn: p.mrn, sex, age: p.age }),
     region: bi(p.city ?? REGIONS[p.region].short, locale),
-    lastVisit: dates.short(p.lastVisit),
+    lastVisit: p.lastVisit ? dates.short(p.lastVisit) : "—",
   }
 }
 

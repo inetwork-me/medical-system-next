@@ -20,7 +20,11 @@ function InputOTP({
       data-slot="input-otp"
       inputMode="numeric"
       autoComplete="one-time-code"
-      containerClassName={cn("group/otp flex max-w-full min-w-0 items-center gap-2.5 has-disabled:opacity-50", containerClassName)}
+      containerClassName={cn(
+        // w-fit: the LTR box row still sits at the start edge of an RTL form (right side in Arabic).
+        "group/otp flex w-fit max-w-full min-w-0 items-center gap-2.5 has-disabled:opacity-50",
+        containerClassName
+      )}
       className={cn("disabled:cursor-not-allowed", className)}
       {...props}
       // OTP digits are always left-to-right, also inside Arabic screens.

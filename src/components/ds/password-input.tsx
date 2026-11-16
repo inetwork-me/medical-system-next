@@ -3,7 +3,6 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 
-import { cn } from "@/lib/utils"
 import { Icon } from "@/components/ds/icon"
 import { Input } from "@/components/ui/input"
 
@@ -25,7 +24,7 @@ export function PasswordInput({
       dir="ltr"
       fieldSize={props.fieldSize ?? "lg"}
       autoComplete={props.autoComplete ?? "current-password"}
-      className={cn("[&>input]:text-start", className)}
+      className={className}
       startIcon={<Icon name="lock" size={16} />}
       end={
         <button

@@ -42,7 +42,7 @@ export function SidebarPanel({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
       <div className="flex flex-col gap-0.5">
         <NavRow href="/settings" icon="setting-2" label={t("nav.settings")} onNavigate={onNavigate} />
-        <NavRow href="/login" icon="logout" label={t("nav.logout")} onNavigate={onNavigate} />
+        <NavRow href="/logout" icon="logout" label={t("nav.logout")} onNavigate={onNavigate} />
       </div>
       <UserCard />
     </div>

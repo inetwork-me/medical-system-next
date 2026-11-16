@@ -48,7 +48,7 @@ export function Rail() {
       </nav>
       <div className="flex flex-col gap-1">
         <RailLink href="/settings" icon="setting-2" label={t("nav.settings")} />
-        <RailLink href="/login" icon="logout" label={t("nav.logout")} />
+        <RailLink href="/logout" icon="logout" label={t("nav.logout")} />
       </div>
       <Avatar>
         <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>

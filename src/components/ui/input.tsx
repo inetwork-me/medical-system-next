@@ -21,8 +21,11 @@ type InputProps = React.ComponentProps<"input"> & {
 
 function Input({ className, type, fieldSize = "default", startIcon, end, ...props }: InputProps) {
   const h = fieldSize === "lg" ? "h-10" : "h-9"
-  const textClass =
-    "text-base text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground md:text-sm"
+  // Latin values (email, mobile, password) keep dir="ltr" but still sit at the start edge in Arabic, as in the design.
+  const textClass = cn(
+    "text-base text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground md:text-sm",
+    props.dir === "ltr" && "rtl:text-right"
+  )
 
   if (!startIcon && !end) {
     return (

@@ -21,7 +21,8 @@ export function scorePassword(pw: string): PasswordLevel | null {
   if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++
   if (/\d/.test(pw)) s++
   if (/[^A-Za-z0-9]/.test(pw)) s++
-  return s <= 2 ? "weak" : s <= 3 ? "fair" : "strong"
+  // Calibrated to the design samples: "Khaled@2026" → Fair, "Noor#Clinic2026" → Strong.
+  return s <= 2 ? "weak" : s <= 4 ? "fair" : "strong"
 }
 
 /**

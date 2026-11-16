@@ -193,7 +193,7 @@ function MoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
               <span className="flex-1">{t("nav.settings")}</span>
               <Icon name="arrow-right-1" size={16} className="text-muted-foreground" />
             </Link>
-            <Link href="/login" onClick={close} className={cn(row, "text-destructive")}>
+            <Link href="/logout" prefetch={false} onClick={close} className={cn(row, "text-destructive")}>
               <Icon name="logout" size={20} />
               <span className="flex-1">{t("nav.logout")}</span>
             </Link>

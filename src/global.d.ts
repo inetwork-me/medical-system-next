@@ -2,6 +2,7 @@ import type { routing } from "@/i18n/routing";
 import type { formats } from "@/i18n/formats";
 import type common from "../messages/en/common.json";
 import type shell from "../messages/en/shell.json";
+import type auth from "../messages/en/auth.json";
 import type dashboard from "../messages/en/dashboard.json";
 import type patients from "../messages/en/patients.json";
 
@@ -9,7 +10,7 @@ import type patients from "../messages/en/patients.json";
 declare module "next-intl" {
   interface AppConfig {
     Locale: (typeof routing.locales)[number];
-    Messages: { common: typeof common; shell: typeof shell; dashboard: typeof dashboard; patients: typeof patients };
+    Messages: { common: typeof common; shell: typeof shell; auth: typeof auth; dashboard: typeof dashboard; patients: typeof patients };
     Formats: typeof formats;
   }
 }

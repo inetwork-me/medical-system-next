@@ -1,0 +1,43 @@
+"use client"
+
+import * as React from "react"
+
+import { DEMO_ACCOUNT, LOGIN_ATTEMPTS } from "@/lib/mock/auth"
+
+/**
+ * State shared across the auth steps (lives in the (auth) layout, which persists between its pages):
+ * who is signing in, where the code was sent, remaining attempts. Pages opened directly fall back to the
+ * design's sample values so every screen still renders.
+ */
+type FlowState = {
+  /** Sign in: e-mail or mobile typed on the login screen */
+  identifier: string
+  keepSignedIn: boolean
+  loginAttemptsLeft: number
+  /** Sign up: mobile (05…) the code went to */
+  signupMobile: string
+  /** Reset: e-mail or mobile the reset code went to */
+  resetTarget: string
+}
+
+const initial: FlowState = {
+  identifier: DEMO_ACCOUNT.email,
+  keepSignedIn: true,
+  loginAttemptsLeft: LOGIN_ATTEMPTS,
+  signupMobile: "0554182290",
+  resetTarget: DEMO_ACCOUNT.email,
+}
+
+const Ctx = React.createContext<{ state: FlowState; set: (patch: Partial<FlowState>) => void } | null>(null)
+
+export function AuthFlowProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = React.useState(initial)
+  const set = React.useCallback((patch: Partial<FlowState>) => setState((s) => ({ ...s, ...patch })), [])
+  return <Ctx.Provider value={{ state, set }}>{children}</Ctx.Provider>
+}
+
+export function useAuthFlow() {
+  const ctx = React.useContext(Ctx)
+  if (!ctx) throw new Error("useAuthFlow outside AuthFlowProvider")
+  return ctx
+}

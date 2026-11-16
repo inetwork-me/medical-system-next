@@ -20,13 +20,28 @@ type FieldProps = {
   error?: React.ReactNode
   required?: boolean
   className?: string
-  children: React.ReactElement
+  /** The control, or a render function for composite controls (e.g. Select → put the props on <SelectTrigger>). */
+  children: React.ReactElement | ((control: ControlProps) => React.ReactNode)
+}
+
+type ControlProps = {
+  id: string
+  "aria-invalid"?: boolean
+  "aria-describedby"?: string
+  "aria-required"?: boolean
 }
 
 export function Field({ label, labelEnd, helper, error, required, className, children }: FieldProps) {
   const id = React.useId()
-  const controlId = (children.props as { id?: string }).id ?? `${id}-control`
+  const controlId =
+    (typeof children !== "function" && (children.props as { id?: string }).id) || `${id}-control`
   const describedBy = error || helper ? `${id}-desc` : undefined
+  const control: ControlProps = {
+    id: controlId,
+    "aria-invalid": error ? true : undefined,
+    "aria-describedby": describedBy,
+    "aria-required": required || undefined,
+  }
 
   return (
     <div data-slot="field" className={cn("flex flex-col gap-1.5", className)}>
@@ -41,14 +56,7 @@ export function Field({ label, labelEnd, helper, error, required, className, chi
           {labelEnd}
         </div>
       )}
-      <Slot.Root
-        id={controlId}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy}
-        aria-required={required || undefined}
-      >
-        {children}
-      </Slot.Root>
+      {typeof children === "function" ? children(control) : <Slot.Root {...control}>{children}</Slot.Root>}
       {(error || helper) && (
         <p id={describedBy} className={cn("text-xs", error ? "text-destructive" : "text-muted-foreground")}>
           {error || helper}

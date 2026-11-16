@@ -95,6 +95,23 @@
   --text-4xl--line-height: 40px;
   --tracking-tight: -0.025em;
 
+  /* OTP error: "shakes once and keeps the digits" (sheet 11) */
+  --animate-shake: shake 0.4s ease-in-out 1;
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20%,
+    60% {
+      transform: translateX(-6px);
+    }
+    40%,
+    80% {
+      transform: translateX(6px);
+    }
+  }
+
   /* Shell sizes: sheet 06 */
   --spacing-sidebar: 16rem;
   --spacing-rail: 4rem;

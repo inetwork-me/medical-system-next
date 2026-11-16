@@ -29,7 +29,7 @@ function useItems(): Item[] {
     { icon: "setting-2", label: t("settings"), href: "/settings" },
     { icon: "language-square", label: tc("other"), onSelect: switchLocale, lang: other },
     { icon: "info-circle", label: t("help"), href: "/help" },
-    { icon: "logout", label: t("logout"), href: "/login", destructive: true },
+    { icon: "logout", label: t("logout"), href: "/logout", destructive: true },
   ]
 }
 

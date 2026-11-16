@@ -118,7 +118,7 @@ type IconProps = Omit<ComponentProps<"svg">, "ref"> & {
 };
 
 /** Size classes so parent rules like `[&_svg:not([class*='size-'])]:size-4` (buttons, menus) don't override the size. */
-const SIZE_CLASS: Record<number, string> = { 16: "size-4", 18: "size-4.5", 20: "size-5", 22: "size-5.5", 24: "size-6" }
+const SIZE_CLASS: Record<number, string> = { 16: "size-4", 18: "size-4.5", 20: "size-5", 22: "size-5.5", 24: "size-6", 26: "size-6.5" }
 
 export function Icon({ name, variant = "linear", size = 20, mirror = true, label, className, ...rest }: IconProps) {
   const Cmp = ICONS[name]

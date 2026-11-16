@@ -2,5 +2,52 @@
   "title": "Good morning, {name}",
   "description": "Here's today's summary of patients and appointments.",
   "export": "Export",
-  "newAppointment": "New appointment"
+  "newAppointment": "New appointment",
+  "kpi": {
+    "totalPatients": "Total patients",
+    "appointmentsToday": "Appointments today",
+    "critical": "Critical patients",
+    "waitTime": "Avg. wait time",
+    "minutes": "{n} min",
+    "minutesDelta": "<num>{sign}{n}</num> min",
+    "vsLastMonth": "vs last month",
+    "vsYesterday": "vs yesterday",
+    "since": "since {time}",
+    "vsLastWeek": "vs last week"
+  },
+  "visits": {
+    "title": "Patient visits",
+    "description": "In-person vs telehealth · {year}",
+    "descriptionShort": "In-person vs telehealth · last 6 months",
+    "inPerson": "In-person",
+    "telehealth": "Telehealth",
+    "range": "Range",
+    "thisYear": "This year",
+    "lastYear": "Last year",
+    "last6": "Last 6 months"
+  },
+  "attention": {
+    "title": "Needs attention",
+    "description": "{count} items · updated {time}",
+    "erCapacity": "ER capacity",
+    "erBeds": "{used} of {total} beds occupied"
+  },
+  "appointments": {
+    "title": "Today's appointments",
+    "description": "{count} scheduled · {left} remaining this hour",
+    "descriptionShort": "{count} scheduled · {left} remaining",
+    "viewAll": "View all",
+    "patient": "Patient",
+    "doctor": "Doctor",
+    "time": "Time",
+    "status": "Status",
+    "actions": "Actions",
+    "openPatient": "Open patient file",
+    "mrn": "MRN {mrn}"
+  },
+  "beds": {
+    "title": "Bed occupancy",
+    "description": "By department · live",
+    "occupied": "{used} / {total}"
+  }
 }

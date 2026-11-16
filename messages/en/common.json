@@ -49,5 +49,16 @@
   },
   "stat": {
     "vsLastMonth": "vs last month"
+  },
+  "status": {
+    "completed": "Completed",
+    "inProgress": "In progress",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "cancelled": "Cancelled"
+  },
+  "widget": {
+    "more": "More options",
+    "refresh": "Refresh"
   }
 }

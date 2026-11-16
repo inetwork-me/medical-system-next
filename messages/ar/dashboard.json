@@ -2,5 +2,52 @@
   "title": "يا هلا {name}",
   "description": "هذا ملخص مرضاك ومواعيدك لليوم.",
   "export": "تصدير",
-  "newAppointment": "احجز موعد"
+  "newAppointment": "احجز موعد",
+  "kpi": {
+    "totalPatients": "عدد المرضى",
+    "appointmentsToday": "مواعيد اليوم",
+    "critical": "حالات حرجة",
+    "waitTime": "متوسط الانتظار",
+    "minutes": "{n} دقيقة",
+    "minutesDelta": "<num>{sign}{n}</num> دقائق",
+    "vsLastMonth": "عن الشهر اللي فات",
+    "vsYesterday": "مقارنة بأمس",
+    "since": "من الساعة {time}",
+    "vsLastWeek": "عن الأسبوع اللي فات"
+  },
+  "visits": {
+    "title": "زيارات المرضى",
+    "description": "حضوري وعن بُعد · {year}",
+    "descriptionShort": "حضوري وعن بُعد · آخر 6 شهور",
+    "inPerson": "حضوري",
+    "telehealth": "عن بُعد",
+    "range": "الفترة",
+    "thisYear": "هالسنة",
+    "lastYear": "السنة اللي فاتت",
+    "last6": "آخر 6 شهور"
+  },
+  "attention": {
+    "title": "تحتاج متابعة",
+    "description": "{count} تنبيهات · آخر تحديث {time}",
+    "erCapacity": "إشغال الطوارئ",
+    "erBeds": "{used} سرير مشغول من {total}"
+  },
+  "appointments": {
+    "title": "مواعيد اليوم",
+    "description": "{count} موعد · باقي {left} هالساعة",
+    "descriptionShort": "{count} موعد · باقي {left}",
+    "viewAll": "شوف الكل",
+    "patient": "المريض",
+    "doctor": "الطبيب",
+    "time": "الوقت",
+    "status": "الحالة",
+    "actions": "إجراءات",
+    "openPatient": "افتح ملف المريض",
+    "mrn": "MRN {mrn}"
+  },
+  "beds": {
+    "title": "إشغال الأسرّة",
+    "description": "حسب القسم · لحظي",
+    "occupied": "{used} / {total}"
+  }
 }

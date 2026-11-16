@@ -49,5 +49,16 @@
   },
   "stat": {
     "vsLastMonth": "عن الشهر اللي فات"
+  },
+  "status": {
+    "completed": "مكتمل",
+    "inProgress": "جاري الحين",
+    "confirmed": "مؤكد",
+    "pending": "بالانتظار",
+    "cancelled": "ملغي"
+  },
+  "widget": {
+    "more": "خيارات أكثر",
+    "refresh": "حدّث"
   }
 }

@@ -9,7 +9,7 @@ import { CODE_ATTEMPTS, DEMO_ACCOUNT, formatMobile, isEmail, maskMobile, mockSen
 import { SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/session"
 import { useAuthFlow } from "./flow"
 import { OtpField } from "./otp-field"
-import { AuthTitle, BackLink, LinkLine, LtrTarget, SubmitButton, TextLink } from "./parts"
+import { AuthAlert, AuthTitle, BackLink, LinkLine, LtrTarget, SubmitButton, TextLink } from "./parts"
 
 type Kind = "login" | "signup" | "reset"
 
@@ -86,7 +86,7 @@ export function VerifyForm({ kind, next }: { kind: Kind; next?: string }) {
       <BackLink href={BACK[kind].href}>{t(`common.${BACK[kind].key}`)}</BackLink>
       <AuthTitle
         icon="sms"
-        title={t(`otp.${kind}.title`)}
+        title={kind === "login" && viaEmail ? t("otp.login.titleEmail") : t(`otp.${kind}.title`)}
         subtitle={t.rich(`otp.${kind}.subtitle`, { value: target, target: LtrTarget })}
       />
       <OtpField
@@ -100,6 +100,21 @@ export function VerifyForm({ kind, next }: { kind: Kind; next?: string }) {
         shakeKey={shake}
         onResend={resend}
       />
+      {/* No backend yet: nothing is sent, so say so and offer the demo code. Remove with the mock auth. */}
+      <AuthAlert tone="info" icon="info-circle">
+        {t("otp.demo")}{" "}
+        <button
+          type="button"
+          onClick={() => {
+            setCode(DEMO_ACCOUNT.code)
+            setError(undefined)
+            verify(DEMO_ACCOUNT.code)
+          }}
+          className="cursor-pointer font-medium underline underline-offset-2"
+        >
+          {t("otp.demoFill")}
+        </button>
+      </AuthAlert>
       <SubmitButton loading={loading}>{t(`otp.${kind}.submit`)}</SubmitButton>
       {kind === "login" && (
         <LinkLine question={t("otp.login.noPhone")}>

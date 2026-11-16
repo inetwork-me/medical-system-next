@@ -1,6 +1,6 @@
 /**
- * DEV-ONLY demo account for the mock auth flow (test values, not real credentials).
- * Values follow the design: Dr. Khaled Mansour, code "482916" is the "Filled" OTP state.
+ * DEV-ONLY mock auth flow. Sign-in accepts any valid e-mail / mobile + password and any 6-digit code;
+ * DEMO_ACCOUNT only supplies the design's sample values for screens that need one (masked code target…).
  * Replace this module with real API calls when the backend exists.
  */
 export const DEMO_ACCOUNT = {
@@ -37,16 +37,20 @@ export function formatMobile(mobile05: string) {
   return `+966 ${n.slice(0, 2)} ${n.slice(2, 5)} ${n.slice(5)}`
 }
 
+/**
+ * Demo sign-in: any valid e-mail or Saudi mobile with any non-empty password is accepted
+ * (there is no backend or user database yet). The form already checks the formats.
+ */
 export async function mockSignIn(identifier: string, password: string) {
   await wait()
-  const id = identifier.trim().toLowerCase()
-  const known = id === DEMO_ACCOUNT.email || normalizeSaudiMobile(id) === DEMO_ACCOUNT.mobile
-  return known && password === DEMO_ACCOUNT.password
+  const id = identifier.trim()
+  return (isEmail(id) || normalizeSaudiMobile(id) !== null) && password.length > 0
 }
 
+/** Demo verification: any 6-digit code is accepted. */
 export async function mockVerifyCode(code: string) {
   await wait()
-  return code === DEMO_ACCOUNT.code
+  return /^\d{6}$/.test(code)
 }
 
 export async function mockSend() {

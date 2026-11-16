@@ -1,0 +1,9 @@
+{
+  "app": {
+    "name": "Medical System"
+  },
+  "language": {
+    "switchLabel": "Switch language",
+    "other": "العربية"
+  }
+}

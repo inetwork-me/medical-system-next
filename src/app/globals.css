@@ -1,0 +1,293 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Design tokens. Source: D:\INetwork\Hillal ahmr\design-tokens.css (FigCraft variables, exported 15 Nov)
+ * and design-scripts/tokens.py (type scale, shadows). Hex values are copied verbatim from the file.
+ * Components use the semantic tokens (bg-card, text-muted-foreground, …), never primitives.
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------- Primitives (Tailwind v4 palette as used in the file) ---------- */
+@theme {
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bedbff;
+  --color-blue-300: #8ec5ff;
+  --color-blue-400: #51a2ff;
+  --color-blue-500: #2b7fff;
+  --color-blue-600: #155dfc;
+  --color-blue-700: #1447e6;
+  --color-blue-800: #193cb8;
+  --color-blue-900: #1c398e;
+  --color-blue-950: #162456;
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cad5e2;
+  --color-slate-400: #90a1b9;
+  --color-slate-500: #62748e;
+  --color-slate-600: #45556c;
+  --color-slate-700: #314158;
+  --color-slate-800: #1d293d;
+  --color-slate-900: #0f172b;
+  --color-slate-950: #020618;
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d0fae5;
+  --color-emerald-400: #00d492;
+  --color-emerald-500: #00bc7d;
+  --color-emerald-600: #009966;
+  --color-emerald-700: #007a55;
+  --color-emerald-950: #002c22;
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c6;
+  --color-amber-400: #ffb900;
+  --color-amber-500: #fe9a00;
+  --color-amber-600: #e17100;
+  --color-amber-700: #bb4d00;
+  --color-amber-950: #461901;
+  --color-red-50: #fef2f2;
+  --color-red-100: #ffe2e2;
+  --color-red-400: #ff6467;
+  --color-red-500: #fb2c36;
+  --color-red-600: #e7000b;
+  --color-red-700: #c10007;
+  --color-red-950: #460809;
+  --color-sky-50: #f0f9ff;
+  --color-sky-100: #dff2fe;
+  --color-sky-400: #00bcff;
+  --color-sky-500: #00a6f4;
+  --color-sky-600: #0084d1;
+  --color-sky-700: #0069a8;
+  --color-sky-950: #052f4a;
+  --color-teal-400: #00d5be;
+  --color-teal-500: #00bba7;
+  --color-violet-400: #a684ff;
+  --color-violet-500: #8e51ff;
+  --color-rose-400: #ff637e;
+  --color-rose-500: #ff2056;
+
+  /* Shadows: effect styles Shadow/xs…lg */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Type scale with EN line heights (AR overrides below). tokens.py TYPE */
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-lg: 18px;
+  --text-lg--line-height: 28px;
+  --text-xl: 20px;
+  --text-xl--line-height: 28px;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 32px;
+  --text-3xl: 30px;
+  --text-3xl--line-height: 36px;
+  --text-4xl: 36px;
+  --text-4xl--line-height: 40px;
+  --tracking-tight: -0.025em;
+
+  /* Shell sizes: sheet 06 */
+  --spacing-sidebar: 16rem;
+  --spacing-rail: 4rem;
+  --spacing-header: 4rem;
+}
+
+/* ---------- Semantic tokens · Light (Theme collection) ---------- */
+:root {
+  --radius: 10px;
+
+  /* EN: Inter; Arabic glyphs inside EN UI (e.g. the "العربية" switch) fall through to Plex Arabic */
+  --app-font: var(--font-inter), var(--font-plex-ar), ui-sans-serif, system-ui, sans-serif;
+
+  --background: var(--color-slate-50);
+  --foreground: var(--color-slate-950);
+  --card: var(--color-white);
+  --card-foreground: var(--color-slate-950);
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-slate-950);
+  --primary: var(--color-blue-600);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-slate-100);
+  --secondary-foreground: var(--color-slate-900);
+  --muted: var(--color-slate-100);
+  --muted-foreground: var(--color-slate-500);
+  --accent: var(--color-blue-50);
+  --accent-foreground: var(--color-blue-700);
+  --destructive: var(--color-red-600);
+  --destructive-foreground: var(--color-white);
+  --success: var(--color-emerald-600);
+  --success-foreground: var(--color-white);
+  --warning: var(--color-amber-500);
+  --warning-foreground: var(--color-slate-950);
+  --info: var(--color-sky-600);
+  --info-foreground: var(--color-white);
+  --success-soft: var(--color-emerald-50);
+  --success-soft-foreground: var(--color-emerald-700);
+  --warning-soft: var(--color-amber-50);
+  --warning-soft-foreground: var(--color-amber-700);
+  --destructive-soft: var(--color-red-50);
+  --destructive-soft-foreground: var(--color-red-700);
+  --info-soft: var(--color-sky-50);
+  --info-soft-foreground: var(--color-sky-700);
+  --border: var(--color-slate-200);
+  --input: var(--color-slate-200);
+  --ring: var(--color-blue-400);
+  --chart-1: var(--color-blue-600);
+  --chart-2: var(--color-teal-500);
+  --chart-3: var(--color-amber-500);
+  --chart-4: var(--color-violet-500);
+  --chart-5: var(--color-rose-500);
+  --sidebar: var(--color-white);
+  --sidebar-foreground: var(--color-slate-600);
+  --sidebar-primary: var(--color-blue-600);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-accent: var(--color-blue-50);
+  --sidebar-accent-foreground: var(--color-blue-700);
+  --sidebar-border: var(--color-slate-200);
+  --sidebar-ring: var(--color-blue-400);
+}
+
+/* ---------- Semantic tokens · Dark (defined in the file; screens postponed) ---------- */
+.dark {
+  --background: var(--color-slate-950);
+  --foreground: var(--color-slate-50);
+  --card: var(--color-slate-900);
+  --card-foreground: var(--color-slate-50);
+  --popover: var(--color-slate-900);
+  --popover-foreground: var(--color-slate-50);
+  --primary: var(--color-blue-500);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-slate-800);
+  --secondary-foreground: var(--color-slate-50);
+  --muted: var(--color-slate-800);
+  --muted-foreground: var(--color-slate-400);
+  --accent: var(--color-blue-950);
+  --accent-foreground: var(--color-blue-200);
+  --destructive: var(--color-red-500);
+  --destructive-foreground: var(--color-white);
+  --success: var(--color-emerald-500);
+  --success-foreground: var(--color-white);
+  --warning: var(--color-amber-400);
+  --warning-foreground: var(--color-slate-950);
+  --info: var(--color-sky-400);
+  --info-foreground: var(--color-slate-950);
+  --success-soft: var(--color-emerald-950);
+  --success-soft-foreground: var(--color-emerald-400);
+  --warning-soft: var(--color-amber-950);
+  --warning-soft-foreground: var(--color-amber-400);
+  --destructive-soft: var(--color-red-950);
+  --destructive-soft-foreground: var(--color-red-400);
+  --info-soft: var(--color-sky-950);
+  --info-soft-foreground: var(--color-sky-400);
+  --border: var(--color-slate-800);
+  --input: var(--color-slate-700);
+  --ring: var(--color-blue-500);
+  --chart-1: var(--color-blue-500);
+  --chart-2: var(--color-teal-400);
+  --chart-3: var(--color-amber-400);
+  --chart-4: var(--color-violet-400);
+  --chart-5: var(--color-rose-400);
+  --sidebar: var(--color-slate-900);
+  --sidebar-foreground: var(--color-slate-400);
+  --sidebar-primary: var(--color-blue-500);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-accent: var(--color-slate-800);
+  --sidebar-accent-foreground: var(--color-slate-50);
+  --sidebar-border: var(--color-slate-800);
+  --sidebar-ring: var(--color-blue-500);
+}
+
+/* ---------- Arabic: IBM Plex Sans Arabic only, taller line heights, no tracking (AR/* text styles) ---------- */
+html[lang="ar"] {
+  --app-font: var(--font-plex-ar), ui-sans-serif, system-ui, sans-serif;
+  --text-xs--line-height: 20px;
+  --text-sm--line-height: 24px;
+  --text-base--line-height: 28px;
+  --text-lg--line-height: 30px;
+  --text-xl--line-height: 32px;
+  --text-2xl--line-height: 38px;
+  --text-3xl--line-height: 46px;
+  --text-4xl--line-height: 52px;
+  --tracking-tight: 0em;
+}
+
+@theme inline {
+  --font-sans: var(--app-font);
+
+  --radius-sm: calc(var(--radius) - 4px); /* 6  */
+  --radius-md: calc(var(--radius) - 2px); /* 8  · controls */
+  --radius-lg: var(--radius); /*             10 · popovers */
+  --radius-xl: calc(var(--radius) + 4px); /* 14 · cards */
+  --radius-2xl: calc(var(--radius) + 8px); /* 18 · hero panels, modals */
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-foreground: var(--success-soft-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-soft-foreground: var(--warning-soft-foreground);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-destructive-soft-foreground: var(--destructive-soft-foreground);
+  --color-info-soft: var(--info-soft);
+  --color-info-soft-foreground: var(--info-soft-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+}
+
+/* Latin fragments (phone numbers, MRNs, +12.5%) keep LTR order inside Arabic text */
+@utility ltr-value {
+  direction: ltr;
+  unicode-bidi: isolate;
+}

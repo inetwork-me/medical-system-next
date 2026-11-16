@@ -5,5 +5,49 @@
   "language": {
     "switchLabel": "Switch language",
     "other": "العربية"
+  },
+  "actions": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "apply": "Apply",
+    "back": "Back",
+    "search": "Search",
+    "saving": "Saving…",
+    "clearFilters": "Clear filters",
+    "tryAgain": "Try again"
+  },
+  "a11y": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "pagination": "Pagination",
+    "removeFile": "Remove file",
+    "retryUpload": "Retry upload"
+  },
+  "password": {
+    "weak": "Weak password",
+    "fair": "Fair — add a symbol",
+    "strong": "Strong password"
+  },
+  "upload": {
+    "dropTitle": "Drag & drop files here",
+    "dropActive": "Drop to upload",
+    "dropError": "File type not supported",
+    "or": "or",
+    "browse": "browse files",
+    "hint": "PDF, JPG or PNG · up to 10 MB",
+    "progress": "{done} MB of {total} MB",
+    "uploaded": "{size} MB · Uploaded",
+    "failed": "Upload failed. Try again"
+  },
+  "pagination": {
+    "showing": "Showing {from}–{to} of {total}"
+  },
+  "stat": {
+    "vsLastMonth": "vs last month"
   }
 }

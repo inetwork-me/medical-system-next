@@ -5,5 +5,49 @@
   "language": {
     "switchLabel": "غيّر اللغة",
     "other": "English"
+  },
+  "actions": {
+    "close": "سكّر",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "apply": "تطبيق",
+    "back": "رجوع",
+    "search": "دوّر",
+    "saving": "جاري الحفظ…",
+    "clearFilters": "امسح الفلاتر",
+    "tryAgain": "جرّب مرة ثانية"
+  },
+  "a11y": {
+    "showPassword": "اعرض كلمة المرور",
+    "hidePassword": "اخفِ كلمة المرور",
+    "previousMonth": "الشهر اللي قبل",
+    "nextMonth": "الشهر الجاي",
+    "previousPage": "الصفحة اللي قبل",
+    "nextPage": "الصفحة الجاية",
+    "pagination": "تنقّل بين الصفحات",
+    "removeFile": "شيل الملف",
+    "retryUpload": "ارفعه مرة ثانية"
+  },
+  "password": {
+    "weak": "كلمة مرور ضعيفة",
+    "fair": "متوسطة، زد رمز",
+    "strong": "كلمة مرور قوية"
+  },
+  "upload": {
+    "dropTitle": "اسحب ملفاتك وحطها هنا",
+    "dropActive": "حط الملف هنا عشان يترفع",
+    "dropError": "نوع الملف ما ينقبل",
+    "or": "أو",
+    "browse": "اختر من جهازك",
+    "hint": "PDF أو JPG أو PNG · بحد أقصى 10 ميجا",
+    "progress": "{done} من {total} ميجا",
+    "uploaded": "{size} ميجا · انرفع",
+    "failed": "ما انرفع الملف، جرّب مرة ثانية"
+  },
+  "pagination": {
+    "showing": "عرض {from}–{to} من {total}"
+  },
+  "stat": {
+    "vsLastMonth": "عن الشهر اللي فات"
   }
 }

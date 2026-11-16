@@ -17,6 +17,8 @@ type Store = {
   archive: (id: string) => void
   /** Save from the Edit page: list fields (name, mobile, tags…) + the full form for the patient page. */
   save: (id: string, fields: Partial<Patient>, form: EditForm) => void
+  /** Merge page: `drop` is closed into `keep` (fields + form for the kept file). Returns an undo function. */
+  merge: (keep: string, drop: string, fields: Partial<Patient>, form: EditForm) => () => void
   /** Add-patient wizard: create a file (shown first in the list); returns its MRN. */
   add: (patient: Omit<Patient, "id" | "mrn">, form: EditForm) => string
   /** Last saved edit form for a patient (this session). */
@@ -51,6 +53,15 @@ export function PatientsStoreProvider({ children }: { children: React.ReactNode 
       save: (id, fields, form) =>
         setOverrides((o) => ({ ...o, [id]: { ...o[id], fields: { ...o[id]?.fields, ...fields }, form, ...(fields.tags ? { tags: fields.tags } : {}) } })),
       savedForm: (id) => overrides[id]?.form,
+      merge: (keep, drop, fields, form) => {
+        const snapshot = overrides
+        setOverrides((o) => ({
+          ...o,
+          [keep]: { ...o[keep], fields: { ...o[keep]?.fields, ...fields }, form, ...(fields.tags ? { tags: fields.tags } : {}) },
+          [drop]: { ...o[drop], archived: true },
+        }))
+        return () => setOverrides(snapshot)
+      },
       add: (patient, form) => {
         // Next file number after the design's latest sample (MRN 004912 for the first new patient).
         const mrn = String(4912 + added.length).padStart(6, "0")

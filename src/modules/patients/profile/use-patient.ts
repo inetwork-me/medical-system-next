@@ -20,8 +20,11 @@ export function usePatient() {
   const form = savedForm(id)
   const record = React.useMemo(() => {
     if (!patient) return null
-    const r = patientRecord(patient)
-    return form ? applyForm(r, form) : r
+    let r = patientRecord(patient)
+    if (form) r = applyForm(r, form)
+    // Merged / cleared duplicates: no "possible duplicate" alert any more.
+    if (!patient.duplicateOf && r.details.duplicate) r = { ...r, details: { ...r.details, duplicate: undefined } }
+    return r
   }, [patient, form])
   const summary = React.useMemo(() => (record ? recordSummary(record) : null), [record])
   return patient && record && summary ? { patient, record, summary } : null

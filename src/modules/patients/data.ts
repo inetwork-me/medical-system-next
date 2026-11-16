@@ -155,6 +155,21 @@ function generate(): Patient[] {
     lastVisit: "2025-03-12",
     registered: "2023-06-04",
   }
+  // The design's merge sample: an older file for the same boy, MRN 004520 (same mobile as 004891).
+  const j = out.findIndex((p) => p.gender === "male" && ageGroupOf(p.age) === ageGroupOf(15) && p.region === "riyadh" && !p.tags.length)
+  out[j] = {
+    ...out[j],
+    id: "004520",
+    mrn: "004520",
+    initials: "FA",
+    name: { en: "Fahad Aldosari", ar: "فهد الدوسري" },
+    age: 15,
+    mobile: "059 300 1287",
+    branch: "olaya",
+    visits: 7,
+    lastVisit: "2025-11-03",
+    registered: "2022-09-14",
+  }
   // Pair suspected duplicates with a neighbour record (same mobile in the data-quality report).
   out.forEach((p, i) => {
     if (p.tags.includes("duplicate")) p.duplicateOf = out[(i + 1) % out.length].mrn
@@ -289,10 +304,10 @@ export function patientDetails(p: Patient): PatientDetails {
     : undefined
   return {
     whatsapp: p.mobile,
-    nationalId: incomplete ? null : p.id === "004650" ? "1087334902" : `1${Math.floor(rand() * 1e9).toString().padStart(9, "0")}`,
+    nationalId: incomplete ? null : p.id === "004650" ? "1087334902" : p.id === "004520" ? "1102334551" : `1${Math.floor(rand() * 1e9).toString().padStart(9, "0")}`,
     birthDate,
     nationality: { en: "Saudi", ar: "سعودي" },
-    district: incomplete && p.id !== "004891" ? null : p.id === "004891" ? { en: "Al Malqa", ar: "الملقا" } : null,
+    district: incomplete && p.id !== "004891" ? null : p.id === "004891" || p.id === "004520" ? { en: "Al Malqa", ar: "الملقا" } : null,
     insurance: p.id === "004891" ? { en: "Bupa · Class B", ar: "بوبا · فئة B" } : rand() < 0.6 ? { en: "Tawuniya · Class A", ar: "التعاونية · فئة A" } : null,
     classification: p.tags.includes("vip") ? { en: "VIP", ar: "VIP" } : { en: "Regular", ar: "عادي" },
     registeredBy: { en: "Reem (reception)", ar: "ريم (الاستقبال)" },

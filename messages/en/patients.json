@@ -698,5 +698,71 @@
       "list": "Back to patients list",
       "open": "Open patient file"
     }
+  },
+  "merge": {
+    "title": "Merge duplicate files",
+    "mobileTitle": "Merge files",
+    "crumbDup": "Duplicate patients",
+    "crumb": "Merge",
+    "back": "Back to duplicate patients",
+    "cancel": "Cancel",
+    "merge": "Merge files",
+    "choose": "Choose what to keep from each file",
+    "chooseText": "Matching values stay as they are. Visits, invoices and files all move over.",
+    "mainFile": "Main file",
+    "closed": "Will be closed",
+    "meta": "{name} · {age}",
+    "years": "{n} yrs",
+    "swap": "Swap main file",
+    "rows": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "nationalId": "National ID",
+      "birth": "Date of birth",
+      "address": "Address",
+      "insurance": "Insurance",
+      "guardian": "Guardian",
+      "visits": "Visits",
+      "invoicesFiles": "Invoices · files"
+    },
+    "same": "Same",
+    "both": "Both move",
+    "selfPay": "Self-pay",
+    "expired": "{insurer} · expired {year}",
+    "pickFrom": "{field} from MRN {mrn}",
+    "after": {
+      "title": "After merge",
+      "visits": "Visits",
+      "invoices": "Invoices",
+      "files": "Files",
+      "completeness": "Profile completeness"
+    },
+    "note": {
+      "title": "Before you merge",
+      "text": "Confirm the national ID with the patient or guardian. MRN {drop} will be closed and redirected to {keep}; you can undo within 30 days."
+    },
+    "confirm": {
+      "title": "Merge 2 files?",
+      "text": "Everything from MRN {drop} moves into MRN {keep}.",
+      "visits": "Visits moved",
+      "invoices": "Invoices moved",
+      "files": "Files moved",
+      "kept": "Kept file",
+      "undoNote": "You can undo a merge from the activity log within 30 days.",
+      "action": "Merge files"
+    },
+    "toast": {
+      "title": "Files merged",
+      "text": "MRN {drop} is now part of {keep}.",
+      "undo": "Undo",
+      "undone": "Merge undone",
+      "undoneText": "MRN {drop} is a separate file again."
+    },
+    "missing": {
+      "title": "Pick two files to merge",
+      "text": "Open a possible duplicate and choose Review & merge.",
+      "action": "Show possible duplicates"
+    },
+    "sameFile": "These are the same file."
   }
 }

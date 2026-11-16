@@ -14,7 +14,13 @@ const BASE: Intl.DateTimeFormatOptions = { numberingSystem: "latn", calendar: "g
 export const parseDay = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00:00Z`)
 
 export function dateFormatter(locale: string) {
-  const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(TAG(locale), { ...BASE, ...o })
+  const make = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(TAG(locale), { ...BASE, ...o })
+  // en-GB abbreviates September as "Sept"; the design uses three letters everywhere.
+  const fix = (s: string) => (locale === "ar" ? s : s.replace(/\bSept\b/g, "Sep"))
+  const fmt = (o: Intl.DateTimeFormatOptions) => {
+    const f = make(o)
+    return { format: (d: Date) => fix(f.format(d)), formatRange: (a: Date, b: Date) => fix(f.formatRange(a, b)) }
+  }
   const toDate = (d: Date | string) => (typeof d === "string" ? parseDay(d) : d)
   return {
     /** 15 Nov 2026 */
@@ -27,6 +33,10 @@ export function dateFormatter(locale: string) {
     weekday: (d: Date | string) => fmt({ weekday: "long", day: "numeric", month: "long" }).format(toDate(d)),
     /** 1 – 15 Nov 2026 */
     range: (a: Date | string, b: Date | string) => fmt({ day: "numeric", month: "short", year: "numeric" }).formatRange(toDate(a), toDate(b)),
+    /** Jan 2024 */
+    monthYear: (d: Date | string) => fmt({ month: "short", year: "numeric" }).format(toDate(d)),
+    /** November 2026 */
+    monthLong: (d: Date | string) => fmt({ month: "long", year: "numeric" }).format(toDate(d)),
     /** Nov (chart axes) */
     month: (d: Date | string) => fmt({ month: "short" }).format(toDate(d)),
   }

@@ -161,7 +161,18 @@ export function BanDialog({ patient, open, onOpenChange }: { patient: Patient; o
 }
 
 /** Overlay · Archive patient: summary (patient, upcoming visits, balance) + acknowledgement checkbox. */
-export function ArchiveDialog({ patient, open, onOpenChange }: { patient: Patient; open: boolean; onOpenChange: (o: boolean) => void }) {
+export function ArchiveDialog({
+  patient,
+  open,
+  onOpenChange,
+  onArchived,
+}: {
+  patient: Patient
+  open: boolean
+  onOpenChange: (o: boolean) => void
+  /** Called after the file is archived (the patient page uses it to go back to the list). */
+  onArchived?: () => void
+}) {
   const t = useTranslations("patients.archive")
   const tc = useTranslations("common.actions")
   const ts = useTranslations("patients.sheet")
@@ -180,6 +191,7 @@ export function ArchiveDialog({ patient, open, onOpenChange }: { patient: Patien
   const confirm = () => {
     archive(patient.id)
     onOpenChange(false)
+    onArchived?.()
     toast.success(t("done"), { description: t("doneText", { name }) })
   }
 

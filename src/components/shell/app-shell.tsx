@@ -75,7 +75,7 @@ export function AppShell({ defaultCollapsed, children }: { defaultCollapsed: boo
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Header onToggle={toggle} className="hidden md:flex" />
-        <MobileAppBar className="md:hidden" />
+        <MobileAppBar className="md:hidden group-has-[[data-mobile-page-bar]]/shell:hidden" />
         <main className="flex min-w-0 flex-1 flex-col pb-28 md:pb-0 group-has-[[data-mobile-action-bar]]/shell:pb-24 md:group-has-[[data-mobile-action-bar]]/shell:pb-0">
           {children}
         </main>

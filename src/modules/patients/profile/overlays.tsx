@@ -27,6 +27,7 @@ import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHea
 import { Textarea } from "@/components/ui/textarea"
 import { TODAY, type Patient } from "../data"
 import { printArea } from "../payments/overlays"
+import { save } from "./download"
 import { usePatientsStore } from "../store"
 import { type Appointment, type FileCategory, type PatientFile, type PatientRecord, type Visit } from "./record"
 import { usePatient, useText } from "./use-patient"
@@ -855,7 +856,7 @@ const ICON_FOR: Record<FileCategory, PatientFile["icon"]> = {
   referral: "document-text",
   consent: "tick-square",
 }
-type Pending = { id: string; name: string; bytes: number; progress: number }
+type Pending = { id: string; name: string; bytes: number; progress: number; file: File }
 const size = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1e3))} KB`)
 
 function Upload({ patient, initial, onClose }: { patient: Patient; initial?: File[]; onClose: () => void }) {
@@ -864,18 +865,10 @@ function Upload({ patient, initial, onClose }: { patient: Patient; initial?: Fil
   const { b } = useText()
   const { change } = usePatientsStore()
   const [category, setCategory] = React.useState<FileCategory>("lab")
-  const [items, setItems] = React.useState<Pending[]>([])
-  const add = React.useCallback((files: File[]) => {
-    setItems((x) => [...x, ...files.map((f, i) => ({ id: `${Date.now()}-${i}-${f.name}`, name: f.name, bytes: f.size, progress: 0 }))])
-  }, [])
-  const seeded = React.useRef(false)
-  React.useEffect(() => {
-    if (initial?.length && !seeded.current) {
-      seeded.current = true
-      const id = window.setTimeout(() => add(initial))
-      return () => window.clearTimeout(id)
-    }
-  }, [initial, add])
+  const toPending = (files: File[]) => files.map((f, i) => ({ id: `${Date.now()}-${i}-${f.name}`, name: f.name, bytes: f.size, progress: 0, file: f }))
+  // Files picked on the Files tab arrive pre-filled.
+  const [items, setItems] = React.useState<Pending[]>(() => toPending(initial ?? []))
+  const add = (files: File[]) => setItems((x) => [...x, ...toPending(files)])
   // Simulated upload progress.
   React.useEffect(() => {
     if (!items.some((i) => i.progress < 100)) return
@@ -897,6 +890,7 @@ function Upload({ patient, initial, onClose }: { patient: Patient; initial?: Fil
         bytes: i.bytes,
         date: TODAY,
         by: SESSION_DOCTOR,
+        url: URL.createObjectURL(i.file),
       }
     })
     change(patient.id, (c) => ({
@@ -992,7 +986,10 @@ function Viewer({ record, name, onClose }: { record: PatientRecord; name: string
             </DialogTitle>
             <DialogDescription className="text-xs text-zinc-400 tabular-nums">{meta}</DialogDescription>
           </div>
-          {icon("document-download", t("download"), () => toast(t("download"), { description: title }))}
+          {icon("document-download", t("download"), () => {
+            const target = file ?? record.files.find((f) => f.category === "lab")
+            if (target) void save(target)
+          })}
           {icon("printer", t("print"), printArea)}
           {icon("close-circle", t("close"), onClose)}
         </div>

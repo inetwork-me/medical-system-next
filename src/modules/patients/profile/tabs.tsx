@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
 import { IfModule } from "@/lib/modules"
@@ -15,9 +14,12 @@ import { DropZone } from "@/components/ds/upload"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FILE_GROUP, type ActivityKind, type Invoice, type FileGroup, type InvoiceStatus, type VisitStatus, type When } from "./record"
+import { FILE_GROUP, type ActivityKind, type Invoice, type PatientFile, type FileGroup, type InvoiceStatus, type VisitStatus, type When } from "./record"
 import { MiniBars } from "./overview"
 import { useOverlay } from "./overlays"
+import { useFileDownloads, type DownloadState } from "./download"
+import { Progress } from "@/components/ui/progress"
+import { toMb } from "@/components/ds/upload"
 import { CollectFlow, ReceiptDialog, StatementDialog } from "../payments/overlays"
 import { PCard, PersonalInfo, ProfileCard, useSoon } from "./side"
 import { usePatient, useText } from "./use-patient"
@@ -626,6 +628,7 @@ export function FilesTab() {
   const { b, locale } = useText()
   const [group, setGroup] = React.useState<"all" | FileGroup>("all")
   const overlay = useOverlay()
+  const { downloads, startDownload } = useFileDownloads()
   const data = usePatient()
   if (!data) return null
   const { record, summary } = data
@@ -685,6 +688,10 @@ export function FilesTab() {
                 <bdi dir="ltr" className="truncate text-sm font-medium rtl:text-right">
                   {f.name}
                 </bdi>
+                {downloads[f.name] ? (
+                  <FileDownloadLine file={f} state={downloads[f.name]} />
+                ) : (
+                  <>
                 {/* Design (Widget / Patient Tab · Files): EN "Category · PDF · 412 KB · date" / "Uploaded by …";
                     AR "التصنيف · التاريخ" / "PDF · 412 KB · رفعه …". */}
                 <span className="truncate text-xs text-muted-foreground tabular-nums">
@@ -710,15 +717,46 @@ export function FilesTab() {
                     t("uploadedBy", { by: b(f.by) })
                   )}
                 </span>
+                  </>
+                )}
               </button>
-              <Button variant="ghost" size="icon-sm" aria-label={t("download", { name: f.name })} onClick={() => toast(t("download", { name: f.name }))}>
-                <Icon name="document-download" size={16} />
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={t("download", { name: f.name })}
+                disabled={!!downloads[f.name] && !downloads[f.name].done}
+                onClick={() => startDownload(f)}
+              >
+                <Icon name={downloads[f.name]?.done ? "tick-circle" : "document-download"} size={16} className={downloads[f.name]?.done ? "text-success" : undefined} />
               </Button>
             </li>
           ))}
         </ul>
       </PCard>
     </>
+  )
+}
+
+/** Download progress inside the file card (DS Upload Item pattern): bar + "x of y MB", then "Downloaded". */
+function FileDownloadLine({ file, state }: { file: PatientFile; state: DownloadState }) {
+  const t = useTranslations("common.upload")
+  const tf = useTranslations("patients.page.files")
+  const total = toMb(file.bytes)
+  if (state.done) {
+    return (
+      <span className="text-xs text-muted-foreground tabular-nums" role="status">
+        {tf("downloaded", { size: total })}
+      </span>
+    )
+  }
+  return (
+    <span className="flex flex-col gap-1.5 pt-1" role="status" aria-live="polite">
+      <span className="flex items-center gap-2">
+        <Progress value={state.progress} aria-label={tf("downloading", { name: file.name })} className="flex-1" />
+        <span className="text-xs font-medium text-muted-foreground tabular-nums">{state.progress}%</span>
+      </span>
+      <span className="text-xs text-muted-foreground tabular-nums">{t("progress", { done: toMb((file.bytes * state.progress) / 100), total })}</span>
+    </span>
   )
 }
 

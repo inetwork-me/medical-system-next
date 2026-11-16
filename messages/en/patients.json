@@ -451,7 +451,9 @@
       "emptyText": "Upload lab results, scans or documents for this patient.",
       "upload": "Upload file",
       "uploaded": "{count, plural, one {# file added} other {# files added}}",
-      "uploadedText": "Saved to {name}'s file."
+      "uploadedText": "Saved to {name}'s file.",
+      "downloaded": "{size} MB · Downloaded",
+      "downloading": "Downloading {name}"
     },
     "activity": {
       "title": "File activity",

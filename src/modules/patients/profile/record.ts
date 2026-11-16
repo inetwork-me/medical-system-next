@@ -83,6 +83,8 @@ export type PatientFile = {
   bytes: number
   date: string
   by: Bi
+  /** Object URL of a file uploaded this session (download saves the original). */
+  url?: string
 }
 
 export type ActivityKind = "added" | "edited" | "flagged"

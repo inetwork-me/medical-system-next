@@ -451,7 +451,9 @@
       "emptyText": "ارفع نتايج تحاليل أو أشعة أو مستندات للمريض.",
       "upload": "ارفع ملف",
       "uploaded": "{count, plural, one {انضاف ملف} two {انضاف ملفين} few {انضافت # ملفات} other {انضاف # ملف}}",
-      "uploadedText": "انحفظت في ملف {name}."
+      "uploadedText": "انحفظت في ملف {name}.",
+      "downloaded": "{size} ميجا · انتزّل",
+      "downloading": "جاري تنزيل {name}"
     },
     "activity": {
       "title": "سجل الملف",

@@ -15,7 +15,9 @@ import { Button } from "@/components/ui/button"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { TODAY } from "../data"
-import { Attention, PCard, PersonalInfo, ProfileCard, useSoon } from "./side"
+import { useOverlay } from "./overlays"
+import { Attention, PCard, PersonalInfo, ProfileCard } from "./side"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { usePatient, useText } from "./use-patient"
 
 /* ================================================================== ring stats */
@@ -390,7 +392,7 @@ export function Notes({ className }: { className?: string }) {
   const t = useTranslations("patients.page.notes")
   const date = useDates().short
   const { b } = useText()
-  const soon = useSoon()
+  const overlay = useOverlay()
   const data = usePatient()
   if (!data) return null
   const notes = data.record.notes.slice(0, 2)
@@ -400,7 +402,7 @@ export function Notes({ className }: { className?: string }) {
       title={t("title")}
       description={notes.length ? t("description") : undefined}
       action={
-        <Button variant="ghost" size="sm" onClick={soon}>
+        <Button variant="ghost" size="sm" onClick={() => overlay.open({ kind: "note" })}>
           <Icon name="add" size={16} />
           {t("add")}
         </Button>
@@ -491,19 +493,14 @@ export function PatientCalendar({ className }: { className?: string }) {
                 const today = key === TODAY
                 return (
                   <td key={key} className="p-0">
-                    <span
-                      aria-label={[dates.long(key), mark && t(mark, { count: 1 }).split(" ·")[0], today && t("today")].filter(Boolean).join(" · ")}
-                      className={cn(
-                        "flex h-8 items-center justify-center rounded-md tabular-nums",
-                        out ? "text-muted-foreground" : "text-foreground",
-                        mark && "font-medium",
-                        mark === "booked" && "bg-primary text-primary-foreground",
-                        mark === "requested" && "bg-accent text-accent-foreground",
-                        today && "font-medium ring-1 ring-primary ring-inset",
-                      )}
-                    >
-                      {d.getUTCDate()}
-                    </span>
+                    <DayCell
+                      day={d.getUTCDate()}
+                      iso={key}
+                      label={[dates.long(key), mark && t(mark, { count: 1 }).split(" ·")[0], today && t("today")].filter(Boolean).join(" · ")}
+                      out={out}
+                      mark={mark}
+                      today={today}
+                    />
                   </td>
                 )
               })}
@@ -526,6 +523,60 @@ export function PatientCalendar({ className }: { className?: string }) {
         </li>
       </ul>
     </section>
+  )
+}
+
+/** Calendar day; a booked / requested day opens its appointment actions (Reschedule · Cancel). */
+function DayCell({
+  day,
+  iso,
+  label,
+  out,
+  mark,
+  today,
+}: {
+  day: number
+  iso: string
+  label: string
+  out: boolean
+  mark?: "booked" | "requested"
+  today: boolean
+}) {
+  const t = useTranslations("patients.ov")
+  const overlay = useOverlay()
+  const cls = cn(
+    "flex h-8 w-full items-center justify-center rounded-md tabular-nums",
+    out ? "text-muted-foreground" : "text-foreground",
+    mark && "font-medium",
+    mark === "booked" && "bg-primary text-primary-foreground",
+    mark === "requested" && "bg-accent text-accent-foreground",
+    today && "font-medium ring-1 ring-primary ring-inset",
+  )
+  if (!mark) {
+    return (
+      <span aria-label={label} className={cls}>
+        {day}
+      </span>
+    )
+  }
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <button type="button" aria-label={label} className={cn(cls, "cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50")}>
+          {day}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="center" className="w-48">
+        <DropdownMenuItem onSelect={() => overlay.open({ kind: "reschedule", date: iso })}>
+          <Icon name="calendar-2" size={16} />
+          {t("visit.reschedule")}
+        </DropdownMenuItem>
+        <DropdownMenuItem variant="destructive" onSelect={() => overlay.open({ kind: "cancel", date: iso })}>
+          <Icon name="close-circle" size={16} />
+          {t("visit.cancelAppt")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

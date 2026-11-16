@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
-import { Link } from "@/i18n/navigation"
 import { IfModule } from "@/lib/modules"
 import { useDates } from "@/i18n/dates"
 import { Icon } from "@/components/ds/icon"
@@ -18,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FILE_GROUP, type ActivityKind, type Invoice, type FileGroup, type InvoiceStatus, type VisitStatus, type When } from "./record"
 import { MiniBars } from "./overview"
+import { useOverlay } from "./overlays"
 import { CollectFlow, ReceiptDialog, StatementDialog } from "../payments/overlays"
 import { PCard, PersonalInfo, ProfileCard, useSoon } from "./side"
 import { usePatient, useText } from "./use-patient"
@@ -122,7 +122,7 @@ export function VisitsTab() {
   const t = useTranslations("patients.page")
   const dates = useDates()
   const { b } = useText()
-  const soon = useSoon()
+  const overlay = useOverlay()
   const [status, setStatus] = React.useState<"all" | VisitStatus>("all")
   const [clinic, setClinic] = React.useState("all")
   const data = usePatient()
@@ -143,11 +143,9 @@ export function VisitsTab() {
       })}
       action={
         <IfModule id="appointments">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href={`/patients/${patient.id}?action=book`}>
-              <Icon name="calendar-add" size={16} />
-              {t("visits.book")}
-            </Link>
+          <Button variant="ghost" size="sm" onClick={() => overlay.open({ kind: "book" })}>
+            <Icon name="calendar-add" size={16} />
+            {t("visits.book")}
           </Button>
         </IfModule>
       }
@@ -211,7 +209,7 @@ export function VisitsTab() {
                 </div>
                 <StatusBadge tone={VISIT_TONE[v.status]}>{t(`status.${v.status}`)}</StatusBadge>
                 <Sar amount={v.amount} className="font-medium" />
-                <Button variant="ghost" size="icon-sm" aria-label={t("visits.view")} onClick={soon}>
+                <Button variant="ghost" size="icon-sm" aria-label={t("visits.view")} onClick={() => overlay.open({ kind: "visit", id: v.id })}>
                   <Icon name="eye" size={16} />
                 </Button>
               </TRow>
@@ -219,21 +217,27 @@ export function VisitsTab() {
           </Table>
           <ul className="@min-[45rem]/tab:hidden">
             {shown.map((v) => (
-              <li key={v.id} className="flex items-start gap-3 border-b py-3 last:border-0">
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="text-sm font-medium">
-                    {b(v.clinic)} · {b(v.doctor)}
-                  </span>
-                  <span className="text-xs">{b(v.reason)}</span>
-                  {v.dx && <span className="text-xs text-muted-foreground">{b(v.dx)}</span>}
-                  <span className="text-xs text-muted-foreground tabular-nums">
-                    {dates.short(v.date)} · {v.time}
-                  </span>
-                </div>
-                <div className="flex flex-col items-end gap-1.5">
-                  <Sar amount={v.amount} className="text-sm font-medium" />
-                  <StatusBadge tone={VISIT_TONE[v.status]}>{t(`status.${v.status}`)}</StatusBadge>
-                </div>
+              <li key={v.id} className="border-b last:border-0">
+                <button
+                  type="button"
+                  onClick={() => overlay.open({ kind: "visit", id: v.id })}
+                  className="flex w-full cursor-pointer items-start gap-3 py-3 text-start"
+                >
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="text-sm font-medium">
+                      {b(v.clinic)} · {b(v.doctor)}
+                    </span>
+                    <span className="text-xs">{b(v.reason)}</span>
+                    {v.dx && <span className="text-xs text-muted-foreground">{b(v.dx)}</span>}
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      {dates.short(v.date)} · {v.time}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5">
+                    <Sar amount={v.amount} className="text-sm font-medium" />
+                    <StatusBadge tone={VISIT_TONE[v.status]}>{t(`status.${v.status}`)}</StatusBadge>
+                  </div>
+                </button>
               </li>
             ))}
           </ul>
@@ -347,7 +351,13 @@ export function PaymentsTab() {
                   <Sar amount={inv.insurance} />
                   <Sar amount={inv.share} className="font-medium" />
                   <StatusBadge tone={INVOICE_TONE[inv.status]}>{t(`status.${inv.status}`)}</StatusBadge>
-                  <Button variant="ghost" size="icon-sm" aria-label={t("payments.receipt")} onClick={() => setDialog({ receipt: inv })} disabled={inv.status === "void"}>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={t("payments.receipt")}
+                    onClick={() => setDialog({ receipt: inv })}
+                    disabled={inv.status === "void"}
+                  >
                     <Icon name="receipt-2" size={16} />
                   </Button>
                 </TRow>
@@ -355,23 +365,30 @@ export function PaymentsTab() {
             </Table>
             <ul className="@min-[45rem]/tab:hidden">
               {record.invoices.map((inv) => (
-                <li key={inv.no} className="flex items-start gap-3 border-b py-3 last:border-0">
-                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="text-sm font-medium">{b(inv.service)}</span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {dates.short(inv.date)} · {inv.method ? b(inv.method) : "—"}
-                    </span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {t("payments.insuranceLine", {
-                        invoice: inv.no,
-                        amount: inv.insurance,
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-end gap-1.5">
-                    <Sar amount={inv.share} className="text-sm font-medium" />
-                    <StatusBadge tone={INVOICE_TONE[inv.status]}>{t(`status.${inv.status}`)}</StatusBadge>
-                  </div>
+                <li key={inv.no} className="border-b last:border-0">
+                  <button
+                    type="button"
+                    disabled={inv.status === "void"}
+                    onClick={() => setDialog({ receipt: inv })}
+                    className="flex w-full cursor-pointer items-start gap-3 py-3 text-start disabled:cursor-default"
+                  >
+                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="text-sm font-medium">{b(inv.service)}</span>
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        {dates.short(inv.date)} · {inv.method ? b(inv.method) : "—"}
+                      </span>
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        {t("payments.insuranceLine", {
+                          invoice: inv.no,
+                          amount: inv.insurance,
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <Sar amount={inv.share} className="text-sm font-medium" />
+                      <StatusBadge tone={INVOICE_TONE[inv.status]}>{t(`status.${inv.status}`)}</StatusBadge>
+                    </div>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -424,7 +441,7 @@ export function MedicalTab() {
   const dates = useDates()
   const when = useWhen()
   const { b } = useText()
-  const soon = useSoon()
+  const overlay = useOverlay()
   const data = usePatient()
   if (!data) return null
   const r = data.record
@@ -494,7 +511,7 @@ export function MedicalTab() {
             : undefined
         }
         action={
-          <Button variant="ghost" size="sm" onClick={soon}>
+          <Button variant="ghost" size="sm" onClick={() => overlay.open({ kind: "rx" })}>
             <Icon name="note-2" size={16} />
             {t("medical.prescribe")}
           </Button>
@@ -566,7 +583,7 @@ export function MedicalTab() {
           }
           action={
             r.labs && (
-              <Button variant="ghost" size="sm" onClick={soon}>
+              <Button variant="ghost" size="sm" onClick={() => overlay.open({ kind: "viewer", file: "__labs" })}>
                 <Icon name="document-download" size={16} />
                 PDF
               </Button>
@@ -608,14 +625,12 @@ export function FilesTab() {
   const dates = useDates()
   const { b } = useText()
   const [group, setGroup] = React.useState<"all" | FileGroup>("all")
+  const overlay = useOverlay()
   const data = usePatient()
   if (!data) return null
-  const { patient, record, summary } = data
+  const { record, summary } = data
   const files = record.files
-  const onFiles = (list: File[]) =>
-    toast.success(t("uploaded", { count: list.length }), {
-      description: t("uploadedText", { name: b(patient.name) }),
-    })
+  const onFiles = (list: File[]) => overlay.open({ kind: "upload", files: list })
 
   if (!files.length) {
     return (
@@ -625,7 +640,12 @@ export function FilesTab() {
           title={t("emptyTitle")}
           description={t("emptyText")}
           className="py-16"
-          actions={<UploadButton onFiles={onFiles} label={t("upload")} />}
+          actions={
+            <Button onClick={() => overlay.open({ kind: "upload" })}>
+              <Icon name="document-upload" size={20} />
+              {t("upload")}
+            </Button>
+          }
         />
       </div>
     )
@@ -657,7 +677,11 @@ export function FilesTab() {
               <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-accent text-primary">
                 <Icon name={f.icon} size={20} />
               </span>
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <button
+                type="button"
+                onClick={() => overlay.open({ kind: "viewer", file: f.name })}
+                className="flex min-w-0 flex-1 cursor-pointer flex-col gap-0.5 text-start outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 rounded-sm"
+              >
                 <bdi dir="ltr" className="truncate text-sm font-medium rtl:text-right">
                   {f.name}
                 </bdi>
@@ -669,7 +693,7 @@ export function FilesTab() {
                   · {dates.short(f.date)}
                 </span>
                 <span className="truncate text-xs text-muted-foreground">{t("uploadedBy", { by: b(f.by) })}</span>
-              </div>
+              </button>
               <Button variant="ghost" size="icon-sm" aria-label={t("download", { name: f.name })} onClick={() => toast(t("download", { name: f.name }))}>
                 <Icon name="document-download" size={16} />
               </Button>
@@ -677,31 +701,6 @@ export function FilesTab() {
           ))}
         </ul>
       </PCard>
-    </>
-  )
-}
-
-function UploadButton({ onFiles, label }: { onFiles: (f: File[]) => void; label: string }) {
-  const input = React.useRef<HTMLInputElement>(null)
-  return (
-    <>
-      <Button onClick={() => input.current?.click()}>
-        <Icon name="document-upload" size={20} />
-        {label}
-      </Button>
-      <input
-        ref={input}
-        type="file"
-        multiple
-        accept=".pdf,.jpg,.jpeg,.png"
-        className="sr-only"
-        tabIndex={-1}
-        onChange={(e) => {
-          const list = Array.from(e.target.files ?? [])
-          if (list.length) onFiles(list)
-          e.target.value = ""
-        }}
-      />
     </>
   )
 }

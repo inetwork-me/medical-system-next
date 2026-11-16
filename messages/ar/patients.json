@@ -1155,5 +1155,171 @@
       "pdf": "نزّل PDF",
       "print": "اطبع"
     }
+  },
+  "ov": {
+    "cancel": "إلغاء",
+    "note": {
+      "title": "أضف ملاحظة طبية",
+      "type": "نوع الملاحظة",
+      "visit": "الزيارة",
+      "noVisit": "بدون زيارة",
+      "text": "الملاحظة",
+      "placeholder": "اكتب اللي لازم يعرفه الفريق الطبي…",
+      "shared": "تظهر لكل أطباء الفرع",
+      "save": "احفظ الملاحظة",
+      "saved": "انحفظت الملاحظة",
+      "savedText": "انضافت لملف {name}.",
+      "types": {
+        "clinical": "طبية",
+        "nursing": "تمريض",
+        "followup": "متابعة"
+      },
+      "required": "اكتب الملاحظة أول."
+    },
+    "visit": {
+      "title": "زيارة · {date}",
+      "reason": "سبب الزيارة",
+      "diagnosis": "التشخيص",
+      "times": "الدخول ← الخروج",
+      "body": "الوزن · الطول",
+      "vitals": "الأكسجين · الحرارة",
+      "notes": "ملاحظات الطبيب",
+      "prescription": "الوصفة",
+      "invoice": "الفاتورة",
+      "invoiceLine": "{total} ر.س · التأمين {insurance} · مستحق {due}",
+      "print": "اطبع",
+      "followUp": "احجز متابعة",
+      "reschedule": "غيّر الموعد",
+      "cancelAppt": "ألغِ الموعد",
+      "none": "ما فيه شي مسجل لهالزيارة."
+    },
+    "appt": {
+      "current": "الموعد الحالي",
+      "clinic": "العيادة",
+      "when": "{day} · {time}",
+      "menu": "موعد {date}"
+    },
+    "reschedule": {
+      "title": "غيّر الموعد",
+      "text": "اختر يوم ووقت جديد",
+      "times": "{day} · الأوقات المتاحة",
+      "notify": "بلّغ المريض برسالة",
+      "notifyGuardian": "بلّغ ولي الأمر برسالة",
+      "confirm": "أكّد الموعد الجديد",
+      "done": "انتقل الموعد",
+      "doneText": "الموعد الجديد: {when}.",
+      "pick": "اختر وقت."
+    },
+    "cancelAppt": {
+      "title": "تلغي الموعد؟",
+      "text": "الوقت بيصير متاح لمرضى ثانيين.",
+      "reason": "السبب",
+      "reasons": {
+        "patient": "طلب المريض",
+        "doctor": "الطبيب مو متاح",
+        "mistake": "حجز بالغلط"
+      },
+      "keep": "خلّ الموعد",
+      "confirm": "ألغِ الموعد",
+      "done": "انلغى الموعد",
+      "doneText": "{when} صار متاح."
+    },
+    "book": {
+      "title": "احجز موعد",
+      "clinic": "العيادة",
+      "doctor": "الطبيب",
+      "type": "نوع الزيارة",
+      "inPerson": "حضوري",
+      "telehealth": "عن بُعد",
+      "service": "الخدمة",
+      "services": {
+        "followup": "متابعة · 20 دقيقة",
+        "consult": "استشارة · 30 دقيقة",
+        "checkup": "كشف · 45 دقيقة"
+      },
+      "day": "{day} · {doctor}",
+      "pickDay": "اختر يوم",
+      "note": "ملاحظة للاستقبال",
+      "notePlaceholder": "أي شي لازم يعرفه الاستقبال…",
+      "confirm": "احجز الموعد",
+      "done": "انحجز الموعد",
+      "doneText": "{when} · {doctor}",
+      "pick": "اختر يوم ووقت.",
+      "noSlots": "ما بقى أوقات بهاليوم.",
+      "reason": "زيارة محجوزة"
+    },
+    "rx": {
+      "title": "وصفة جديدة",
+      "meta": "{name} · {age} · {weight}",
+      "allergies": "حساسية: {list}.",
+      "medication": "الدواء",
+      "search": "دوّر على دواء…",
+      "empty": "ما فيه نتيجة",
+      "dose": "الجرعة",
+      "frequency": "التكرار",
+      "duration": "المدة",
+      "refills": "التجديد",
+      "instructions": "تعليمات للمريض",
+      "instructionsPlaceholder": "مثال: تنمضغ قبل النوم.",
+      "confirm": "أضف للوصفة",
+      "done": "انضافت الوصفة",
+      "doneText": "{med} · {dose}",
+      "required": "مطلوب.",
+      "allergyHit": "{name} عنده حساسية من {allergy}. اختر دواء ثاني.",
+      "freq": {
+        "once": "مرة باليوم",
+        "twice": "مرتين باليوم",
+        "three": "ثلاث مرات باليوم",
+        "asNeeded": "عند الحاجة",
+        "evening": "مرة باليوم · بالليل"
+      },
+      "days": "{n} يوم",
+      "none": "ما فيه"
+    },
+    "upload": {
+      "title": "ارفع ملفات",
+      "text": "PDF أو JPG أو PNG · بحد أقصى 10 ميجا للملف",
+      "category": "التصنيف",
+      "confirm": "{count, plural, =0 {احفظ الملفات} one {احفظ ملف واحد} two {احفظ ملفين} few {احفظ # ملفات} other {احفظ # ملف}}",
+      "done": "{count, plural, one {انحفظ ملف واحد} two {انحفظ ملفين} few {انحفظت # ملفات} other {انحفظ # ملف}}",
+      "doneText": "انضافت لملف {name}.",
+      "by": "د. خالد منصور"
+    },
+    "viewer": {
+      "meta": "{category} · {size} · صفحة {page} من {pages}",
+      "download": "نزّل",
+      "print": "اطبع",
+      "close": "سكّر",
+      "report": "تقرير المختبر",
+      "preview": "المعاينة مو متاحة",
+      "previewText": "نزّل الملف عشان تفتحه.",
+      "prev": "الصفحة اللي قبل",
+      "next": "الصفحة اللي بعد"
+    },
+    "sms": {
+      "title": "أرسل رسالة",
+      "to": "إلى",
+      "patient": "المريض · {phone}",
+      "guardian": "ولي الأمر · {name} · {phone}",
+      "template": "القالب",
+      "templates": {
+        "reminder": "تذكير بموعد",
+        "results": "النتايج جاهزة",
+        "payment": "تذكير بالدفع",
+        "custom": "رسالة خاصة"
+      },
+      "message": "الرسالة",
+      "counter": "{n} / 160 · {sms, plural, one {رسالة وحدة} two {رسالتين} few {# رسائل} other {# رسالة}}",
+      "send": "أرسل",
+      "sent": "انرسلت الرسالة",
+      "sentText": "انرسلت على {phone}.",
+      "bodies": {
+        "reminder": "تذكير: موعد {name} في عيادة {clinic} مع {doctor} يوم {when}. رد بـ 1 للتأكيد.",
+        "reminderNone": "هلا من النظام الطبي. رد بـ 1 عشان تحجز موعدك الجاي.",
+        "results": "نتايج {name} جاهزة. افتح التطبيق أو كلمنا عشان تراجعها مع الطبيب.",
+        "payment": "فيه مبلغ {amount} ر.س مستحق على ملف {name}. تقدر تدفع عند الكاونتر أو من التطبيق."
+      },
+      "noPhone": "ما فيه رقم جوال بهالملف."
+    }
   }
 }

@@ -1155,5 +1155,171 @@
       "pdf": "Download PDF",
       "print": "Print"
     }
+  },
+  "ov": {
+    "cancel": "Cancel",
+    "note": {
+      "title": "Add clinical note",
+      "type": "Note type",
+      "visit": "Linked visit",
+      "noVisit": "No visit",
+      "text": "Note",
+      "placeholder": "Write what the care team should know…",
+      "shared": "Visible to all doctors in this branch",
+      "save": "Save note",
+      "saved": "Note saved",
+      "savedText": "Added to {name}'s file.",
+      "types": {
+        "clinical": "Clinical",
+        "nursing": "Nursing",
+        "followup": "Follow-up"
+      },
+      "required": "Write the note first."
+    },
+    "visit": {
+      "title": "Visit · {date}",
+      "reason": "Reason",
+      "diagnosis": "Diagnosis",
+      "times": "Check-in → exit",
+      "body": "Weight · height",
+      "vitals": "SpO₂ · temp",
+      "notes": "Doctor's notes",
+      "prescription": "Prescription",
+      "invoice": "Invoice",
+      "invoiceLine": "SAR {total} · insurance {insurance} · due {due}",
+      "print": "Print",
+      "followUp": "Book follow-up",
+      "reschedule": "Reschedule",
+      "cancelAppt": "Cancel appointment",
+      "none": "Nothing recorded for this visit."
+    },
+    "appt": {
+      "current": "Current",
+      "clinic": "Clinic",
+      "when": "{day} · {time}",
+      "menu": "Appointment {date}"
+    },
+    "reschedule": {
+      "title": "Reschedule appointment",
+      "text": "Pick a new day and time",
+      "times": "{day} · available times",
+      "notify": "Notify the patient by SMS",
+      "notifyGuardian": "Notify the guardian by SMS",
+      "confirm": "Confirm new time",
+      "done": "Appointment moved",
+      "doneText": "New time: {when}.",
+      "pick": "Pick a time."
+    },
+    "cancelAppt": {
+      "title": "Cancel this appointment?",
+      "text": "The slot will be released for other patients.",
+      "reason": "Reason",
+      "reasons": {
+        "patient": "Patient request",
+        "doctor": "Doctor unavailable",
+        "mistake": "Booked by mistake"
+      },
+      "keep": "Keep appointment",
+      "confirm": "Cancel appointment",
+      "done": "Appointment cancelled",
+      "doneText": "{when} is free again."
+    },
+    "book": {
+      "title": "Book a visit",
+      "clinic": "Clinic",
+      "doctor": "Doctor",
+      "type": "Visit type",
+      "inPerson": "In person",
+      "telehealth": "Telehealth",
+      "service": "Service",
+      "services": {
+        "followup": "Follow-up · 20 min",
+        "consult": "Consultation · 30 min",
+        "checkup": "Check-up · 45 min"
+      },
+      "day": "{day} · {doctor}",
+      "pickDay": "Pick a day",
+      "note": "Note for reception",
+      "notePlaceholder": "Anything reception should know…",
+      "confirm": "Book visit",
+      "done": "Visit booked",
+      "doneText": "{when} · {doctor}",
+      "pick": "Pick a day and a time.",
+      "noSlots": "No times left on this day.",
+      "reason": "Booked visit"
+    },
+    "rx": {
+      "title": "New prescription",
+      "meta": "{name} · {age} · {weight}",
+      "allergies": "Allergies: {list}.",
+      "medication": "Medication",
+      "search": "Search medicines…",
+      "empty": "No match",
+      "dose": "Dose",
+      "frequency": "Frequency",
+      "duration": "Duration",
+      "refills": "Refills",
+      "instructions": "Instructions for the patient",
+      "instructionsPlaceholder": "e.g. Chew before bedtime.",
+      "confirm": "Add to prescription",
+      "done": "Prescription added",
+      "doneText": "{med} · {dose}",
+      "required": "Required.",
+      "allergyHit": "{name} is allergic to {allergy}. Pick another medicine.",
+      "freq": {
+        "once": "Once daily",
+        "twice": "Twice daily",
+        "three": "Three times daily",
+        "asNeeded": "As needed",
+        "evening": "Once daily · evening"
+      },
+      "days": "{n} days",
+      "none": "None"
+    },
+    "upload": {
+      "title": "Upload files",
+      "text": "PDF, JPG or PNG · up to 10 MB each",
+      "category": "Category",
+      "confirm": "{count, plural, =0 {Save files} one {Save # file} other {Save # files}}",
+      "done": "{count, plural, one {# file saved} other {# files saved}}",
+      "doneText": "Added to {name}'s file.",
+      "by": "Dr. Khaled Mansour"
+    },
+    "viewer": {
+      "meta": "{category} · {size} · page {page} of {pages}",
+      "download": "Download",
+      "print": "Print",
+      "close": "Close",
+      "report": "Laboratory report",
+      "preview": "Preview not available",
+      "previewText": "Download the file to open it.",
+      "prev": "Previous page",
+      "next": "Next page"
+    },
+    "sms": {
+      "title": "Send SMS",
+      "to": "To",
+      "patient": "Patient · {phone}",
+      "guardian": "Guardian · {name} · {phone}",
+      "template": "Template",
+      "templates": {
+        "reminder": "Appointment reminder",
+        "results": "Results ready",
+        "payment": "Payment reminder",
+        "custom": "Custom message"
+      },
+      "message": "Message",
+      "counter": "{n} / 160 · {sms, plural, one {# SMS} other {# SMS}}",
+      "send": "Send",
+      "sent": "SMS sent",
+      "sentText": "Sent to {phone}.",
+      "bodies": {
+        "reminder": "Reminder: {name} has a {clinic} visit with {doctor} on {when}. Reply 1 to confirm.",
+        "reminderNone": "Hello from Medical System. Reply 1 to book your next visit.",
+        "results": "{name}'s results are ready. Open the app or call us to review them with the doctor.",
+        "payment": "A balance of SAR {amount} is due on {name}'s file. Pay at the desk or in the app."
+      },
+      "noPhone": "No mobile number on this file."
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
+import { useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
@@ -15,6 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import type { Patient } from "../data"
 import { BanDialog, ArchiveDialog } from "../list/row-actions"
 import { toggleTag, usePatientsStore } from "../store"
+import { OverlayProvider, useOverlay, type OverlayKind } from "./overlays"
 import { ProfileCard } from "./side"
 import { PATIENT_TABS, usePatient, usePatientTab, useText, type PatientTab } from "./use-patient"
 
@@ -27,6 +29,12 @@ import { PATIENT_TABS, usePatient, usePatientTab, useText, type PatientTab } fro
 export function PatientFrame({ children }: { children: React.ReactNode }) {
   const t = useTranslations("patients.page")
   const current = usePatient()
+  // ?action=book (row menu, side sheet, wizard "Book first visit") opens Book visit once, then the URL is cleaned.
+  const sp = useSearchParams()
+  const [initialAction] = React.useState<OverlayKind | null>(() => (sp.get("action") === "book" ? { kind: "book" } : null))
+  React.useEffect(() => {
+    if (sp.get("action")) window.history.replaceState(null, "", window.location.pathname)
+  }, [sp])
   const tab = usePatientTab()
   // Keep showing the file while leaving after "Archive" (the store drops it at once).
   const [last, setLast] = React.useState(current)
@@ -58,7 +66,7 @@ export function PatientFrame({ children }: { children: React.ReactNode }) {
 
   const { patient, record } = data
   return (
-    <>
+    <OverlayProvider initial={initialAction}>
       <MobileProfileBar patient={patient} />
       <PageContainer className="gap-4 md:gap-6">
         <Heading patient={patient} actions={tab === "overview"} />
@@ -66,7 +74,7 @@ export function PatientFrame({ children }: { children: React.ReactNode }) {
         <PatientTabs active={tab} id={patient.id} counts={{ visits: record.visits.length, files: record.files.length }} />
         {children}
       </PageContainer>
-    </>
+    </OverlayProvider>
   )
 }
 
@@ -118,12 +126,7 @@ function Heading({ patient, actions }: { patient: Patient; actions: boolean }) {
             </Link>
           </Button>
           <IfModule id="appointments">
-            <Button asChild>
-              <Link href={`/patients/${patient.id}?action=book`}>
-                <Icon name="calendar-add" size={20} />
-                {t("book")}
-              </Link>
-            </Button>
+            <BookButton label={t("book")} />
           </IfModule>
           <MoreActions patient={patient} />
         </div>
@@ -161,6 +164,7 @@ function MoreActions({ patient, variant = "outline" }: { patient: Patient; varia
   const name = b(patient.name)
   const isVip = patient.tags.includes("vip")
   const soon = () => toast(t("page.soon"))
+  const overlay = useOverlay()
 
   return (
     <>
@@ -179,7 +183,7 @@ function MoreActions({ patient, variant = "outline" }: { patient: Patient; varia
             <Icon name="document-download" size={16} />
             {t("page.menu.pdf")}
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={soon} disabled={!patient.mobile}>
+          <DropdownMenuItem onSelect={() => overlay.open({ kind: "sms" })}>
             <Icon name="sms" size={16} />
             {t("page.menu.sms")}
           </DropdownMenuItem>
@@ -256,5 +260,15 @@ function PatientTabs({ active, id, counts }: { active: PatientTab; id: string; c
         })}
       </div>
     </nav>
+  )
+}
+
+function BookButton({ label }: { label: string }) {
+  const overlay = useOverlay()
+  return (
+    <Button onClick={() => overlay.open({ kind: "book" })}>
+      <Icon name="calendar-add" size={20} />
+      {label}
+    </Button>
   )
 }

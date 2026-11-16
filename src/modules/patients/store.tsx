@@ -4,11 +4,25 @@ import * as React from "react"
 
 import { allPatients, type Patient, type Tag } from "./data"
 import type { EditForm } from "./edit/form"
+import type { ActivityItem, Medication, Note, PatientFile, Visit } from "./profile/record"
 
 /**
  * Client-side changes made during this session (mock persistence): VIP toggles, bans, archives.
  * Lives in the Patients layout so the list, side sheet and patient page agree. Swap for API mutations later.
  */
+/** Clinical / scheduling changes made from the patient page overlays (session only). */
+export type PatientChanges = {
+  notes: Note[]
+  visits: Visit[]
+  visitEdits: Record<string, Partial<Visit>>
+  /** Keyed by the appointment's original date. */
+  apptEdits: Record<string, { date?: string; time?: string; cancelled?: boolean }>
+  meds: Medication[]
+  files: PatientFile[]
+  activity: ActivityItem[]
+}
+export const NO_CHANGES: PatientChanges = { notes: [], visits: [], visitEdits: {}, apptEdits: {}, meds: [], files: [], activity: [] }
+
 /** A payment taken at the desk (Collect payment overlay). */
 export type Collection = { invoice: string; amount: number; method: "mada" | "cash" | "card"; receipt: string; at: string }
 
@@ -25,6 +39,8 @@ type Store = {
   /** Payments collected this session, per patient. */
   collections: (id: string) => Collection[]
   collect: (id: string, c: Omit<Collection, "receipt" | "at">) => Collection
+  changes: (id: string) => PatientChanges
+  change: (id: string, fn: (c: PatientChanges) => PatientChanges) => void
   /** Add-patient wizard: create a file (shown first in the list); returns its MRN. */
   add: (patient: Omit<Patient, "id" | "mrn">, form: EditForm) => string
   /** Last saved edit form for a patient (this session). */
@@ -39,6 +55,7 @@ export function PatientsStoreProvider({ children }: { children: React.ReactNode 
   const [overrides, setOverrides] = React.useState<Record<string, Override>>({})
   const [added, setAdded] = React.useState<Patient[]>([])
   const [paid, setPaid] = React.useState<Record<string, Collection[]>>({})
+  const [edits, setEdits] = React.useState<Record<string, PatientChanges>>({})
   const base = React.useMemo(() => allPatients(), [])
 
   const patients = React.useMemo(
@@ -76,6 +93,8 @@ export function PatientsStoreProvider({ children }: { children: React.ReactNode 
         setPaid((p) => ({ ...p, [id]: [...(p[id] ?? []), done] }))
         return done
       },
+      changes: (id) => edits[id] ?? NO_CHANGES,
+      change: (id, fn) => setEdits((e) => ({ ...e, [id]: fn(e[id] ?? NO_CHANGES) })),
       add: (patient, form) => {
         // Next file number after the design's latest sample (MRN 004912 for the first new patient).
         const mrn = String(4912 + added.length).padStart(6, "0")
@@ -85,7 +104,7 @@ export function PatientsStoreProvider({ children }: { children: React.ReactNode 
       },
       get: (id) => patients.find((p) => p.id === id),
     }),
-    [patients, overrides, added.length, paid]
+    [patients, overrides, added.length, paid, edits]
   )
 
   return <Ctx.Provider value={store}>{children}</Ctx.Provider>

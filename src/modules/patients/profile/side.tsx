@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { REGIONS } from "../data"
+import { useOverlay } from "./overlays"
 import { usePatient, useText } from "./use-patient"
 
 /** Patient page card: Widget with the page's tighter padding (p-5, gap-4). */
@@ -38,6 +39,7 @@ export function KeyValues({ rows, className }: { rows: [string, React.ReactNode]
 /** Widget / Patient Profile Card: photo (initials), name, sex · age · city, MRN + status, key facts, contact buttons. */
 export function ProfileCard({ className }: { className?: string }) {
   const t = useTranslations("patients")
+  const overlay = useOverlay()
   const { b } = useText()
   const date = useDates().short
   const data = usePatient()
@@ -88,7 +90,11 @@ export function ProfileCard({ className }: { className?: string }) {
         {contact.map(([icon, label, href]) => (
           <Tooltip key={icon}>
             <TooltipTrigger asChild>
-              {href ? (
+              {icon === "sms" ? (
+                <Button variant="outline" size="icon-sm" aria-label={label} onClick={() => overlay.open({ kind: "sms" })}>
+                  <Icon name={icon} size={20} />
+                </Button>
+              ) : href ? (
                 <Button variant="outline" size="icon-sm" asChild>
                   <a href={href} aria-label={label} target={icon === "message" ? "_blank" : undefined} rel="noreferrer">
                     <Icon name={icon} size={20} />

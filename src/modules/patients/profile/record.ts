@@ -1,6 +1,6 @@
 import type { Bi } from "@/lib/mock/bi"
 import type { IconName } from "@/components/ds/icon"
-import type { Collection } from "../store"
+import type { Collection, PatientChanges } from "../store"
 import { TODAY, missingOf, patientDetails, type MissingField, type Patient, type PatientDetails } from "../data"
 
 /**
@@ -96,7 +96,7 @@ export type ActivityItem = {
 }
 
 export type Note = { title: Bi; by: Bi; date: string; body: Bi }
-export type Appointment = { date: string; kind: "booked" | "requested" }
+export type Appointment = { date: string; kind: "booked" | "requested"; time?: string; clinic?: Bi; doctor?: Bi; reason?: Bi; visitId?: string }
 export type BillingLine = { label: Bi; amount: number }
 
 export type PatientRecord = {
@@ -519,9 +519,9 @@ const FAHAD_RECORD: Omit<PatientRecord, "details" | "missing"> = {
   weight: [44, 44.5, 45, 45.5, 46, 46.5, 47.5, 48, 49, 50, 51, 52].map((kg, i) => ({ month: monthIso(i - 11), kg })),
   weightNote: { en: "healthy growth", ar: "نمو طبيعي" },
   appointments: [
-    { date: "2026-11-18", kind: "booked" },
-    { date: "2026-11-25", kind: "requested" },
-    { date: "2026-11-28", kind: "booked" },
+    { date: "2026-11-18", kind: "booked", time: "10:30", clinic: PEDS, doctor: AZ, reason: { en: "Asthma follow-up", ar: "متابعة الربو" }, visitId: "v5" },
+    { date: "2026-11-25", kind: "requested", time: "16:00", clinic: DENTAL, doctor: SO, reason: { en: "Check-up", ar: "كشف" } },
+    { date: "2026-11-28", kind: "booked", time: "09:30", clinic: LAB, doctor: HF, reason: { en: "Vitamin D re-test", ar: "إعادة تحليل فيتامين د" } },
   ],
   billing: {
     since: "2024-01-02",
@@ -814,4 +814,31 @@ export function applyCollections(r: PatientRecord, cols: Collection[]): PatientR
     }))
     .reverse()
   return { ...r, invoices, activity: [...activity, ...r.activity], billing: { ...r.billing, coverage, balance: Math.max(0, r.billing.balance - total) } }
+}
+
+/* ---------------------------------------------------------------- overlay changes (notes, visits, meds, files) */
+
+export function applyChanges(r: PatientRecord, ch: PatientChanges): PatientRecord {
+  if (!ch.notes.length && !ch.visits.length && !Object.keys(ch.visitEdits).length && !Object.keys(ch.apptEdits).length && !ch.meds.length && !ch.files.length && !ch.activity.length)
+    return r
+  const visits = [...ch.visits, ...r.visits].map((v) => ({ ...v, ...ch.visitEdits[v.id] })).sort((a, b) => b.date.localeCompare(a.date))
+  const appointments: Appointment[] = [
+    ...r.appointments.flatMap((a) => {
+      const e = ch.apptEdits[a.date]
+      return e?.cancelled ? [] : [{ ...a, date: e?.date ?? a.date, time: e?.time ?? a.time }]
+    }),
+    ...ch.visits
+      .map((v) => ({ ...v, ...ch.visitEdits[v.id] }))
+      .filter((v) => v.status === "upcoming")
+      .map((v) => ({ date: v.date, kind: "booked" as const, time: v.time, clinic: v.clinic, doctor: v.doctor, reason: v.reason, visitId: v.id })),
+  ]
+  return {
+    ...r,
+    visits,
+    appointments,
+    notes: [...ch.notes, ...r.notes],
+    medications: [...ch.meds, ...r.medications],
+    files: [...ch.files, ...r.files],
+    activity: [...ch.activity, ...r.activity],
+  }
 }

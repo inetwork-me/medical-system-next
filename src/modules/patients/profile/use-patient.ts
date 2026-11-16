@@ -7,7 +7,7 @@ import { useFormatter, useLocale } from "next-intl"
 import { bi, type Bi } from "@/lib/mock/bi"
 import { applyForm } from "../edit/apply"
 import { usePatientsStore } from "../store"
-import { applyCollections, patientRecord, recordSummary } from "./record"
+import { applyChanges, applyCollections, patientRecord, recordSummary } from "./record"
 
 export const PATIENT_TABS = ["overview", "visits", "payments", "medical", "files", "activity"] as const
 export type PatientTab = (typeof PATIENT_TABS)[number]
@@ -15,19 +15,21 @@ export type PatientTab = (typeof PATIENT_TABS)[number]
 /** Current patient (from the session store, so VIP / ban changes show) + its page record. */
 export function usePatient() {
   const { id } = useParams<{ id: string }>()
-  const { get, savedForm, collections } = usePatientsStore()
+  const { get, savedForm, collections, changes } = usePatientsStore()
   const patient = get(id)
   const form = savedForm(id)
   const paid = collections(id)
+  const ch = changes(id)
   const record = React.useMemo(() => {
     if (!patient) return null
     let r = patientRecord(patient)
     if (form) r = applyForm(r, form)
     r = applyCollections(r, paid)
+    r = applyChanges(r, ch)
     // Merged / cleared duplicates: no "possible duplicate" alert any more.
     if (!patient.duplicateOf && r.details.duplicate) r = { ...r, details: { ...r.details, duplicate: undefined } }
     return r
-  }, [patient, form, paid])
+  }, [patient, form, paid, ch])
   const summary = React.useMemo(() => (record ? recordSummary(record) : null), [record])
   return patient && record && summary ? { patient, record, summary } : null
 }

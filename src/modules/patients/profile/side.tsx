@@ -120,10 +120,10 @@ export function PersonalInfo({ className }: { className?: string }) {
   const address = record.missing.includes("address") ? null : b(p.city ?? REGIONS[p.region].long)
   const rows: [IconName, string, React.ReactNode | null][] = [
     ["user", t("page.info.gender"), p.gender === "unset" ? null : t(`gender.single.${p.gender}`)],
-    ["calendar-2", t("page.info.birth"), `${date(d.birthDate)} · ${t("page.years", { n: p.age })}`],
+    ["calendar-2", t("page.info.birth"), record.missing.includes("birthDate") ? null : `${date(d.birthDate)} · ${t("page.years", { n: p.age })}`],
     ["call", t("page.info.phone"), p.mobile && <bdi dir="ltr">{p.mobile}</bdi>],
     ["personalcard", t("page.info.nationalId"), d.nationalId && <bdi dir="ltr">{`${d.nationalId.slice(0, 1)}•••••••${d.nationalId.slice(-2)}`}</bdi>],
-    ["global", t("page.info.nationality"), b(d.nationality)],
+    ["global", t("page.info.nationality"), record.missing.includes("nationality") ? null : b(d.nationality)],
     ["location", t("page.info.address"), address],
   ]
   return (
@@ -165,11 +165,12 @@ export function PersonalInfo({ className }: { className?: string }) {
 /** Widget / Patient Attention: data-quality alerts with link actions (Complete now → edit, Review & merge → merge). */
 export function Attention({ className }: { className?: string }) {
   const t = useTranslations("patients.page.attention")
+  const { locale } = useText()
   const data = usePatient()
   if (!data) return null
   const { patient: p, record } = data
   const f = record.missing.map((k) => t(`fields.${k}`))
-  const fields = f.length === 1 ? f[0] : f.length === 2 ? t("and", { a: f[0], b: f[1] }) : t("list", { a: f[0], b: f[1], c: f[2] })
+  const fields = new Intl.ListFormat(locale, { type: "conjunction" }).format(f)
   const dup = record.details.duplicate
   const alerts = [
     f.length > 0 && {

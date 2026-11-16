@@ -1,6 +1,6 @@
 import type { Bi } from "@/lib/mock/bi"
 import type { IconName } from "@/components/ds/icon"
-import { TODAY, patientDetails, type Patient, type PatientDetails } from "../data"
+import { TODAY, missingOf, patientDetails, type MissingField, type Patient, type PatientDetails } from "../data"
 
 /**
  * Patient page data (Overview + Visits / Payments / Medical / Files / Activity tabs).
@@ -126,7 +126,7 @@ export type PatientRecord = {
     since: string
   }
   /** Personal-info completeness: 10 fields, missing ones listed. */
-  missing: ("nationalId" | "address" | "phone")[]
+  missing: MissingField[]
 }
 
 /* ---------------------------------------------------------------- shared people */
@@ -749,11 +749,8 @@ export function patientRecord(p: Patient): PatientRecord {
   const hit = cache.get(p.id)
   if (hit) return hit
   const details = patientDetails(p)
-  const incomplete = p.tags.includes("incomplete")
-  const missing: PatientRecord["missing"] = []
-  if (!details.nationalId) missing.push("nationalId")
-  if (incomplete || p.id === FAHAD) missing.push("address")
-  if (!p.mobile) missing.push("phone")
+  const missing = [...missingOf(p)]
+  if (!p.mobile && !missing.includes("phone")) missing.push("phone")
   const rec: PatientRecord = {
     details,
     missing,

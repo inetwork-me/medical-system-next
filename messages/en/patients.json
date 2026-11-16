@@ -278,7 +278,10 @@
       "fields": {
         "nationalId": "National ID",
         "address": "address",
-        "phone": "phone number"
+        "phone": "phone number",
+        "nationality": "nationality",
+        "birthDate": "date of birth",
+        "gender": "gender"
       },
       "and": "{a} and {b}",
       "list": "{a}, {b} and {c}",
@@ -764,5 +767,285 @@
       "action": "Show possible duplicates"
     },
     "sameFile": "These are the same file."
+  },
+  "reports": {
+    "open": "Open report",
+    "meta": "Updated today · PDF · Excel",
+    "back": "Reports",
+    "print": "Print",
+    "export": "Export",
+    "exported": "Report exported",
+    "exportedText": "{count} rows saved as CSV.",
+    "loadMore": "Load more",
+    "noRows": "No rows match these filters",
+    "noRowsText": "Try another filter or period.",
+    "period": {
+      "all": "1 – 15 Nov 2026",
+      "last7": "Last 7 days",
+      "today": "Today · 15 Nov 2026",
+      "label": "Period"
+    },
+    "allStaff": "All staff",
+    "allBranches": "All branches",
+    "allDepartments": "All departments",
+    "allDoctors": "All doctors",
+    "allClinics": "All clinics",
+    "all": "All",
+    "cards": {
+      "activity": {
+        "title": "Patient activity log",
+        "desc": "Every add, edit, merge and delete on a patient record: who did it and when.",
+        "page": "Every change on patient records: who, what and when."
+      },
+      "registrations": {
+        "title": "Registrations by period",
+        "desc": "New patients per day, branch and staff, with date filters and print.",
+        "page": "New patients per day, branch, staff and source."
+      },
+      "stay": {
+        "title": "Length of stay",
+        "desc": "Time from first check-in to exit, per visit and staff on duty.",
+        "page": "Time from first check-in to exit, per visit and staff on duty."
+      },
+      "visits": {
+        "title": "Patient visits",
+        "desc": "Bookings, doctors, clinics, status and amounts for every visit.",
+        "page": "Bookings, doctors, clinics, status and amounts for every visit."
+      },
+      "duplicates": {
+        "title": "Duplicate patients",
+        "desc": "Matches by phone, WhatsApp, ID, name and birth date, ready to merge.",
+        "page": "Possible duplicate files by phone, WhatsApp, ID, name and birth date. Review, then merge or dismiss."
+      },
+      "incomplete": {
+        "title": "Incomplete records",
+        "desc": "Files missing phone, birth date, gender, nationality or address.",
+        "page": "Files missing phone, birth date, gender, nationality or address."
+      }
+    },
+    "action": {
+      "added": "Added",
+      "edited": "Edited",
+      "deleted": "Deleted",
+      "merged": "Merged",
+      "banned": "Banned"
+    },
+    "source": {
+      "walkin": "Walk-in",
+      "online": "Online",
+      "referral": "Referral",
+      "insurance": "Insurance",
+      "phone": "Phone"
+    },
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In progress",
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "cancelled": "Cancelled",
+      "noShow": "No-show",
+      "complete": "Complete",
+      "incomplete": "Incomplete",
+      "overTarget": "Over target"
+    },
+    "col": {
+      "when": "When",
+      "staff": "Staff",
+      "action": "Action",
+      "patient": "Patient",
+      "change": "Change",
+      "branch": "Branch",
+      "registered": "Registered",
+      "registeredBy": "Registered by",
+      "source": "Source",
+      "profile": "Profile",
+      "department": "Department",
+      "checkIn": "Check-in",
+      "exit": "Exit",
+      "duration": "Duration",
+      "onDuty": "Staff on duty",
+      "doctor": "Doctor",
+      "clinic": "Clinic",
+      "booking": "Booking",
+      "status": "Status",
+      "amount": "Amount",
+      "missing": "Missing",
+      "completeness": "Completeness",
+      "lastVisit": "Last visit"
+    },
+    "hm": "{h}h {m}m",
+    "m": "{m}m",
+    "by": "by {name}",
+    "activity": {
+      "chips": {
+        "all": "All",
+        "added": "Added",
+        "edited": "Edited",
+        "deleted": "Deleted",
+        "merged": "Merged",
+        "banned": "Banned"
+      }
+    },
+    "registrations": {
+      "kpi": {
+        "new": "New registrations",
+        "newDelta": "+14%",
+        "newCap": "vs previous period",
+        "avg": "Average per day",
+        "avgDelta": "+2.1",
+        "avgCap": "patients a day",
+        "busiest": "Busiest day",
+        "busiestCap": "registrations",
+        "incomplete": "Incomplete at sign-up",
+        "incompleteCap": "of new files"
+      },
+      "chart": "New registrations per day",
+      "chartDesc": "{period} · {branch}",
+      "table": "Registrations",
+      "tableDesc": "{count, plural, one {# new patient} other {# new patients}}",
+      "chips": {
+        "all": "All",
+        "walkin": "Walk-in",
+        "online": "Online",
+        "referral": "Referral",
+        "insurance": "Insurance"
+      }
+    },
+    "stay": {
+      "kpi": {
+        "avg": "Average stay",
+        "avgDelta": "−8m",
+        "avgCap": "vs last month",
+        "median": "Median stay",
+        "medianDelta": "−5m",
+        "medianCap": "vs last month",
+        "longest": "Longest today",
+        "er": "ER",
+        "over": "Over 2h target",
+        "overCap": "visits today"
+      },
+      "byDept": "Average stay by department",
+      "byDeptDesc": "Target: under 2 hours",
+      "split": "Where the time goes",
+      "splitDesc": "Average per visit · {time}",
+      "table": "Stay per visit",
+      "tableDesc": "Today · {count} visits",
+      "chips": {
+        "all": "All",
+        "emergency": "Emergency",
+        "outpatient": "Outpatient",
+        "over": "Over target"
+      }
+    },
+    "visits": {
+      "kpi": {
+        "visits": "Visits",
+        "visitsDelta": "+6%",
+        "visitsCap": "vs previous period",
+        "completed": "Completed",
+        "completedCap": "visits",
+        "cancelled": "Cancelled & no-show",
+        "cancelledCap": "visits",
+        "revenue": "Revenue",
+        "revenueDelta": "+11%",
+        "revenueCap": "vs previous period"
+      },
+      "byClinic": "Visits by clinic",
+      "byClinicDesc": "{period} · {count} visits",
+      "source": "Booking source",
+      "sourceDesc": "How patients booked",
+      "online": "online",
+      "table": "Visits",
+      "tableDesc": "{count} visits",
+      "chips": {
+        "all": "All",
+        "completed": "Completed",
+        "confirmed": "Confirmed",
+        "cancelled": "Cancelled",
+        "noShow": "No-show"
+      }
+    },
+    "duplicates": {
+      "kpi": {
+        "groups": "Duplicate groups",
+        "groupsDelta": "+4",
+        "groupsCap": "this week",
+        "affected": "Patients affected",
+        "affectedCap": "of all files",
+        "high": "High confidence",
+        "highCap": "review first",
+        "merged": "Merged this month",
+        "mergedDelta": "+7",
+        "mergedCap": "vs last month"
+      },
+      "high": "High match",
+      "medium": "Medium match",
+      "reason": {
+        "phone": "Same phone",
+        "whatsapp": "Same WhatsApp",
+        "nationalId": "Same national ID",
+        "nameBirth": "Same name & birth date"
+      },
+      "sameName": "Same name",
+      "notDup": "Not a duplicate",
+      "mergeInto": "Merge into {mrn}",
+      "keep": "Keep",
+      "merge": "Merge",
+      "field": {
+        "name": "Name",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "nationalId": "National ID",
+        "birth": "Date of birth",
+        "visits": "Visits",
+        "lastVisit": "Last visit"
+      },
+      "dismissed": "Marked as not a duplicate",
+      "dismissedText": "We won't suggest these 2 files again.",
+      "undo": "Undo",
+      "none": "No possible duplicates",
+      "noneText": "New matches show here when the data-quality check finds them.",
+      "chips": {
+        "all": "All",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "nationalId": "National ID",
+        "nameBirth": "Name + birth date"
+      }
+    },
+    "incomplete": {
+      "kpi": {
+        "files": "Incomplete files",
+        "filesDelta": "−14",
+        "filesCap": "this week",
+        "share": "Share of all files",
+        "shareCap": "total files",
+        "most": "Most missing",
+        "mostCap": "files",
+        "completed": "Completed this week",
+        "completedDelta": "+6",
+        "completedCap": "vs last week"
+      },
+      "chart": "Missing fields",
+      "chartDesc": "Files missing each field",
+      "table": "Incomplete files",
+      "tableDesc": "{count} files · sorted by priority",
+      "complete": "Complete",
+      "field": {
+        "nationalId": "National ID",
+        "address": "Address",
+        "nationality": "Nationality",
+        "birthDate": "Date of birth",
+        "phone": "Phone",
+        "gender": "Gender"
+      },
+      "chips": {
+        "all": "All",
+        "nationalId": "National ID",
+        "address": "Address",
+        "nationality": "Nationality",
+        "birthDate": "Birth date"
+      }
+    }
   }
 }

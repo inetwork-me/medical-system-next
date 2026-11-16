@@ -12,6 +12,9 @@ export function applyForm(r: PatientRecord, f: EditForm): PatientRecord {
   if (!f.idNumber.trim()) missing.push("nationalId")
   if (!f.street.trim()) missing.push("address")
   if (!f.mobile.trim()) missing.push("phone")
+  if (!f.nationality) missing.push("nationality")
+  if (!f.birthDate) missing.push("birthDate")
+  if (f.gender === "unset") missing.push("gender")
   const known = new Map(r.allergies.flatMap((a) => [[a.name.en, a] as const, [a.name.ar, a] as const]))
   return {
     ...r,

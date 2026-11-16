@@ -62,7 +62,7 @@ const DESIGN: Patient[] = [
   { id: "004812", mrn: "004812", initials: "SA", name: { en: "Sara Ahmed", ar: "سارة أحمد" }, gender: "female", age: 34, mobile: "050 123 4567", region: "riyadh", branch: "main", tags: ["vip"], lastVisit: "2026-11-15", visits: 12, registered: "2021-05-04" },
   { id: "004833", mrn: "004833", initials: "OH", name: { en: "Omar Al-Harbi", ar: "عمر الحربي" }, gender: "male", age: 52, mobile: "055 987 1122", region: "jeddah", branch: "jeddah", tags: [], lastVisit: "2026-11-12", visits: 5, registered: "2023-02-19" },
   { id: "004857", mrn: "004857", initials: "LH", name: { en: "Lina Haddad", ar: "لينا حداد" }, gender: "female", age: 8, mobile: null, region: "riyadh", branch: "olaya", tags: ["incomplete"], lastVisit: "2026-11-10", visits: 3, registered: "2025-09-08" },
-  { id: "004861", mrn: "004861", initials: "YN", name: { en: "Yousef Nasser", ar: "يوسف ناصر" }, gender: "male", age: 67, mobile: "054 222 8890", region: "eastern", branch: "main", tags: ["duplicate"], lastVisit: "2026-11-09", visits: 21, registered: "2019-11-23", duplicateOf: "004833" },
+  { id: "004861", mrn: "004861", initials: "YN", name: { en: "Yousef Nasser", ar: "يوسف ناصر" }, gender: "male", age: 67, mobile: "054 222 8890", region: "eastern", branch: "main", tags: ["duplicate"], lastVisit: "2026-11-09", visits: 21, registered: "2019-11-23", duplicateOf: "004712" },
   { id: "004870", mrn: "004870", initials: "MS", name: { en: "Maha Saleh", ar: "مها صالح" }, gender: "female", age: 29, mobile: "056 410 7733", region: "makkah", branch: "main", tags: ["banned"], lastVisit: "2026-11-02", visits: 2, registered: "2024-07-30" },
   { id: "004874", mrn: "004874", initials: "AQ", name: { en: "Abdullah Al-Qahtani", ar: "عبدالله القحطاني" }, gender: "male", age: 41, mobile: "050 771 2045", region: "riyadh", branch: "olaya", tags: ["vip"], lastVisit: "2026-11-01", visits: 9, registered: "2022-03-14" },
   { id: "004880", mrn: "004880", initials: "NR", name: { en: "Noura Al-Rashid", ar: "نورة الراشد" }, gender: "female", age: 23, mobile: "053 118 6650", region: "madinah", branch: "main", tags: [], lastVisit: "2026-10-30", visits: 1, registered: "2026-10-30" },
@@ -121,7 +121,7 @@ function generate(): Patient[] {
     const tag = tagRoll[i]
     const tags: Tag[] = tag === "none" ? [] : [tag]
     const mrn = String(1000 + i * 3).padStart(6, "0")
-    const noPhone = tag === "incomplete" && rand() < 0.5
+    rand() // (kept so the random sequence — and every generated value — stays the same; phones are cleared by MISSING below)
     const phone = `05${Math.floor(rand() * 10)} ${String(Math.floor(rand() * 1000)).padStart(3, "0")} ${String(Math.floor(rand() * 10000)).padStart(4, "0")}`
     const last = new Date(lastStart - Math.floor(i * 0.55) * 86400000)
     const regDate = new Date(Date.UTC(2019 + Math.floor(rand() * 7), Math.floor(rand() * 12), 1 + Math.floor(rand() * 27)))
@@ -132,7 +132,7 @@ function generate(): Patient[] {
       name: { en: `${first[0]} ${fam[0]}`, ar: `${first[1]} ${fam[1]}` },
       gender: g,
       age,
-      mobile: noPhone ? null : phone,
+      mobile: phone,
       region,
       city: region === "other" ? OTHER_CITIES[i % OTHER_CITIES.length] : undefined,
       branch: region === "jeddah" ? "jeddah" : rand() < 0.65 ? "main" : "olaya",
@@ -167,9 +167,15 @@ function generate(): Patient[] {
     mobile: "059 300 1287",
     branch: "olaya",
     visits: 7,
-    lastVisit: "2025-11-03",
+    lastVisit: "2026-06-14",
     registered: "2022-09-14",
   }
+  // Duplicate-report samples: the older files paired with Yousef Nasser (004861) and Noura Al-Rashid (004880).
+  const pick = (f: (p: Patient) => boolean, taken: number[]) => out.findIndex((p, i) => !taken.includes(i) && !p.tags.length && f(p))
+  const y = pick((p) => p.gender === "male" && p.age >= 60 && p.region === "eastern", [k, j])
+  out[y] = { ...out[y], id: "004712", mrn: "004712", initials: "YA", name: { en: "Yousef A. Nasser", ar: "يوسف عبدالله ناصر" }, age: 67, mobile: "055 019 4432", visits: 3, lastVisit: "2025-01-11", registered: "2021-03-02" }
+  const nr = pick((p) => p.gender === "female" && ageGroupOf(p.age) === "youth" && p.region === "madinah", [k, j, y])
+  out[nr] = { ...out[nr], id: "003998", mrn: "003998", initials: "NM", name: { en: "Noura M. Alrashed", ar: "نورة محمد الراشد" }, age: 23, mobile: "053 118 6650", visits: 2, lastVisit: "2024-03-02", registered: "2023-11-20" }
   // Pair suspected duplicates with a neighbour record (same mobile in the data-quality report).
   out.forEach((p, i) => {
     if (p.tags.includes("duplicate")) p.duplicateOf = out[(i + 1) % out.length].mrn
@@ -179,8 +185,53 @@ function generate(): Patient[] {
 
 let cache: Patient[] | null = null
 export function allPatients(): Patient[] {
-  if (!cache) cache = [...DESIGN, ...generate()]
+  if (!cache) {
+    cache = [...DESIGN, ...generate()]
+    buildMissing(cache)
+  }
   return cache
+}
+
+/* ---------------------------------------------------------------- incomplete files: what is missing */
+
+export type MissingField = "nationalId" | "address" | "nationality" | "birthDate" | "phone" | "gender"
+export const MISSING_FIELDS: MissingField[] = ["nationalId", "address", "nationality", "birthDate", "phone", "gender"]
+/** Design figures (Incomplete records report): files missing each field. */
+const MISSING_COUNTS: [MissingField, number][] = [["nationalId", 74], ["address", 61], ["nationality", 38], ["birthDate", 22], ["phone", 9]]
+const MISSING_FIXED: Record<string, MissingField[]> = { "004891": ["nationalId", "address"], "004857": ["phone", "nationalId", "nationality"] }
+const missingMap = new Map<string, MissingField[]>()
+
+/** Spreads the design's missing-field counts over the incomplete files (deterministic); clears their phones. */
+function buildMissing(list: Patient[]) {
+  const rand = mulberry32(128)
+  const inc = list.filter((p) => p.tags.includes("incomplete"))
+  const used = Object.values(MISSING_FIXED).flat()
+  const tokens = bag<MissingField>(MISSING_COUNTS.map(([f, n]) => [f, n - used.filter((x) => x === f).length]), rand)
+  const files = inc.filter((p) => !MISSING_FIXED[p.id])
+  for (const [id, f] of Object.entries(MISSING_FIXED)) missingMap.set(id, f)
+  files.forEach((p) => missingMap.set(p.id, [tokens.pop()!]))
+  for (const f of tokens) {
+    for (let tries = 0; tries < 12; tries++) {
+      const p = files[Math.floor(rand() * files.length)]
+      const m = missingMap.get(p.id)!
+      if (!m.includes(f)) {
+        m.push(f)
+        break
+      }
+    }
+  }
+  for (const p of inc) {
+    const m = missingMap.get(p.id)!
+    if (p.gender === "unset" && !m.includes("gender")) m.push("gender")
+    m.sort((a, b) => MISSING_FIELDS.indexOf(a) - MISSING_FIELDS.indexOf(b))
+    if (m.includes("phone") && !DESIGN.includes(p)) p.mobile = null
+  }
+}
+
+/** Fields missing on a file (only incomplete files have any). */
+export function missingOf(p: Patient): MissingField[] {
+  allPatients()
+  return p.tags.includes("incomplete") ? (missingMap.get(p.id) ?? ["nationalId"]) : []
 }
 
 export const patientById = (id: string) => allPatients().find((p) => p.id === id)
@@ -284,8 +335,9 @@ export type PatientDetails = {
 export function patientDetails(p: Patient): PatientDetails {
   const rand = mulberry32(Number(p.mrn) + 7)
   const birthYear = 2026 - p.age
-  const birthDate = p.id === "004891" ? "2011-03-12" : `${birthYear}-${pad(1 + Math.floor(rand() * 12))}-${pad(1 + Math.floor(rand() * 27))}`
-  const incomplete = p.tags.includes("incomplete")
+  const FIXED_BIRTH: Record<string, string> = { "004891": "2011-03-12", "004520": "2011-03-12", "004861": "1959-02-03", "004712": "1959-02-03", "004880": "2003-07-19" }
+  const birthDate = FIXED_BIRTH[p.id] ? FIXED_BIRTH[p.id] : `${birthYear}-${pad(1 + Math.floor(rand() * 12))}-${pad(1 + Math.floor(rand() * 27))}`
+  const missing = missingOf(p)
   const visitsList =
     p.id === "004891"
       ? FAHAD_VISITS
@@ -304,10 +356,10 @@ export function patientDetails(p: Patient): PatientDetails {
     : undefined
   return {
     whatsapp: p.mobile,
-    nationalId: incomplete ? null : p.id === "004650" ? "1087334902" : p.id === "004520" ? "1102334551" : `1${Math.floor(rand() * 1e9).toString().padStart(9, "0")}`,
+    nationalId: missing.includes("nationalId") ? null : p.id === "004650" ? "1087334902" : p.id === "004520" ? "1102334551" : p.id === "004861" || p.id === "004712" ? "1045776210" : p.id === "004880" ? "1120556781" : `1${Math.floor(rand() * 1e9).toString().padStart(9, "0")}`,
     birthDate,
     nationality: { en: "Saudi", ar: "سعودي" },
-    district: incomplete && p.id !== "004891" ? null : p.id === "004891" || p.id === "004520" ? { en: "Al Malqa", ar: "الملقا" } : null,
+    district: p.id === "004891" || p.id === "004520" ? { en: "Al Malqa", ar: "الملقا" } : null,
     insurance: p.id === "004891" ? { en: "Bupa · Class B", ar: "بوبا · فئة B" } : rand() < 0.6 ? { en: "Tawuniya · Class A", ar: "التعاونية · فئة A" } : null,
     classification: p.tags.includes("vip") ? { en: "VIP", ar: "VIP" } : { en: "Regular", ar: "عادي" },
     registeredBy: { en: "Reem (reception)", ar: "ريم (الاستقبال)" },

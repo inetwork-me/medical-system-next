@@ -21,7 +21,7 @@ type FlowState = {
 }
 
 const initial: FlowState = {
-  identifier: DEMO_ACCOUNT.email,
+  identifier: "", // starts empty: a pre-filled value got the typed email appended to it
   keepSignedIn: true,
   loginAttemptsLeft: LOGIN_ATTEMPTS,
   signupMobile: "0554182290",

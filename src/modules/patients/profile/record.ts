@@ -1,5 +1,6 @@
 import type { Bi } from "@/lib/mock/bi"
 import type { IconName } from "@/components/ds/icon"
+import type { Collection } from "../store"
 import { TODAY, missingOf, patientDetails, type MissingField, type Patient, type PatientDetails } from "../data"
 
 /**
@@ -778,4 +779,39 @@ export function recordSummary(r: PatientRecord) {
     profile: { complete: 10 - r.missing.length, total: 10 },
     filesBytes: r.files.reduce((s, f) => s + f.bytes, 0),
   }
+}
+
+/* ---------------------------------------------------------------- payments collected this session */
+
+const METHOD_BI: Record<Collection["method"], Bi> = { mada: { en: "Mada", ar: "مدى" }, cash: { en: "Cash", ar: "كاش" }, card: { en: "Card", ar: "بطاقة" } }
+
+/** Record with the session's desk payments applied: invoices paid, balance down, "Paid" line up, activity entry. */
+export function applyCollections(r: PatientRecord, cols: Collection[]): PatientRecord {
+  if (!cols.length) return r
+  const total = cols.reduce((s, c) => s + c.amount, 0)
+  const invoices = r.invoices.map((inv) => {
+    const got = cols.filter((c) => c.invoice === inv.no).reduce((s, c) => s + c.amount, 0)
+    if (!got || inv.status !== "pending") return inv
+    const method = cols.find((c) => c.invoice === inv.no)!.method
+    return {
+      ...inv,
+      status: got >= Math.min(inv.share, r.billing.balance) ? ("paid" as const) : inv.status,
+      method: inv.insurance ? { en: `Insurance + ${METHOD_BI[method].en}`, ar: `تأمين + ${METHOD_BI[method].ar}` } : METHOD_BI[method],
+    }
+  })
+  const coverage = [...r.billing.coverage]
+  const i = coverage.findIndex((l) => l.label.en.startsWith("Paid"))
+  if (i >= 0) coverage[i] = { ...coverage[i], amount: coverage[i].amount - total }
+  else coverage.push({ label: { en: "Paid", ar: "مدفوع" }, amount: -total })
+  const activity: ActivityItem[] = cols
+    .map((c) => ({
+      date: TODAY,
+      time: new Date(c.at).toTimeString().slice(0, 5),
+      initials: "KM",
+      by: { en: "Dr. Khaled Mansour", ar: "د. خالد منصور" },
+      kind: "added" as const,
+      text: { en: `Payment received: SAR ${c.amount} · ${METHOD_BI[c.method].en} · ${c.receipt}`, ar: `استلام مبلغ: ${c.amount} ر.س · ${METHOD_BI[c.method].ar} · ${c.receipt}` },
+    }))
+    .reverse()
+  return { ...r, invoices, activity: [...activity, ...r.activity], billing: { ...r.billing, coverage, balance: Math.max(0, r.billing.balance - total) } }
 }

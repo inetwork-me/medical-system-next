@@ -9,6 +9,9 @@ import type { EditForm } from "./edit/form"
  * Client-side changes made during this session (mock persistence): VIP toggles, bans, archives.
  * Lives in the Patients layout so the list, side sheet and patient page agree. Swap for API mutations later.
  */
+/** A payment taken at the desk (Collect payment overlay). */
+export type Collection = { invoice: string; amount: number; method: "mada" | "cash" | "card"; receipt: string; at: string }
+
 type Override = { tags?: Tag[]; archived?: boolean; fields?: Partial<Patient>; form?: EditForm }
 
 type Store = {
@@ -19,6 +22,9 @@ type Store = {
   save: (id: string, fields: Partial<Patient>, form: EditForm) => void
   /** Merge page: `drop` is closed into `keep` (fields + form for the kept file). Returns an undo function. */
   merge: (keep: string, drop: string, fields: Partial<Patient>, form: EditForm) => () => void
+  /** Payments collected this session, per patient. */
+  collections: (id: string) => Collection[]
+  collect: (id: string, c: Omit<Collection, "receipt" | "at">) => Collection
   /** Add-patient wizard: create a file (shown first in the list); returns its MRN. */
   add: (patient: Omit<Patient, "id" | "mrn">, form: EditForm) => string
   /** Last saved edit form for a patient (this session). */
@@ -27,10 +33,12 @@ type Store = {
 }
 
 const Ctx = React.createContext<Store | null>(null)
+const NONE: Collection[] = []
 
 export function PatientsStoreProvider({ children }: { children: React.ReactNode }) {
   const [overrides, setOverrides] = React.useState<Record<string, Override>>({})
   const [added, setAdded] = React.useState<Patient[]>([])
+  const [paid, setPaid] = React.useState<Record<string, Collection[]>>({})
   const base = React.useMemo(() => allPatients(), [])
 
   const patients = React.useMemo(
@@ -62,6 +70,12 @@ export function PatientsStoreProvider({ children }: { children: React.ReactNode 
         }))
         return () => setOverrides(snapshot)
       },
+      collections: (id) => paid[id] ?? NONE,
+      collect: (id, c) => {
+        const done: Collection = { ...c, receipt: c.invoice.replace("INV", "RCP"), at: new Date().toISOString() }
+        setPaid((p) => ({ ...p, [id]: [...(p[id] ?? []), done] }))
+        return done
+      },
       add: (patient, form) => {
         // Next file number after the design's latest sample (MRN 004912 for the first new patient).
         const mrn = String(4912 + added.length).padStart(6, "0")
@@ -71,7 +85,7 @@ export function PatientsStoreProvider({ children }: { children: React.ReactNode 
       },
       get: (id) => patients.find((p) => p.id === id),
     }),
-    [patients, overrides, added.length]
+    [patients, overrides, added.length, paid]
   )
 
   return <Ctx.Provider value={store}>{children}</Ctx.Provider>

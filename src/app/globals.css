@@ -313,3 +313,20 @@ html[lang="ar"] {
   direction: ltr;
   unicode-bidi: isolate;
 }
+
+/* Printing a receipt / statement: only the marked area prints (printArea() in modules/patients/payments). */
+@media print {
+  html[data-printing] body * {
+    visibility: hidden !important;
+  }
+  html[data-printing] [data-print-area],
+  html[data-printing] [data-print-area] * {
+    visibility: visible !important;
+  }
+  html[data-printing] [data-print-area] {
+    position: fixed;
+    inset: 0;
+    margin: 0 auto;
+    box-shadow: none !important;
+  }
+}

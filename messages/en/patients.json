@@ -1047,5 +1047,113 @@
         "birthDate": "Birth date"
       }
     }
+  },
+  "pay": {
+    "kpi": {
+      "collected": "Collected this month",
+      "collectedDelta": "+8.2%",
+      "collectedCap": "vs last month",
+      "outstanding": "Outstanding",
+      "outstandingCap": "invoices",
+      "refunds": "Refunds",
+      "refundsCap": "transactions",
+      "claims": "Insurance claims",
+      "claimsDelta": "SAR 210K",
+      "claimsCap": "pending review"
+    },
+    "search": "Search receipt or patient…",
+    "chips": {
+      "all": "All",
+      "paid": "Paid",
+      "pending": "Pending",
+      "refunded": "Refunded",
+      "insurance": "Insurance"
+    },
+    "period": {
+      "month": "This month",
+      "week": "Last 7 days",
+      "today": "Today"
+    },
+    "periodLabel": "Period",
+    "col": {
+      "date": "Date",
+      "receipt": "Receipt",
+      "patient": "Patient",
+      "service": "Service",
+      "method": "Method",
+      "amount": "Amount",
+      "status": "Status"
+    },
+    "status": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "refunded": "Refunded",
+      "partial": "Partial"
+    },
+    "viewReceipt": "View receipt {no}",
+    "sar": "SAR {amount}",
+    "noResults": "No transactions match",
+    "noResultsText": "Try another receipt number, patient or filter.",
+    "collect": {
+      "title": "Collect payment",
+      "text": "{invoice} · patient share of the {date} visit",
+      "total": "Invoice total",
+      "covered": "Insurance covered",
+      "due": "Due now",
+      "amount": "Amount (SAR)",
+      "method": "Payment method",
+      "mada": "Mada card",
+      "madaHint": "Tap or insert at the desk",
+      "cash": "Cash",
+      "card": "Apple Pay / credit card",
+      "sms": "Send the receipt by SMS",
+      "confirm": "Collect SAR {amount}",
+      "errorEmpty": "Enter the amount.",
+      "errorMore": "That's more than the SAR {due} due."
+    },
+    "received": {
+      "title": "Payment received",
+      "text": "The receipt was sent to {phone}.",
+      "textNoSms": "Print the receipt or send it later.",
+      "receipt": "Receipt",
+      "method": "Method",
+      "amount": "Amount",
+      "balance": "Balance now",
+      "print": "Print receipt",
+      "done": "Done"
+    },
+    "receipt": {
+      "title": "Receipt {no}",
+      "text": "{status} {date} · {method}",
+      "paidOn": "Paid",
+      "issuedOn": "Issued",
+      "clinic": "Medical System · Main branch",
+      "vat": "VAT 300 123 456 700 003 · Riyadh",
+      "patient": "Patient",
+      "service": "Service",
+      "doctor": "Doctor",
+      "subtotal": "Subtotal",
+      "vatLine": "VAT (0% · citizen)",
+      "insurance": "Insurance",
+      "paid": "Paid",
+      "due": "Due",
+      "thanks": "Thank you. Keep this receipt for insurance claims.",
+      "pdf": "Download PDF",
+      "print": "Print",
+      "pdfStarted": "Preparing the PDF",
+      "pdfStartedText": "Your download starts in a moment."
+    },
+    "statement": {
+      "title": "Account statement · print preview",
+      "text": "A4 · 1 page",
+      "heading": "Account statement",
+      "meta": "{name} · MRN {mrn} · {from} – {to}",
+      "date": "Date",
+      "item": "Item",
+      "amount": "Amount",
+      "balance": "Balance due (SAR)",
+      "pdf": "Download PDF",
+      "print": "Print"
+    }
   }
 }

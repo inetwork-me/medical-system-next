@@ -1047,5 +1047,113 @@
         "birthDate": "الميلاد"
       }
     }
+  },
+  "pay": {
+    "kpi": {
+      "collected": "المحصّل هالشهر",
+      "collectedDelta": "+8.2%",
+      "collectedCap": "عن الشهر اللي فات",
+      "outstanding": "مبالغ معلّقة",
+      "outstandingCap": "فاتورة",
+      "refunds": "المسترجع",
+      "refundsCap": "عملية",
+      "claims": "مطالبات التأمين",
+      "claimsDelta": "210 ألف ر.س",
+      "claimsCap": "تحت المراجعة"
+    },
+    "search": "دوّر برقم الفاتورة أو المريض…",
+    "chips": {
+      "all": "الكل",
+      "paid": "مدفوع",
+      "pending": "معلّق",
+      "refunded": "مسترجع",
+      "insurance": "تأمين"
+    },
+    "period": {
+      "month": "هالشهر",
+      "week": "آخر 7 أيام",
+      "today": "اليوم"
+    },
+    "periodLabel": "الفترة",
+    "col": {
+      "date": "التاريخ",
+      "receipt": "الفاتورة",
+      "patient": "المريض",
+      "service": "الخدمة",
+      "method": "طريقة الدفع",
+      "amount": "المبلغ",
+      "status": "الحالة"
+    },
+    "status": {
+      "paid": "مدفوع",
+      "pending": "معلّق",
+      "refunded": "مسترجع",
+      "partial": "دفع جزئي"
+    },
+    "viewReceipt": "افتح إيصال {no}",
+    "sar": "{amount} ر.س",
+    "noResults": "ما فيه عمليات مطابقة",
+    "noResultsText": "جرّب رقم فاتورة أو مريض أو فلتر ثاني.",
+    "collect": {
+      "title": "تحصيل مبلغ",
+      "text": "حصة المريض من زيارة {date} · {invoice}",
+      "total": "إجمالي الفاتورة",
+      "covered": "غطّاه التأمين",
+      "due": "المستحق الحين",
+      "amount": "المبلغ (ر.س)",
+      "method": "طريقة الدفع",
+      "mada": "بطاقة مدى",
+      "madaHint": "تمرير أو إدخال عند الكاونتر",
+      "cash": "كاش",
+      "card": "Apple Pay أو بطاقة ائتمان",
+      "sms": "أرسل الإيصال برسالة",
+      "confirm": "حصّل {amount} ر.س",
+      "errorEmpty": "دخّل المبلغ.",
+      "errorMore": "المبلغ أكثر من المستحق ({due} ر.س)."
+    },
+    "received": {
+      "title": "تم استلام المبلغ",
+      "text": "انرسل الإيصال على {phone}.",
+      "textNoSms": "اطبع الإيصال أو أرسله بعدين.",
+      "receipt": "الإيصال",
+      "method": "الطريقة",
+      "amount": "المبلغ",
+      "balance": "الرصيد الحين",
+      "print": "اطبع الإيصال",
+      "done": "تمام"
+    },
+    "receipt": {
+      "title": "إيصال {no}",
+      "text": "{status} {date} · {method}",
+      "paidOn": "مدفوع",
+      "issuedOn": "صادر",
+      "clinic": "النظام الطبي · الفرع الرئيسي",
+      "vat": "الرقم الضريبي 300 123 456 700 003 · الرياض",
+      "patient": "المريض",
+      "service": "الخدمة",
+      "doctor": "الطبيب",
+      "subtotal": "المجموع",
+      "vatLine": "الضريبة (0% · مواطن)",
+      "insurance": "التأمين",
+      "paid": "المدفوع",
+      "due": "المستحق",
+      "thanks": "شكراً لك. احتفظ بالإيصال لمطالبات التأمين.",
+      "pdf": "نزّل PDF",
+      "print": "اطبع",
+      "pdfStarted": "نجهّز ملف PDF",
+      "pdfStartedText": "التنزيل يبدأ بعد لحظات."
+    },
+    "statement": {
+      "title": "كشف حساب · معاينة الطباعة",
+      "text": "A4 · صفحة وحدة",
+      "heading": "كشف حساب",
+      "meta": "{name} · {mrn} · {from} – {to}",
+      "date": "التاريخ",
+      "item": "البند",
+      "amount": "المبلغ",
+      "balance": "المستحق (ر.س)",
+      "pdf": "نزّل PDF",
+      "print": "اطبع"
+    }
   }
 }

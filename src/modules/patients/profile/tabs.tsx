@@ -16,8 +16,9 @@ import { DropZone } from "@/components/ds/upload"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FILE_GROUP, type ActivityKind, type FileGroup, type InvoiceStatus, type VisitStatus, type When } from "./record"
+import { FILE_GROUP, type ActivityKind, type Invoice, type FileGroup, type InvoiceStatus, type VisitStatus, type When } from "./record"
 import { MiniBars } from "./overview"
+import { CollectFlow, ReceiptDialog, StatementDialog } from "../payments/overlays"
 import { PCard, PersonalInfo, ProfileCard, useSoon } from "./side"
 import { usePatient, useText } from "./use-patient"
 
@@ -250,7 +251,9 @@ export function PaymentsTab() {
   const t = useTranslations("patients.page")
   const dates = useDates()
   const { b } = useText()
-  const soon = useSoon()
+  const [dialog, setDialog] = React.useState<null | "collect" | "statement" | { receipt: Invoice }>(null)
+  // Snapshot of the invoice being collected: the flow stays mounted for "Payment received" after the balance hits 0.
+  const [collecting, setCollecting] = React.useState<{ invoice: Invoice; due: number } | null>(null)
   const data = usePatient()
   if (!data) return null
   const { patient, record, summary } = data
@@ -289,7 +292,13 @@ export function PaymentsTab() {
               })}
             </p>
           </div>
-          <Button size="sm" onClick={soon}>
+          <Button
+            size="sm"
+            onClick={() => {
+              setCollecting({ invoice: pending, due: money.due })
+              setDialog("collect")
+            }}
+          >
             {t("payments.collect")}
           </Button>
         </div>
@@ -302,7 +311,7 @@ export function PaymentsTab() {
           date: dates.monthYear(patient.registered),
         })}
         action={
-          <Button variant="ghost" size="sm" onClick={soon}>
+          <Button variant="ghost" size="sm" onClick={() => setDialog("statement")}>
             <Icon name="printer" size={16} />
             {t("payments.statement")}
           </Button>
@@ -338,7 +347,7 @@ export function PaymentsTab() {
                   <Sar amount={inv.insurance} />
                   <Sar amount={inv.share} className="font-medium" />
                   <StatusBadge tone={INVOICE_TONE[inv.status]}>{t(`status.${inv.status}`)}</StatusBadge>
-                  <Button variant="ghost" size="icon-sm" aria-label={t("payments.receipt")} onClick={soon} disabled={inv.status === "void"}>
+                  <Button variant="ghost" size="icon-sm" aria-label={t("payments.receipt")} onClick={() => setDialog({ receipt: inv })} disabled={inv.status === "void"}>
                     <Icon name="receipt-2" size={16} />
                   </Button>
                 </TRow>
@@ -369,6 +378,35 @@ export function PaymentsTab() {
           </>
         )}
       </PCard>
+      {collecting && (
+        <CollectFlow
+          patient={patient}
+          invoice={collecting.invoice}
+          due={collecting.due}
+          open={dialog === "collect"}
+          onOpenChange={(o) => setDialog(o ? "collect" : null)}
+        />
+      )}
+      <StatementDialog patient={patient} record={record} open={dialog === "statement"} onOpenChange={(o) => setDialog(o ? "statement" : null)} />
+      {dialog && typeof dialog === "object" && (
+        <ReceiptDialog
+          open
+          onOpenChange={(o) => !o && setDialog(null)}
+          data={{
+            no: dialog.receipt.no,
+            date: dialog.receipt.date,
+            status: dialog.receipt.status,
+            method: dialog.receipt.method,
+            patient,
+            service: dialog.receipt.service,
+            doctor: record.visits.find((v) => v.date === dialog.receipt.date)?.doctor ?? null,
+            subtotal: dialog.receipt.total,
+            insurance: dialog.receipt.insurance,
+            paid: dialog.receipt.status === "paid" ? dialog.receipt.share : 0,
+            due: dialog.receipt.status === "pending" ? Math.min(dialog.receipt.share, money.due) : 0,
+          }}
+        />
+      )}
     </>
   )
 }

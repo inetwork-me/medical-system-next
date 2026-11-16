@@ -1,0 +1,6 @@
+{
+  "title": "Good morning, {name}",
+  "description": "Here's today's summary of patients and appointments.",
+  "export": "Export",
+  "newAppointment": "New appointment"
+}

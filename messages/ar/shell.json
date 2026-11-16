@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "dashboard": "الرئيسية",
+    "home": "الرئيسية",
+    "patients": "المرضى",
+    "appointments": "المواعيد",
+    "doctors": "الأطباء",
+    "departments": "الأقسام",
+    "records": "الملفات الطبية",
+    "recordsShort": "الملفات الطبية",
+    "lab": "نتائج التحاليل",
+    "labShort": "التحاليل",
+    "billing": "الفواتير",
+    "reports": "التقارير",
+    "messages": "الرسائل",
+    "settings": "الإعدادات",
+    "logout": "تسجيل خروج",
+    "more": "المزيد",
+    "profile": "ملفي",
+    "help": "المساعدة والدعم"
+  },
+  "groups": {
+    "main": "الأساسية",
+    "clinical": "الخدمات الطبية",
+    "admin": "الإدارة"
+  },
+  "tabs": {
+    "patients": {
+      "list": "قائمة المرضى",
+      "reports": "التقارير",
+      "payments": "المدفوعات"
+    }
+  },
+  "header": {
+    "toggleSidebar": "اعرض أو اخفِ القائمة",
+    "searchPlaceholder": "دوّر على مريض…",
+    "searchShort": "دوّر…",
+    "darkMode": "الوضع الليلي",
+    "notifications": "الإشعارات",
+    "accountMenu": "قائمة الحساب",
+    "mainNav": "التنقل الرئيسي"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "unread": "{count} ما انقرت",
+    "markAll": "علّم الكل كمقروء",
+    "viewAll": "اعرض كل الإشعارات"
+  },
+  "search": {
+    "patients": "المرضى · {count}",
+    "recent": "عمليات بحث سابقة",
+    "hint": "دوّر بالاسم أو رقم الملف أو الجوال أو الهوية · Enter يعرض كل النتايج",
+    "mrn": "MRN {mrn}",
+    "noResults": "ما فيه مرضى مطابقين",
+    "age": "{n} سنة"
+  },
+  "more": {
+    "title": "المزيد",
+    "language": "اللغة",
+    "darkMode": "الوضع الليلي"
+  },
+  "placeholder": {
+    "title": "{module} جاي قريب",
+    "description": "هالقسم لسه ما انبنى، تصميمه شغالين عليه."
+  }
+}

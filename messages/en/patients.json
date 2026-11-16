@@ -1,0 +1,9 @@
+{
+  "title": "Patients",
+  "addPatient": "Add patient",
+  "description": {
+    "list": "All patients across your branches: profiles, data quality and visits.",
+    "reports": "Detailed patient reports you can filter, print and export.",
+    "payments": "Payment history and transactions for every patient."
+  }
+}

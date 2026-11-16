@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "home": "Home",
+    "patients": "Patients",
+    "appointments": "Appointments",
+    "doctors": "Doctors",
+    "departments": "Departments",
+    "records": "Medical records",
+    "recordsShort": "Records",
+    "lab": "Lab results",
+    "labShort": "Lab results",
+    "billing": "Billing",
+    "reports": "Reports",
+    "messages": "Messages",
+    "settings": "Settings",
+    "logout": "Log out",
+    "more": "More",
+    "profile": "My profile",
+    "help": "Help & support"
+  },
+  "groups": {
+    "main": "Main",
+    "clinical": "Clinical",
+    "admin": "Admin"
+  },
+  "tabs": {
+    "patients": {
+      "list": "Patients list",
+      "reports": "Reports",
+      "payments": "Payments"
+    }
+  },
+  "header": {
+    "toggleSidebar": "Toggle sidebar",
+    "searchPlaceholder": "Search patients, MRN…",
+    "searchShort": "Search…",
+    "darkMode": "Dark mode",
+    "notifications": "Notifications",
+    "accountMenu": "Account menu",
+    "mainNav": "Main navigation"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unread": "{count} unread",
+    "markAll": "Mark all as read",
+    "viewAll": "View all notifications"
+  },
+  "search": {
+    "patients": "Patients · {count}",
+    "recent": "Recent searches",
+    "hint": "Search by name, MRN, mobile or national ID · Enter shows all results",
+    "mrn": "MRN {mrn}",
+    "noResults": "No matching patients",
+    "age": "{n} yrs"
+  },
+  "more": {
+    "title": "More",
+    "language": "Language",
+    "darkMode": "Dark mode"
+  },
+  "placeholder": {
+    "title": "{module} is on the way",
+    "description": "This module isn't built yet. The design for it is still in progress."
+  }
+}

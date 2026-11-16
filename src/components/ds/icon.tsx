@@ -117,8 +117,12 @@ type IconProps = Omit<ComponentProps<"svg">, "ref"> & {
   label?: string;
 };
 
+/** Size classes so parent rules like `[&_svg:not([class*='size-'])]:size-4` (buttons, menus) don't override the size. */
+const SIZE_CLASS: Record<number, string> = { 16: "size-4", 18: "size-4.5", 20: "size-5", 22: "size-5.5", 24: "size-6" }
+
 export function Icon({ name, variant = "linear", size = 20, mirror = true, label, className, ...rest }: IconProps) {
-  const Cmp = ICONS[name];
+  const Cmp = ICONS[name]
+  const sizeClass = SIZE_CLASS[size] ?? "";
   return (
     <Cmp
       variant={variant === "bold" ? "Bold" : "Linear"}
@@ -128,7 +132,7 @@ export function Icon({ name, variant = "linear", size = 20, mirror = true, label
       aria-label={label}
       role={label ? "img" : undefined}
       focusable={false}
-      className={cn("shrink-0", mirror && DIRECTIONAL.has(name) && "rtl:-scale-x-100", className)}
+      className={cn("shrink-0", sizeClass, mirror && DIRECTIONAL.has(name) && "rtl:-scale-x-100", className)}
       {...rest}
     />
   );

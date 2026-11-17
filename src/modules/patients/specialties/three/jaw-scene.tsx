@@ -7,7 +7,7 @@
 import * as React from "react"
 import * as THREE from "three"
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber"
-import { Html, OrbitControls } from "@react-three/drei"
+import { OrbitControls } from "@react-three/drei"
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib"
 
 import { DENTITION_ROWS, type DentalChart } from "../data"
@@ -42,7 +42,33 @@ const PRESET: Record<JawPreset, { pos: THREE.Vector3; target: THREE.Vector3 }> =
   lower: { pos: V(0, 9.5, 2.8), target: V(0, -1, 0.2) },
 }
 
-function Jaw(p: JawSceneProps) {
+/**
+ * Moves the DOM callout (rendered next to the canvas, not through drei's <Html>, whose separate React root gets
+ * unmounted mid-render when the canvas connects its events) onto the selected tooth: project its anchor each frame.
+ */
+function CalloutTracker({ anchor, show, el }: { anchor: THREE.Vector3 | null; show: boolean; el: React.RefObject<HTMLDivElement | null> }) {
+  const camera = useThree((s) => s.camera)
+  const size = useThree((s) => s.size)
+  const v = React.useMemo(() => new THREE.Vector3(), [])
+  useFrame(() => {
+    const d = el.current
+    if (!d) return
+    if (!anchor || !show) {
+      d.style.visibility = "hidden"
+      return
+    }
+    v.copy(anchor).project(camera)
+    const x = (v.x * 0.5 + 0.5) * size.width
+    const y = (-v.y * 0.5 + 0.5) * size.height
+    // Back teeth: shift the box towards the midline so it stays inside narrow viewports.
+    const shift = anchor.x > 0.5 ? -85 : anchor.x < -0.5 ? -15 : -50
+    d.style.transform = `translate(${x}px, ${y}px) translate(${shift}%, calc(-100% - 6px))`
+    d.style.visibility = v.z < 1 ? "visible" : "hidden"
+  })
+  return null
+}
+
+function Jaw(p: JawSceneProps & { calloutEl: React.RefObject<HTMLDivElement | null> }) {
   const source = p.source ?? proceduralJaw
   const all = React.useMemo(() => [...DENTITION_ROWS.permanent.upper.flat(), ...DENTITION_ROWS.permanent.lower.flat()], [])
   const teeth = React.useMemo(
@@ -92,19 +118,7 @@ function Jaw(p: JawSceneProps) {
         ))}
       </group>
       <primitive object={gums} />
-      {sel && p.callout && p.preset !== "upper" && p.preset !== "lower" && (
-        <Html position={sel.anchor.toArray()} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-          {/* Shifted towards the midline so callouts on back teeth stay inside narrow viewports. */}
-          <div
-            className={`w-max max-w-[min(16rem,42vw)] -translate-y-8 rounded-[10px] border border-[#2B6BFF] bg-slate-900/90 px-3 py-2 text-xs ${
-              sel.anchor.x > 0.5 ? "-translate-x-[35%]" : sel.anchor.x < -0.5 ? "translate-x-[35%]" : ""
-            }`}
-          >
-            <div className="font-medium text-[#93C5FD]">{p.callout.title}</div>
-            <div className="text-slate-200">{p.callout.text}</div>
-          </div>
-        </Html>
-      )}
+      <CalloutTracker anchor={sel?.anchor ?? null} show={!!p.callout && p.preset !== "upper" && p.preset !== "lower"} el={p.calloutEl} />
     </>
   )
 }
@@ -163,17 +177,28 @@ function Rig({ preset, apiRef }: { preset: JawPreset; apiRef?: React.Ref<ViewerA
 }
 
 export default function JawScene(p: JawSceneProps) {
+  const callout = React.useRef<HTMLDivElement>(null)
   return (
-    <Canvas
-      dpr={[1, 2]}
-      camera={{ position: PRESET.front.pos.toArray(), fov: 32 }}
-      gl={{ alpha: true, antialias: true }}
-      onCreated={() => p.onReady?.()}
-      style={{ position: "absolute", inset: 0 }}
-    >
-      <Lights />
-      <Jaw {...p} />
-      <Rig preset={p.preset} apiRef={p.apiRef} />
-    </Canvas>
+    <>
+      <Canvas
+        dpr={[1, 2]}
+        camera={{ position: PRESET.front.pos.toArray(), fov: 32 }}
+        gl={{ alpha: true, antialias: true }}
+        onCreated={() => p.onReady?.()}
+        style={{ position: "absolute", inset: 0 }}
+      >
+        <Lights />
+        <Jaw {...p} calloutEl={callout} />
+        <Rig preset={p.preset} apiRef={p.apiRef} />
+      </Canvas>
+      <div
+        ref={callout}
+        aria-live="polite"
+        className="pointer-events-none invisible absolute top-0 left-0 w-max max-w-[min(16rem,42vw)] rounded-[10px] border border-[#2B6BFF] bg-slate-900/90 px-3 py-2 text-xs"
+      >
+        <div className="font-medium text-[#93C5FD]">{p.callout?.title}</div>
+        <div className="text-slate-200">{p.callout?.text}</div>
+      </div>
+    </>
   )
 }

@@ -576,5 +576,25 @@
         "text": "Since July the muscle moves more and the double vision is smaller. We'll check again in 6 weeks; if you still see double, special glasses with prisms can help."
       }
     }
+  },
+  "d3": {
+    "mobileTitle": "3D mouth view",
+    "alt": "3D view of the teeth and gums",
+    "occlusal": "Lower arch from above",
+    "presetsLabel": "View",
+    "preset": {
+      "front": "Front",
+      "right": "Right",
+      "left": "Left",
+      "upper": "Upper",
+      "lower": "Lower"
+    },
+    "layer": {
+      "gums": "Gums",
+      "roots": "Roots",
+      "plan": "Plan colours"
+    },
+    "patientPays": "Patient pays",
+    "viewOnly": "View only on phones. Edit the chart on a tablet or computer."
   }
 }

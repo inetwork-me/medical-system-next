@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation"
 import { Icon } from "@/components/ds/icon"
 import { EmptyState } from "@/components/ds/states"
 import { Button } from "@/components/ui/button"
+import { BottomNav } from "@/components/shell/mobile-nav"
 import { usePatient, useText } from "../profile/use-patient"
 import { specialtyHref } from "./data"
 
@@ -36,12 +37,15 @@ export function Workspace({
   kind,
   mode,
   actions,
+  mobileTitle,
   children,
 }: {
   kind: WorkspaceKind
   mode: string
   /** Bar actions; render compact (icon) variants with `xl:hidden` / full ones with `max-xl:hidden` as the design does. */
   actions?: React.ReactNode
+  /** Phone layout of a view-only screen (Dental · 3D view 390): plain bar with this title, no mode tabs, bottom nav. */
+  mobileTitle?: string
   children: React.ReactNode
 }) {
   const t = useTranslations("specialties.ws")
@@ -74,7 +78,8 @@ export function Workspace({
             <Icon name="arrow-left" size={20} />
           </Link>
         </Button>
-        <div className="flex min-w-0 flex-1 flex-col xl:flex-none">
+        {mobileTitle && <h1 className="min-w-0 flex-1 truncate text-lg font-semibold md:hidden">{mobileTitle}</h1>}
+        <div className={cn("flex min-w-0 flex-1 flex-col xl:flex-none", mobileTitle && "max-md:hidden")}>
           <nav aria-label={t("breadcrumb")} className="flex items-center gap-1.5 text-xs">
             <Link href="/patients" className="text-primary hover:underline max-sm:hidden">
               {tp("title")}
@@ -106,10 +111,11 @@ export function Workspace({
         <ModeTabs kind={kind} mode={mode} id={p.id} className="mx-auto hidden xl:flex" />
         <div className="flex shrink-0 items-center gap-2">{actions}</div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 p-4 md:p-6 xl:p-4">
-        <ModeTabs kind={kind} mode={mode} id={p.id} className="xl:hidden" fill />
+      <div className={cn("flex flex-1 flex-col gap-4 p-4 md:p-6 xl:p-4", mobileTitle && "max-md:p-0 max-md:pb-24")}>
+        <ModeTabs kind={kind} mode={mode} id={p.id} className={cn("xl:hidden", mobileTitle && "max-md:hidden")} fill />
         {children}
       </div>
+      {mobileTitle && <BottomNav className="md:hidden" />}
     </div>
   )
 }

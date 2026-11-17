@@ -12,6 +12,18 @@ import { cn } from "@/lib/utils";
  * Add icons to ICONS as screens need them.
  */
 const ICONS = {
+  // Eyes & Dental (Design System · "Added icons · Eyes & Dental")
+  "3d-rotate": Iconsax.I3DRotate,
+  "3dcube": Iconsax.I3Dcube,
+  "presention-chart": Iconsax.PresentionChart,
+  "rotate-left": Iconsax.RotateLeft,
+  "search-zoom-in": Iconsax.SearchZoomIn,
+  "search-zoom-out": Iconsax.SearchZoomOut,
+  "maximize-4": Iconsax.Maximize4,
+  "record-circle": Iconsax.RecordCircle,
+  "send-2": Iconsax.Send2,
+  layer: Iconsax.Layer,
+  ruler: Iconsax.Ruler,
   activity: Iconsax.Activity,
   add: Iconsax.Add,
   "arrow-down": Iconsax.ArrowDown2,

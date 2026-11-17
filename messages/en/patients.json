@@ -241,6 +241,8 @@
       "visits": "Visits · {count}",
       "payments": "Payments",
       "medical": "Medical",
+      "eyes": "Eyes",
+      "dental": "Dental",
       "files": "Files · {count}",
       "activity": "Activity"
     },

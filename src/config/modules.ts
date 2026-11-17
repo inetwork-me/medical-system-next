@@ -44,6 +44,11 @@ export type ModuleDef = {
   mobile: "bottom" | "more"
   /** Module screens exist in this build (others show a placeholder page). */
   built: boolean
+  /**
+   * Tabs inside the module's record page (not in the nav), hideable per branch like module tabs ("patients.eyes").
+   * Hiding one removes the tab, its workspaces and every button that opens them.
+   */
+  recordTabs?: string[]
 }
 
 export const MODULES: ModuleDef[] = [
@@ -61,6 +66,8 @@ export const MODULES: ModuleDef[] = [
       { key: "reports", href: "/patients/reports", icon: "chart-2", ownTitle: true },
       { key: "payments", href: "/patients/payments", icon: "wallet-money", ownTitle: true },
     ],
+    // Patient page specialty tabs (Eyes & Dental): optional per branch.
+    recordTabs: ["eyes", "dental"],
   },
   {
     id: "appointments",

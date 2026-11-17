@@ -1,0 +1,153 @@
+{
+  "sar": "SAR {amount}",
+  "eyes": {
+    "sim": {
+      "title": "3D eye movement simulator",
+      "lastExam": "Last exam {date} · {doctor}",
+      "patientView": "Patient view",
+      "open": "Open simulator",
+      "readout": "Looking right · 30°",
+      "rightEye": "Right eye",
+      "leftEye": "Left eye",
+      "tools": {
+        "rotate": "Rotate",
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "reset": "Reset view",
+        "fullscreen": "Full screen"
+      },
+      "legend": {
+        "normal": "Normal",
+        "under": "Under-acting",
+        "over": "Over-acting",
+        "selected": "Selected"
+      },
+      "alt": "3D view of both eyes looking right"
+    },
+    "findings": {
+      "title": "Latest findings",
+      "description": "{date} · {doctor}",
+      "diagnosis": "Diagnosis",
+      "deviation": "Deviation",
+      "diplopia": "Double vision",
+      "headPosture": "Head posture",
+      "nystagmus": "Nystagmus",
+      "acuity": "Visual acuity",
+      "deviationValue": "{type} · {near}Δ near · {far}Δ far",
+      "cover": {
+        "esotropia": "Esotropia",
+        "exotropia": "Exotropia",
+        "ortho": "Straight"
+      }
+    },
+    "muscles": {
+      "title": "Muscle function",
+      "scale": "<n>−4</n> … <n>+4</n> · 0 = normal",
+      "muscle": "Muscle"
+    },
+    "gaze": {
+      "title": "Nine gaze positions",
+      "description": "From the last exam · as you face the patient",
+      "patientRight": "← Patient's right",
+      "patientLeft": "Patient's left →",
+      "pos": {
+        "upR": "Up right",
+        "up": "Up",
+        "upL": "Up left",
+        "right": "Right",
+        "primary": "Primary",
+        "left": "Left",
+        "downR": "Down right",
+        "down": "Down",
+        "downL": "Down left"
+      },
+      "limited": "limited"
+    },
+    "history": {
+      "title": "Exam history",
+      "description": "{count, plural, one {# exam} other {# exams}} · {doctor}",
+      "compare": "Compare",
+      "view": "View exam",
+      "kind": {
+        "first": "First exam",
+        "followUp": "Follow-up",
+        "today": "Today · in progress"
+      },
+      "trend": {
+        "draft": "Draft",
+        "improving": "Improving",
+        "baseline": "Baseline"
+      }
+    },
+    "empty": {
+      "title": "No eye exams yet",
+      "text": "Open the simulator to record the first eye movement exam.",
+      "start": "Start eye exam"
+    }
+  },
+  "dental": {
+    "tiles": {
+      "teeth": "Teeth",
+      "teethCaption": "{unerupted} not erupted · {missing} missing",
+      "planned": "Planned",
+      "plannedCaption": "SAR {amount} in total",
+      "preApproval": "Pre-approval",
+      "pending": "Pending",
+      "approved": "Approved",
+      "declined": "Declined",
+      "preApprovalCaption": "Tooth {tooth} · sent today",
+      "patientPays": "Patient pays",
+      "patientPaysCaption": "After insurance"
+    },
+    "chart": {
+      "title": "Dental chart",
+      "description": "FDI numbering · as you face the patient",
+      "view3d": "3D view",
+      "open": "Open dental chart"
+    },
+    "patientRight": "Patient's right",
+    "patientLeft": "Patient's left",
+    "upperLower": "Upper · Lower",
+    "upperJaw": "Upper jaw",
+    "lowerJaw": "Lower jaw",
+    "toothN": "Tooth {n}",
+    "state": {
+      "missing": "missing",
+      "unerupted": "not erupted"
+    },
+    "legend": {
+      "decay": "Decay",
+      "existing": "Existing work",
+      "planned": "Planned",
+      "done": "Done today",
+      "missing": "Missing · not erupted"
+    },
+    "plan": {
+      "title": "Treatment plan",
+      "description": "{planned} planned · {done} done today · {payer} · Class {cls}",
+      "add": "Add treatment",
+      "patient": "patient",
+      "ins": {
+        "pending": "Pre-approval pending",
+        "covered": "Covered",
+        "claimSent": "Claim sent"
+      }
+    },
+    "card3d": {
+      "title": "3D mouth view",
+      "text": "Rotate, zoom and tap a tooth. Great for explaining the plan to the patient.",
+      "open": "Open 3D view",
+      "alt": "3D view of the teeth with the planned work on tooth 36"
+    },
+    "history": {
+      "title": "Dental history",
+      "description": "{count, plural, one {# visit} other {# visits}} · since {since}",
+      "done": "Done"
+    },
+    "empty": {
+      "title": "No dental records yet",
+      "text": "Open the dental chart to record the first check-up.",
+      "start": "Open dental chart"
+    }
+  }
+}

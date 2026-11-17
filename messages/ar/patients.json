@@ -241,6 +241,8 @@
       "visits": "الزيارات · {count}",
       "payments": "المدفوعات",
       "medical": "الطبي",
+      "eyes": "العيون",
+      "dental": "الأسنان",
       "files": "الملفات · {count}",
       "activity": "السجل"
     },

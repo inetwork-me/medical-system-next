@@ -1,0 +1,153 @@
+{
+  "sar": "{amount} ر.س",
+  "eyes": {
+    "sim": {
+      "title": "محاكي حركة العين ثلاثي الأبعاد",
+      "lastExam": "آخر فحص {date} · {doctor}",
+      "patientView": "عرض للمريض",
+      "open": "افتح المحاكي",
+      "readout": "يطالع يمين · 30°",
+      "rightEye": "العين اليمنى",
+      "leftEye": "العين اليسرى",
+      "tools": {
+        "rotate": "لف",
+        "zoomIn": "كبّر",
+        "zoomOut": "صغّر",
+        "reset": "رجّع العرض",
+        "fullscreen": "ملء الشاشة"
+      },
+      "legend": {
+        "normal": "طبيعي",
+        "under": "ضعيفة",
+        "over": "زيادة",
+        "selected": "المحددة"
+      },
+      "alt": "عرض ثلاثي الأبعاد للعينين وهي تطالع يمين"
+    },
+    "findings": {
+      "title": "آخر النتايج",
+      "description": "{date} · {doctor}",
+      "diagnosis": "التشخيص",
+      "deviation": "الانحراف",
+      "diplopia": "الرؤية المزدوجة",
+      "headPosture": "وضعية الراس",
+      "nystagmus": "الرأرأة",
+      "acuity": "حدة النظر",
+      "deviationValue": "{type} · قريب {near}Δ · بعيد {far}Δ",
+      "cover": {
+        "esotropia": "حَوَل للداخل",
+        "exotropia": "حَوَل للخارج",
+        "ortho": "مستقيمة"
+      }
+    },
+    "muscles": {
+      "title": "حركة العضلات",
+      "scale": "من <n>−4</n> لين <n>+4</n> · 0 = طبيعي",
+      "muscle": "العضلة"
+    },
+    "gaze": {
+      "title": "اتجاهات النظر التسعة",
+      "description": "من آخر فحص · وانت مقابل المريض",
+      "patientRight": "← يمين المريض",
+      "patientLeft": "يسار المريض →",
+      "pos": {
+        "upR": "فوق يمين",
+        "up": "فوق",
+        "upL": "فوق يسار",
+        "right": "يمين",
+        "primary": "قدام",
+        "left": "يسار",
+        "downR": "تحت يمين",
+        "down": "تحت",
+        "downL": "تحت يسار"
+      },
+      "limited": "محدودة"
+    },
+    "history": {
+      "title": "سجل الفحوصات",
+      "description": "{count, plural, one {فحص واحد} two {فحصين} few {# فحوصات} many {# فحص} other {# فحص}} · {doctor}",
+      "compare": "قارن",
+      "view": "اعرض الفحص",
+      "kind": {
+        "first": "أول فحص",
+        "followUp": "متابعة",
+        "today": "اليوم · جاري الفحص"
+      },
+      "trend": {
+        "draft": "مسودة",
+        "improving": "يتحسن",
+        "baseline": "بداية"
+      }
+    },
+    "empty": {
+      "title": "ما فيه فحوصات عيون للحين",
+      "text": "افتح المحاكي وسجّل أول فحص لحركة العين.",
+      "start": "ابدأ فحص العين"
+    }
+  },
+  "dental": {
+    "tiles": {
+      "teeth": "الأسنان",
+      "teethCaption": "{unerupted} ما طلعت · {missing} مفقود",
+      "planned": "مخطط له",
+      "plannedCaption": "بإجمالي {amount} ر.س",
+      "preApproval": "موافقة التأمين",
+      "pending": "بالانتظار",
+      "approved": "انقبلت",
+      "declined": "انرفضت",
+      "preApprovalCaption": "السن {tooth} · انرسل اليوم",
+      "patientPays": "على المريض",
+      "patientPaysCaption": "بعد التأمين"
+    },
+    "chart": {
+      "title": "مخطط الأسنان",
+      "description": "ترقيم FDI · وانت مقابل المريض",
+      "view3d": "عرض ثلاثي الأبعاد",
+      "open": "افتح مخطط الأسنان"
+    },
+    "patientRight": "يمين المريض",
+    "patientLeft": "يسار المريض",
+    "upperLower": "العلوي · السفلي",
+    "upperJaw": "الفك العلوي",
+    "lowerJaw": "الفك السفلي",
+    "toothN": "السن {n}",
+    "state": {
+      "missing": "مفقود",
+      "unerupted": "ما طلع"
+    },
+    "legend": {
+      "decay": "تسوس",
+      "existing": "علاج سابق",
+      "planned": "مخطط له",
+      "done": "انعمل اليوم",
+      "missing": "مفقود · ما طلع"
+    },
+    "plan": {
+      "title": "خطة العلاج",
+      "description": "{planned} مخططة · {done} انعمل اليوم · {payer} · فئة {cls}",
+      "add": "أضف علاج",
+      "patient": "على المريض",
+      "ins": {
+        "pending": "بانتظار موافقة التأمين",
+        "covered": "مغطى",
+        "claimSent": "انرسلت المطالبة"
+      }
+    },
+    "card3d": {
+      "title": "عرض الفم ثلاثي الأبعاد",
+      "text": "لفّه وكبّره واضغط على أي سن. ممتاز عشان تشرح الخطة للمريض.",
+      "open": "افتح العرض",
+      "alt": "عرض ثلاثي الأبعاد للأسنان مع العلاج المخطط للسن 36"
+    },
+    "history": {
+      "title": "سجل الأسنان",
+      "description": "{count, plural, one {زيارة وحدة} two {زيارتين} few {# زيارات} many {# زيارة} other {# زيارة}} · من {since}",
+      "done": "انعمل"
+    },
+    "empty": {
+      "title": "ما فيه سجل أسنان للحين",
+      "text": "افتح مخطط الأسنان وسجّل أول كشف.",
+      "start": "افتح مخطط الأسنان"
+    }
+  }
+}

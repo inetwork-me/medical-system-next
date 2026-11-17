@@ -19,6 +19,16 @@ export function moduleTabs(m: ModuleDef): ModuleTab[] {
   return (m.tabs ?? []).filter((t) => !hidden.includes(`${m.id}.${t.key}`))
 }
 
+/** Is a module tab or record tab ("patients.eyes") on for the active branch? Off with its module, too. */
+export function isTabEnabled(id: ModuleId, key: string) {
+  return isModuleEnabled(id) && !branchConfig().hiddenTabs.includes(`${id}.${key}`)
+}
+
+/** Renders children only when that tab is on — wrap every button that opens a specialty tab or workspace. */
+export function IfTab({ module, tab, children, fallback = null }: { module: ModuleId; tab: string; children: ReactNode; fallback?: ReactNode }) {
+  return <>{isTabEnabled(module, tab) ? children : fallback}</>
+}
+
 /**
  * Renders children only when the module is on — wrap every cross-module action with it,
  * e.g. <IfModule id="appointments"><Button>Book visit</Button></IfModule>.

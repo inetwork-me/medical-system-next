@@ -12,8 +12,8 @@ export type BranchConfig = {
 
 export const BRANCHES: Record<string, BranchConfig> = {
   main: { hiddenModules: [], hiddenTabs: [] },
-  // Example: a small clinic without inpatient lab or billing.
-  "olaya-clinic": { hiddenModules: ["lab", "billing"], hiddenTabs: ["patients.payments"] },
+  // Example: a small clinic without inpatient lab or billing, and without the eye / dental specialties.
+  "olaya-clinic": { hiddenModules: ["lab", "billing"], hiddenTabs: ["patients.payments", "patients.eyes", "patients.dental"] },
 }
 
 export const ACTIVE_BRANCH = process.env.NEXT_PUBLIC_BRANCH ?? "main"

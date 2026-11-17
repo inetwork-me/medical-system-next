@@ -76,11 +76,6 @@
     "failed": "Couldn't export",
     "failedText": "Something went wrong while building the file. Try again."
   },
-  "soon": {
-    "title": "{tab} is on the way",
-    "text": "This part of Appointments is the next one we're building from the FigCraft screens.",
-    "back": "Back to calendar"
-  },
   "list": {
     "kpi": {
       "today": "Today",
@@ -424,6 +419,258 @@
       "required": "Write the message",
       "toast": "SMS sent",
       "toastText": "To {to} · {template}"
+    }
+  },
+  "reports": {
+    "open": "Open report",
+    "meta": "Updated today · PDF · Excel",
+    "back": "Reports",
+    "print": "Print",
+    "export": "Export",
+    "exported": "Report exported",
+    "exportedText": "{count, plural, one {1 row} other {# rows}} saved as CSV.",
+    "badge": {
+      "volume": "Operations",
+      "no-shows": "Attendance",
+      "utilisation": "Capacity",
+      "waiting-time": "Patient experience",
+      "channels": "Booking",
+      "reminders": "Engagement"
+    },
+    "cards": {
+      "volume": {
+        "title": "Appointment volume",
+        "desc": "Bookings per day, clinic, type and doctor."
+      },
+      "no-shows": {
+        "title": "No-shows & cancellations",
+        "desc": "Where booked slots are lost, and who keeps missing."
+      },
+      "utilisation": {
+        "title": "Doctor utilisation",
+        "desc": "Booked vs available hours, idle slots and busy hours."
+      },
+      "waiting-time": {
+        "title": "Waiting time",
+        "desc": "Check-in to called in, by hour and doctor."
+      },
+      "channels": {
+        "title": "Booking channels & lead time",
+        "desc": "How and how early patients book."
+      },
+      "reminders": {
+        "title": "Reminders",
+        "desc": "Do SMS and WhatsApp reminders cut no-shows?"
+      }
+    },
+    "filter": {
+      "period": "Period",
+      "clinic": "Clinic",
+      "doctor": "Doctor",
+      "allClinics": "All clinics",
+      "allDoctors": "All doctors"
+    },
+    "vsPrev": "vs previous period",
+    "pts": "{n} pts",
+    "min": "{n} min",
+    "days": "{n} days",
+    "hours": "{n} h",
+    "sar": "SAR {n}",
+    "col": {
+      "doctor": "Doctor",
+      "patient": "Patient",
+      "channel": "Channel"
+    },
+    "volume": {
+      "kAppts": "Appointments",
+      "kAvg": "Daily average",
+      "kAvgDelta": "{n} days",
+      "kAvgCap": "open days",
+      "kDone": "Completed",
+      "kDoneCap": "visits",
+      "kTele": "Telehealth",
+      "perDay": "Appointments per day",
+      "perDaySub": "{range} · Fridays closed",
+      "byClinic": "By clinic",
+      "byClinicSub": "Share of {n} appointments",
+      "byType": "By type",
+      "byTypeSub": "In person vs telehealth",
+      "type": {
+        "new": "New patient",
+        "followUp": "Follow-up",
+        "procedure": "Procedure",
+        "telehealth": "Telehealth"
+      },
+      "byDoctor": "By doctor",
+      "byDoctorSub": "Booked, completed, cancelled and no-show",
+      "booked": "Booked",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "noShow": "No-show",
+      "completion": "Completion",
+      "item": "{clinic} · {booked} booked · {noShow} no-show"
+    },
+    "noShows": {
+      "kRate": "No-show rate",
+      "kCancel": "Cancellations",
+      "kCancelCap": "of bookings",
+      "kLate": "Late cancellations",
+      "kLateDelta": "< 24 h",
+      "kLateCap": "before the visit",
+      "kLost": "Lost revenue",
+      "kLostCap": "empty slots",
+      "byDay": "No-show rate by weekday",
+      "byDaySub": "Saturdays and Thursdays are highest",
+      "reasons": "Cancellation reasons",
+      "reasonsSub": "{n} cancellations · {late} within 24 h",
+      "reason": {
+        "patient": "Patient request",
+        "rescheduled": "Rescheduled",
+        "doctor": "Doctor unavailable",
+        "duplicate": "Duplicate booking",
+        "none": "No reason given"
+      },
+      "repeat": "Repeat no-shows",
+      "repeatSub": "Patients with 2+ no-shows this year",
+      "mobile": "Mobile",
+      "count": "No-shows",
+      "last": "Last no-show",
+      "lastItem": "Last: {date}",
+      "status": "Status",
+      "blocked": "Online booking blocked",
+      "oneMore": "One more = blocked",
+      "warn": "Send warning",
+      "warned": "Warning sent",
+      "warnedText": "{name} gets an SMS about missed visits."
+    },
+    "utilisation": {
+      "kUtil": "Utilisation",
+      "kIdle": "Idle hours",
+      "kIdleCap": "empty slots",
+      "kOver": "Overbooked days",
+      "kOverDelta": "Dr. Ahmed",
+      "kOverCap": "most often",
+      "kBusy": "Busiest hour",
+      "kBusyDelta": "Mon",
+      "kBusyCap": "busiest day",
+      "byDoctor": "Utilisation by doctor",
+      "byDoctorSub": "Booked hours ÷ available hours",
+      "busy": "Busy hours",
+      "busySub": "Average bookings per hour · all doctors",
+      "quiet": "Quiet",
+      "busyLabel": "Busy",
+      "cell": "{day} {hour}:00 · level {n} of 6",
+      "hours": "Hours by doctor",
+      "available": "Available",
+      "booked": "Booked",
+      "util": "Utilisation",
+      "idle": "Idle slots",
+      "overtime": "Overtime",
+      "item": "{booked} of {available} h · {idle} idle slots"
+    },
+    "waiting": {
+      "kAvg": "Average wait",
+      "kMedian": "Median",
+      "kOver": "Over 30 min",
+      "kOverCap": "visits",
+      "kLongest": "Longest today",
+      "kLongestDelta": "Cardiology",
+      "kLongestCap": "clinic",
+      "byHour": "Average wait by hour",
+      "byHourSub": "Check-in → called in, minutes",
+      "byDoctor": "By doctor",
+      "byDoctorSub": "Target: under 15 min",
+      "longest": "Longest waits",
+      "longestSub": "Today · over 30 minutes",
+      "checkedIn": "Checked in",
+      "calledIn": "Called in",
+      "wait": "Wait",
+      "reasonCol": "Reason",
+      "reason": {
+        "late": "Doctor running late",
+        "walkIn": "Walk-in squeezed in",
+        "lab": "Lab result pending",
+        "overrun": "Previous procedure ran over"
+      }
+    },
+    "channels": {
+      "channel": {
+        "online": "Online",
+        "phone": "Phone",
+        "walkIn": "Walk-in",
+        "referral": "Referral"
+      },
+      "kWalkCap": "visits",
+      "kLead": "Avg lead time",
+      "kLeadDelta": "22%",
+      "kLeadCap": "same day",
+      "donut": "Booking channel",
+      "donutSub": "{n} appointments",
+      "lead": "Lead time",
+      "leadSub": "Days between booking and visit · avg {avg}",
+      "bucket": {
+        "same": "Same day",
+        "one": "1 day",
+        "two": "2–3 days",
+        "four": "4–7 days",
+        "eight": "8–14 days",
+        "fifteen": "15+ days"
+      },
+      "bucketShort": {
+        "same": "0",
+        "one": "1",
+        "two": "2–3",
+        "four": "4–7",
+        "eight": "8–14",
+        "fifteen": "15+"
+      },
+      "byChannel": "By channel",
+      "byChannelSub": "No-show and cancellation rates",
+      "bookings": "Bookings",
+      "noShow": "No-show",
+      "cancelled": "Cancelled",
+      "avgLead": "Avg lead",
+      "item": "{n} bookings · {c} cancelled"
+    },
+    "reminders": {
+      "kSent": "Reminders sent",
+      "kSentCap": "delivered",
+      "kConfirmed": "Confirmed",
+      "kNoShow": "No-show with reminder",
+      "kNoShowCap": "without",
+      "kCost": "SMS cost",
+      "kCostDelta": "WhatsApp free",
+      "kCostCap": "this period",
+      "rate": "No-show rate",
+      "rateSub": "With vs without a reminder",
+      "with": "With reminder",
+      "without": "Without",
+      "cut": "Reminders cut no-shows by {n}%.",
+      "funnel": "Reminder funnel",
+      "step": {
+        "sent": "Sent",
+        "delivered": "Delivered",
+        "opened": "Opened",
+        "confirmed": "Confirmed"
+      },
+      "byChannel": "By channel",
+      "byChannelSub": "Delivery, confirmation and cost",
+      "sent": "Sent",
+      "delivered": "Delivered",
+      "confirmed": "Confirmed",
+      "cost": "Cost",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp",
+      "item": "{n} sent · {d} delivered"
+    },
+    "weekday": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
     }
   }
 }

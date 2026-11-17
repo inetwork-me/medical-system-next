@@ -60,5 +60,10 @@
   "widget": {
     "more": "More options",
     "refresh": "Refresh"
+  },
+  "report": {
+    "noRows": "No rows match these filters",
+    "noRowsText": "Try another filter or period.",
+    "loadMore": "Load more"
   }
 }

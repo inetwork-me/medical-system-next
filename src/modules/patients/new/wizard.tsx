@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "sonner"
+import { notify } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
@@ -139,7 +139,7 @@ export function NewPatientWizard() {
       const d = readDraft()
       if (d) {
         setForm(d)
-        toast(t("draftRestored"), { description: t("draftRestoredText") })
+        notify.info(t("draftRestored"), { description: t("draftRestoredText") })
       }
     })
     return () => window.clearTimeout(id)
@@ -267,7 +267,7 @@ export function NewPatientWizard() {
 
   const saveDraft = () => {
     writeDraft(form)
-    toast.info(t("draft"), { description: t("draftText") })
+    notify.info(t("draft"), { description: t("draftText") })
   }
   const cancel = () => guard.leave(`/${locale}/patients`)
 

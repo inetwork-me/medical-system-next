@@ -68,7 +68,7 @@ export function ModuleTabsNav({ module, counts, className }: { module: ModuleId;
               href={tab.href}
               aria-current={on ? "page" : undefined}
               data-state={on ? "active" : "inactive"}
-              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md px-3.5 text-sm font-medium whitespace-nowrap text-muted-foreground outline-none transition-[color,background-color,box-shadow] hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs"
+              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md px-3.5 text-sm font-medium whitespace-nowrap text-muted-foreground outline-none transition-[color,background-color,box-shadow] hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-xs"
             >
               {tab.icon && <Icon name={tab.icon} size={18} variant={on ? "bold" : "linear"} />}
               {tabLabel(m, tab.key)}

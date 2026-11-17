@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "sonner"
+import { notify } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import type { Bi } from "@/lib/mock/bi"
@@ -224,7 +224,7 @@ function AddNote({ patient, record, onClose }: { patient: Patient; record: Patie
       activity: [act({ en: `Note: ${titleBi[type].en}`, ar: `ملاحظة: ${titleBi[type].ar}` }), ...c.activity],
     }))
     onClose()
-    toast.success(t("saved"), { description: t("savedText", { name: b(patient.name) }) })
+    notify.success(t("saved"), { description: t("savedText", { name: b(patient.name) }) })
   }
   return (
     <ResponsiveDialog
@@ -435,7 +435,7 @@ function Reschedule({ patient, record, date, onClose }: { patient: Patient; reco
   const a = useAppt(record, date)
   const [d, setD] = React.useState<string | null>(null)
   const [time, setTime] = React.useState<string | null>(null)
-  const [notify, setNotify] = React.useState(true)
+  const [sendSms, setSendSms] = React.useState(true)
   const [tried, setTried] = React.useState(false)
   if (!a) return null
   const confirm = () => {
@@ -452,7 +452,7 @@ function Reschedule({ patient, record, date, onClose }: { patient: Patient; reco
       }
     })
     onClose()
-    toast.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(d), time }) }) })
+    notify.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(d), time }) }) })
   }
   return (
     <ResponsiveDialog
@@ -474,7 +474,7 @@ function Reschedule({ patient, record, date, onClose }: { patient: Patient; reco
       <SlotPicker day={d} setDay={setD} time={time} setTime={setTime} appts={record.appointments} heading={d ? t("times", { day: day(d) }) : null}>
         {tried && (!d || !time) && <p className="text-xs text-destructive">{t("pick")}</p>}
         <label className="flex cursor-pointer items-center gap-2 text-sm">
-          <Checkbox checked={notify} onCheckedChange={(v) => setNotify(v === true)} />
+          <Checkbox checked={sendSms} onCheckedChange={(v) => setSendSms(v === true)} />
           {patient.age < 18 ? t("notifyGuardian") : t("notify")}
         </label>
       </SlotPicker>
@@ -490,7 +490,7 @@ function CancelAppt({ patient, record, date, onClose }: { patient: Patient; reco
   const { change } = usePatientsStore()
   const a = useAppt(record, date)
   const [reason, setReason] = React.useState("patient")
-  const [notify, setNotify] = React.useState(true)
+  const [sendSms, setSendSms] = React.useState(true)
   if (!a) return null
   const confirm = () => {
     change(patient.id, (c) => {
@@ -504,7 +504,7 @@ function CancelAppt({ patient, record, date, onClose }: { patient: Patient; reco
       }
     })
     onClose()
-    toast.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(a.date), time: a.time ?? "" }) }) })
+    notify.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(a.date), time: a.time ?? "" }) }) })
   }
   return (
     <ResponsiveDialog
@@ -529,7 +529,7 @@ function CancelAppt({ patient, record, date, onClose }: { patient: Patient; reco
         ))}
       </RadioGroup>
       <label className="flex cursor-pointer items-center gap-2 text-sm">
-        <Checkbox checked={notify} onCheckedChange={(v) => setNotify(v === true)} />
+        <Checkbox checked={sendSms} onCheckedChange={(v) => setSendSms(v === true)} />
         {patient.age < 18 ? tr("notifyGuardian") : tr("notify")}
       </label>
     </ResponsiveDialog>
@@ -585,7 +585,7 @@ function BookVisit({ patient, record, onClose }: { patient: Patient; record: Pat
       activity: [act({ en: `Visit booked: ${c.name.en} · ${d} ${time}`, ar: `حجز موعد: ${c.name.ar} · ${d} ${time}` }), ...ch.activity],
     }))
     onClose()
-    toast.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(d), time }), doctor: b(doc) }) })
+    notify.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(d), time }), doctor: b(doc) }) })
   }
   return (
     <ResponsiveDialog
@@ -742,7 +742,7 @@ function Prescribe({ patient, record, onClose }: { patient: Patient; record: Pat
       activity: [act({ en: `Prescription: ${m.name.en}`, ar: `وصفة: ${m.name.ar}` }), ...c.activity],
     }))
     onClose()
-    toast.success(t("done"), { description: t("doneText", { med: b(m.name), dose: `${dose.trim()} · ${t(`freq.${freq}`)}` }) })
+    notify.success(t("done"), { description: t("doneText", { med: b(m.name), dose: `${dose.trim()} · ${t(`freq.${freq}`)}` }) })
   }
   return (
     <ResponsiveDialog
@@ -899,7 +899,7 @@ function Upload({ patient, initial, onClose }: { patient: Patient; initial?: Fil
       activity: [act({ en: `Files uploaded: ${files.length}`, ar: `رفع ملفات: ${files.length}` }), ...c.activity],
     }))
     onClose()
-    toast.success(t("done", { count: files.length }), { description: t("doneText", { name: b(patient.name) }) })
+    notify.success(t("done", { count: files.length }), { description: t("doneText", { name: b(patient.name) }) })
   }
   return (
     <ResponsiveDialog
@@ -1096,7 +1096,7 @@ function Sms({ patient, record, onClose }: { patient: Patient; record: PatientRe
   const send = () => {
     if (!phone || !text.trim()) return
     onClose()
-    toast.success(t("sent"), { description: t("sentText", { phone }) })
+    notify.success(t("sent"), { description: t("sentText", { phone }) })
   }
   const parts = Math.max(1, Math.ceil(text.length / 160))
   return (

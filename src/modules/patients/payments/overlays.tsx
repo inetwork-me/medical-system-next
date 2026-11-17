@@ -1,15 +1,17 @@
 "use client"
 
 import * as React from "react"
-import { useTranslations } from "next-intl"
-import { toast } from "sonner"
+import { useLocale, useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
 import type { Bi } from "@/lib/mock/bi"
 import { useDates } from "@/i18n/dates"
+import { pdfDocument, type PdfBlock } from "@/lib/export/pdf"
+import { saveBlob } from "@/lib/export/files"
 import { Field } from "@/components/ds/field"
 import { Icon } from "@/components/ds/icon"
 import { RadioOption } from "@/components/ds/radio-option"
+import { notify } from "@/components/ds/toast"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -30,6 +32,25 @@ export function printArea() {
   }
   window.addEventListener("afterprint", done)
   window.print()
+}
+
+/** "Download PDF" for receipt / statement: builds the PDF in the browser, saves it, confirms with a DS toast. */
+function usePdfDownload() {
+  const t = useTranslations("patients.pay.pdf")
+  const rtl = useLocale() === "ar"
+  const [busy, setBusy] = React.useState(false)
+  const run = async (name: string, blocks: PdfBlock[]) => {
+    setBusy(true)
+    try {
+      saveBlob(await pdfDocument(blocks, { dir: rtl ? "rtl" : "ltr", title: name }), name)
+      notify.success(t("ready"), { description: t("readyText", { name }) })
+    } catch {
+      notify.error(t("failed"), { description: t("failedText") })
+    } finally {
+      setBusy(false)
+    }
+  }
+  return { busy, run }
 }
 
 function useSar() {
@@ -133,7 +154,13 @@ export function CollectFlow({
           ]}
         />
         <Field label={t("collect.amount")} required error={tried && error ? error : undefined}>
-          <Input dir="ltr" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.,]/g, ""))} onBlur={() => setTried(true)} />
+          <Input
+            dir="ltr"
+            inputMode="decimal"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value.replace(/[^\d.,]/g, ""))}
+            onBlur={() => setTried(true)}
+          />
         </Field>
         <div className="flex flex-col gap-2">
           <p className="text-xs font-medium">{t("collect.method")}</p>
@@ -170,7 +197,12 @@ export function CollectFlow({
         {done && (
           <KV
             rows={[
-              [t("received.receipt"), <bdi key="r" dir="ltr">{done.receipt}</bdi>],
+              [
+                t("received.receipt"),
+                <bdi key="r" dir="ltr">
+                  {done.receipt}
+                </bdi>,
+              ],
               [t("received.method"), b(METHOD_LABEL[done.method])],
               [t("received.amount"), sar(done.amount)],
               [t("received.balance"), sar(Math.max(0, due - done.amount), false)],
@@ -229,8 +261,19 @@ export function ReceiptDialog({ data: r, open, onOpenChange }: { data: ReceiptDa
   const dates = useDates()
   const { b } = useText()
   const sar = useSar()
+  const pdf = usePdfDownload()
+  const text = t("receipt.text", {
+    status: r.status === "paid" ? t("receipt.paidOn") : t("receipt.issuedOn"),
+    date: dates.short(r.date),
+    method: r.method ? b(r.method) : "—",
+  })
   const rows: [string, React.ReactNode][] = [
-    [t("receipt.patient"), <span key="p">{b(r.patient.name)} · <bdi dir="ltr">{r.patient.mrn}</bdi></span>],
+    [
+      t("receipt.patient"),
+      <span key="p">
+        {b(r.patient.name)} · <bdi dir="ltr">{r.patient.mrn}</bdi>
+      </span>,
+    ],
     [t("receipt.service"), b(r.service)],
     ...(r.doctor ? ([[t("receipt.doctor"), b(r.doctor)]] as [string, React.ReactNode][]) : []),
     [t("receipt.subtotal"), sar(r.subtotal)],
@@ -246,10 +289,22 @@ export function ReceiptDialog({ data: r, open, onOpenChange }: { data: ReceiptDa
       icon="receipt-2"
       width="sm:max-w-140"
       title={t("receipt.title", { no: r.no })}
-      description={t("receipt.text", { status: r.status === "paid" ? t("receipt.paidOn") : t("receipt.issuedOn"), date: dates.short(r.date), method: r.method ? b(r.method) : "—" })}
+      description={text}
       secondary={
-        <Button variant="outline" onClick={() => toast(t("receipt.pdfStarted"), { description: t("receipt.pdfStartedText") })}>
-          <Icon name="document-download" size={20} />
+        <Button
+          variant="outline"
+          loading={pdf.busy}
+          onClick={() =>
+            pdf.run(`receipt-${r.no}.pdf`, [
+              { kind: "brand", title: t("receipt.clinic"), subtitle: t("receipt.vat") },
+              { kind: "title", text: t("receipt.title", { no: r.no }) },
+              { kind: "meta", text },
+              { kind: "kv", rows: rows.map(([k, v], i) => [k, i === 0 ? `${b(r.patient.name)} · ${r.patient.mrn}` : String(v)]) },
+              { kind: "note", text: t("receipt.thanks") },
+            ])
+          }
+        >
+          {!pdf.busy && <Icon name="document-download" size={20} />}
           {t("receipt.pdf")}
         </Button>
       }
@@ -280,11 +335,22 @@ export function ReceiptDialog({ data: r, open, onOpenChange }: { data: ReceiptDa
 /* ================================================================== statement */
 
 /** Overlay · Account statement (print preview): A4 page with billed items, insurance, paid and the balance. */
-export function StatementDialog({ patient, record, open, onOpenChange }: { patient: Patient; record: PatientRecord; open: boolean; onOpenChange: (o: boolean) => void }) {
+export function StatementDialog({
+  patient,
+  record,
+  open,
+  onOpenChange,
+}: {
+  patient: Patient
+  record: PatientRecord
+  open: boolean
+  onOpenChange: (o: boolean) => void
+}) {
   const t = useTranslations("patients.pay")
   const dates = useDates()
   const { b } = useText()
   const n = (v: number) => new Intl.NumberFormat("en-US").format(v)
+  const pdf = usePdfDownload()
   const billed = record.invoices.filter((i) => i.status !== "void").sort((a, z) => a.date.localeCompare(z.date))
   const lines: { date: string; item: string; amount: number }[] = [
     ...billed.map((i) => ({ date: dates.short(i.date), item: b(i.service), amount: i.total })),
@@ -299,8 +365,31 @@ export function StatementDialog({ patient, record, open, onOpenChange }: { patie
       title={t("statement.title")}
       description={t("statement.text")}
       secondary={
-        <Button variant="outline" onClick={() => toast(t("receipt.pdfStarted"), { description: t("receipt.pdfStartedText") })}>
-          <Icon name="document-download" size={20} />
+        <Button
+          variant="outline"
+          loading={pdf.busy}
+          onClick={() =>
+            pdf.run(`statement-${patient.mrn}.pdf`, [
+              { kind: "brand", title: t("receipt.clinic"), subtitle: t("receipt.vat") },
+              { kind: "title", text: t("statement.heading") },
+              {
+                kind: "meta",
+                text: t("statement.meta", { name: b(patient.name), mrn: patient.mrn, from: dates.short(record.billing.since), to: dates.short(new Date()) }),
+              },
+              {
+                kind: "table",
+                head: [t("statement.date"), t("statement.item"), t("statement.amount")],
+                weights: [1.2, 3, 1.2],
+                endAlign: [2],
+                rows: [
+                  ...lines.map((l) => [l.date, l.item, l.amount < 0 ? `−${n(-l.amount)}` : n(l.amount)]),
+                  ["", t("statement.balance"), n(record.billing.balance)],
+                ],
+              },
+            ])
+          }
+        >
+          {!pdf.busy && <Icon name="document-download" size={20} />}
           {t("statement.pdf")}
         </Button>
       }

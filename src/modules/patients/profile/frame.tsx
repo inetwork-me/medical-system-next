@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
-import { toast } from "sonner"
+import { notify } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import { Link, useRouter } from "@/i18n/navigation"
@@ -16,6 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import type { Patient } from "../data"
 import { BanDialog, ArchiveDialog } from "../list/row-actions"
 import { toggleTag, usePatientsStore } from "../store"
+import { usePatientExports } from "./exports"
 import { OverlayProvider, useOverlay, type OverlayKind } from "./overlays"
 import { ProfileCard } from "./side"
 import { PATIENT_TABS, usePatient, usePatientTab, useText, type PatientTab } from "./use-patient"
@@ -163,7 +164,8 @@ function MoreActions({ patient, variant = "outline" }: { patient: Patient; varia
   const [dialog, setDialog] = React.useState<null | "ban" | "archive">(null)
   const name = b(patient.name)
   const isVip = patient.tags.includes("vip")
-  const soon = () => toast(t("page.soon"))
+  const data = usePatient()
+  const exports = usePatientExports()
   const overlay = useOverlay()
 
   return (
@@ -179,7 +181,7 @@ function MoreActions({ patient, variant = "outline" }: { patient: Patient; varia
             <Icon name="printer" size={16} />
             {t("page.menu.print")}
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={soon}>
+          <DropdownMenuItem disabled={!data || exports.busy} onSelect={() => data && void exports.summaryPdf(data.patient, data.record)}>
             <Icon name="document-download" size={16} />
             {t("page.menu.pdf")}
           </DropdownMenuItem>
@@ -191,7 +193,7 @@ function MoreActions({ patient, variant = "outline" }: { patient: Patient; varia
           <DropdownMenuItem
             onSelect={() => {
               setTags(patient.id, toggleTag(patient.tags, "vip", !isVip))
-              toast.success(isVip ? t("vipToast.off") : t("vipToast.on"), {
+              notify.success(isVip ? t("vipToast.off") : t("vipToast.on"), {
                 description: t("vipToast.text", { name }),
               })
             }}
@@ -251,7 +253,7 @@ function PatientTabs({ active, id, counts }: { active: PatientTab; id: string; c
               data-state={on ? "active" : "inactive"}
               className={cn(
                 "inline-flex h-8 shrink-0 items-center rounded-md px-3 text-sm font-medium whitespace-nowrap text-muted-foreground outline-none transition-[color,background-color,box-shadow]",
-                "hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs",
+                "hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-xs",
               )}
             >
               {label}

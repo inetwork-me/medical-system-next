@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "sonner"
+import { notify } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import { Link, useRouter } from "@/i18n/navigation"
@@ -188,13 +188,13 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
     const undo = merge(keep.patient.id, drop.patient.id, fields, merged)
     setConfirm(false)
     const vars = { drop: drop.patient.mrn, keep: keep.patient.mrn }
-    toast.success(t("toast.title"), {
+    notify.success(t("toast.title"), {
       description: t("toast.text", vars),
       action: {
         label: t("toast.undo"),
         onClick: () => {
           undo()
-          toast(t("toast.undone"), { description: t("toast.undoneText", vars) })
+          notify.info(t("toast.undone"), { description: t("toast.undoneText", vars) })
         },
       },
     })

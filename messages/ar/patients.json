@@ -171,10 +171,16 @@
     "colLastVisit": "آخر زيارة",
     "colTags": "التصنيفات",
     "confirm": "صدّر",
-    "started": "بدأ التصدير",
-    "startedText": "بنبلغك لما يجهز ملف {format}.",
-    "downloaded": "التصدير جاهز",
-    "downloadedText": "انحفظ {count} صف بصيغة CSV."
+    "downloaded": "الملف جاهز",
+    "downloadedText": "انحفظت {count} صف كملف {format}.",
+    "mobile": "الجوال",
+    "region": "المنطقة",
+    "sheet": "المرضى",
+    "pdfTitle": "قائمة المرضى",
+    "pdfMeta": "{count} مريض · تم التصدير {date}",
+    "failed": "ما قدرنا نصدّر",
+    "failedText": "صار خطأ وإحنا نجهّز الملف. جرّب مرة ثانية.",
+    "patient": "المريض"
   },
   "sheet": {
     "label": "ملف المريض",
@@ -241,7 +247,6 @@
     "notFoundTitle": "ما لقينا المريض",
     "notFoundText": "الملف هذا مو موجود أو انأرشف.",
     "backToList": "ارجع لقائمة المرضى",
-    "soon": "جاي في التحديث الجاي",
     "sar": "{amount} ر.س",
     "years": "{n} سنة",
     "card": {
@@ -462,6 +467,62 @@
       "filter": "كل الموظفين · كل الفترات",
       "allStaff": "كل الموظفين",
       "all": "الكل"
+    },
+    "pdf": {
+      "clinic": "النظام الطبي · الفرع الرئيسي",
+      "generated": "ملخص المريض · {date}",
+      "meta": "رقم الملف {mrn} · {gender} · {age} سنة",
+      "gender": {
+        "male": "ذكر",
+        "female": "أنثى",
+        "unset": "غير محدد"
+      },
+      "mobile": "الجوال",
+      "region": "المنطقة",
+      "registered": "مريض من",
+      "lastVisit": "آخر زيارة",
+      "visitsCount": "الزيارات",
+      "tags": "الوسوم",
+      "visits": "الزيارات",
+      "diagnoses": "التشخيصات",
+      "medications": "الأدوية",
+      "allergies": "الحساسية",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "clinic_": "العيادة",
+      "doctor": "الطبيب",
+      "reason": "السبب",
+      "status": "الحالة",
+      "name": "الاسم",
+      "dose": "الجرعة",
+      "prescriber": "وصفها",
+      "detail": "التفاعل",
+      "severity": "الشدة",
+      "by": "بواسطة",
+      "type": "النوع",
+      "details": "التفاصيل",
+      "visit": {
+        "upcoming": "جاية",
+        "completed": "مكتملة",
+        "cancelled": "ملغية"
+      },
+      "dx": {
+        "active": "نشط",
+        "treated": "تحت العلاج",
+        "resolved": "انتهى"
+      },
+      "med": {
+        "active": "مستمر",
+        "stopped": "موقوف"
+      },
+      "ready": "نزل الملف",
+      "readyText": "{name} موجود في التنزيلات.",
+      "failed": "ما قدرنا نسوي الملف",
+      "failedText": "صار خطأ وإحنا نجهّز الملف. جرّب مرة ثانية.",
+      "level": {
+        "severe": "شديدة",
+        "moderate": "متوسطة"
+      }
     }
   },
   "edit": {
@@ -1141,9 +1202,7 @@
       "due": "المستحق",
       "thanks": "شكراً لك. احتفظ بالإيصال لمطالبات التأمين.",
       "pdf": "نزّل PDF",
-      "print": "اطبع",
-      "pdfStarted": "نجهّز ملف PDF",
-      "pdfStartedText": "التنزيل يبدأ بعد لحظات."
+      "print": "اطبع"
     },
     "statement": {
       "title": "كشف حساب · معاينة الطباعة",
@@ -1156,6 +1215,12 @@
       "balance": "المستحق (ر.س)",
       "pdf": "نزّل PDF",
       "print": "اطبع"
+    },
+    "pdf": {
+      "ready": "نزل الـ PDF",
+      "readyText": "{name} موجود في التنزيلات.",
+      "failed": "ما قدرنا نسوي الـ PDF",
+      "failedText": "صار خطأ وإحنا نجهّز الملف. جرّب مرة ثانية."
     }
   },
   "ov": {

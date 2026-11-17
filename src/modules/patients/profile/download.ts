@@ -2,6 +2,8 @@
 
 import * as React from "react"
 
+import { saveBlob } from "@/lib/export/files"
+import { pdfDocument } from "@/lib/export/pdf"
 import type { PatientFile } from "./record"
 
 /**
@@ -38,7 +40,7 @@ export function useFileDownloads() {
               delete next[file.name]
               return next
             }),
-          2500
+          2500,
         )
         timers.current.push(back)
       } else {
@@ -53,14 +55,7 @@ export function useFileDownloads() {
 
 /** Save a patient file right away (viewer "Download"). */
 export async function save(file: PatientFile) {
-  const href = file.url ?? URL.createObjectURL(await standIn(file))
-  const a = document.createElement("a")
-  a.href = href
-  a.download = file.name
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  if (!file.url) window.setTimeout(() => URL.revokeObjectURL(href), 1000)
+  saveBlob(file.url ?? (await standIn(file)), file.name)
 }
 
 /** A small valid file with the same name, for the design's sample files (no real storage yet). */
@@ -83,28 +78,12 @@ async function standIn(file: PatientFile): Promise<Blob> {
     const type = ext === "png" ? "image/png" : "image/jpeg"
     return new Promise((resolve) => canvas.toBlob((b) => resolve(b!), type, 0.92))
   }
-  return new Blob([pdf([file.title.en, `${file.name} · ${file.date}`, "Sample file · Medical System demo"])], { type: "application/pdf" })
-}
-
-/** Minimal one-page PDF with a few lines of text. */
-function pdf(lines: string[]) {
-  const esc = (s: string) => s.replace(/[\\()]/g, (c) => `\\${c}`).replace(/[^\x20-\x7E]/g, "?")
-  const text = lines.map((l, i) => `BT /F1 ${i === 0 ? 18 : 12} Tf 56 ${780 - i * 28} Td (${esc(l)}) Tj ET`).join("\n")
-  const objs = [
-    "<< /Type /Catalog /Pages 2 0 R >>",
-    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
-    `<< /Length ${text.length} >>\nstream\n${text}\nendstream`,
-    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-  ]
-  let out = "%PDF-1.4\n"
-  const offsets: number[] = []
-  objs.forEach((o, i) => {
-    offsets.push(out.length)
-    out += `${i + 1} 0 obj\n${o}\nendobj\n`
-  })
-  const xref = out.length
-  out += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n${offsets.map((o) => `${String(o).padStart(10, "0")} 00000 n \n`).join("")}`
-  out += `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`
-  return out
+  return pdfDocument(
+    [
+      { kind: "title", text: file.title.en },
+      { kind: "meta", text: `${file.name} · ${file.date}` },
+      { kind: "note", text: "Sample file · Medical System demo" },
+    ],
+    { dir: "ltr", title: file.name },
+  )
 }

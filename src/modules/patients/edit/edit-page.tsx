@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "sonner"
+import { notify } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import { Link, useRouter } from "@/i18n/navigation"
@@ -122,7 +122,7 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
       return
     }
     if (!dirty) {
-      toast(t("noChanges"), { description: t("noChangesText") })
+      notify.info(t("noChanges"), { description: t("noChangesText") })
       return
     }
     const region = CITY_REGION[form.city] ?? "other"
@@ -150,7 +150,7 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
       form
     )
     guard.allow()
-    toast.success(t("saved"), { description: t("savedText", { name: b({ en: nameEn, ar: form.nameAr.trim() }) }) })
+    notify.success(t("saved"), { description: t("savedText", { name: b({ en: nameEn, ar: form.nameAr.trim() }) }) })
     router.push(back)
   }
 

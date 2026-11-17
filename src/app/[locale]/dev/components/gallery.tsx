@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
-import { toast } from "sonner"
+import { notify } from "@/components/ds/toast"
 
 import { Icon } from "@/components/ds/icon"
 import { Field } from "@/components/ds/field"
@@ -334,7 +334,7 @@ export function Gallery() {
 
       <Section title="Upload & drag-and-drop · Empty states">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <DropZone onFiles={(f) => toast.success(`${f.length} file(s)`)} />
+          <DropZone onFiles={(f) => notify.success(`${f.length} file(s)`)} />
           <div className="space-y-2">
             <UploadItem name="lab-report-004812.pdf" state="uploading" progress={64} doneMb="2.4" totalMb="3.8" />
             <UploadItem name="lab-report-004812.pdf" state="complete" totalMb="3.8" />
@@ -402,7 +402,7 @@ export function Gallery() {
             </PopoverContent>
           </Popover>
           {(["success", "info", "warning", "error"] as const).map((k) => (
-            <Button key={k} variant="ghost" onClick={() => toast[k](L("Saved", "انحفظ"), { description: L("Your changes were saved.", "تعديلاتك انحفظت.") })}>
+            <Button key={k} variant="ghost" onClick={() => notify[k](L("Saved", "انحفظ"), { description: L("Your changes were saved.", "تعديلاتك انحفظت.") })}>
               Toast · {k}
             </Button>
           ))}

@@ -171,10 +171,16 @@
     "colLastVisit": "Last visit",
     "colTags": "Tags",
     "confirm": "Export",
-    "started": "Export started",
-    "startedText": "We'll let you know when your {format} file is ready.",
     "downloaded": "Export ready",
-    "downloadedText": "{count} rows saved as CSV."
+    "downloadedText": "{count} rows saved as {format}.",
+    "mobile": "Mobile",
+    "region": "Region",
+    "sheet": "Patients",
+    "pdfTitle": "Patients list",
+    "pdfMeta": "{count} patients · exported {date}",
+    "failed": "Couldn't export",
+    "failedText": "Something went wrong while building the file. Try again.",
+    "patient": "Patient"
   },
   "sheet": {
     "label": "Patient profile",
@@ -241,7 +247,6 @@
     "notFoundTitle": "Patient not found",
     "notFoundText": "This file doesn't exist or was archived.",
     "backToList": "Back to patients list",
-    "soon": "Coming in the next update",
     "sar": "SAR {amount}",
     "years": "{n} yrs",
     "card": {
@@ -462,6 +467,62 @@
       "filter": "All staff · all time",
       "allStaff": "All staff",
       "all": "All"
+    },
+    "pdf": {
+      "clinic": "Medical System · Main branch",
+      "generated": "Patient summary · {date}",
+      "meta": "MRN {mrn} · {gender} · {age} yrs",
+      "gender": {
+        "male": "Male",
+        "female": "Female",
+        "unset": "Not set"
+      },
+      "mobile": "Mobile",
+      "region": "Region",
+      "registered": "Patient since",
+      "lastVisit": "Last visit",
+      "visitsCount": "Visits",
+      "tags": "Tags",
+      "visits": "Visits",
+      "diagnoses": "Diagnoses",
+      "medications": "Medications",
+      "allergies": "Allergies",
+      "date": "Date",
+      "time": "Time",
+      "clinic_": "Clinic",
+      "doctor": "Doctor",
+      "reason": "Reason",
+      "status": "Status",
+      "name": "Name",
+      "dose": "Dose",
+      "prescriber": "Prescribed by",
+      "detail": "Reaction",
+      "severity": "Severity",
+      "by": "By",
+      "type": "Type",
+      "details": "Details",
+      "visit": {
+        "upcoming": "Upcoming",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "dx": {
+        "active": "Active",
+        "treated": "Treated",
+        "resolved": "Resolved"
+      },
+      "med": {
+        "active": "Active",
+        "stopped": "Stopped"
+      },
+      "ready": "File downloaded",
+      "readyText": "{name} is in your downloads.",
+      "failed": "Couldn't create the file",
+      "failedText": "Something went wrong while building the file. Try again.",
+      "level": {
+        "severe": "Severe",
+        "moderate": "Moderate"
+      }
     }
   },
   "edit": {
@@ -1141,9 +1202,7 @@
       "due": "Due",
       "thanks": "Thank you. Keep this receipt for insurance claims.",
       "pdf": "Download PDF",
-      "print": "Print",
-      "pdfStarted": "Preparing the PDF",
-      "pdfStartedText": "Your download starts in a moment."
+      "print": "Print"
     },
     "statement": {
       "title": "Account statement · print preview",
@@ -1156,6 +1215,12 @@
       "balance": "Balance due (SAR)",
       "pdf": "Download PDF",
       "print": "Print"
+    },
+    "pdf": {
+      "ready": "PDF downloaded",
+      "readyText": "{name} is in your downloads.",
+      "failed": "Couldn't create the PDF",
+      "failedText": "Something went wrong while building the file. Try again."
     }
   },
   "ov": {

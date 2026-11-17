@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "sonner"
+import { notify } from "@/components/ds/toast"
 
 import { useRouter } from "@/i18n/navigation"
 import { CODE_ATTEMPTS, DEMO_ACCOUNT, formatMobile, isEmail, maskMobile, mockSend, mockVerifyCode, normalizeSaudiMobile } from "@/lib/mock/auth"
@@ -71,7 +71,7 @@ export function VerifyForm({ kind, next }: { kind: Kind; next?: string }) {
     setTries(CODE_ATTEMPTS)
     setError(undefined)
     setCode("")
-    toast.success(t("otp.resent"))
+    notify.success(t("otp.resent"))
   }
 
   return (

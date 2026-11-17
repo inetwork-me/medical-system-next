@@ -21,7 +21,8 @@ import { useFileDownloads, type DownloadState } from "./download"
 import { Progress } from "@/components/ui/progress"
 import { toMb } from "@/components/ds/upload"
 import { CollectFlow, ReceiptDialog, StatementDialog } from "../payments/overlays"
-import { PCard, PersonalInfo, ProfileCard, useSoon } from "./side"
+import { usePatientExports } from "./exports"
+import { PCard, PersonalInfo, ProfileCard } from "./side"
 import { usePatient, useText } from "./use-patient"
 
 /* ================================================================== layout */
@@ -692,31 +693,31 @@ export function FilesTab() {
                   <FileDownloadLine file={f} state={downloads[f.name]} />
                 ) : (
                   <>
-                {/* Design (Widget / Patient Tab · Files): EN "Category · PDF · 412 KB · date" / "Uploaded by …";
+                    {/* Design (Widget / Patient Tab · Files): EN "Category · PDF · 412 KB · date" / "Uploaded by …";
                     AR "التصنيف · التاريخ" / "PDF · 412 KB · رفعه …". */}
-                <span className="truncate text-xs text-muted-foreground tabular-nums">
-                  {locale === "ar" ? (
-                    <>
-                      {t(`category.${f.category}`)} · {dates.short(f.date)}
-                    </>
-                  ) : (
-                    <>
-                      {t(`category.${f.category}`)} · {f.ext} · {f.size} · {dates.short(f.date)}
-                    </>
-                  )}
-                </span>
-                <span className="truncate text-xs text-muted-foreground tabular-nums">
-                  {locale === "ar" ? (
-                    <>
-                      <bdi dir="ltr">
-                        {f.ext} · {f.size}
-                      </bdi>{" "}
-                      · {t("uploadedBy", { by: b(f.by) })}
-                    </>
-                  ) : (
-                    t("uploadedBy", { by: b(f.by) })
-                  )}
-                </span>
+                    <span className="truncate text-xs text-muted-foreground tabular-nums">
+                      {locale === "ar" ? (
+                        <>
+                          {t(`category.${f.category}`)} · {dates.short(f.date)}
+                        </>
+                      ) : (
+                        <>
+                          {t(`category.${f.category}`)} · {f.ext} · {f.size} · {dates.short(f.date)}
+                        </>
+                      )}
+                    </span>
+                    <span className="truncate text-xs text-muted-foreground tabular-nums">
+                      {locale === "ar" ? (
+                        <>
+                          <bdi dir="ltr">
+                            {f.ext} · {f.size}
+                          </bdi>{" "}
+                          · {t("uploadedBy", { by: b(f.by) })}
+                        </>
+                      ) : (
+                        t("uploadedBy", { by: b(f.by) })
+                      )}
+                    </span>
                   </>
                 )}
               </button>
@@ -727,7 +728,11 @@ export function FilesTab() {
                 disabled={!!downloads[f.name] && !downloads[f.name].done}
                 onClick={() => startDownload(f)}
               >
-                <Icon name={downloads[f.name]?.done ? "tick-circle" : "document-download"} size={16} className={downloads[f.name]?.done ? "text-success" : undefined} />
+                <Icon
+                  name={downloads[f.name]?.done ? "tick-circle" : "document-download"}
+                  size={16}
+                  className={downloads[f.name]?.done ? "text-success" : undefined}
+                />
               </Button>
             </li>
           ))}
@@ -766,7 +771,7 @@ export function ActivityTab() {
   const t = useTranslations("patients.page")
   const dates = useDates()
   const { b } = useText()
-  const soon = useSoon()
+  const exports = usePatientExports()
   const [kind, setKind] = React.useState<"all" | ActivityKind>("all")
   const [staff, setStaff] = React.useState("all")
   const data = usePatient()
@@ -786,8 +791,8 @@ export function ActivityTab() {
         name: b(patient.name).split(" ")[0],
       })}
       action={
-        <Button variant="ghost" size="sm" onClick={soon}>
-          <Icon name="export" size={16} />
+        <Button variant="ghost" size="sm" loading={exports.busy} onClick={() => exports.activityCsv(patient, shown, (k) => t(`status.${k}`))}>
+          {!exports.busy && <Icon name="export" size={16} />}
           {t("activity.export")}
         </Button>
       }

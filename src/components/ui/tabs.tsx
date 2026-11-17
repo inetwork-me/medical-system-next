@@ -59,7 +59,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "group/tab relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-[color,background-color,box-shadow] outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "group/tab relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-[color,background-color,box-shadow] outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-xs [&_svg]:pointer-events-none [&_svg]:shrink-0",
         "group-data-[variant=default]/tabs-list:h-8 group-data-[variant=default]/tabs-list:rounded-sm group-data-[variant=default]/tabs-list:px-3",
         "group-data-[variant=module]/tabs-list:h-9 group-data-[variant=module]/tabs-list:gap-2 group-data-[variant=module]/tabs-list:rounded-md group-data-[variant=module]/tabs-list:px-3.5",
         className

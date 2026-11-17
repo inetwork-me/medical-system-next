@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { toast } from "sonner"
+import { notify } from "@/components/ds/toast"
 
 import { Link } from "@/i18n/navigation"
 import { IfModule } from "@/lib/modules"
@@ -73,7 +73,7 @@ export function RowActions({ patient, trigger }: { patient: Patient; trigger?: R
           <DropdownMenuItem
             onSelect={() => {
               setTags(patient.id, toggleTag(patient.tags, "vip", !isVip))
-              toast.success(isVip ? t("vipToast.off") : t("vipToast.on"), { description: t("vipToast.text", { name }) })
+              notify.success(isVip ? t("vipToast.off") : t("vipToast.on"), { description: t("vipToast.text", { name }) })
             }}
           >
             <Icon name="star-1" size={16} />
@@ -112,13 +112,13 @@ export function BanDialog({ patient, open, onOpenChange }: { patient: Patient; o
   const { setTags } = usePatientsStore()
   const [reason, setReason] = React.useState("noShows")
   const [note, setNote] = React.useState("")
-  const [notify, setNotify] = React.useState(true)
+  const [sendSms, setSendSms] = React.useState(true)
   const name = bi(patient.name, locale)
 
   const confirm = () => {
     setTags(patient.id, toggleTag(patient.tags, "banned", true))
     onOpenChange(false)
-    toast.success(t("done", { name }), { description: t("doneText") })
+    notify.success(t("done", { name }), { description: t("doneText") })
   }
 
   return (
@@ -154,7 +154,7 @@ export function BanDialog({ patient, open, onOpenChange }: { patient: Patient; o
       </Field>
       <label className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm font-medium">
         <span className="flex-1">{t("notify")}</span>
-        <Switch checked={notify} onCheckedChange={setNotify} />
+        <Switch checked={sendSms} onCheckedChange={setSendSms} />
       </label>
     </ResponsiveDialog>
   )
@@ -192,7 +192,7 @@ export function ArchiveDialog({
     archive(patient.id)
     onOpenChange(false)
     onArchived?.()
-    toast.success(t("done"), { description: t("doneText", { name }) })
+    notify.success(t("done"), { description: t("doneText", { name }) })
   }
 
   return (

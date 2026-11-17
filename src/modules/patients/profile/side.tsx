@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
@@ -231,8 +230,3 @@ export function Attention({ className }: { className?: string }) {
   )
 }
 
-/** Small "coming next" toast for actions whose overlays land in a later slice. */
-export function useSoon() {
-  const t = useTranslations("patients.page")
-  return () => toast(t("soon"))
-}

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useFormatter, useTranslations } from "next-intl"
 import { Cell, Pie, PieChart } from "recharts"
-import { toast } from "sonner"
+import { notify } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
@@ -56,7 +56,7 @@ export function ReportShell({
     a.download = `${name}-${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(a.href)
-    toast.success(t("exported"), { description: t("exportedText", { count: rows.length }) })
+    notify.success(t("exported"), { description: t("exportedText", { count: rows.length }) })
   }
   return (
     <PageContainer>

@@ -549,5 +549,32 @@
       "homeCare": "Home care",
       "print": "Print advice for the patient"
     }
+  },
+  "pv": {
+    "title": "How your eyes move",
+    "by": "Explained by {doctor}",
+    "close": "Close the patient view",
+    "lookLabel": "Where to look",
+    "look": {
+      "right": "Look right",
+      "ahead": "Straight ahead",
+      "left": "Look left"
+    },
+    "stepsLabel": "Steps",
+    "stepN": "Step {n}",
+    "steps": {
+      "0": {
+        "title": "Six small muscles move each eye",
+        "text": "Each eye has six muscles that pull it up, down, left and right. They work together so both eyes always look at the same thing."
+      },
+      "1": {
+        "title": "Your right eye can't turn all the way out",
+        "text": "The muscle on the outer side of the right eye (orange) is weak. When you look to the right, the left eye moves but the right eye stays behind — that's why you see double on that side."
+      },
+      "2": {
+        "title": "It's getting better",
+        "text": "Since July the muscle moves more and the double vision is smaller. We'll check again in 6 weeks; if you still see double, special glasses with prisms can help."
+      }
+    }
   }
 }

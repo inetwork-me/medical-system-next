@@ -88,8 +88,7 @@ function stills(mode: "exam" | "anatomy", gaze: Gaze, muscle: MuscleKey | null):
       ? { portrait: s("eye_ws_d_anat"), landscape: s("eye_ws_t_anat") }
       : { portrait: s("eye_anat_od", "contain"), landscape: s("eye_anat_od") }
   if (gaze === "right") return { portrait: s("eye_ws_d_right"), landscape: s("eye_ws_t_right") }
-  if (gaze === "primary") return { portrait: s("eye_ws_d_primary"), landscape: s("eye_front_primary") }
-  if (gaze === "left") return { portrait: s("eye_front_left", "contain"), landscape: s("eye_front_left") }
+  if (gaze === "primary") return { portrait: s("eye_ws_d_primary"), landscape: s("eye_ws_d_primary", "contain") }
   return { portrait: s(`eye_9_${GAZE_IMG[gaze]}`, "contain"), landscape: s(`eye_9_${GAZE_IMG[gaze]}`, "contain") }
 }
 

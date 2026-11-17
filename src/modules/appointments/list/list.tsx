@@ -19,6 +19,7 @@ import { STATUS_TONE } from "../calendar/agenda"
 import { ExportDialog } from "../calendar/export"
 import { DOCTORS, doctorById, hhmm, TODAY, type ApptStatus } from "../data"
 import { AppointmentsFrame } from "../frame"
+import { useApptOverlay } from "../overlays"
 import { useAppointmentActions, useAppointmentsOn, type LiveAppointment } from "../store"
 
 type Chip = "all" | "waiting" | "withDoctor" | "completed" | "noShow" | "cancelled"
@@ -193,6 +194,7 @@ function useRowText(a: LiveAppointment) {
 
 function TableRow({ a }: { a: LiveAppointment }) {
   const t = useTranslations("appointments.list")
+  const overlay = useApptOverlay()
   const x = useRowText(a)
   return (
     <tr className="h-14 border-b last:border-b-0">
@@ -205,7 +207,13 @@ function TableRow({ a }: { a: LiveAppointment }) {
         </span>
       </td>
       <td className="truncate px-2 font-medium">
-        <span className={cn(a.status === "cancelled" && "text-muted-foreground line-through")}>{x.name}</span>
+        <button
+          type="button"
+          onClick={() => overlay.open("details", a)}
+          className={cn("cursor-pointer truncate text-start hover:underline", a.status === "cancelled" && "text-muted-foreground line-through")}
+        >
+          {x.name}
+        </button>
       </td>
       <td className="px-2">
         <span className="flex flex-col">
@@ -281,7 +289,8 @@ function RowMenu({ a, trigger }: { a: LiveAppointment; trigger: React.ReactEleme
   const t = useTranslations("appointments.list")
   const ts = useTranslations("appointments.status")
   const router = useRouter()
-  const { setStatus, remind } = useAppointmentActions()
+  const { setStatus } = useAppointmentActions()
+  const overlay = useApptOverlay()
   const x = useRowText(a)
   const doc = doctorById(a.doctor)
   const vars = { name: x.name, doctor: x.doctor, time: hhmm(a.start), room: doc.room }
@@ -305,21 +314,20 @@ function RowMenu({ a, trigger }: { a: LiveAppointment; trigger: React.ReactEleme
   const open = a.status === "booked" || a.status === "confirmed"
   const items: (ActionItem | false)[][] = [
     [
-      open && { key: "checkIn", icon: "tick-circle", label: t("menu.checkIn"), onSelect: () => move("arrived", t("toast.checkedIn"), t("toast.checkedInText", vars)) },
+      { key: "details", icon: "document-text", label: t("menu.details"), onSelect: () => overlay.open("details", a) },
+      open && { key: "checkIn", icon: "tick-circle", label: t("menu.checkIn"), onSelect: () => overlay.open("checkIn", a) },
       a.status === "arrived" && { key: "callIn", icon: "people", label: t("menu.callIn"), onSelect: () => move("withDoctor", t("toast.calledIn"), t("toast.calledInText", vars)) },
       a.status === "withDoctor" && { key: "finish", icon: "tick-square", label: t("menu.finish"), onSelect: () => move("completed", t("toast.finished"), t("toast.finishedText", vars)) },
-      { key: "day", icon: "calendar-2", label: t("menu.openDay"), onSelect: () => router.push("/appointments") },
+      { key: "day", icon: "calendar-2", label: t("menu.openDay"), onSelect: () => router.push(a.date === TODAY ? "/appointments" : `/appointments?date=${a.date}`) },
     ],
     [
       open && {
         key: "remind",
         icon: "sms",
         label: t("menu.remind"),
-        onSelect: () => {
-          remind(a.id)
-          notify.success(t("toast.reminded"), { description: t("toast.remindedText", vars) })
-        },
+        onSelect: () => overlay.open("sms", a),
       },
+      (open || a.status === "arrived") && { key: "reschedule", icon: "calendar-add", label: t("menu.reschedule"), onSelect: () => overlay.open("reschedule", a) },
     ],
     [
       (open || a.status === "arrived") && {
@@ -327,14 +335,14 @@ function RowMenu({ a, trigger }: { a: LiveAppointment; trigger: React.ReactEleme
         icon: "close-circle",
         label: t("menu.noShow"),
         destructive: true,
-        onSelect: () => move("noShow", t("toast.noShow"), t("toast.noShowText", vars), "info"),
+        onSelect: () => overlay.open("noShow", a),
       },
       (open || a.status === "arrived") && {
         key: "cancel",
         icon: "trash",
         label: t("menu.cancel"),
         destructive: true,
-        onSelect: () => move("cancelled", t("toast.cancelled"), t("toast.cancelledText", vars), "info"),
+        onSelect: () => overlay.open("cancel", a),
       },
     ],
   ]

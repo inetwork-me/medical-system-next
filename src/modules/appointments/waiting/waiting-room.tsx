@@ -15,6 +15,7 @@ import { ExportDialog } from "../calendar/export"
 import { DOCTORS, doctorById, hhmm, NOW_MIN, TODAY, type ApptStatus } from "../data"
 import { AppointmentsFrame } from "../frame"
 import { Kpis } from "../list/list"
+import { useApptOverlay } from "../overlays"
 import { useAppointmentActions, useAppointmentsOn, type LiveAppointment } from "../store"
 
 type Col = "expected" | "waiting" | "withDoctor" | "done"
@@ -117,6 +118,7 @@ function Card({ col, a }: { col: Col; a: LiveAppointment }) {
   const tw = useTranslations("appointments.waiting")
   const locale = useLocale()
   const { setStatus, collect } = useAppointmentActions()
+  const overlay = useApptOverlay()
   const doc = doctorById(a.doctor)
   const name = a.patient ? bi(a.patient, locale) : t("calendar.bookedSlot")
   const doctor = bi(doc.name, locale)
@@ -137,7 +139,9 @@ function Card({ col, a }: { col: Col; a: LiveAppointment }) {
   return (
     <li className="flex flex-col gap-2 rounded-xl border bg-card p-3">
       <div className="flex items-center gap-2">
-        <span className="min-w-0 flex-1 truncate text-sm font-medium">{name}</span>
+        <button type="button" onClick={() => overlay.open("details", a)} className="min-w-0 flex-1 cursor-pointer truncate text-start text-sm font-medium hover:underline">
+          {name}
+        </button>
         <span className="text-xs font-medium text-muted-foreground tabular-nums">{hhmm(a.start)}</span>
       </div>
       <span className="truncate text-xs text-muted-foreground">
@@ -158,7 +162,7 @@ function Card({ col, a }: { col: Col; a: LiveAppointment }) {
         )}
         <span className="flex-1" />
         {col === "expected" && (
-          <Button size="sm" onClick={() => move("arrived", t("list.toast.checkedIn"), t("list.toast.checkedInText", vars))}>
+          <Button size="sm" onClick={() => overlay.open("checkIn", a)}>
             {tw("checkIn")}
           </Button>
         )}

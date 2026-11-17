@@ -131,7 +131,9 @@
       "finish": "Finish visit",
       "remind": "Send reminder",
       "noShow": "Mark no-show",
-      "cancel": "Cancel appointment"
+      "cancel": "Cancel appointment",
+      "details": "View details",
+      "reschedule": "Reschedule"
     },
     "toast": {
       "checkedIn": "Checked in",
@@ -290,5 +292,138 @@
     "booked": "Appointment booked",
     "bookedText": "{name} · {date} · {time} · {doctor}. {reminder, select, yes {Reminder scheduled.} other {No reminder.}}",
     "view": "View"
+  },
+  "ov": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "keep": "Keep appointment",
+    "details": {
+      "meta": "MRN {mrn} · {age} yrs",
+      "vip": "VIP",
+      "waiting": "Arrived · waiting {n} min",
+      "withDoctor": "With doctor · {n} min",
+      "dateTime": "Date & time",
+      "doctor": "Doctor",
+      "clinicRoom": "Clinic · room",
+      "clinicRoomValue": "{clinic} · Clinic {room}",
+      "service": "Service",
+      "serviceValue": "{name} · {n} min",
+      "insurance": "Insurance",
+      "insured": "{plan} · co-pay SAR {n}",
+      "selfPay": "Self-pay",
+      "bookedBy": "Booked by",
+      "bookedByValue": "{who} · {date} · {via}",
+      "via": {
+        "phone": "phone",
+        "online": "online",
+        "desk": "reception"
+      },
+      "timeline": "Timeline",
+      "ev": {
+        "booked": "{via, select, phone {Booked by phone} online {Booked online} other {Booked at reception}}",
+        "bookedMeta": "{date} · {time} · {who}",
+        "reminder": "Reminder sent",
+        "reminderMeta": "{date} · {time} · SMS",
+        "confirmed": "Confirmed on WhatsApp",
+        "confirmedMeta": "{date} · {time}",
+        "arrived": "Arrived at reception",
+        "arrivedMeta": "{date} · {time} · ID verified",
+        "calledIn": "Called in",
+        "calledInMeta": "{date} · {time} · Clinic {room}",
+        "finished": "Visit finished",
+        "noShow": "Marked as no-show",
+        "cancelled": "Appointment cancelled"
+      },
+      "sendReminder": "Send reminder",
+      "noShow": "Mark no-show",
+      "cancelAppt": "Cancel appointment",
+      "reschedule": "Reschedule",
+      "checkIn": "Check in",
+      "callIn": "Call in",
+      "finish": "Finish visit",
+      "rebook": "Book again",
+      "openFile": "Open patient file"
+    },
+    "checkIn": {
+      "title": "Check in {name}",
+      "sub": "{time} · {doctor} · {clinic}",
+      "id": "National ID verified",
+      "insurance": "Insurance card valid · {plan} until 06/2027",
+      "noInsurance": "No insurance · self-pay",
+      "contact": "Contact details confirmed",
+      "copay": "Co-pay due",
+      "pay": {
+        "mada": "Mada card",
+        "cash": "Cash",
+        "later": "Collect after the visit"
+      },
+      "payLabel": "Payment",
+      "room": "Room",
+      "roomValue": "Clinic {n}",
+      "confirm": "Check in",
+      "toastText": "{name} is waiting for Clinic {room}."
+    },
+    "noShow": {
+      "title": "Mark {name} as no-show?",
+      "sub": "{time} · {doctor} · {clinic}",
+      "first": "This is {name}'s first no-show this year. After 3, online booking is blocked automatically.",
+      "second": "This is {name}'s 2nd no-show this year. After 3, online booking is blocked automatically.",
+      "rebook": "Send a rebooking link by SMS",
+      "confirm": "Mark no-show",
+      "toastText": "{name} · {time} · {doctor}.{sms, select, yes { Rebooking link sent.} other {}}"
+    },
+    "cancelAppt": {
+      "title": "Cancel this appointment?",
+      "sub": "The slot will be released for other patients.",
+      "current": "Current",
+      "clinic": "Clinic",
+      "clinicValue": "{clinic} · {doctor}",
+      "reasonLabel": "Reason",
+      "reason": {
+        "patient": "Patient request",
+        "doctor": "Doctor unavailable",
+        "mistake": "Booked by mistake"
+      },
+      "notifyGuardian": "Notify the guardian by SMS",
+      "notifyPatient": "Notify the patient by SMS",
+      "confirm": "Cancel appointment",
+      "toastText": "{name} · {when} · {doctor}. The slot is free again."
+    },
+    "reschedule": {
+      "title": "Reschedule appointment",
+      "sub": "Pick a new day and time",
+      "current": "Current",
+      "clinic": "Clinic",
+      "available": "{date} · available times",
+      "notifyGuardian": "Notify the guardian by SMS",
+      "notifyPatient": "Notify the patient by SMS",
+      "confirm": "Confirm new time",
+      "pick": "Pick a new time",
+      "toast": "Appointment moved",
+      "toastText": "{name} · {from} → {to}.{sms, select, yes { SMS sent.} other {}}"
+    },
+    "sms": {
+      "title": "Send SMS",
+      "to": "To",
+      "toPatient": "Patient · {name} · {mobile}",
+      "toGuardian": "Guardian · {name} · {mobile}",
+      "template": "Template",
+      "templates": {
+        "reminder": "Appointment reminder",
+        "confirm": "Ask to confirm",
+        "late": "Doctor running late"
+      },
+      "message": "Message",
+      "counter": "{n} / 160 · {sms, plural, one {1 SMS} other {# SMS}}",
+      "body": {
+        "reminder": "Reminder: {name} has a {clinic} visit with {doctor} on {date} at {time}. Reply 1 to confirm.",
+        "confirm": "Hi {name}, please confirm your {clinic} visit with {doctor} on {date} at {time}. Reply 1 to confirm or 2 to change.",
+        "late": "Sorry {name}, {doctor} is running about 20 min late today. Your {time} visit is still on."
+      },
+      "send": "Send",
+      "required": "Write the message",
+      "toast": "SMS sent",
+      "toastText": "To {to} · {template}"
+    }
   }
 }

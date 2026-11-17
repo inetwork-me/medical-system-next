@@ -439,7 +439,7 @@ function PatientCard({ p, selected, onClick, label }: { p: Patient; selected?: b
 }
 
 /** Month for booking: today outlined, picked = primary, past days, Fridays and other months greyed. */
-function MonthPicker({ date, onPick }: { date: string; onPick: (d: string) => void }) {
+export function MonthPicker({ date, onPick }: { date: string; onPick: (d: string) => void }) {
   const t = useTranslations("appointments.calendar")
   const dates = useDates()
   const [month, setMonth] = React.useState(date.slice(0, 7))
@@ -492,7 +492,7 @@ function MonthPicker({ date, onPick }: { date: string; onPick: (d: string) => vo
   )
 }
 
-function Slots({
+export function Slots({
   label,
   slots,
   value,

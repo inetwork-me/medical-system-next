@@ -131,7 +131,9 @@
       "finish": "خلّص الزيارة",
       "remind": "أرسل تذكير",
       "noShow": "علّمه ما حضر",
-      "cancel": "ألغِ الموعد"
+      "cancel": "ألغِ الموعد",
+      "details": "اعرض التفاصيل",
+      "reschedule": "غيّر الموعد"
     },
     "toast": {
       "checkedIn": "تم تسجيل الوصول",
@@ -290,5 +292,138 @@
     "booked": "انحجز الموعد",
     "bookedText": "{name} · {date} · {time} · {doctor}. {reminder, select, yes {التذكير مجدول.} other {بدون تذكير.}}",
     "view": "اعرض"
+  },
+  "ov": {
+    "close": "إغلاق",
+    "cancel": "إلغاء",
+    "keep": "خلّ الموعد",
+    "details": {
+      "meta": "MRN {mrn} · {age} سنة",
+      "vip": "VIP",
+      "waiting": "وصل · ينتظر {n} دقيقة",
+      "withDoctor": "عند الطبيب · {n} دقيقة",
+      "dateTime": "اليوم والوقت",
+      "doctor": "الطبيب",
+      "clinicRoom": "العيادة · الغرفة",
+      "clinicRoomValue": "{clinic} · عيادة {room}",
+      "service": "الخدمة",
+      "serviceValue": "{name} · {n} دقيقة",
+      "insurance": "التأمين",
+      "insured": "{plan} · يدفع {n} ر.س",
+      "selfPay": "على حسابه",
+      "bookedBy": "حجزه",
+      "bookedByValue": "{who} · {date} · {via}",
+      "via": {
+        "phone": "اتصال",
+        "online": "أونلاين",
+        "desk": "الاستقبال"
+      },
+      "timeline": "التسلسل",
+      "ev": {
+        "booked": "انحجز {via, select, phone {بالاتصال} online {أونلاين} other {من الاستقبال}}",
+        "bookedMeta": "{date} · {time} · {who}",
+        "reminder": "انرسل التذكير",
+        "reminderMeta": "{date} · {time} · رسالة",
+        "confirmed": "أكّد بالواتساب",
+        "confirmedMeta": "{date} · {time}",
+        "arrived": "وصل الاستقبال",
+        "arrivedMeta": "{date} · {time} · تم التحقق من الهوية",
+        "calledIn": "دخل للطبيب",
+        "calledInMeta": "{date} · {time} · عيادة {room}",
+        "finished": "خلصت الزيارة",
+        "noShow": "انعلّم ما حضر",
+        "cancelled": "انلغى الموعد"
+      },
+      "sendReminder": "أرسل تذكير",
+      "noShow": "ما حضر",
+      "cancelAppt": "ألغِ الموعد",
+      "reschedule": "غيّر الموعد",
+      "checkIn": "سجّل الوصول",
+      "callIn": "ناده",
+      "finish": "خلّص الزيارة",
+      "rebook": "احجز له من جديد",
+      "openFile": "افتح ملف المريض"
+    },
+    "checkIn": {
+      "title": "تسجيل وصول {name}",
+      "sub": "{time} · {doctor} · {clinic}",
+      "id": "تم التحقق من الهوية",
+      "insurance": "بطاقة التأمين سارية · {plan} لين 06/2027",
+      "noInsurance": "بدون تأمين · على حسابه",
+      "contact": "تم تأكيد بيانات التواصل",
+      "copay": "المبلغ المستحق",
+      "pay": {
+        "mada": "بطاقة مدى",
+        "cash": "كاش",
+        "later": "يدفع بعد الزيارة"
+      },
+      "payLabel": "الدفع",
+      "room": "الغرفة",
+      "roomValue": "عيادة {n}",
+      "confirm": "سجّل الوصول",
+      "toastText": "{name} ينتظر في عيادة {room}."
+    },
+    "noShow": {
+      "title": "تعلّم {name} إنه ما حضر؟",
+      "sub": "{time} · {doctor} · {clinic}",
+      "first": "هذي أول مرة ما يحضر هالسنة. بعد 3 مرات ينقفل الحجز الأونلاين تلقائي.",
+      "second": "هذي ثاني مرة ما يحضر هالسنة. بعد 3 مرات ينقفل الحجز الأونلاين تلقائي.",
+      "rebook": "أرسل له رابط يحجز من جديد",
+      "confirm": "علّمه ما حضر",
+      "toastText": "{name} · {time} · {doctor}.{sms, select, yes { انرسل رابط الحجز.} other {}}"
+    },
+    "cancelAppt": {
+      "title": "تلغي الموعد؟",
+      "sub": "الوقت بيصير متاح لمرضى ثانيين.",
+      "current": "الموعد الحالي",
+      "clinic": "العيادة",
+      "clinicValue": "{clinic} · {doctor}",
+      "reasonLabel": "السبب",
+      "reason": {
+        "patient": "طلب المريض",
+        "doctor": "الطبيب مو متاح",
+        "mistake": "حجز بالغلط"
+      },
+      "notifyGuardian": "بلّغ ولي الأمر برسالة",
+      "notifyPatient": "بلّغ المريض برسالة",
+      "confirm": "ألغِ الموعد",
+      "toastText": "{name} · {when} · {doctor}. الوقت صار متاح."
+    },
+    "reschedule": {
+      "title": "غيّر الموعد",
+      "sub": "اختر يوم ووقت جديد",
+      "current": "الموعد الحالي",
+      "clinic": "العيادة",
+      "available": "{date} · الأوقات المتاحة",
+      "notifyGuardian": "بلّغ ولي الأمر برسالة",
+      "notifyPatient": "بلّغ المريض برسالة",
+      "confirm": "أكّد الموعد الجديد",
+      "pick": "اختر وقت جديد",
+      "toast": "انتقل الموعد",
+      "toastText": "{name} · {from} ← {to}.{sms, select, yes { انرسلت رسالة.} other {}}"
+    },
+    "sms": {
+      "title": "أرسل رسالة",
+      "to": "إلى",
+      "toPatient": "المريض · {name} · {mobile}",
+      "toGuardian": "ولي الأمر · {name} · {mobile}",
+      "template": "القالب",
+      "templates": {
+        "reminder": "تذكير بموعد",
+        "confirm": "طلب تأكيد",
+        "late": "الطبيب متأخر"
+      },
+      "message": "الرسالة",
+      "counter": "{n} / 160 · {sms, plural, one {رسالة وحدة} two {رسالتين} few {# رسائل} other {# رسالة}}",
+      "body": {
+        "reminder": "تذكير: موعد {name} في عيادة {clinic} مع {doctor} يوم {date} الساعة {time}. رد بـ 1 للتأكيد.",
+        "confirm": "هلا {name}، أكّد موعدك في عيادة {clinic} مع {doctor} يوم {date} الساعة {time}. رد بـ 1 للتأكيد أو 2 للتغيير.",
+        "late": "نعتذر {name}، {doctor} متأخر تقريباً 20 دقيقة اليوم. موعدك الساعة {time} باقي."
+      },
+      "send": "أرسل",
+      "required": "اكتب الرسالة",
+      "toast": "انرسلت الرسالة",
+      "toastText": "إلى {to} · {template}"
+    }
   }
 }

@@ -9,6 +9,7 @@ import { useDates } from "@/i18n/dates"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
 import { Button } from "@/components/ui/button"
+import { useApptOverlay } from "../overlays"
 import { useAppointmentsOn } from "../store"
 import { addDays, doctorById, hhmm, isClosed, NOW_LABEL, NOW_MIN, TODAY, weekStart, type Appointment, type ApptStatus, type DoctorId } from "../data"
 
@@ -117,10 +118,16 @@ function NowDivider() {
 
 function Item({ a }: { a: Appointment }) {
   const t = useTranslations("appointments")
+  const overlay = useApptOverlay()
   const locale = useLocale()
   const doc = doctorById(a.doctor)
   return (
-    <li className="flex gap-2.5 rounded-xl border bg-card p-3">
+    <li>
+      <button
+        type="button"
+        onClick={() => overlay.open("details", a)}
+        className="flex w-full cursor-pointer gap-2.5 rounded-xl border bg-card p-3 text-start outline-none hover:bg-muted/40 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      >
       <span className="flex w-11.5 shrink-0 flex-col">
         <span className="text-sm font-medium tabular-nums">{hhmm(a.start)}</span>
         <span className="text-xs text-muted-foreground">{t("calendar.minutes", { n: a.duration })}</span>
@@ -138,6 +145,7 @@ function Item({ a }: { a: Appointment }) {
           {t(`status.${a.status}`)}
         </StatusBadge>
       </span>
+      </button>
     </li>
   )
 }

@@ -22,6 +22,7 @@ import {
   type Doctor,
   type DoctorId,
 } from "../data"
+import { useApptOverlay } from "../overlays"
 import { useAppointmentsOn } from "../store"
 
 /** 88px per hour (design · Day Board / Week Board). */
@@ -43,7 +44,7 @@ const LOOK: Record<ApptStatus | "break", { box: string; bar: string; sub: string
 }
 
 /** One appointment (or lunch break) on a board column: 3px status bar + time / name / reason. */
-function Block({ start, duration, name, reason, status, telehealth, label }: {
+function Block({ start, duration, name, reason, status, telehealth, label, onOpen }: {
   start: number
   duration: number
   name: string
@@ -51,17 +52,25 @@ function Block({ start, duration, name, reason, status, telehealth, label }: {
   status: ApptStatus | "break"
   telehealth?: boolean
   label?: string
+  onOpen?: () => void
 }) {
   const t = useTranslations("appointments.calendar")
   const look = LOOK[status]
+  const Tag = onOpen ? "button" : "div"
   const compact = duration < 30
   const top = px(start) + 2
   const height = (duration * HOUR) / 60 - 4
   return (
-    <div
+    <Tag
+      type={onOpen ? "button" : undefined}
+      onClick={onOpen}
       role={label ? "listitem" : undefined}
       aria-label={label}
-      className={cn("absolute inset-x-1 flex overflow-hidden rounded-lg text-xs leading-4", look.box)}
+      className={cn(
+        "absolute inset-x-1 flex overflow-hidden rounded-lg text-start text-xs leading-4",
+        onOpen && "cursor-pointer outline-none hover:brightness-[0.97] focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        look.box
+      )}
       style={{ top, height }}
     >
       <span aria-hidden className={cn("w-[3px] shrink-0", look.bar)} />
@@ -82,7 +91,7 @@ function Block({ start, duration, name, reason, status, telehealth, label }: {
           {reason && duration >= 45 && <span className={cn("truncate", look.sub)}>{reason}</span>}
         </span>
       )}
-    </div>
+    </Tag>
   )
 }
 
@@ -161,6 +170,7 @@ export function DayBoard({ date, doctors }: { date: string; doctors: DoctorId[] 
   const locale = useLocale()
   const text = useApptText()
   const list = useAppointmentsOn()(date)
+  const overlay = useApptOverlay()
   const today = date === TODAY
   const cols = doctors.map(doctorById)
   return (
@@ -196,6 +206,7 @@ export function DayBoard({ date, doctors }: { date: string; doctors: DoctorId[] 
                     status={a.status}
                     telehealth={a.telehealth}
                     label={text.label(a)}
+                    onOpen={() => overlay.open("details", a)}
                   />
                 ))}
               {today && <NowLine />}
@@ -234,6 +245,7 @@ export function WeekBoard({ sunday, doctor }: { sunday: string; doctor: DoctorId
   const dates = useDates()
   const text = useApptText()
   const on = useAppointmentsOn()
+  const overlay = useApptOverlay()
   const days = weekDays(sunday)
   return (
     <BoardShell
@@ -277,6 +289,7 @@ export function WeekBoard({ sunday, doctor }: { sunday: string; doctor: DoctorId
                     status={a.status}
                     telehealth={a.telehealth}
                     label={text.label(a)}
+                    onOpen={() => overlay.open("details", a)}
                   />
                 ))}
               {d === TODAY && <NowLine />}

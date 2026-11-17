@@ -8,7 +8,7 @@ import { appointmentsOn, NOW_MIN, TIME_OFF, type Appointment, type ApptStatus, t
  * Session changes on top of the mock data (no backend yet): status moves (check in, call in, no-show, cancel…) and
  * reminders sent. Kept in sessionStorage so a refresh keeps them; every Appointments screen reads through here.
  */
-type Change = { status?: ApptStatus; reminded?: boolean; since?: number; paid?: boolean }
+type Change = { status?: ApptStatus; reminded?: boolean; since?: number; paid?: boolean; moved?: boolean }
 type Store = {
   changes: Record<string, Change>
   setStatus: (id: string, status: ApptStatus, since?: number) => void
@@ -16,6 +16,8 @@ type Store = {
   collect: (id: string, paid?: boolean) => void
   added: Appointment[]
   book: (a: Appointment) => void
+  /** Move to a new day / time: the original is hidden, a copy is booked; returns an undo. */
+  reschedule: (a: Appointment, date: string, start: number) => () => void
   timeOff: TimeOff[]
   addTimeOff: (t: TimeOff) => void
   removeTimeOff: (id: string) => void
@@ -62,6 +64,15 @@ export function AppointmentsStoreProvider({ children }: { children: React.ReactN
       remind: (id) => setChanges((c) => ({ ...c, [id]: { ...c[id], reminded: true } })),
       added: booked,
       book: (a) => setBooked((l) => [...l, a]),
+      reschedule: (a, date, start) => {
+        const copy: Appointment = { ...a, id: `${a.id}~${date}-${start}`, date, start, since: undefined }
+        setChanges((c) => ({ ...c, [a.id]: { ...c[a.id], moved: true } }))
+        setBooked((l) => [...l.filter((x) => x.id !== a.id), copy])
+        return () => {
+          setChanges((c) => ({ ...c, [a.id]: { ...c[a.id], moved: false } }))
+          setBooked((l) => [...l.filter((x) => x.id !== copy.id), ...(a.id.startsWith("new-") || a.id.includes("~") ? [a] : [])])
+        }
+      },
       timeOff: [...TIME_OFF, ...added],
       addTimeOff: (t) => setAdded((l) => [...l, t]),
       removeTimeOff: (id) => setAdded((l) => l.filter((x) => x.id !== id)),
@@ -90,6 +101,7 @@ export function useAppointmentsOn() {
   return React.useCallback(
     (date: string) =>
       [...appointmentsOn(date), ...(booked ?? []).filter((a) => a.date === date)]
+        .filter((a) => !changes?.[a.id]?.moved)
         .sort((a, b) => a.start - b.start)
         .map((a) => withChange(a, changes?.[a.id])),
     [changes, booked]
@@ -106,6 +118,7 @@ export function useAppointmentActions() {
     addTimeOff: store.addTimeOff,
     removeTimeOff: store.removeTimeOff,
     book: store.book,
+    reschedule: store.reschedule,
   }
 }
 

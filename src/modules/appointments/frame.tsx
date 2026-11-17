@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ds/states"
 import { ModuleTabsNav, PageContainer, PageHeader } from "@/components/shell/page"
 import { Button } from "@/components/ui/button"
 import { TODAY } from "./data"
+import { AppointmentOverlays } from "./overlays"
 import { useAppointmentsOn } from "./store"
 
 /**
@@ -41,7 +42,7 @@ export function AppointmentsFrame({ onExport, children }: { onExport?: () => voi
           </>
         }
       />
-      {children}
+      <AppointmentOverlays>{children}</AppointmentOverlays>
     </PageContainer>
   )
 }

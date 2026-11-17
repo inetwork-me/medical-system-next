@@ -17,6 +17,8 @@ type PatientEdits = {
   notes?: Record<number, string>
   selected?: number | null
   savedAt?: string
+  preApproval?: { sentAt: string; notifyGuardian: boolean }
+  consent?: "sent" | "signed"
 }
 type State = Record<string, PatientEdits>
 
@@ -80,6 +82,16 @@ export function useDentalRecord(id: string): DentalRecord | null {
         selected: edits.selected === undefined ? base.chart.selected : (edits.selected ?? base.chart.selected),
       },
       plan: edits.plan ?? base.plan,
+      consent: edits.consent ? { ...base.consent, status: edits.consent } : base.consent,
+      preApproval:
+        base.preApproval && edits.preApproval
+          ? {
+              ...base.preApproval,
+              notifyGuardian: edits.preApproval.notifyGuardian,
+              current: "decision" as const,
+              steps: base.preApproval.steps.map((st) => (st.key === "sent" ? { ...st, at: edits.preApproval!.sentAt } : st)),
+            }
+          : base.preApproval,
     }
   }, [id, edits])
 }
@@ -191,4 +203,22 @@ export function applyDraft(id: string, rec: DentalRecord, fdi: number, d: ToothD
 
 export function markChartSaved(id: string) {
   update(id, (e) => ({ ...e, savedAt: new Date().toISOString() }))
+}
+
+/** "2026-11-17T13:14" in clinic time (Asia/Riyadh), like the design's step times. */
+function clinicNow() {
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+      .formatToParts(new Date())
+      .map((x) => [x.type, x.value]),
+  )
+  return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`
+}
+
+export function sendPreApproval(id: string, notifyGuardian: boolean) {
+  update(id, (e) => ({ ...e, preApproval: { sentAt: clinicNow(), notifyGuardian } }))
+}
+
+export function setConsent(id: string, status: "sent" | "signed") {
+  update(id, (e) => ({ ...e, consent: status }))
 }

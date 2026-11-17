@@ -97,7 +97,8 @@
       "declined": "انرفضت",
       "preApprovalCaption": "السن {tooth} · انرسل اليوم",
       "patientPays": "على المريض",
-      "patientPaysCaption": "بعد التأمين"
+      "patientPaysCaption": "بعد التأمين",
+      "preApprovalReady": "السن {tooth} · جاهز للإرسال"
     },
     "chart": {
       "title": "مخطط الأسنان",
@@ -287,5 +288,93 @@
     "updated": "انحدّث السن {n}",
     "needTreatment": "اختر العلاج",
     "needTreatmentText": "الشغل المخطط أو اللي انعمل يحتاج كود علاج."
+  },
+  "ins": {
+    "title": "التأمين والموافقات",
+    "description": "{payer} · فئة {cls} · {policy}",
+    "limit": "حد الأسنان السنوي",
+    "used": "مستخدم {used} من {limit} ر.س",
+    "leftAfter": "بعد هالخطة يبقى {amount}",
+    "overBy": "هالخطة تتعدى الحد بـ {amount}",
+    "paTitle": "موافقة مسبقة · السن {teeth}",
+    "paWhat": "{what} · {amount}",
+    "step": {
+      "prepared": "انجهز الطلب",
+      "xrays": "انرفقت الأشعة",
+      "sent": "انرسل لـ{payer}",
+      "decision": "الرد"
+    },
+    "send": "أرسل طلب الموافقة",
+    "waiting": "ننتظر رد {payer}",
+    "sentTitle": "انرسل طلب الموافقة لـ{payer}",
+    "sentText": "عادةً يردون خلال 24 ساعة.",
+    "dlg": {
+      "title": "إرسال طلب موافقة مسبقة",
+      "tooth": "السن",
+      "procedures": "الإجراءات",
+      "diagnosis": "التشخيص",
+      "amount": "المبلغ",
+      "attached": "انرفقت تلقائياً",
+      "xrays": "{count, plural, one {صورة أشعة} two {صورتين أشعة} few {# صور أشعة} many {# صورة أشعة} other {# صورة أشعة}}",
+      "chart": "مخطط الأسنان",
+      "note": "الملاحظة الطبية",
+      "notify": "أرسل رسالة لولي الأمر لما ترد {payer}",
+      "send": "أرسل لـ{payer}"
+    }
+  },
+  "consent": {
+    "title": "موافقة المريض",
+    "minor": "{name} {gender, select, female {عمرها} other {عمره}} {age} سنة، {gender, select, female {فيوقّع ولي أمرها} other {فيوقّع ولي أمره}}",
+    "adult": "المريض يوقّع على خطة العلاج",
+    "patient": "المريض",
+    "status": {
+      "unsigned": "ما وقّع للحين",
+      "sent": "انرسل الرابط",
+      "signed": "وقّع"
+    },
+    "whatsapp": "أرسلها واتساب",
+    "resend": "أرسلها مرة ثانية",
+    "sign": "وقّع على الجهاز",
+    "sentTitle": "انرسل رابط الموافقة",
+    "sentText": "بيوصل {name} رابط واتساب يقرأ فيه الخطة ويوقّع.",
+    "signTitle": "توقيع الموافقة على العلاج",
+    "signText": "{name}، وقّع في المربع تحت عشان توافق على خطة العلاج.",
+    "pad": "مربع التوقيع",
+    "clearSig": "امسح",
+    "confirmSign": "وقّع",
+    "signedTitle": "انوقّعت الموافقة",
+    "signedText": "انحفظت في ملف المريض."
+  },
+  "gums": {
+    "title": "فحص اللثة",
+    "description": "عمق الجيب باللمم · 3 نقاط لكل سن (من برّا)",
+    "mm": "{v} مم",
+    "avgDepth": "متوسط العمق",
+    "deep": "نقاط ≥ 4 مم",
+    "bleeding": "النزيف",
+    "plaque": "البلاك",
+    "upper": "العلوي",
+    "lower": "السفلي",
+    "row": {
+      "depth": "العمق",
+      "bleeding": "نزيف",
+      "recession": "انحسار",
+      "mobility": "حركة"
+    },
+    "bleedSites": "{n, plural, =0 {ما فيه نزيف} one {نزيف في نقطة وحدة} two {نزيف في نقطتين} few {نزيف في # نقاط} many {نزيف في # نقطة} other {نزيف في # نقطة}}",
+    "health": {
+      "title": "صحة اللثة",
+      "description": "من فحص اليوم",
+      "risk": {
+        "low": "خطورة منخفضة",
+        "moderate": "خطورة متوسطة",
+        "high": "خطورة عالية"
+      },
+      "next": "التنظيف الجاي",
+      "inMonths": "بعد {n} شهور",
+      "watch": "نتابع",
+      "homeCare": "العناية في البيت",
+      "print": "اطبع النصايح للمريض"
+    }
   }
 }

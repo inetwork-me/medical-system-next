@@ -97,7 +97,8 @@
       "declined": "Declined",
       "preApprovalCaption": "Tooth {tooth} · sent today",
       "patientPays": "Patient pays",
-      "patientPaysCaption": "After insurance"
+      "patientPaysCaption": "After insurance",
+      "preApprovalReady": "Tooth {tooth} · ready to send"
     },
     "chart": {
       "title": "Dental chart",
@@ -287,5 +288,93 @@
     "updated": "Tooth {n} updated",
     "needTreatment": "Choose a treatment",
     "needTreatmentText": "Planned or done work needs a treatment code."
+  },
+  "ins": {
+    "title": "Insurance & approvals",
+    "description": "{payer} · Class {cls} · {policy}",
+    "limit": "Annual dental limit",
+    "used": "SAR {used} of {limit} used",
+    "leftAfter": "After this plan: {amount} left",
+    "overBy": "This plan goes over the limit by {amount}",
+    "paTitle": "Pre-approval · tooth {teeth}",
+    "paWhat": "{what} · {amount}",
+    "step": {
+      "prepared": "Request prepared",
+      "xrays": "X-rays attached",
+      "sent": "Sent to {payer}",
+      "decision": "Decision"
+    },
+    "send": "Send for pre-approval",
+    "waiting": "Waiting for {payer}",
+    "sentTitle": "Pre-approval sent to {payer}",
+    "sentText": "Usually answered within 24 hours.",
+    "dlg": {
+      "title": "Send for pre-approval",
+      "tooth": "Tooth",
+      "procedures": "Procedures",
+      "diagnosis": "Diagnosis",
+      "amount": "Amount",
+      "attached": "Attached automatically",
+      "xrays": "{count, plural, one {# x-ray} other {# x-rays}}",
+      "chart": "Dental chart",
+      "note": "Clinical note",
+      "notify": "Text the guardian when {payer} replies",
+      "send": "Send to {payer}"
+    }
+  },
+  "consent": {
+    "title": "Patient consent",
+    "minor": "{name} is {age}, so {gender, select, female {her} other {his}} guardian signs",
+    "adult": "The patient signs the treatment plan",
+    "patient": "Patient",
+    "status": {
+      "unsigned": "Not signed yet",
+      "sent": "Link sent",
+      "signed": "Signed"
+    },
+    "whatsapp": "Send by WhatsApp",
+    "resend": "Send again",
+    "sign": "Sign on this device",
+    "sentTitle": "Consent link sent",
+    "sentText": "{name} gets a WhatsApp link to read and sign the plan.",
+    "signTitle": "Sign the treatment consent",
+    "signText": "{name}, sign in the box below to agree to the treatment plan.",
+    "pad": "Signature box",
+    "clearSig": "Clear",
+    "confirmSign": "Sign",
+    "signedTitle": "Consent signed",
+    "signedText": "Saved to the patient's file."
+  },
+  "gums": {
+    "title": "Gum chart",
+    "description": "Pocket depth in mm · 3 sites per tooth (buccal)",
+    "mm": "{v} mm",
+    "avgDepth": "Average depth",
+    "deep": "Sites ≥ 4 mm",
+    "bleeding": "Bleeding",
+    "plaque": "Plaque",
+    "upper": "Upper",
+    "lower": "Lower",
+    "row": {
+      "depth": "Depth",
+      "bleeding": "Bleeding",
+      "recession": "Recession",
+      "mobility": "Mobility"
+    },
+    "bleedSites": "{n, plural, =0 {No bleeding} one {Bleeding at 1 site} other {Bleeding at # sites}}",
+    "health": {
+      "title": "Gum health",
+      "description": "From today's chart",
+      "risk": {
+        "low": "Low risk",
+        "moderate": "Moderate risk",
+        "high": "High risk"
+      },
+      "next": "Next cleaning",
+      "inMonths": "in {n} months",
+      "watch": "Watch",
+      "homeCare": "Home care",
+      "print": "Print advice for the patient"
+    }
   }
 }

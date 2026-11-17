@@ -14,10 +14,10 @@ import { notify } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetBody, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { PCard } from "../profile/side"
-import { usePatient, useText } from "../profile/use-patient"
-import { printArea } from "../payments/overlays"
+import { useText } from "../profile/use-patient"
 import type { Dentition } from "./data"
-import { markChartSaved, useDentalRecord, useSelectedTooth } from "./dental-store"
+import { DentalActions } from "./dental-actions"
+import { useDentalRecord, useSelectedTooth } from "./dental-store"
 import { PlanTable } from "./plan"
 import { DentalChartView, DentalLegend, type Layer } from "./tooth"
 import { ToothPanel } from "./tooth-panel"
@@ -37,14 +37,7 @@ export function DentalChartWorkspace({ initialTooth }: { initialTooth?: number }
   const [dentition, setDentition] = React.useState<Dentition>("permanent")
   const [history, setHistory] = React.useState(false)
   const mobile = useIsMobile()
-  const data = usePatient()
-  const { b } = useText()
-  const dates = useDates()
 
-  const save = () => {
-    markChartSaved(id)
-    notify.success(t("saved"), { description: data ? `${b(data.patient.name)} · ${dates.short(new Date())}` : undefined })
-  }
   const addTreatment = () => {
     if (selected == null) {
       notify.info(t("pickTooth"), { description: t("pickToothText") })
@@ -55,25 +48,8 @@ export function DentalChartWorkspace({ initialTooth }: { initialTooth?: number }
     el?.focus()
   }
 
-  const actions = !mobile && rec && (
-    <>
-      <Button variant="outline" size="icon" onClick={printArea} aria-label={t("print")} className="xl:hidden">
-        <Icon name="printer" size={20} />
-      </Button>
-      <Button variant="outline" onClick={printArea} className="max-xl:hidden">
-        <Icon name="printer" size={20} />
-        {t("print")}
-      </Button>
-      <Button onClick={save}>
-        <Icon name="tick-circle" size={20} />
-        <span className="xl:hidden">{t("saveShort")}</span>
-        <span className="max-xl:hidden">{t("save")}</span>
-      </Button>
-    </>
-  )
-
   return (
-    <Workspace kind="dental" mode="chart" actions={actions}>
+    <Workspace kind="dental" mode="chart" actions={rec && <DentalActions />}>
       {!rec ? (
         <div className="rounded-xl border bg-card">
           <EmptyState icon="health" title={t("emptyTitle")} description={t("emptyText")} className="py-16" />

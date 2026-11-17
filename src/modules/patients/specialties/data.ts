@@ -241,11 +241,11 @@ export function toothName(fdi: number): Bi {
 
 /* ---------------------------------------------------------------- procedures (CDT) */
 
-export type Procedure = { cdt: string; name: Bi; fee: number; coveragePct: number; preApproval: boolean; mark?: ToothMark; condition?: Condition }
+export type Procedure = { cdt: string; name: Bi; short?: Bi; fee: number; coveragePct: number; preApproval: boolean; mark?: ToothMark; condition?: Condition }
 export const PROCEDURES: Procedure[] = [
-  { cdt: "D3330", name: { en: "Root canal · molar", ar: "علاج عصب · ضرس" }, fee: 1800, coveragePct: 80, preApproval: true, mark: "rootCanal", condition: "rootCanal" },
+  { cdt: "D3330", name: { en: "Root canal · molar", ar: "علاج عصب · ضرس" }, short: { en: "root canal", ar: "علاج عصب" }, fee: 1800, coveragePct: 80, preApproval: true, mark: "rootCanal", condition: "rootCanal" },
   { cdt: "D3310", name: { en: "Root canal · front tooth", ar: "علاج عصب · سن أمامي" }, fee: 1200, coveragePct: 80, preApproval: true, mark: "rootCanal", condition: "rootCanal" },
-  { cdt: "D2740", name: { en: "Porcelain crown", ar: "تلبيسة بورسلان" }, fee: 2200, coveragePct: 50, preApproval: true, mark: "crown", condition: "crown" },
+  { cdt: "D2740", name: { en: "Porcelain crown", ar: "تلبيسة بورسلان" }, short: { en: "crown", ar: "تلبيسة" }, fee: 2200, coveragePct: 50, preApproval: true, mark: "crown", condition: "crown" },
   { cdt: "D2391", name: { en: "Composite filling · 1 surface", ar: "حشوة تجميلية · سطح واحد" }, fee: 350, coveragePct: 80, preApproval: false, condition: "filling" },
   { cdt: "D2392", name: { en: "Composite filling · 2 surfaces", ar: "حشوة تجميلية · سطحين" }, fee: 450, coveragePct: 80, preApproval: false, condition: "filling" },
   { cdt: "D2330", name: { en: "Composite filling · front", ar: "حشوة أمامية" }, fee: 300, coveragePct: 80, preApproval: false, condition: "filling" },
@@ -354,6 +354,7 @@ export type PreApproval = {
   items: string[]
   teeth: number[]
   diagnosis: string
+  diagnosisName: Bi
   attachments: ("xrays" | "chart" | "note")[]
   steps: { key: PreApprovalStep; at?: string }[]
   /** Current step (the next one to happen). */
@@ -365,6 +366,7 @@ const FAHAD_PREAPPROVAL: PreApproval = {
   items: ["p1", "p2"],
   teeth: [36],
   diagnosis: "K04.0",
+  diagnosisName: { en: "Pulpitis", ar: "التهاب العصب" },
   attachments: ["xrays", "chart", "note"],
   steps: [{ key: "prepared", at: "2026-11-17T10:42" }, { key: "xrays", at: "2026-11-17T10:44" }, { key: "sent" }, { key: "decision" }],
   current: "sent",
@@ -406,7 +408,14 @@ const fahadGums = (): Record<number, GumSite> => {
 /* ================================================================== per patient */
 
 export type EyeRecord = { exams: EyeExam[] }
+/** Patients under 18: the guardian signs the treatment consent (on the device or through a WhatsApp link). */
+export type Consent = { guardian: { name: Bi; initials: string; relation: Bi; mobile: string } | null; status: "unsigned" | "sent" | "signed" }
+/** Gum health summary (Gums workspace). Plaque comes from the hygienist's index, not the pocket chart. */
+export type GumHealth = { plaquePct: number; risk: "low" | "moderate" | "high"; nextCleaning: string; watch: Bi | null; advice: Bi[] }
+
 export type DentalRecord = {
+  consent: Consent
+  gumHealth: GumHealth
   chart: DentalChart
   plan: PlanItem[]
   insurance: DentalInsurance
@@ -424,6 +433,21 @@ export function eyeRecord(patientId: string): EyeRecord | null {
 export function dentalRecord(patientId: string): DentalRecord | null {
   if (patientId !== FAHAD) return null
   return {
+    consent: {
+      guardian: { name: { en: "Abdullah Al-Dosari", ar: "عبدالله الدوسري" }, initials: "AD", relation: { en: "Father · guardian", ar: "الأب · ولي الأمر" }, mobile: "059 300 1287" },
+      status: "unsigned",
+    },
+    gumHealth: {
+      plaquePct: 18,
+      risk: "low",
+      nextCleaning: "2027-05-17",
+      watch: { en: "Tooth 36 · 5 mm pocket with bleeding", ar: "السن 36 · جيب 5 مم مع نزيف" },
+      advice: [
+        { en: "Floss around 36 daily", ar: "خيط الأسنان حول 36 يومياً" },
+        { en: "Soft toothbrush", ar: "فرشاة ناعمة" },
+        { en: "Fluoride toothpaste", ar: "معجون فيه فلورايد" },
+      ],
+    },
     chart: FAHAD_TEETH,
     plan: FAHAD_PLAN,
     insurance: FAHAD_INSURANCE,
@@ -452,6 +476,25 @@ export function dentalSummary(r: DentalRecord) {
     patientPays: pays,
     insurancePays: fees - pays,
   }
+}
+
+/** Gum chart summary tiles, computed from the sites: average depth, sites ≥ 4 mm, bleeding %. */
+export function gumSummary(gums: Record<number, GumSite>) {
+  const depths = Object.values(gums).flatMap((g) => g.depth)
+  const bleeding = Object.values(gums).flatMap((g) => g.bleeding).filter(Boolean).length
+  return {
+    sites: depths.length,
+    avgDepth: depths.length ? depths.reduce((a, b) => a + b, 0) / depths.length : 0,
+    deep: depths.filter((d) => d >= 4).length,
+    bleedingPct: depths.length ? Math.round((bleeding / depths.length) * 100) : 0,
+  }
+}
+
+/** Insurance figures for the plan: limit used, and what's left once the planned (not yet claimed) work is paid. */
+export function insuranceSummary(r: DentalRecord) {
+  const planned = r.plan.filter((i) => i.status === "planned").reduce((s, i) => s + (i.fee - patientShare(i)), 0)
+  const { annualLimit, used } = r.insurance
+  return { annualLimit, used, usedPct: (used / annualLimit) * 100, leftAfter: annualLimit - used - planned }
 }
 
 /* ================================================================== routes (workspaces live outside the app shell) */

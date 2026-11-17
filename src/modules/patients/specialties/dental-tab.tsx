@@ -67,7 +67,7 @@ export function DentalTab() {
         </div>
       </PCard>
       <div className="grid items-start gap-4 @min-[45rem]/tab:grid-cols-[minmax(0,1fr)_300px] @min-[45rem]/tab:gap-6">
-        <PlanCompact id={id} rec={rec} />
+        <PlanCompact rec={rec} addHref={specialtyHref.dentalPlan(id)} />
         <Mouth3dCard id={id} className="hidden @min-[45rem]/tab:flex" />
       </div>
       <DentalHistory rec={rec} />
@@ -93,7 +93,7 @@ function Tiles({ rec }: { rec: DentalRecord }) {
             icon: "shield-tick" as IconName,
             label: t("preApproval"),
             value: t(pa.status),
-            caption: t("preApprovalCaption", { tooth: pa.teeth.join(", ") }),
+            caption: t(pa.steps.find((x) => x.key === "sent")?.at ? "preApprovalCaption" : "preApprovalReady", { tooth: pa.teeth.join(", ") }),
             tone: pa.status === "pending" ? "text-warning-soft-foreground" : pa.status === "approved" ? "text-success-soft-foreground" : "text-destructive",
           },
         ]
@@ -129,7 +129,7 @@ export function useSarFn() {
 
 export const INS_TONE: Record<InsuranceStatus, StatusTone> = { pending: "warning", covered: "success", claimSent: "info" }
 
-function PlanCompact({ id, rec }: { id: string; rec: DentalRecord }) {
+export function PlanCompact({ rec, addHref, className }: { rec: DentalRecord; addHref: string; className?: string }) {
   const t = useTranslations("specialties.dental.plan")
   const { b } = useText()
   const sar = useSarFn()
@@ -138,10 +138,10 @@ function PlanCompact({ id, rec }: { id: string; rec: DentalRecord }) {
     <PCard
       title={t("title")}
       description={t("description", { planned: s.planned, done: s.doneToday, payer: b(rec.insurance.payerShort), cls: rec.insurance.className })}
-      className="max-md:p-4"
+      className={cn("max-md:p-4", className)}
       action={
         <Button variant="ghost" size="sm" asChild className="max-md:hidden">
-          <Link href={specialtyHref.dentalPlan(id)}>
+          <Link href={addHref}>
             <Icon name="add" size={16} />
             {t("add")}
           </Link>

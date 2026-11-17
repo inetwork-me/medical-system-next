@@ -1108,7 +1108,8 @@
         "address": "Address",
         "nationality": "Nationality",
         "birthDate": "Birth date"
-      }
+      },
+      "lastVisitBy": "Last visit {date} · by {name}"
     }
   },
   "pay": {

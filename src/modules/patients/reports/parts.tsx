@@ -98,9 +98,9 @@ export type SelectSpec = { value: string; onChange: (v: string) => void; options
 export function ReportFilters({ selects, chips, className }: { selects: SelectSpec[]; chips?: React.ReactNode; className?: string }) {
   return (
     <div className={cn("flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-2", className)}>
-      {selects.map((s) => (
+      {selects.map((s, i) => (
         <Select key={s.label} value={s.value} onValueChange={s.onChange}>
-          <SelectTrigger aria-label={s.label} className={cn("w-full", s.width ?? "md:w-40")}>
+          <SelectTrigger aria-label={s.label} className={cn("w-full", s.width ?? "md:w-37.5", i > 0 && "hidden md:flex")}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -117,12 +117,20 @@ export function ReportFilters({ selects, chips, className }: { selects: SelectSp
   )
 }
 
-export function Chips<K extends string>({ value, onChange, items }: { value: K; onChange: (k: K) => void; items: { key: K; label: string; count: number }[] }) {
+export function Chips<K extends string>({
+  value,
+  onChange,
+  items,
+}: {
+  value: K
+  onChange: (k: K) => void
+  items: { key: K; label: string; count: number; className?: string }[]
+}) {
   const format = useFormatter()
   return (
     <>
       {items.map((c) => (
-        <FilterChip key={c.key} selected={value === c.key} count={format.number(c.count, "integer")} onClick={() => onChange(c.key)}>
+        <FilterChip key={c.key} className={c.className} selected={value === c.key} count={format.number(c.count, "integer")} onClick={() => onChange(c.key)}>
           {c.label}
         </FilterChip>
       ))}
@@ -148,7 +156,7 @@ export function Kpis({ items }: { items: Kpi[] }) {
 
 export function ReportCard({ title, description, className, children }: { title: React.ReactNode; description?: React.ReactNode; className?: string; children: React.ReactNode }) {
   return (
-    <Widget className={cn("@container/rpt min-w-0", className)} title={title} description={description} action={<WidgetMenu />}>
+    <Widget className={cn("@container/rpt min-w-0 p-4 lg:p-6", className)} title={title} description={description} action={<WidgetMenu />}>
       {children}
     </Widget>
   )
@@ -196,7 +204,7 @@ export function ReportTable<T>({
     <>
       <div className="hidden flex-col gap-4 @min-[50rem]/rpt:flex">
         <div className="overflow-hidden rounded-lg border" role="table">
-          <div role="row" className="grid items-center gap-3 border-b bg-muted px-4 py-2.5 text-xs font-medium text-muted-foreground" style={{ gridTemplateColumns: cols }}>
+          <div role="row" className="grid h-10 items-center gap-4 border-b bg-muted px-4 text-xs font-medium text-muted-foreground" style={{ gridTemplateColumns: cols }}>
             {columns.map((c) => (
               <span key={c.key} role="columnheader">
                 {c.head}
@@ -204,7 +212,7 @@ export function ReportTable<T>({
             ))}
           </div>
           {slice.map((r) => (
-            <div key={rowKey(r)} role="row" className="grid min-h-14 items-center gap-3 border-b px-4 py-2.5 text-sm last:border-0" style={{ gridTemplateColumns: cols }}>
+            <div key={rowKey(r)} role="row" className="grid min-h-14 items-center gap-4 border-b px-4 py-2 text-sm last:border-0" style={{ gridTemplateColumns: cols }}>
               {columns.map((c) => (
                 <div key={c.key} role="cell" className="min-w-0">
                   {c.cell(r)}
@@ -238,17 +246,19 @@ export function ReportTable<T>({
   )
 }
 
-/** Avatar + name + MRN (links to the patient page). */
-export function PatientCell({ patient, mrn }: { patient: Patient | null; mrn: string }) {
+/** Avatar + name + MRN (links to the patient page). Activity log: no avatar, regular name. */
+export function PatientCell({ patient, mrn, avatar = true }: { patient: Patient | null; mrn: string; avatar?: boolean }) {
   const { b } = useText()
   return (
     <div className="flex min-w-0 items-center gap-2.5">
-      <Avatar size="sm">
-        <AvatarFallback>{patient?.initials ?? "—"}</AvatarFallback>
-      </Avatar>
+      {avatar && (
+        <Avatar size="sm">
+          <AvatarFallback>{patient?.initials ?? "—"}</AvatarFallback>
+        </Avatar>
+      )}
       <div className="flex min-w-0 flex-col">
         {patient ? (
-          <Link href={`/patients/${patient.id}`} className="truncate font-medium hover:underline">
+          <Link href={`/patients/${patient.id}`} className={cn("truncate hover:underline", avatar && "font-medium")}>
             {b(patient.name)}
           </Link>
         ) : (
@@ -328,7 +338,7 @@ export function Donut({ rows, center, caption }: { rows: { key: string; label: s
   const total = rows.reduce((s, r) => s + r.value, 0) || 1
   const config = Object.fromEntries(rows.map((r) => [r.key, { label: r.label, color: r.color }])) satisfies ChartConfig
   return (
-    <div className="flex flex-col items-center gap-4 @min-[22rem]/rpt:flex-row">
+    <div className="flex items-center gap-4">
       <div className="relative size-37.5 shrink-0">
         <ChartContainer config={config} className="aspect-square size-37.5">
           <PieChart>
@@ -344,7 +354,7 @@ export function Donut({ rows, center, caption }: { rows: { key: string; label: s
           <span className="text-xs text-muted-foreground">{caption}</span>
         </div>
       </div>
-      <ul className="flex w-full flex-col gap-2">
+      <ul className="flex min-w-0 flex-1 flex-col gap-2">
         {rows.map((r) => (
           <li key={r.key} className="flex items-center gap-2 text-sm">
             <span className="size-2 shrink-0 rounded-[2px]" style={{ background: r.color }} />

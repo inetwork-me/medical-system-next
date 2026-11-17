@@ -58,8 +58,8 @@ export function ModuleTabsNav({ module, counts, className }: { module: ModuleId;
   const current = activeTab(m, pathname)
   if (tabs.length < 2) return null
   return (
-    <nav className={cn("-mx-4 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:px-0", className)}>
-      <div className="inline-flex items-center gap-1 rounded-lg bg-muted p-1">
+    <nav className={cn("md:overflow-x-auto md:[scrollbar-width:none]", className)}>
+      <div className="flex items-center gap-1 rounded-lg bg-muted p-1 md:inline-flex">
         {tabs.map((tab) => {
           const on = current?.key === tab.key
           return (
@@ -68,14 +68,14 @@ export function ModuleTabsNav({ module, counts, className }: { module: ModuleId;
               href={tab.href}
               aria-current={on ? "page" : undefined}
               data-state={on ? "active" : "inactive"}
-              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md px-3.5 text-sm font-medium whitespace-nowrap text-muted-foreground outline-none transition-[color,background-color,box-shadow] hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-xs"
+              className="inline-flex h-9 min-w-0 flex-1 items-center justify-center gap-2 rounded-md px-2 md:flex-none md:shrink-0 md:px-3.5 text-sm font-medium whitespace-nowrap text-muted-foreground outline-none transition-[color,background-color,box-shadow] hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-xs"
             >
-              {tab.icon && <Icon name={tab.icon} size={18} variant={on ? "bold" : "linear"} />}
+              {tab.icon && <Icon name={tab.icon} size={18} variant={on ? "bold" : "linear"} className="hidden md:block" />}
               {tabLabel(m, tab.key)}
               {counts?.[tab.key] !== undefined && (
                 <span
                   className={cn(
-                    "inline-flex h-5 items-center rounded-full px-1.5 text-xs font-medium tabular-nums",
+                    "hidden h-5 items-center md:inline-flex rounded-full px-1.5 text-xs font-medium tabular-nums",
                     on ? "bg-accent text-accent-foreground" : "bg-card text-muted-foreground"
                   )}
                 >

@@ -149,14 +149,14 @@ function ActivityReport() {
         rows: rows.map((r) => [when(r.day, r.time), b(STAFF[r.staff].name), t(`action.${r.kind}`), r.patient ? b(r.patient.name) : "—", r.mrn, b(r.change), b(BRANCH[r.branch])]),
       })}
     >
-      <section className="@container/rpt flex min-w-0 flex-col gap-5 rounded-xl border bg-card p-4 md:p-6">
+      <section className="@container/rpt flex min-w-0 flex-col gap-5 rounded-xl border bg-card p-4 lg:p-6">
         <ReportFilters
           selects={[periodSel, { value: staff, onChange: setStaff, label: t("allStaff"), options: [{ value: "all", label: t("allStaff") }, ...Object.entries(STAFF).map(([k, s]) => ({ value: k, label: b(s.name) }))] }]}
           chips={
             <Chips
               value={chip}
               onChange={setChip}
-              items={[{ key: "all" as const, label: t("activity.chips.all"), count: base.length }, ...kinds.map((k) => ({ key: k, label: t(`activity.chips.${k}`), count: base.filter((r) => r.kind === k).length }))]}
+              items={[{ key: "all" as const, label: t("activity.chips.all"), count: base.length }, ...kinds.map((k) => ({ key: k, label: t(`activity.chips.${k}`), count: base.filter((r) => r.kind === k).length, className: k === "deleted" ? "hidden lg:inline-flex" : undefined }))]}
             />
           }
         />
@@ -168,7 +168,7 @@ function ActivityReport() {
             { key: "when", head: t("col.when"), width: "7.5rem", cell: (r) => <span className="tabular-nums">{when(r.day, r.time)}</span> },
             { key: "staff", head: t("col.staff"), width: "minmax(0,1.1fr)", cell: (r) => <StaffCell id={r.staff} /> },
             { key: "action", head: t("col.action"), width: "6rem", cell: (r) => <StatusBadge tone={ACTION_TONE[r.kind]}>{t(`action.${r.kind}`)}</StatusBadge> },
-            { key: "patient", head: t("col.patient"), width: "minmax(0,1.1fr)", cell: (r) => <PatientCell patient={r.patient} mrn={r.mrn} /> },
+            { key: "patient", head: t("col.patient"), width: "minmax(0,1.1fr)", cell: (r) => <PatientCell patient={r.patient} mrn={r.mrn} avatar={false} /> },
             { key: "change", head: t("col.change"), width: "minmax(0,1.4fr)", cell: (r) => <span className="text-xs">{b(r.change)}</span> },
             { key: "branch", head: t("col.branch"), width: "5rem", cell: (r) => <span className="text-muted-foreground">{b(BRANCH[r.branch])}</span> },
           ]}
@@ -178,16 +178,18 @@ function ActivityReport() {
                 <AvatarFallback>{STAFF[r.staff].initials}</AvatarFallback>
               </Avatar>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-medium">{b(STAFF[r.staff].name)}</span>
+                <div className="flex items-center gap-2">
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium">{b(STAFF[r.staff].name)}</span>
                   <StatusBadge tone={ACTION_TONE[r.kind]}>{t(`action.${r.kind}`)}</StatusBadge>
                 </div>
-                <span className="text-xs">{b(r.change)}</span>
+                <span className="text-xs">
+                  {r.patient ? b(r.patient.name) : "—"} · <bdi dir="ltr">MRN {r.mrn}</bdi>
+                </span>
+                <span className="text-xs text-muted-foreground">{b(r.change)}</span>
                 <span className="text-xs text-muted-foreground tabular-nums">
-                  {r.patient ? b(r.patient.name) : "—"} · <bdi dir="ltr">MRN {r.mrn}</bdi> · {b(BRANCH[r.branch])}
+                  {when(r.day, r.time)} · {b(BRANCH[r.branch])}
                 </span>
               </div>
-              <span className="text-xs text-muted-foreground tabular-nums">{when(r.day, r.time)}</span>
             </div>
           )}
         />
@@ -289,7 +291,10 @@ function RegistrationsReport() {
                 <AvatarFallback>{r.patient.initials}</AvatarFallback>
               </Avatar>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-sm font-medium">{b(r.patient.name)}</span>
+                <div className="flex items-center gap-2">
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium">{b(r.patient.name)}</span>
+                  <StatusBadge tone={r.complete ? "success" : "warning"}>{t(`status.${r.complete ? "complete" : "incomplete"}`)}</StatusBadge>
+                </div>
                 <span className="text-xs text-muted-foreground tabular-nums">
                   <bdi dir="ltr">MRN {r.patient.mrn}</bdi> · {b(BRANCH[r.branch])} · {t(`source.${r.source}`)}
                 </span>
@@ -297,7 +302,6 @@ function RegistrationsReport() {
                   {when(r.day, r.time)} · {t("by", { name: b(STAFF[r.staff].name) })}
                 </span>
               </div>
-              <StatusBadge tone={r.complete ? "success" : "warning"}>{t(`status.${r.complete ? "complete" : "incomplete"}`)}</StatusBadge>
             </div>
           )}
         />
@@ -369,7 +373,7 @@ function StayReport() {
         />
       }
     >
-      <div className="grid gap-4 md:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+      <div className="grid items-start gap-4 md:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <ReportCard title={t("stay.byDept")} description={t("stay.byDeptDesc")}>
           <HBars vmax={180} rows={STAY_DEPT.map(([k, m]) => ({ key: k, label: b(DEPT[k]), value: dur(m), amount: m, color: m > STAY_TARGET ? "bg-warning" : "bg-chart-1" }))} />
         </ReportCard>
@@ -399,10 +403,10 @@ function StayReport() {
           columns={[
             { key: "patient", head: t("col.patient"), cell: (r) => <PatientCell patient={r.patient} mrn={r.patient.mrn} /> },
             { key: "dept", head: t("col.department"), width: "7.5rem", cell: (r) => b(DEPT[r.dept]) },
-            { key: "in", head: t("col.checkIn"), width: "5.5rem", cell: (r) => <span className="tabular-nums">{r.in}</span> },
-            { key: "out", head: t("col.exit"), width: "5.5rem", cell: (r) => <span className="tabular-nums">{r.out}</span> },
-            { key: "dur", head: t("col.duration"), width: "minmax(0,0.8fr)", cell: (r) => <Duration minutes={r.minutes} /> },
-            { key: "staff", head: t("col.onDuty"), width: "minmax(0,0.9fr)", cell: (r) => <span className="text-xs text-muted-foreground">{b(r.staff)}</span> },
+            { key: "in", head: t("col.checkIn"), width: "5.625rem", cell: (r) => <span className="tabular-nums">{r.in}</span> },
+            { key: "out", head: t("col.exit"), width: "5.625rem", cell: (r) => <span className="tabular-nums">{r.out}</span> },
+            { key: "dur", head: t("col.duration"), width: "9.375rem", cell: (r) => <Duration minutes={r.minutes} /> },
+            { key: "staff", head: t("col.onDuty"), width: "minmax(0,0.6fr)", cell: (r) => <span className="text-xs text-muted-foreground">{b(r.staff)}</span> },
           ]}
           item={(r) => (
             <div className="flex items-start gap-3">
@@ -412,7 +416,7 @@ function StayReport() {
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="text-sm font-medium">{b(r.patient.name)}</span>
                 <span className="text-xs text-muted-foreground tabular-nums">
-                  {b(DEPT[r.dept])} · <bdi dir="ltr">{r.in} – {r.out}</bdi>
+                  {b(DEPT[r.dept])} · <bdi dir="ltr">{r.in} → {r.out}</bdi>
                 </span>
                 <span className="text-xs text-muted-foreground">{b(r.staff)}</span>
               </div>
@@ -504,7 +508,7 @@ function VisitsReport() {
         <ReportCard title={t("visits.byClinic")} description={t("visits.byClinicDesc", { period: t(`period.${period}`), count: n(rows.length) })}>
           <div className="hidden @min-[40rem]/rpt:block">
             <VBars
-              height={180}
+              height={250}
               values={byClinic.map((x) => x.v)}
               labels={byClinic.map((x) => b(CLINIC[x.c]))}
               vmax={Math.max(100, Math.ceil(maxClinic / 100) * 100)}
@@ -563,7 +567,7 @@ function VisitsReport() {
 /* ================================================================== 5 · duplicates */
 
 const DUP_FIELDS: DupField[] = ["name", "phone", "whatsapp", "nationalId", "birth", "visits", "lastVisit"]
-const GROUPS_PAGE = 5
+const GROUPS_PAGE = 3
 
 function DuplicatesReport() {
   const t = useTranslations("patients.reports")
@@ -650,7 +654,7 @@ function DupGroupCard({ group: g, onDismiss }: { group: ReturnType<typeof duplic
   const nameMatch = g.matched.includes("name") && !g.reasons.includes("nameBirth")
   const actions = (
     <>
-      <Button variant="ghost" size="sm" onClick={onDismiss}>
+      <Button variant="outline" size="sm" onClick={onDismiss}>
         {t("notDup")}
       </Button>
       <Button size="sm" asChild>
@@ -701,10 +705,18 @@ function DupGroupCard({ group: g, onDismiss }: { group: ReturnType<typeof duplic
                 <Badge variant={side === "keep" ? "default" : "secondary"}>{side === "keep" ? t("keep") : t("merge")}</Badge>
               </div>
               <dl className="flex flex-col gap-0.5">
-                {DUP_FIELDS.filter((f) => f !== "name").map((f) => {
+                {DUP_FIELDS.map((f) => {
                   const hit = g.matched.includes(f)
                   return (
-                    <div key={f} className={cn("flex items-center gap-2 rounded-md px-2 py-1 text-xs", hit && "bg-accent")}>
+                    // Wide card: all 7 rows. Narrow (mobile): name and WhatsApp are left out, as designed.
+                    <div
+                      key={f}
+                      className={cn(
+                        "flex items-center gap-2 rounded-md px-2 py-2 text-xs",
+                        hit && "bg-accent",
+                        (f === "name" || f === "whatsapp") && "hidden @min-[40rem]/dup:flex"
+                      )}
+                    >
                       <dt className="w-27 shrink-0 text-muted-foreground">{t(`field.${f}`)}</dt>
                       <dd className={cn("min-w-0 flex-1 font-medium tabular-nums", hit ? "text-accent-foreground" : !vals[f] && "text-muted-foreground")}>{vals[f] ?? "—"}</dd>
                     </div>
@@ -788,15 +800,16 @@ function IncompleteReport() {
             { key: "act", head: <span className="sr-only">{t("incomplete.complete")}</span>, width: "6.5rem", cell: (r) => <CompleteButton id={r.patient.id} /> },
           ]}
           item={(r) => (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                <div className="min-w-0 flex-1">
-                  <PatientCell patient={r.patient} mrn={r.patient.mrn} />
-                </div>
-                <CompleteButton id={r.patient.id} />
-              </div>
+            <div className="flex flex-col items-start gap-2">
+              <Link href={`/patients/${r.patient.id}`} className="text-sm font-medium hover:underline">
+                {b(r.patient.name)}
+              </Link>
               <MissingBadges fields={r.missing} />
               <Completeness value={r.completeness} />
+              <span className="text-xs text-muted-foreground tabular-nums">
+                {t("incomplete.lastVisitBy", { date: r.patient.lastVisit ? dates.short(r.patient.lastVisit) : "—", name: b(STAFF[r.staff].name) })}
+              </span>
+              <CompleteButton id={r.patient.id} />
             </div>
           )}
         />

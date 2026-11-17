@@ -39,6 +39,8 @@ export type Appointment = {
   reason: Bi | null
   status: ApptStatus
   telehealth?: boolean
+  /** Minutes from midnight the patient arrived (arrived) or was called in (with doctor) — waiting room timers. */
+  since?: number
 }
 
 /** Lunch breaks drawn on the boards (not appointments). */
@@ -88,6 +90,16 @@ const BREAKS: Break[] = [
 /** Dr. Sami Odeh has no lunch block on the design (his 12:30 slot is a cancelled visit). */
 export const breaksFor = (doctor: DoctorId) => BREAKS.filter((b) => b.doctor === doctor)
 
+/** Design · Waiting room: waiting 18 / 6 / 11 min, with the doctor 26 / 14 / 21 min at 10:40. */
+const SINCE: Record<string, string> = {
+  "Abdullah Al-Qahtani": "10:22",
+  "Omar Faisal": "10:34",
+  "Saad Al-Dossary": "10:29",
+  "Yousef Nasser": "10:14",
+  "Jana Al-Qahtani": "10:26",
+  "Maha Saleh": "10:19",
+}
+
 const fromRow = (date: string, [doctor, start, duration, en, ar, ren, rar, status, tele]: Row, i: number): Appointment => ({
   id: `${date}-${doctor}-${start}-${i}`,
   date,
@@ -98,6 +110,7 @@ const fromRow = (date: string, [doctor, start, duration, en, ar, ren, rar, statu
   reason: { en: ren, ar: rar },
   status,
   telehealth: tele,
+  since: SINCE[en] ? t(SINCE[en]) : undefined,
 })
 
 /* ---------------------------------------------------------------- Dr. Khaled Mansour's week (design · Week view) */

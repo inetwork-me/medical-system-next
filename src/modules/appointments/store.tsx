@@ -2,17 +2,18 @@
 
 import * as React from "react"
 
-import { appointmentsOn, type Appointment, type ApptStatus } from "./data"
+import { appointmentsOn, NOW_MIN, type Appointment, type ApptStatus } from "./data"
 
 /**
  * Session changes on top of the mock data (no backend yet): status moves (check in, call in, no-show, cancel…) and
  * reminders sent. Kept in sessionStorage so a refresh keeps them; every Appointments screen reads through here.
  */
-type Change = { status?: ApptStatus; reminded?: boolean }
+type Change = { status?: ApptStatus; reminded?: boolean; since?: number; paid?: boolean }
 type Store = {
   changes: Record<string, Change>
-  setStatus: (id: string, status: ApptStatus) => void
+  setStatus: (id: string, status: ApptStatus, since?: number) => void
   remind: (id: string) => void
+  collect: (id: string, paid?: boolean) => void
 }
 
 const KEY = "ms.appointments.changes"
@@ -40,7 +41,10 @@ export function AppointmentsStoreProvider({ children }: { children: React.ReactN
   const store = React.useMemo<Store>(
     () => ({
       changes,
-      setStatus: (id, status) => setChanges((c) => ({ ...c, [id]: { ...c[id], status } })),
+      // Check in / call in start the waiting-room timer now; undo restores the previous status and timer.
+      setStatus: (id, status, since?: number) =>
+        setChanges((c) => ({ ...c, [id]: { ...c[id], status, since: since ?? (status === "arrived" || status === "withDoctor" ? NOW_MIN : c[id]?.since) } })),
+      collect: (id, paid = true) => setChanges((c) => ({ ...c, [id]: { ...c[id], paid } })),
       remind: (id) => setChanges((c) => ({ ...c, [id]: { ...c[id], reminded: true } })),
     }),
     [changes]
@@ -48,10 +52,16 @@ export function AppointmentsStoreProvider({ children }: { children: React.ReactN
   return <Ctx.Provider value={store}>{children}</Ctx.Provider>
 }
 
-export type LiveAppointment = Appointment & { reminded: boolean }
+export type LiveAppointment = Appointment & { reminded: boolean; paid: boolean }
 
 /** Reminders go out the evening before, so everything today has one; a manual send marks it again. */
-const withChange = (a: Appointment, c?: Change): LiveAppointment => ({ ...a, status: c?.status ?? a.status, reminded: c?.reminded ?? true })
+const withChange = (a: Appointment, c?: Change): LiveAppointment => ({
+  ...a,
+  status: c?.status ?? a.status,
+  since: c?.since ?? a.since,
+  reminded: c?.reminded ?? true,
+  paid: c?.paid ?? false,
+})
 
 /** `on(date)` → that day's appointments with this session's changes applied. */
 export function useAppointmentsOn() {
@@ -63,5 +73,5 @@ export function useAppointmentsOn() {
 export function useAppointmentActions() {
   const store = React.useContext(Ctx)
   if (!store) throw new Error("useAppointmentActions needs AppointmentsStoreProvider")
-  return { setStatus: store.setStatus, remind: store.remind }
+  return { setStatus: store.setStatus, remind: store.remind, collect: store.collect }
 }

@@ -150,5 +150,34 @@
       "undone": "تم التراجع",
       "undoneText": "رجع {name} لحالة {status}."
     }
+  },
+  "waiting": {
+    "columns": {
+      "expected": "جايين خلال ساعة",
+      "waiting": "ينتظرون",
+      "withDoctor": "عند الطبيب",
+      "done": "خلصوا · للدفع"
+    },
+    "tabs": {
+      "expected": "جايين",
+      "waiting": "ينتظرون",
+      "withDoctor": "عند الطبيب",
+      "done": "خلصوا"
+    },
+    "label": "غرفة الانتظار",
+    "checkIn": "سجّل وصوله",
+    "callIn": "ناده",
+    "finish": "خلّص",
+    "collect": "حصّل",
+    "minutes": "{n} دقيقة",
+    "waitedLabel": "ينتظر من {n} دقيقة",
+    "withLabel": "عند الطبيب من {n} دقيقة",
+    "summary": "متوسط الانتظار اليوم: {avg} دقيقة · الأطول: {max} دقيقة",
+    "showAll": "اعرض الكل · {count}",
+    "showLess": "اعرض أقل",
+    "empty": "ما فيه أحد هنا الحين",
+    "collected": "تم التحصيل",
+    "collectedText": "{name} · {doctor}",
+    "finishedText": "{name} جاهز يدفع عند الاستقبال."
   }
 }

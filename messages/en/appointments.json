@@ -150,5 +150,34 @@
       "undone": "Change undone",
       "undoneText": "{name} is back to {status}."
     }
+  },
+  "waiting": {
+    "columns": {
+      "expected": "Expected · next hour",
+      "waiting": "Waiting",
+      "withDoctor": "With doctor",
+      "done": "Done · to pay"
+    },
+    "tabs": {
+      "expected": "Expected",
+      "waiting": "Waiting",
+      "withDoctor": "With doctor",
+      "done": "Done"
+    },
+    "label": "Waiting room",
+    "checkIn": "Check in",
+    "callIn": "Call in",
+    "finish": "Finish",
+    "collect": "Collect",
+    "minutes": "{n} min",
+    "waitedLabel": "Waiting for {n} min",
+    "withLabel": "With the doctor for {n} min",
+    "summary": "Average wait today: {avg} min · longest: {max} min",
+    "showAll": "Show all · {count}",
+    "showLess": "Show less",
+    "empty": "Nobody here right now",
+    "collected": "Payment collected",
+    "collectedText": "{name} · {doctor}",
+    "finishedText": "{name} is ready to pay at reception."
   }
 }

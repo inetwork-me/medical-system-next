@@ -141,11 +141,11 @@ export function AppointmentsList() {
 }
 
 /** KPI row (design · Stat Card ×4): today · waiting now (12 min average wait) · completed (% of today) · no-show. */
-function Kpis({ list }: { list: LiveAppointment[] }) {
+export function Kpis({ list, className }: { list: LiveAppointment[]; className?: string }) {
   const t = useTranslations("appointments.list.kpi")
   const completed = list.filter((a) => a.status === "completed").length
   return (
-    <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-4">
+    <div className={cn("hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-4", className)}>
       <StatCard icon="calendar-tick" label={t("today")} value={list.length} delta="+4" caption={t("vsLastMonday")} />
       <StatCard
         icon="clock"
@@ -288,13 +288,14 @@ function RowMenu({ a, trigger }: { a: LiveAppointment; trigger: React.ReactEleme
 
   const move = (to: ApptStatus, title: string, description: string, tone: "success" | "info" = "success") => {
     const from = a.status
+    const since = a.since
     setStatus(a.id, to)
     notify[tone](title, {
       description,
       action: {
         label: t("toast.undo"),
         onClick: () => {
-          setStatus(a.id, from)
+          setStatus(a.id, from, since)
           notify.info(t("toast.undone"), { description: t("toast.undoneText", { name: x.name, status: ts(from) }) })
         },
       },

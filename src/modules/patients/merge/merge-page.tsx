@@ -222,7 +222,7 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
                   <Icon name="arrow-left" size={20} />
                 </Link>
               </Button>
-              <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+              <h1 className="text-xl font-semibold">{t("title")}</h1>
             </div>
             <Crumbs />
           </div>
@@ -253,20 +253,20 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
             </header>
 
             {/* File heads */}
-            <div className="grid grid-cols-2 gap-3 @min-[40rem]/cmp:grid-cols-[150px_1fr_1fr]">
-              <span className="hidden @min-[40rem]/cmp:block" />
+            <div className="grid grid-cols-2 gap-3 @min-[36rem]/cmp:grid-cols-[150px_1fr_1fr]">
+              <span className="hidden @min-[36rem]/cmp:block" />
               {[
                 { f: keep, tone: "success" as const, label: t("mainFile") },
                 { f: drop, tone: "warning" as const, label: t("closed") },
               ].map(({ f, tone, label }) => (
                 <div key={f.patient.id} className="flex min-w-0 flex-col gap-1 rounded-lg bg-muted p-3">
-                  <div className="flex flex-col gap-1.5 @min-[40rem]/cmp:flex-row @min-[40rem]/cmp:items-center">
-                    <bdi dir="ltr" className="flex-1 text-sm font-medium tabular-nums rtl:text-right">
+                  <div className="flex flex-col gap-1.5 @min-[36rem]/cmp:flex-row @min-[36rem]/cmp:items-center">
+                    <bdi dir="ltr" className="flex-1 text-sm font-medium rtl:text-right">
                       MRN {f.patient.mrn}
                     </bdi>
                     <StatusBadge tone={tone}>{label}</StatusBadge>
                   </div>
-                  <span className="truncate text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {t("meta", { name: b(f.patient.name), age: t("years", { n: f.patient.age }) })}
                   </span>
                 </div>
@@ -274,7 +274,7 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
             </div>
 
             {/* Rows */}
-            <div className="flex flex-col gap-4 @min-[40rem]/cmp:gap-2.5">
+            <div className="flex flex-col gap-4">
               {rows.map((k) => {
                 const isSame = same(k)
                 const label = t(`rows.${k}`)
@@ -283,12 +283,12 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
                     key={k}
                     role={isSame ? undefined : "radiogroup"}
                     aria-label={isSame ? undefined : label}
-                    className="grid gap-1.5 @min-[40rem]/cmp:grid-cols-[150px_1fr_1fr] @min-[40rem]/cmp:items-center @min-[40rem]/cmp:gap-3"
+                    className="grid gap-1.5 @min-[36rem]/cmp:grid-cols-[150px_1fr_1fr] @min-[36rem]/cmp:items-center @min-[36rem]/cmp:gap-3"
                   >
                     <div className="flex items-center gap-1.5">
-                      <span className="flex-1 text-xs font-medium @min-[40rem]/cmp:text-muted-foreground">{label}</span>
+                      <span className="flex-1 text-xs font-medium @min-[36rem]/cmp:text-muted-foreground">{label}</span>
                       {isSame && (
-                        <StatusBadge tone="success" className="@min-[40rem]/cmp:hidden">
+                        <StatusBadge tone="success" className="@min-[36rem]/cmp:hidden">
                           {t("same")}
                         </StatusBadge>
                       )}
@@ -296,7 +296,7 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
                     {isSame ? (
                       <>
                         <Static value={show(keep, k)} selected />
-                        <div className="hidden @min-[40rem]/cmp:block">
+                        <div className="hidden @min-[36rem]/cmp:block">
                           <Static value={show(drop, k)} />
                         </div>
                       </>
@@ -316,8 +316,8 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
                   ["invoicesFiles", `${n(keep.invoices)} · ${n(keep.files)}`, `${n(drop.invoices)} · ${n(drop.files)}`],
                 ] as const
               ).map(([k, va, vb]) => (
-                <div key={k} className="grid gap-1.5 @min-[40rem]/cmp:grid-cols-[150px_1fr_1fr] @min-[40rem]/cmp:items-center @min-[40rem]/cmp:gap-3">
-                  <span className="text-xs font-medium @min-[40rem]/cmp:text-muted-foreground">{t(`rows.${k}`)}</span>
+                <div key={k} className="grid gap-1.5 @min-[36rem]/cmp:grid-cols-[150px_1fr_1fr] @min-[36rem]/cmp:items-center @min-[36rem]/cmp:gap-3">
+                  <span className="text-xs font-medium @min-[36rem]/cmp:text-muted-foreground">{t(`rows.${k}`)}</span>
                   <Static value={va} selected both />
                   <Static value={vb} selected both />
                 </div>
@@ -326,7 +326,7 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
           </section>
 
           <aside className="order-3 flex flex-col gap-4 md:order-1 xl:sticky xl:top-22 xl:order-2">
-            <section className="flex flex-col gap-3 rounded-xl border bg-card p-5" aria-labelledby="after-title">
+            <section className="flex flex-col gap-4 rounded-xl border bg-card p-5" aria-labelledby="after-title">
               <div className="flex flex-col gap-0.5">
                 <h2 id="after-title" className="text-lg font-semibold">
                   {t("after.title")}
@@ -335,7 +335,7 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
                   MRN {keep.patient.mrn}
                 </bdi>
               </div>
-              <dl className="flex flex-col gap-3 text-xs">
+              <dl className="flex flex-col gap-4 text-xs">
                 {(
                   [
                     ["visits", n(after.visits)],
@@ -355,7 +355,7 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
             </section>
             <div className="flex flex-col gap-1.5 rounded-xl bg-info-soft p-4 text-info-soft-foreground">
               <p className="text-sm font-medium">{t("note.title")}</p>
-              <p className="text-xs">{t("note.text", { drop: drop.patient.mrn, keep: keep.patient.mrn })}</p>
+              <p className="text-xs">{t("note.text", { drop: drop.patient.mrn, keep: keep.patient.mrn, who: keep.patient.age < 18 ? "guardian" : "patient" })}</p>
             </div>
           </aside>
         </div>
@@ -478,10 +478,10 @@ function Value({ v }: { v: string | null }) {
   if (!v) return <span className="text-muted-foreground">—</span>
   const latin = !/[؀-ۿ]/.test(v) && /\d/.test(v)
   return latin ? (
-    <bdi dir="ltr" className="min-w-0 flex-1 tabular-nums rtl:text-right">
+    <bdi dir="ltr" className="min-w-0 flex-1 rtl:text-right">
       {v}
     </bdi>
   ) : (
-    <span className="min-w-0 flex-1 tabular-nums">{v}</span>
+    <span className="min-w-0 flex-1">{v}</span>
   )
 }

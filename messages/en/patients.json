@@ -805,7 +805,7 @@
     },
     "note": {
       "title": "Before you merge",
-      "text": "Confirm the national ID with the patient or guardian. MRN {drop} will be closed and redirected to {keep}; you can undo within 30 days."
+      "text": "Confirm the national ID with the {who, select, guardian {guardian} other {patient}}. MRN {drop} will be closed and redirected to {keep}; you can undo within 30 days."
     },
     "confirm": {
       "title": "Merge 2 files?",

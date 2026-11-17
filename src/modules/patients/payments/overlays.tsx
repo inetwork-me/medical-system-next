@@ -409,7 +409,7 @@ export function StatementDialog({
           <table className="w-full overflow-hidden rounded-md border text-xs">
             <thead className="bg-muted">
               <tr className="text-start">
-                <th className="px-2.5 py-2 text-start font-medium md:w-30">{t("statement.date")}</th>
+                <th className="w-px px-2.5 py-2 text-start font-medium whitespace-nowrap md:w-30">{t("statement.date")}</th>
                 <th className="px-2.5 py-2 text-start font-medium">{t("statement.item")}</th>
                 <th className="px-2.5 py-2 text-end font-medium">{t("statement.amount")}</th>
               </tr>
@@ -417,9 +417,9 @@ export function StatementDialog({
             <tbody>
               {lines.map((l, i) => (
                 <tr key={i} className="border-t">
-                  <td className="px-2.5 py-2 tabular-nums">{l.date}</td>
+                  <td className="px-2.5 py-2 whitespace-nowrap tabular-nums">{l.date}</td>
                   <td className="px-2.5 py-2">{l.item}</td>
-                  <td className="px-2.5 py-2 text-end tabular-nums">
+                  <td className="px-2.5 py-2 text-end whitespace-nowrap tabular-nums">
                     <bdi dir="ltr">{l.amount < 0 ? `−${n(-l.amount)}` : n(l.amount)}</bdi>
                   </td>
                 </tr>
@@ -427,7 +427,7 @@ export function StatementDialog({
               <tr className="border-t bg-muted font-medium">
                 <td className="px-2.5 py-2" />
                 <td className="px-2.5 py-2">{t("statement.balance")}</td>
-                <td className="px-2.5 py-2 text-end tabular-nums">{n(record.billing.balance)}</td>
+                <td className="px-2.5 py-2 text-end whitespace-nowrap tabular-nums">{n(record.billing.balance)}</td>
               </tr>
             </tbody>
           </table>

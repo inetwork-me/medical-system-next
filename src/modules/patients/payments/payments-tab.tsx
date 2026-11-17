@@ -80,8 +80,8 @@ export function TransactionsCard() {
   )
 
   return (
-    <section className="@container/rpt flex min-w-0 flex-col gap-4 rounded-xl border bg-card p-4 md:p-6">
-      <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-2">
+    <section className="@container/rpt flex min-w-0 flex-col gap-4 rounded-xl border bg-card p-4 lg:p-6">
+      <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-2">
         <Input
           type="search"
           value={q}
@@ -89,18 +89,18 @@ export function TransactionsCard() {
           placeholder={t("search")}
           aria-label={t("search")}
           startIcon={<Icon name="search-normal-1" size={16} />}
-          className="md:w-70"
+          className="lg:w-70"
         />
         <div className="flex flex-wrap gap-2">
           {chips.map((c) => (
-            <FilterChip key={c} selected={chip === c} count={format.number(base.filter((x) => match(x, c)).length, "integer")} onClick={() => setChip(c)}>
+            <FilterChip key={c} className={c === "insurance" ? "hidden lg:inline-flex" : undefined} selected={chip === c} count={format.number(base.filter((x) => match(x, c)).length, "integer")} onClick={() => setChip(c)}>
               {t(`chips.${c}`)}
             </FilterChip>
           ))}
         </div>
-        <span className="hidden flex-1 md:block" />
+        <span className="hidden flex-1 lg:block" />
         <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
-          <SelectTrigger className="hidden w-38 md:flex" aria-label={t("periodLabel")}>
+          <SelectTrigger className="hidden w-38 lg:flex" aria-label={t("periodLabel")}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent align="end">
@@ -121,9 +121,9 @@ export function TransactionsCard() {
           {
             key: "no",
             head: t("col.receipt"),
-            width: "6.5rem",
+            width: "6.25rem",
             cell: (x) => (
-              <button type="button" onClick={() => setReceipt(x)} className="cursor-pointer font-medium text-primary tabular-nums hover:underline">
+              <button type="button" onClick={() => setReceipt(x)} className="cursor-pointer font-medium text-primary hover:underline">
                 {x.no}
               </button>
             ),
@@ -131,17 +131,17 @@ export function TransactionsCard() {
           {
             key: "patient",
             head: t("col.patient"),
-            width: "minmax(0,1fr)",
+            width: "minmax(0,1.2fr)",
             cell: (x) => (
               <Link href={`/patients/${x.patient.id}`} className="truncate font-medium hover:underline">
                 {b(x.patient.name)}
               </Link>
             ),
           },
-          { key: "service", head: t("col.service"), width: "minmax(0,1.1fr)", cell: (x) => <span className="truncate">{b(x.service)}</span> },
-          { key: "method", head: t("col.method"), width: "6rem", cell: (x) => b(METHOD[x.method]) },
-          { key: "amount", head: t("col.amount"), width: "7rem", cell: (x) => <span className="font-medium tabular-nums">{sar(x.amount)}</span> },
-          { key: "status", head: t("col.status"), width: "6.5rem", cell: (x) => <StatusBadge tone={TONE[x.status]}>{t(`status.${x.status}`)}</StatusBadge> },
+          { key: "service", head: t("col.service"), width: "minmax(0,1fr)", cell: (x) => <span className="truncate">{b(x.service)}</span> },
+          { key: "method", head: t("col.method"), width: "6.25rem", cell: (x) => b(METHOD[x.method]) },
+          { key: "amount", head: t("col.amount"), width: "6.875rem", cell: (x) => <span className="font-medium tabular-nums">{sar(x.amount)}</span> },
+          { key: "status", head: t("col.status"), width: "6.875rem", cell: (x) => <StatusBadge tone={TONE[x.status]}>{t(`status.${x.status}`)}</StatusBadge> },
           { key: "act", head: <span className="sr-only">{t("col.receipt")}</span>, width: "2.25rem", cell: receiptBtn },
         ]}
         item={(x) => (

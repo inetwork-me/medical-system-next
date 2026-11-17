@@ -13,7 +13,9 @@ import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
 import { Button } from "@/components/ui/button"
 import { PCard } from "../profile/side"
 import { usePatient, useText } from "../profile/use-patient"
-import { GAZES, GAZE_IMG, MUSCLES, eyeRecord, specialtyHref, type EyeExam, type Gaze, type MuscleKey } from "./data"
+import { GAZES, GAZE_IMG, MUSCLES, icdName, specialtyHref, type EyeExam, type Gaze, type MuscleKey } from "./data"
+import { GradeChip, Glass, formatGrade, useEyeText } from "./eye-parts"
+import { useEyeRecord } from "./eye-store"
 
 /**
  * Patients · Patient page · Eyes (Widget / Patient Tab · Eyes, Wide | Compact). Wide from 45rem of tab width (desktop),
@@ -23,9 +25,9 @@ import { GAZES, GAZE_IMG, MUSCLES, eyeRecord, specialtyHref, type EyeExam, type 
 export function EyesTab() {
   const t = useTranslations("specialties.eyes")
   const data = usePatient()
+  const rec = useEyeRecord(data?.patient.id ?? "")
   if (!data) return null
   const id = data.patient.id
-  const rec = eyeRecord(id)
   if (!rec)
     return (
       <div className="rounded-xl border bg-card">
@@ -61,23 +63,6 @@ export function EyesTab() {
 
 /* ---------------------------------------------------------------- shared bits */
 
-/** −3 / 0 / +1 grade chip: under-acting warning, over-acting info, normal muted. Always LTR. */
-export function GradeChip({ grade, className }: { grade: number; className?: string }) {
-  return (
-    <span
-      dir="ltr"
-      className={cn(
-        "inline-flex h-[22px] w-11 shrink-0 items-center justify-center rounded-md text-xs font-medium tabular-nums",
-        grade < 0 ? "bg-warning-soft text-warning-soft-foreground" : grade > 0 ? "bg-info-soft text-info-soft-foreground" : "bg-muted text-muted-foreground",
-        className,
-      )}
-    >
-      {formatGrade(grade)}
-    </span>
-  )
-}
-export const formatGrade = (g: number) => (g === 0 ? "0" : g < 0 ? `−${Math.abs(g)}` : `+${g}`)
-
 /** Most affected muscle of an exam, e.g. "LR −3" (history tags). */
 function worstMuscle(exam: EyeExam) {
   let best: { key: MuscleKey; g: number } | null = null
@@ -87,11 +72,6 @@ function worstMuscle(exam: EyeExam) {
       if (g < 0 && (!best || g < best.g)) best = { key: m.key, g }
     }
   return best
-}
-
-/** Dark viewport chip (3D overlays). */
-function Glass({ className, children, dir }: { className?: string; children: React.ReactNode; dir?: "ltr" | "rtl" }) {
-  return <span dir={dir} className={cn("inline-flex items-center gap-1.5 rounded-full bg-slate-900/80 px-2.5 py-1 text-xs text-slate-50", className)}>{children}</span>
 }
 
 /* ---------------------------------------------------------------- simulator card */
@@ -209,17 +189,18 @@ function LatestFindings({ exam }: { exam: EyeExam }) {
   const t = useTranslations("specialties.eyes.findings")
   const { b } = useText()
   const dates = useDates()
+  const tx = useEyeText()
   const rows: [string, React.ReactNode, boolean?][] = [
     [
       t("diagnosis"),
       <>
-        <bdi dir="ltr">{exam.icd10.code}</bdi> · {b(exam.icd10.name)}
+        <bdi dir="ltr">{exam.icd10}</bdi> · {b(icdName(exam.icd10))}
       </>,
     ],
     [t("deviation"), t("deviationValue", { type: t(`cover.${exam.coverTest}`), near: exam.deviation.near, far: exam.deviation.far })],
-    [t("diplopia"), exam.diplopia ? b(exam.diplopia) : "—", !!exam.diplopia],
-    [t("headPosture"), exam.headPosture ? b(exam.headPosture) : "—"],
-    [t("nystagmus"), exam.nystagmus ? b(exam.nystagmus) : "—"],
+    [t("diplopia"), tx.diplopia(exam.diplopia), exam.diplopia !== "none"],
+    [t("headPosture"), tx.posture(exam.headPosture)],
+    [t("nystagmus"), tx.nystagmus(exam.nystagmus)],
     [t("acuity"), <bdi key="a" dir="ltr">{`OD ${exam.acuity.OD} · OS ${exam.acuity.OS}`}</bdi>],
   ]
   return (
@@ -316,7 +297,9 @@ function NineGaze({ exam }: { exam: EyeExam }) {
 
 /* ---------------------------------------------------------------- history */
 
-const TREND_TONE: Record<EyeExam["trend"], StatusTone> = { draft: "info", improving: "success", baseline: "neutral" }
+const TREND_TONE: Record<EyeExam["trend"] | "signed", StatusTone> = { draft: "info", improving: "success", baseline: "neutral", signed: "success" }
+
+const trend = (e: EyeExam) => (e.trend === "draft" && e.status === "signed" ? "signed" : e.trend)
 
 function ExamHistory({ id, exams }: { id: string; exams: EyeExam[] }) {
   const t = useTranslations("specialties.eyes.history")
@@ -347,7 +330,7 @@ function ExamHistory({ id, exams }: { id: string; exams: EyeExam[] }) {
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="text-sm font-medium tabular-nums">{dates.short(e.date)}</span>
-                <span className="text-xs text-muted-foreground">{t(`kind.${e.kind}`)}</span>
+                <span className="text-xs text-muted-foreground">{t(e.kind === "today" && e.status === "signed" ? "kind.todaySigned" : `kind.${e.kind}`)}</span>
               </div>
               <span className="hidden items-center gap-1.5 @min-[45rem]/tab:flex" dir="ltr">
                 {worst && (
@@ -359,7 +342,7 @@ function ExamHistory({ id, exams }: { id: string; exams: EyeExam[] }) {
                   {e.coverTest === "exotropia" ? "XT" : "ET"} {e.deviation.near}Δ
                 </span>
               </span>
-              <StatusBadge tone={TREND_TONE[e.trend]}>{t(`trend.${e.trend}`)}</StatusBadge>
+              <StatusBadge tone={TREND_TONE[trend(e)]}>{t(`trend.${trend(e)}`)}</StatusBadge>
               <Button variant="ghost" size="icon-sm" asChild className="hidden @min-[45rem]/tab:inline-flex">
                 <Link href={specialtyHref.eyeExam(id, e.id)} aria-label={`${t("view")} · ${dates.short(e.date)}`}>
                   <Icon name="eye" size={18} />

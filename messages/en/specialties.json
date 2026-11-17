@@ -71,18 +71,191 @@
       "kind": {
         "first": "First exam",
         "followUp": "Follow-up",
-        "today": "Today · in progress"
+        "today": "Today · in progress",
+        "todaySigned": "Today · signed"
       },
       "trend": {
         "draft": "Draft",
         "improving": "Improving",
-        "baseline": "Baseline"
+        "baseline": "Baseline",
+        "signed": "Signed"
       }
     },
     "empty": {
       "title": "No eye exams yet",
       "text": "Open the simulator to record the first eye movement exam.",
       "start": "Start eye exam"
+    },
+    "f": {
+      "diplopia": {
+        "none": "None",
+        "right": "Horizontal, worse looking right",
+        "left": "Horizontal, worse looking left",
+        "vertical": "Vertical",
+        "most": "In most directions"
+      },
+      "diplopiaShort": {
+        "none": "None",
+        "right": "Only looking right",
+        "left": "Only looking left",
+        "vertical": "Looking up or down",
+        "most": "Most directions"
+      },
+      "posture": {
+        "none": "Normal",
+        "turnRight": "Turns face to the right · {deg}°",
+        "turnLeft": "Turns face to the left · {deg}°",
+        "tiltRight": "Tilts head to the right · {deg}°",
+        "tiltLeft": "Tilts head to the left · {deg}°"
+      },
+      "postureOpt": {
+        "none": "Normal",
+        "turnRight": "Face turn right",
+        "turnLeft": "Face turn left",
+        "tiltRight": "Head tilt right",
+        "tiltLeft": "Head tilt left"
+      },
+      "nystagmus": {
+        "none": "None",
+        "horizontal": "Horizontal",
+        "vertical": "Vertical"
+      },
+      "coverOpt": {
+        "esotropia": "Esotropia (turns in)",
+        "exotropia": "Exotropia (turns out)",
+        "ortho": "Straight"
+      }
+    },
+    "ews": {
+      "patientView": "Patient view",
+      "finish": "Finish exam",
+      "finishShort": "Finish",
+      "gaze": {
+        "title": "Gaze",
+        "description": "As you face the patient",
+        "eyes": {
+          "both": "Both eyes",
+          "OD": "Right · OD",
+          "OS": "Left · OS"
+        },
+        "angle": "Gaze angle",
+        "together": "Move both eyes together",
+        "muscles": "Show muscles",
+        "lines": "Show gaze lines",
+        "pad": "Gaze direction",
+        "dir": {
+          "upR": "up right",
+          "up": "up",
+          "upL": "up left",
+          "right": "right",
+          "primary": "ahead",
+          "left": "left",
+          "downR": "down right",
+          "down": "down",
+          "downL": "down left"
+        },
+        "readout": "Looking {dir} · {angle}°",
+        "readoutAhead": "Looking ahead"
+      },
+      "anatReadout": "Anatomy · {eye}",
+      "eyeName": {
+        "OD": "right eye",
+        "OS": "left eye"
+      },
+      "calloutText": "The {eye} can't turn fully {dir}",
+      "calloutDir": {
+        "LR": "out",
+        "MR": "in",
+        "SR": "up",
+        "IR": "down",
+        "SO": "down and in",
+        "IO": "up and out"
+      },
+      "muscles": {
+        "title": "Muscle function",
+        "description": "−4 can't move · 0 normal · +4 overacting",
+        "eyeTabs": {
+          "OD": "Right eye · OD",
+          "OS": "Left eye · OS"
+        },
+        "down": "Grade down",
+        "up": "Grade up",
+        "note": "{eye}: {muscle} {grade} ({why}).",
+        "noteEye": {
+          "OD": "Right eye",
+          "OS": "Left eye"
+        },
+        "why": {
+          "over": "overacting to make up for the other eye",
+          "under": "under-acting"
+        },
+        "allNormal": "All six muscles move normally in both eyes."
+      },
+      "findings": {
+        "title": "Findings",
+        "description": "Saved with the visit and sent on the claim",
+        "diagnosis": "Diagnosis (ICD-10)",
+        "cover": "Cover test",
+        "near": "Near (Δ)",
+        "far": "Far (Δ)",
+        "diplopia": "Double vision",
+        "posture": "Head posture",
+        "nystagmus": "Nystagmus",
+        "notes": "Notes"
+      },
+      "info": {
+        "selected": "{eye} · selected",
+        "moves": "Moves the eye",
+        "nerve": "Nerve",
+        "patient": "This patient",
+        "notices": "Patient notices",
+        "grade": {
+          "under": "{grade} · under-acting",
+          "over": "{grade} · overacting",
+          "normal": "0 · normal"
+        },
+        "nothing": "Nothing unusual",
+        "show": "Show to the patient",
+        "pick": "Tap a muscle in the list to see what it does.",
+        "noticesSide": "Double vision when looking {side}",
+        "side": {
+          "right": "right",
+          "left": "left"
+        }
+      },
+      "compare": {
+        "baseline": "Baseline",
+        "latest": "Latest",
+        "sync": "Both views move together: pick a gaze direction once and compare the same position.",
+        "changed": "What changed",
+        "measure": "Measure",
+        "change": "Change",
+        "better": "Better",
+        "worse": "Worse",
+        "same": "Same",
+        "lr": "Lateral rectus · right",
+        "near": "Deviation · near",
+        "turn": "Head turn",
+        "diplopia": "Double vision",
+        "range": "{from} → {to}"
+      },
+      "dlg": {
+        "title": "Finish and sign the exam?",
+        "text": "It's saved to {name}'s file and added to today's visit claim.",
+        "diagnosis": "Diagnosis",
+        "graded": "Muscles graded",
+        "gradedValue": "{n} of 12",
+        "next": "Next exam",
+        "nextValue": "In 6 weeks",
+        "keep": "Keep editing",
+        "confirm": "Finish & sign",
+        "savedTitle": "Exam saved and signed",
+        "savedText": "Added to today's visit.",
+        "signed": "Signed {date}"
+      },
+      "viewOnly": "View only on phones. Open the exam on a tablet or computer to record findings.",
+      "calloutOD": "Right {muscle} · {grade}",
+      "calloutOS": "Left {muscle} · {grade}"
     }
   },
   "dental": {

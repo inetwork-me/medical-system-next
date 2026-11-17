@@ -44,6 +44,11 @@ export const GAZE_IMG: Record<Gaze, string> = {
   downL: "down_l",
 }
 
+export type Diplopia = "none" | "right" | "left" | "vertical" | "most"
+export type HeadPosture = { kind: "none" | "turnRight" | "turnLeft" | "tiltRight" | "tiltLeft"; deg: number }
+export type Nystagmus = "none" | "horizontal" | "vertical"
+export type CoverTest = "esotropia" | "exotropia" | "ortho"
+
 export type EyeExam = {
   id: string
   date: string
@@ -53,23 +58,64 @@ export type EyeExam = {
   kind: "first" | "followUp" | "today"
   trend: "draft" | "improving" | "baseline"
   grades: Grades
-  icd10: { code: string; name: Bi }
-  coverTest: "esotropia" | "exotropia" | "ortho"
+  icd10: string
+  coverTest: CoverTest
   /** Prism dioptres (Δ). */
   deviation: { near: number; far: number }
-  diplopia: Bi | null
-  headPosture: Bi | null
-  nystagmus: Bi | null
+  diplopia: Diplopia
+  headPosture: HeadPosture
+  nystagmus: Nystagmus
   acuity: Record<Eye, string>
   /** Gaze positions where the movement is limited (highlighted on the nine-gaze grid). */
   limited: Gaze[]
   notes: Bi
 }
 
+/** ICD-10 codes offered on the eye exam (Latin code + name). */
+export const EYE_ICD: { code: string; name: Bi }[] = [
+  { code: "H49.21", name: { en: "Sixth nerve palsy, right eye", ar: "شلل العصب السادس · العين اليمنى" } },
+  { code: "H49.22", name: { en: "Sixth nerve palsy, left eye", ar: "شلل العصب السادس · العين اليسرى" } },
+  { code: "H49.11", name: { en: "Fourth nerve palsy, right eye", ar: "شلل العصب الرابع · العين اليمنى" } },
+  { code: "H50.00", name: { en: "Esotropia, unspecified", ar: "حَوَل للداخل" } },
+  { code: "H50.10", name: { en: "Exotropia, unspecified", ar: "حَوَل للخارج" } },
+]
+export const icdName = (code: string) => EYE_ICD.find((x) => x.code === code)?.name ?? { en: code, ar: code }
+
+/** Anatomy view: what each muscle does, its nerve, and what the patient notices when it's weak. */
+export const MUSCLE_INFO: Record<MuscleKey, { moves: Bi; nerve: Bi; notices: Bi }> = {
+  LR: {
+    moves: { en: "Out, away from the nose", ar: "لبرّا، بعيد عن الأنف" },
+    nerve: { en: "Cranial nerve VI (abducens)", ar: "العصب القحفي السادس (المبعِّد)" },
+    notices: { en: "Double vision when looking to that side", ar: "يشوف الشي شيئين لما يطالع لهالجهة" },
+  },
+  MR: {
+    moves: { en: "In, towards the nose", ar: "لجوّا، باتجاه الأنف" },
+    nerve: { en: "Cranial nerve III (oculomotor)", ar: "العصب القحفي الثالث (المحرّك للعين)" },
+    notices: { en: "Double vision when looking across", ar: "يشوف الشي شيئين لما يطالع للجهة الثانية" },
+  },
+  SR: {
+    moves: { en: "Up, and a little in", ar: "لفوق، وشوي لجوّا" },
+    nerve: { en: "Cranial nerve III (oculomotor)", ar: "العصب القحفي الثالث (المحرّك للعين)" },
+    notices: { en: "Double vision when looking up", ar: "يشوف الشي شيئين لما يطالع فوق" },
+  },
+  IR: {
+    moves: { en: "Down, and a little in", ar: "لتحت، وشوي لجوّا" },
+    nerve: { en: "Cranial nerve III (oculomotor)", ar: "العصب القحفي الثالث (المحرّك للعين)" },
+    notices: { en: "Double vision when looking down", ar: "يشوف الشي شيئين لما يطالع تحت" },
+  },
+  SO: {
+    moves: { en: "Down and out, turns the top of the eye in", ar: "لتحت ولبرّا، ويلف أعلى العين لجوّا" },
+    nerve: { en: "Cranial nerve IV (trochlear)", ar: "العصب القحفي الرابع (البَكَري)" },
+    notices: { en: "Double vision reading or going downstairs", ar: "يشوف الشي شيئين لما يقرا أو ينزل الدرج" },
+  },
+  IO: {
+    moves: { en: "Up and out", ar: "لفوق ولبرّا" },
+    nerve: { en: "Cranial nerve III (oculomotor)", ar: "العصب القحفي الثالث (المحرّك للعين)" },
+    notices: { en: "Double vision when looking up and in", ar: "يشوف الشي شيئين لما يطالع فوق ولجوّا" },
+  },
+}
+
 const REEM: Bi = { en: "Dr. Reem Al-Otaibi", ar: "د. ريم العتيبي" }
-const PALSY = { code: "H49.21", name: { en: "Sixth nerve palsy, right eye", ar: "شلل العصب السادس · العين اليمنى" } }
-const DIPLOPIA: Bi = { en: "Horizontal, worse looking right", ar: "أفقية، تزيد لما يطالع يمين" }
-const NONE: Bi = { en: "None", ar: "ما فيه" }
 
 /** Newest first. The latest signed exam feeds the tab summary; today's draft is still being recorded. */
 const FAHAD_EYE: EyeExam[] = [
@@ -81,12 +127,12 @@ const FAHAD_EYE: EyeExam[] = [
     kind: "today",
     trend: "draft",
     grades: grades({ LR: -3 }, { MR: 1 }),
-    icd10: PALSY,
+    icd10: "H49.21",
     coverTest: "esotropia",
     deviation: { near: 12, far: 16 },
-    diplopia: DIPLOPIA,
-    headPosture: { en: "Turns face to the right · 10°", ar: "يلف وجهه يمين · 10°" },
-    nystagmus: NONE,
+    diplopia: "right",
+    headPosture: { kind: "turnRight", deg: 10 },
+    nystagmus: "none",
     acuity: { OD: "6/6", OS: "6/6" },
     limited: ["right"],
     notes: {
@@ -102,12 +148,12 @@ const FAHAD_EYE: EyeExam[] = [
     kind: "followUp",
     trend: "improving",
     grades: grades({ LR: -3 }, { MR: 1 }),
-    icd10: PALSY,
+    icd10: "H49.21",
     coverTest: "esotropia",
     deviation: { near: 12, far: 16 },
-    diplopia: DIPLOPIA,
-    headPosture: { en: "Turns face to the right · 10°", ar: "يلف وجهه يمين · 10°" },
-    nystagmus: NONE,
+    diplopia: "right",
+    headPosture: { kind: "turnRight", deg: 10 },
+    nystagmus: "none",
     acuity: { OD: "6/6", OS: "6/6" },
     limited: ["right"],
     notes: { en: "Lateral rectus improving. Keep patching the left eye 2 hours a day.", ar: "المستقيمة الخارجية قاعدة تتحسن. يكمل تغطية العين اليسرى ساعتين باليوم." },
@@ -120,12 +166,12 @@ const FAHAD_EYE: EyeExam[] = [
     kind: "first",
     trend: "baseline",
     grades: grades({ LR: -4 }, { MR: 1 }),
-    icd10: PALSY,
+    icd10: "H49.21",
     coverTest: "esotropia",
     deviation: { near: 20, far: 24 },
-    diplopia: DIPLOPIA,
-    headPosture: { en: "Turns face to the right · 15°", ar: "يلف وجهه يمين · 15°" },
-    nystagmus: NONE,
+    diplopia: "most",
+    headPosture: { kind: "turnRight", deg: 15 },
+    nystagmus: "none",
     acuity: { OD: "6/9", OS: "6/6" },
     limited: ["upR", "right", "downR"],
     notes: { en: "Sudden double vision after a viral illness. MRI normal.", ar: "رؤية مزدوجة فجأة بعد التهاب فيروسي. الرنين طبيعي." },

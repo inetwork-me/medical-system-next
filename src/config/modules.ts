@@ -26,6 +26,8 @@ export type ModuleTab = {
   key: string
   href: string
   icon?: IconName
+  /** Header shows "module / tab" for this tab (design: reports, payments); other tabs show "Home / module". */
+  ownTitle?: boolean
 }
 
 export type ModuleDef = {
@@ -56,8 +58,8 @@ export const MODULES: ModuleDef[] = [
     built: true,
     tabs: [
       { key: "list", href: "/patients", icon: "profile-2user" },
-      { key: "reports", href: "/patients/reports", icon: "chart-2" },
-      { key: "payments", href: "/patients/payments", icon: "wallet-money" },
+      { key: "reports", href: "/patients/reports", icon: "chart-2", ownTitle: true },
+      { key: "payments", href: "/patients/payments", icon: "wallet-money", ownTitle: true },
     ],
   },
   {
@@ -73,7 +75,7 @@ export const MODULES: ModuleDef[] = [
       { key: "list", href: "/appointments/list" },
       { key: "waiting", href: "/appointments/waiting-room" },
       { key: "schedules", href: "/appointments/schedules" },
-      { key: "reports", href: "/appointments/reports" },
+      { key: "reports", href: "/appointments/reports", ownTitle: true },
     ],
   },
   { id: "doctors", icon: "people", href: "/doctors", group: "main", labelKey: "doctors", mobile: "more", built: false },

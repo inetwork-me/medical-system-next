@@ -9,7 +9,8 @@ import { useDates } from "@/i18n/dates"
 import { Icon } from "@/components/ds/icon"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { addMonths, appointmentsOn, DOCTORS, isClosed, monthCells, STATUSES, TODAY, type ApptStatus, type DoctorId } from "../data"
+import { useAppointmentsOn } from "../store"
+import { addMonths, DOCTORS, isClosed, monthCells, STATUSES, TODAY, type ApptStatus, type DoctorId } from "../data"
 
 /** Legend swatches (design · Side Panel · Status). */
 const SWATCH: Record<ApptStatus, string> = {
@@ -40,7 +41,7 @@ export function SidePanel({
 }) {
   const t = useTranslations("appointments")
   const locale = useLocale()
-  const list = appointmentsOn(date)
+  const list = useAppointmentsOn()(date)
   return (
     <aside className={cn("flex flex-col gap-4", className)}>
       <MiniMonth date={date} onPick={onPick} />

@@ -9,7 +9,8 @@ import { useDates } from "@/i18n/dates"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
 import { Button } from "@/components/ui/button"
-import { addDays, appointmentsOn, doctorById, hhmm, isClosed, NOW_LABEL, NOW_MIN, TODAY, weekStart, type Appointment, type ApptStatus, type DoctorId } from "../data"
+import { useAppointmentsOn } from "../store"
+import { addDays, doctorById, hhmm, isClosed, NOW_LABEL, NOW_MIN, TODAY, weekStart, type Appointment, type ApptStatus, type DoctorId } from "../data"
 
 export const STATUS_TONE: Record<ApptStatus, StatusTone> = {
   booked: "neutral",
@@ -34,7 +35,7 @@ export function Agenda({ date, doctors, onPick }: { date: string; doctors: Docto
   const [more, setMore] = React.useState(false)
   const [earlier, setEarlier] = React.useState(false)
 
-  const all = appointmentsOn(date).filter((a) => doctors.includes(a.doctor))
+  const all = useAppointmentsOn()(date).filter((a) => doctors.includes(a.doctor))
   const today = date === TODAY
   // Today: visits already over (completed / no-show) are folded away above the list.
   const done = today ? all.filter((a) => a.status === "completed" || a.status === "noShow") : []

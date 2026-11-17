@@ -14,13 +14,13 @@ export const DAY_START = 8 * 60
 export const DAY_END = 16 * 60
 
 export type DoctorId = "km" | "az" | "so" | "hf"
-export type Doctor = { id: DoctorId; initials: string; name: Bi; clinic: Bi; color: string }
+export type Doctor = { id: DoctorId; initials: string; name: Bi; clinic: Bi; color: string; room: number }
 
 export const DOCTORS: Doctor[] = [
-  { id: "km", initials: "KM", name: { en: "Dr. Khaled Mansour", ar: "د. خالد منصور" }, clinic: { en: "Cardiology", ar: "القلب" }, color: "var(--chart-1)" },
-  { id: "az", initials: "AZ", name: { en: "Dr. Ahmed Zaki", ar: "د. أحمد زكي" }, clinic: { en: "Pediatrics", ar: "الأطفال" }, color: "var(--chart-2)" },
-  { id: "so", initials: "SO", name: { en: "Dr. Sami Odeh", ar: "د. سامي عودة" }, clinic: { en: "Dental", ar: "الأسنان" }, color: "var(--chart-3)" },
-  { id: "hf", initials: "HF", name: { en: "Dr. Huda Fares", ar: "د. هدى فارس" }, clinic: { en: "Orthopedics", ar: "العظام" }, color: "var(--chart-4)" },
+  { id: "km", initials: "KM", name: { en: "Dr. Khaled Mansour", ar: "د. خالد منصور" }, clinic: { en: "Cardiology", ar: "القلب" }, color: "var(--chart-1)", room: 3 },
+  { id: "az", initials: "AZ", name: { en: "Dr. Ahmed Zaki", ar: "د. أحمد زكي" }, clinic: { en: "Pediatrics", ar: "الأطفال" }, color: "var(--chart-2)", room: 1 },
+  { id: "so", initials: "SO", name: { en: "Dr. Sami Odeh", ar: "د. سامي عودة" }, clinic: { en: "Dental", ar: "الأسنان" }, color: "var(--chart-3)", room: 5 },
+  { id: "hf", initials: "HF", name: { en: "Dr. Huda Fares", ar: "د. هدى فارس" }, clinic: { en: "Orthopedics", ar: "العظام" }, color: "var(--chart-4)", room: 2 },
 ]
 export const doctorById = (id: DoctorId) => DOCTORS.find((d) => d.id === id)!
 

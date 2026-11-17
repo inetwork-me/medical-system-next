@@ -80,5 +80,75 @@
     "title": "{tab} في الطريق",
     "text": "هذا الجزء من المواعيد هو اللي بنبنيه بعدين من شاشات FigCraft.",
     "back": "ارجع للتقويم"
+  },
+  "list": {
+    "kpi": {
+      "today": "اليوم",
+      "waiting": "ينتظرون الحين",
+      "completed": "مكتملة",
+      "noShow": "ما حضروا",
+      "vsLastMonday": "عن الاثنين اللي فات",
+      "avgWait": "متوسط الانتظار",
+      "ofToday": "من اليوم",
+      "thisWeek": "هالأسبوع",
+      "minutes": "{n} دقيقة"
+    },
+    "title": "مواعيد اليوم",
+    "subtitle": "{date} · {count, plural, one {موعد واحد} two {موعدين} few {# مواعيد} many {# موعد} other {# موعد}}",
+    "chips": {
+      "all": "الكل",
+      "waiting": "ينتظرون",
+      "withDoctor": "عند الطبيب",
+      "completed": "مكتملة",
+      "noShow": "ما حضروا",
+      "cancelled": "ملغية"
+    },
+    "col": {
+      "time": "الوقت",
+      "patient": "المريض",
+      "doctor": "الطبيب والعيادة",
+      "type": "النوع",
+      "reminder": "التذكير",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "duration": "{n} دقيقة",
+    "inClinic": "في العيادة",
+    "video": "زيارة بالفيديو",
+    "sent": "انرسل",
+    "more": "خيارات ثانية",
+    "print": "اطبع القائمة",
+    "exportToday": "صدّر قائمة اليوم",
+    "empty": "ما فيه مواعيد هنا",
+    "emptyText": "ما فيه شي بهالحالة اليوم.",
+    "showAll": "اعرض الكل",
+    "showing": "يعرض {from}–{to} من {total}",
+    "menu": {
+      "label": "إجراءات {name}",
+      "openDay": "اعرضه في التقويم",
+      "checkIn": "سجّل الوصول",
+      "callIn": "نادِ المريض",
+      "finish": "خلّص الزيارة",
+      "remind": "أرسل تذكير",
+      "noShow": "علّمه ما حضر",
+      "cancel": "ألغِ الموعد"
+    },
+    "toast": {
+      "checkedIn": "تم تسجيل الوصول",
+      "checkedInText": "{name} ينتظر في عيادة {room}.",
+      "calledIn": "تم النداء",
+      "calledInText": "{name} الحين عند {doctor}.",
+      "finished": "خلصت الزيارة",
+      "finishedText": "{name} · {time} · {doctor}",
+      "noShow": "انعلّم ما حضر",
+      "noShowText": "{name} · {time} · {doctor}",
+      "cancelled": "انلغى الموعد",
+      "cancelledText": "{name} · {time} · {doctor}",
+      "reminded": "انرسل التذكير",
+      "remindedText": "توصل {name} رسالة لموعد {time} مع {doctor}.",
+      "undo": "تراجع",
+      "undone": "تم التراجع",
+      "undoneText": "رجع {name} لحالة {status}."
+    }
   }
 }

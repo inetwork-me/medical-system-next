@@ -9,7 +9,6 @@ import { useDates } from "@/i18n/dates"
 import { Icon } from "@/components/ds/icon"
 import {
   addDays,
-  appointmentsOn,
   breaksFor,
   DAY_END,
   DAY_START,
@@ -23,6 +22,7 @@ import {
   type Doctor,
   type DoctorId,
 } from "../data"
+import { useAppointmentsOn } from "../store"
 
 /** 88px per hour (design · Day Board / Week Board). */
 const HOUR = 88
@@ -160,7 +160,7 @@ export function DayBoard({ date, doctors }: { date: string; doctors: DoctorId[] 
   const t = useTranslations("appointments.calendar")
   const locale = useLocale()
   const text = useApptText()
-  const list = appointmentsOn(date)
+  const list = useAppointmentsOn()(date)
   const today = date === TODAY
   const cols = doctors.map(doctorById)
   return (
@@ -233,6 +233,7 @@ export const weekDays = (sunday: string) => [0, 1, 2, 3, 4].map((i) => addDays(s
 export function WeekBoard({ sunday, doctor }: { sunday: string; doctor: DoctorId }) {
   const dates = useDates()
   const text = useApptText()
+  const on = useAppointmentsOn()
   const days = weekDays(sunday)
   return (
     <BoardShell
@@ -265,7 +266,7 @@ export function WeekBoard({ sunday, doctor }: { sunday: string; doctor: DoctorId
           {days.map((d) => (
             <div key={d} role="list" aria-label={dates.full(d)} className={cn("relative border-s", d === TODAY && "bg-accent")} style={{ height: HEIGHT }}>
               <Lines />
-              {appointmentsOn(d)
+              {on(d)
                 .filter((a) => a.doctor === doctor)
                 .map((a) => (
                   <Block

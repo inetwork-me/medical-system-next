@@ -8,7 +8,8 @@ import { Icon } from "@/components/ds/icon"
 import { EmptyState } from "@/components/ds/states"
 import { ModuleTabsNav, PageContainer, PageHeader } from "@/components/shell/page"
 import { Button } from "@/components/ui/button"
-import { appointmentsOn, TODAY } from "./data"
+import { TODAY } from "./data"
+import { useAppointmentsOn } from "./store"
 
 /**
  * Shared Appointments frame (every tab): module tabs (Calendar · n, List · n, Waiting room · n, Doctor schedules,
@@ -16,7 +17,7 @@ import { appointmentsOn, TODAY } from "./data"
  */
 export function AppointmentsFrame({ onExport, children }: { onExport?: () => void; children?: React.ReactNode }) {
   const t = useTranslations("appointments")
-  const today = appointmentsOn(TODAY)
+  const today = useAppointmentsOn()(TODAY)
   const count = today.length
   const waiting = today.filter((a) => a.status === "arrived").length
   return (

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
-import { activeTab, moduleTabs } from "@/lib/modules"
+import { activeTab } from "@/lib/modules"
 import { Icon } from "@/components/ds/icon"
 import { Button } from "@/components/ui/button"
 import { useNav } from "./use-shell"
@@ -46,9 +46,8 @@ function useDefaultTitle(): PageTitleValue {
   const { current, pathname, label, tabLabel, t } = useNav()
   if (!current) return { title: "" }
   if (current.id === "dashboard") return { title: label(current) }
-  const tabs = moduleTabs(current)
   const tab = activeTab(current, pathname)
-  if (!tab || tabs.length < 2 || tab.key === tabs[0].key) return { title: label(current), crumbs: [{ label: t("nav.home"), href: "/dashboard" }] }
+  if (!tab?.ownTitle) return { title: label(current), crumbs: [{ label: t("nav.home"), href: "/dashboard" }] }
   return { title: tabLabel(current, tab.key), crumbs: [{ label: label(current), href: current.href }] }
 }
 

@@ -80,5 +80,75 @@
     "title": "{tab} is on the way",
     "text": "This part of Appointments is the next one we're building from the FigCraft screens.",
     "back": "Back to calendar"
+  },
+  "list": {
+    "kpi": {
+      "today": "Today",
+      "waiting": "Waiting now",
+      "completed": "Completed",
+      "noShow": "No-show",
+      "vsLastMonday": "vs last Monday",
+      "avgWait": "average wait",
+      "ofToday": "of today",
+      "thisWeek": "this week",
+      "minutes": "{n} min"
+    },
+    "title": "Today's appointments",
+    "subtitle": "{date} · {count, plural, one {1 appointment} other {# appointments}}",
+    "chips": {
+      "all": "All",
+      "waiting": "Waiting",
+      "withDoctor": "With doctor",
+      "completed": "Completed",
+      "noShow": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "col": {
+      "time": "Time",
+      "patient": "Patient",
+      "doctor": "Doctor & clinic",
+      "type": "Type",
+      "reminder": "Reminder",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "duration": "{n} min",
+    "inClinic": "In clinic",
+    "video": "Video visit",
+    "sent": "Sent",
+    "more": "More options",
+    "print": "Print the list",
+    "exportToday": "Export today's list",
+    "empty": "No appointments here",
+    "emptyText": "Nothing matches this status today.",
+    "showAll": "Show all",
+    "showing": "Showing {from}–{to} of {total}",
+    "menu": {
+      "label": "Actions for {name}",
+      "openDay": "Show in calendar",
+      "checkIn": "Check in",
+      "callIn": "Call in",
+      "finish": "Finish visit",
+      "remind": "Send reminder",
+      "noShow": "Mark no-show",
+      "cancel": "Cancel appointment"
+    },
+    "toast": {
+      "checkedIn": "Checked in",
+      "checkedInText": "{name} is waiting for Clinic {room}.",
+      "calledIn": "Called in",
+      "calledInText": "{name} is with {doctor} now.",
+      "finished": "Visit finished",
+      "finishedText": "{name} · {time} · {doctor}",
+      "noShow": "Marked as no-show",
+      "noShowText": "{name} · {time} · {doctor}",
+      "cancelled": "Appointment cancelled",
+      "cancelledText": "{name} · {time} · {doctor}",
+      "reminded": "Reminder sent",
+      "remindedText": "{name} gets an SMS for {time} with {doctor}.",
+      "undo": "Undo",
+      "undone": "Change undone",
+      "undoneText": "{name} is back to {status}."
+    }
   }
 }

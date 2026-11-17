@@ -13,7 +13,8 @@ import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { notify } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { RadioGroup } from "@/components/ui/radio-group"
-import { appointmentsOn, doctorById, hhmm, type DoctorId } from "../data"
+import { doctorById, hhmm, type DoctorId } from "../data"
+import { useAppointmentsOn } from "../store"
 
 /**
  * Appointments › Export (same flow as Patients / Dashboard): format → the visible range (day, week or month,
@@ -42,7 +43,8 @@ export function ExportDialog({
   const dates = useDates()
   const [fmt, setFmt] = React.useState<"excel" | "pdf" | "csv">("excel")
   const [busy, setBusy] = React.useState(false)
-  const list = React.useMemo(() => days.flatMap((d) => appointmentsOn(d)).filter((a) => doctors.includes(a.doctor)), [days, doctors])
+  const on = useAppointmentsOn()
+  const list = React.useMemo(() => days.flatMap((d) => on(d)).filter((a) => doctors.includes(a.doctor)), [days, doctors, on])
 
   const run = async () => {
     const head = [tx("col.date"), tx("col.time"), tx("col.minutes"), tx("col.patient"), tx("col.doctor"), tx("col.clinic"), tx("col.reason"), tx("col.type"), tx("col.status")]

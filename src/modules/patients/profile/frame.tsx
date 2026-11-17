@@ -12,6 +12,7 @@ import { ActionMenu } from "@/components/ds/action-menu"
 import { Icon } from "@/components/ds/icon"
 import { EmptyState } from "@/components/ds/states"
 import { PageContainer } from "@/components/shell/page"
+import { PageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
 import type { Patient } from "../data"
 import { BanDialog, ArchiveDialog } from "../list/row-actions"
@@ -23,7 +24,7 @@ import { PATIENT_TABS, usePatient, usePatientTab, useText, type PatientTab } fro
 
 /**
  * Patient page frame (Patients · Patient page · 1440 / 768 / 390):
- *  · md+  heading — back arrow + "Patient details", breadcrumb under it; Edit · Book visit · ⋯ on the Overview
+ *  · md+  app header: back · "Patients / Patients list" over the patient's name; tabs row with Edit · Book visit · ⋯ (Overview)
  *  · <md  profile bar (back · "Patient profile" · ⋯) replaces the app bar; the profile card sits above the tabs
  *  · tabs as route navigation (Overview, Visits · n, Payments, Medical, Files · n, Activity); scrolls on mobile
  */
@@ -69,69 +70,51 @@ export function PatientFrame({ children }: { children: React.ReactNode }) {
   return (
     <OverlayProvider initial={initialAction}>
       <MobileProfileBar patient={patient} />
+      <HeaderTitle patient={patient} />
       <PageContainer className="gap-4 md:gap-6">
-        <Heading patient={patient} actions={tab === "overview"} />
         <ProfileCard className="md:hidden" />
-        <PatientTabs active={tab} id={patient.id} counts={{ visits: record.visits.length, files: record.files.length }} />
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+          <div className="min-w-0 xl:flex-1">
+            <PatientTabs active={tab} id={patient.id} counts={{ visits: record.visits.length, files: record.files.length }} />
+          </div>
+          {tab === "overview" && <HeadingActions patient={patient} />}
+        </div>
         {children}
       </PageContainer>
     </OverlayProvider>
   )
 }
 
-function Heading({ patient, actions }: { patient: Patient; actions: boolean }) {
-  const t = useTranslations("patients.page")
+function HeaderTitle({ patient }: { patient: Patient }) {
   const tn = useTranslations("patients")
+  const ts = useTranslations("shell.tabs.patients")
   const { b } = useText()
   return (
-    <div className="hidden items-center gap-3 md:flex">
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon-sm" asChild>
-            <Link href="/patients" aria-label={t("back")}>
-              <Icon name="arrow-left" size={20} />
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        </div>
-        <nav aria-label={t("breadcrumb")}>
-          <ol className="flex flex-wrap items-center gap-1.5 text-xs">
-            <li>
-              <Link href="/dashboard" className="text-primary hover:underline">
-                {t("dashboard")}
-              </Link>
-            </li>
-            <li aria-hidden className="text-muted-foreground">
-              /
-            </li>
-            <li>
-              <Link href="/patients" className="text-primary hover:underline">
-                {tn("title")}
-              </Link>
-            </li>
-            <li aria-hidden className="text-muted-foreground">
-              /
-            </li>
-            <li aria-current="page" className="font-medium text-foreground">
-              {b(patient.name)}
-            </li>
-          </ol>
-        </nav>
-      </div>
-      {actions && (
-        <div className="flex items-center gap-2">
-          <Button variant="outline" asChild>
-            <Link href={`/patients/${patient.id}/edit`}>
-              <Icon name="edit-2" size={20} />
-              {t("edit")}
-            </Link>
-          </Button>
-          <IfModule id="appointments">
-            <BookButton label={t("book")} />
-          </IfModule>
-          <MoreActions patient={patient} />
-        </div>
-      )}
+    <PageTitle
+      title={b(patient.name)}
+      back="/patients"
+      crumbs={[
+        { label: tn("title"), href: "/patients" },
+        { label: ts("list"), href: "/patients" },
+      ]}
+    />
+  )
+}
+
+function HeadingActions({ patient }: { patient: Patient }) {
+  const t = useTranslations("patients.page")
+  return (
+    <div className="hidden items-center gap-2 md:flex">
+      <Button variant="outline" asChild>
+        <Link href={`/patients/${patient.id}/edit`}>
+          <Icon name="edit-2" size={20} />
+          {t("edit")}
+        </Link>
+      </Button>
+      <IfModule id="appointments">
+        <BookButton label={t("book")} />
+      </IfModule>
+      <MoreActions patient={patient} />
     </div>
   )
 }

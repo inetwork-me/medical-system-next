@@ -85,7 +85,7 @@ function MenuEntry({ it }: { it: Item }) {
       {it.destructive && <DropdownMenuSeparator className="mx-0" />}
       {it.href ? (
         <DropdownMenuItem asChild variant={it.destructive ? "destructive" : "default"} className={cls}>
-          <Link href={it.href}>{inner}</Link>
+          <Link href={it.href} prefetch={it.href === "/logout" ? false : undefined}>{inner}</Link>
         </DropdownMenuItem>
       ) : (
         <DropdownMenuItem onSelect={it.onSelect} className={cls}>
@@ -119,7 +119,7 @@ export function MobileUserMenu({ open, onOpenChange }: { open: boolean; onOpenCh
             return (
               <li key={it.icon} className={cn(it.destructive && "mt-1 border-t pt-1")}>
                 {it.href ? (
-                  <Link href={it.href} onClick={close} className={cls}>
+                  <Link href={it.href} prefetch={it.href === "/logout" ? false : undefined} onClick={close} className={cls}>
                     <Icon name={it.icon} size={20} />
                     {it.label}
                   </Link>

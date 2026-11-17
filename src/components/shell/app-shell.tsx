@@ -11,9 +11,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { HeaderSearch } from "./header-search"
 import { BottomNav, MobileAppBar } from "./mobile-nav"
 import { NotificationsButton } from "./notifications"
+import { HeaderTitle, PageTitleProvider } from "./page-title"
 import { Rail } from "./rail"
 import { SidebarPanel } from "./sidebar"
-import { useLocaleSwitch, useNav } from "./use-shell"
+import { useLocaleSwitch } from "./use-shell"
 import { UserMenuButton } from "./user-menu"
 
 import { SIDEBAR_COOKIE } from "./constants"
@@ -41,6 +42,7 @@ export function AppShell({ defaultCollapsed, children }: { defaultCollapsed: boo
   }
 
   return (
+    <PageTitleProvider>
     <div className="group/shell flex min-h-dvh bg-background" data-collapsed={collapsed || undefined}>
       {/* Desktop expanded sidebar */}
       <aside
@@ -82,15 +84,15 @@ export function AppShell({ defaultCollapsed, children }: { defaultCollapsed: boo
       </div>
       <BottomNav className="md:hidden group-has-[[data-mobile-action-bar]]/shell:hidden" />
     </div>
+    </PageTitleProvider>
   )
 }
 
 /**
- * DS sheet 08 · Header (64px, card, border-b, sticky): sidebar toggle · page title (18 SemiBold) · spacer ·
+ * DS sheet 08 · Header (64px, card, border-b, sticky): sidebar toggle · [back] · breadcrumb over page title · spacer ·
  * search · language (outline, names the other language) · dark mode · notifications · avatar (user menu).
  */
 function Header({ onToggle, className }: { onToggle: () => void; className?: string }) {
-  const { current, label } = useNav()
   const t = useTranslations("shell.header")
   const tc = useTranslations("common.language")
   const { other, switchLocale } = useLocaleSwitch()
@@ -100,9 +102,9 @@ function Header({ onToggle, className }: { onToggle: () => void; className?: str
       <Button variant="ghost" size="icon" onClick={onToggle} aria-label={t("toggleSidebar")}>
         <Icon name="sidebar-left" size={24} />
       </Button>
-      <p className="min-w-0 truncate text-lg font-semibold text-foreground">{current ? label(current) : ""}</p>
+      <HeaderTitle className="max-w-1/2 shrink-0" />
       <div className="flex-1" />
-      <HeaderSearch className="w-40 lg:w-70" />
+      <HeaderSearch className="w-40 min-w-24 shrink lg:w-70" />
       <Button variant="outline" onClick={switchLocale} aria-label={tc("switchLabel")}>
         <Icon name="language-square" size={24} />
         <span lang={other}>{tc("other")}</span>

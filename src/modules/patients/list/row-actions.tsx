@@ -4,7 +4,6 @@ import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { notify } from "@/components/ds/toast"
 
-import { Link } from "@/i18n/navigation"
 import { isModuleEnabled } from "@/lib/modules"
 import { bi } from "@/lib/mock/bi"
 import { ActionMenu } from "@/components/ds/action-menu"

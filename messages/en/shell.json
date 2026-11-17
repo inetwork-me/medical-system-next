@@ -38,7 +38,9 @@
     "darkMode": "Dark mode",
     "notifications": "Notifications",
     "accountMenu": "Account menu",
-    "mainNav": "Main navigation"
+    "mainNav": "Main navigation",
+    "back": "Back",
+    "breadcrumb": "Breadcrumb"
   },
   "notifications": {
     "title": "Notifications",

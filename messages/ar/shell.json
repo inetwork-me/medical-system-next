@@ -38,7 +38,9 @@
     "darkMode": "الوضع الليلي",
     "notifications": "الإشعارات",
     "accountMenu": "قائمة الحساب",
-    "mainNav": "التنقل الرئيسي"
+    "mainNav": "التنقل الرئيسي",
+    "back": "رجوع",
+    "breadcrumb": "مسار الصفحة"
   },
   "notifications": {
     "title": "الإشعارات",

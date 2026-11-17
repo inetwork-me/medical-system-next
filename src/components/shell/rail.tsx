@@ -74,7 +74,7 @@ function RailLink({ href, icon, label, active, dot }: { href: string; icon: Icon
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Link href={href} aria-label={label} aria-current={active ? "page" : undefined} data-active={active || undefined} className={railItem}>
+        <Link href={href} prefetch={href === "/logout" ? false : undefined} aria-label={label} aria-current={active ? "page" : undefined} data-active={active || undefined} className={railItem}>
           <Icon name={icon} size={20} variant={active ? "bold" : "linear"} />
           <Dot show={dot} />
         </Link>

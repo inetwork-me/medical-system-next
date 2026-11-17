@@ -16,29 +16,23 @@ export function PageContainer({ className, ...props }: React.ComponentProps<"div
 }
 
 /**
- * DS sheet 08 · Page Header / Page Header Stacked.
- * md+: title (H1 30 SemiBold) + description (14 muted) at the start, actions at the end aligned to the bottom.
- * Mobile: stacked — title 24, actions in a row of equal lg buttons (wrap children in <PageActions>).
+ * DS sheet 08 · Page Header. The page title, breadcrumb and back link live in the app header (see page-title.tsx),
+ * so the page header is the tabs row. xl: tabs at the start, actions at the end. md–lg: tabs, then the actions under
+ * them (start-aligned). Mobile: actions (equal lg buttons) above the tabs. Without tabs the actions sit at the end.
  */
-export function PageHeader({
-  title,
-  description,
-  actions,
-  className,
-}: {
-  title: React.ReactNode
-  description?: React.ReactNode
-  actions?: React.ReactNode
-  className?: string
-}) {
+export function PageHeader({ tabs, actions, className }: { tabs?: React.ReactNode; actions?: React.ReactNode; className?: string }) {
+  if (!tabs && !actions) return null
   return (
-    <div className={cn("flex flex-col gap-4 md:flex-row md:items-end md:gap-4", className)}>
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">{title}</h1>
-        {description && <p className="text-sm text-muted-foreground">{description}</p>}
-      </div>
+    <div className={cn("flex flex-col gap-4 md:gap-3 xl:flex-row xl:items-center", className)}>
+      {tabs && <div className="order-2 min-w-0 md:order-1 xl:flex-1">{tabs}</div>}
       {actions && (
-        <div className="flex gap-2 *:data-[slot=button]:h-10 *:data-[slot=button]:flex-1 *:data-[slot=button]:px-6 md:*:data-[slot=button]:h-9 md:*:data-[slot=button]:flex-none md:*:data-[slot=button]:px-4">
+        <div
+          className={cn(
+            "order-1 flex gap-2 md:order-2 xl:ms-auto",
+            "*:data-[slot=button]:h-10 *:data-[slot=button]:flex-1 *:data-[slot=button]:px-6 md:*:data-[slot=button]:h-9 md:*:data-[slot=button]:flex-none md:*:data-[slot=button]:px-4",
+            !tabs && "md:justify-end"
+          )}
+        >
           {actions}
         </div>
       )}

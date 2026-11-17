@@ -13,7 +13,8 @@ import { StatCard } from "@/components/ds/stat-card"
 import { EmptyState } from "@/components/ds/states"
 import type { StatusTone } from "@/components/ds/status-badge"
 import { Widget, WidgetMenu } from "@/components/ds/widget"
-import { ModuleTabsNav, PageContainer } from "@/components/shell/page"
+import { ModuleTabsNav, PageContainer, PageHeader } from "@/components/shell/page"
+import { PageTitle } from "@/components/shell/page-title"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart"
@@ -45,6 +46,7 @@ export function ReportShell({
   children: React.ReactNode
 }) {
   const t = useTranslations("patients.reports")
+  const tp = useTranslations("patients")
   const { patients } = usePatientsStore()
   const total = patients.length || allPatients().length
   const exportCsv = () => {
@@ -60,29 +62,35 @@ export function ReportShell({
   }
   return (
     <PageContainer>
-      <Button variant="ghost" size="sm" className="-ms-2 w-fit" asChild>
+      <PageTitle
+        title={t(`cards.${report}.title`)}
+        back="/patients/reports"
+        crumbs={[
+          { label: tp("title"), href: "/patients" },
+          { label: t("back"), href: "/patients/reports" },
+        ]}
+      />
+      <Button variant="ghost" size="sm" className="-ms-2 -mb-2 w-fit md:hidden" asChild>
         <Link href="/patients/reports">
           <Icon name="arrow-left" size={20} />
           {t("back")}
         </Link>
       </Button>
-      <div className="flex flex-col gap-4 md:flex-row md:items-end">
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{t(`cards.${report}.title`)}</h1>
-          <p className="text-sm text-muted-foreground">{t(`cards.${report}.page`)}</p>
-        </div>
-        <div className="flex gap-2 *:flex-1 md:*:flex-none">
-          <Button variant="outline" className="h-10 md:h-9" onClick={() => window.print()}>
-            <Icon name="printer" size={20} />
-            {t("print")}
-          </Button>
-          <Button className="h-10 md:h-9" onClick={exportCsv}>
-            <Icon name="export" size={20} />
-            {t("export")}
-          </Button>
-        </div>
-      </div>
-      <ModuleTabsNav module="patients" counts={{ list: total.toLocaleString("en-US") }} />
+      <PageHeader
+        tabs={<ModuleTabsNav module="patients" counts={{ list: total.toLocaleString("en-US") }} />}
+        actions={
+          <>
+            <Button variant="outline" onClick={() => window.print()}>
+              <Icon name="printer" size={20} />
+              {t("print")}
+            </Button>
+            <Button onClick={exportCsv}>
+              <Icon name="export" size={20} />
+              {t("export")}
+            </Button>
+          </>
+        }
+      />
       {filters}
       {kpis}
       {children}

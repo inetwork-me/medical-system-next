@@ -16,7 +16,7 @@ import { usePatientsStore } from "@/modules/patients/store"
  * Shared Patients module frame: page header (Export → dialog, Add patient → wizard) + module tabs
  * (Patients list · count / Reports / Payments).
  */
-export function PatientsFrame({ tab, children }: { tab: "list" | "reports" | "payments"; children?: React.ReactNode }) {
+export function PatientsFrame({ children }: { tab: "list" | "reports" | "payments"; children?: React.ReactNode }) {
   const t = useTranslations("patients")
   const { patients } = usePatientsStore()
   const [exportOpen, setExportOpen] = React.useState(false)
@@ -25,8 +25,7 @@ export function PatientsFrame({ tab, children }: { tab: "list" | "reports" | "pa
   return (
     <PageContainer>
       <PageHeader
-        title={t("title")}
-        description={t(`description.${tab}`)}
+        tabs={<ModuleTabsNav module="patients" counts={{ list: total.toLocaleString("en-US") }} />}
         actions={
           <>
             <Button variant="outline" onClick={() => setExportOpen(true)}>
@@ -42,7 +41,6 @@ export function PatientsFrame({ tab, children }: { tab: "list" | "reports" | "pa
           </>
         }
       />
-      <ModuleTabsNav module="patients" counts={{ list: total.toLocaleString("en-US") }} />
       {children}
       {exportOpen && <ExportRows open={exportOpen} onOpenChange={setExportOpen} />}
     </PageContainer>

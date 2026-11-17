@@ -13,6 +13,7 @@ import { Segmented } from "@/components/ds/segmented"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
 import { MobileActionBar, PageContainer } from "@/components/shell/page"
+import { PageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
@@ -66,6 +67,7 @@ type Data = NonNullable<ReturnType<typeof usePatient>>
 
 function EditForm_({ patient: p, record }: { patient: Patient; record: Data["record"] }) {
   const t = useTranslations("patients.edit")
+  const tp = useTranslations("patients")
   const { b, locale } = useText()
   const router = useRouter()
   const { save, savedForm } = usePatientsStore()
@@ -165,7 +167,15 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
       </div>
 
       <PageContainer className="gap-4 md:gap-6">
-        <Heading patient={p} onCancel={leave} onSave={onSave} />
+        <PageTitle
+          title={t("title")}
+          back={back}
+          crumbs={[
+            { label: tp("title"), href: "/patients" },
+            { label: b(p.name), href: `/patients/${p.id}` },
+          ]}
+        />
+        <Heading onCancel={leave} onSave={onSave} />
 
         {submitted && visibleErrors.length > 0 && (
           <div ref={summaryRef} tabIndex={-1} role="alert" className="flex flex-col gap-2 rounded-xl bg-destructive-soft p-4 text-destructive-soft-foreground outline-none">
@@ -253,44 +263,10 @@ function LastUpdated({ date, by }: { date: string; by: string }) {
 
 /* ================================================================== heading */
 
-function Heading({ patient, onCancel, onSave }: { patient: Patient; onCancel: () => void; onSave: () => void }) {
+function Heading({ onCancel, onSave }: { onCancel: () => void; onSave: () => void }) {
   const t = useTranslations("patients")
-  const { b } = useText()
   return (
-    <div className="hidden items-center gap-3 md:flex">
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon-sm" aria-label={t("edit.back")} onClick={onCancel}>
-            <Icon name="arrow-left" size={20} />
-          </Button>
-          <h1 className="text-xl font-semibold">{t("edit.title")}</h1>
-        </div>
-        <nav aria-label={t("page.breadcrumb")}>
-          <ol className="flex flex-wrap items-center gap-1.5 text-xs">
-            {(
-              [
-                [t("page.dashboard"), "/dashboard"],
-                [t("title"), "/patients"],
-                [b(patient.name), `/patients/${patient.id}`],
-              ] as const
-            ).map(([label, href]) => (
-              <React.Fragment key={href}>
-                <li>
-                  <Link href={href} className="text-primary hover:underline">
-                    {label}
-                  </Link>
-                </li>
-                <li aria-hidden className="text-muted-foreground">
-                  /
-                </li>
-              </React.Fragment>
-            ))}
-            <li aria-current="page" className="font-medium text-foreground">
-              {t("edit.crumb")}
-            </li>
-          </ol>
-        </nav>
-      </div>
+    <div className="hidden items-center justify-end gap-3 md:flex">
       <div className="flex items-center gap-2">
         <Button variant="outline" onClick={onCancel}>
           <Icon name="close-circle" size={20} />

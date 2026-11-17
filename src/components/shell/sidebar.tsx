@@ -100,6 +100,7 @@ function NavRow({
   return (
     <Link
       href={href}
+      prefetch={href === "/logout" ? false : undefined}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(rowBase, active && "bg-sidebar-accent text-sidebar-accent-foreground")}

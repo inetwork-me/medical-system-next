@@ -7,6 +7,7 @@ import { SESSION_USER } from "@/lib/mock/shell"
 import { Icon } from "@/components/ds/icon"
 import { Button } from "@/components/ui/button"
 import { PageContainer, PageHeader } from "@/components/shell/page"
+import { PageTitle } from "@/components/shell/page-title"
 import { DashboardExport } from "@/modules/dashboard/export"
 import { AppointmentsWidget, AttentionWidget, BedsWidget, KpiRow, VisitsWidget } from "@/modules/dashboard/widgets"
 
@@ -27,9 +28,8 @@ export default async function DashboardPage() {
 
   return (
     <PageContainer>
+      <PageTitle title={t("title", { name: bi(SESSION_USER.shortName, locale) })} />
       <PageHeader
-        title={t("title", { name: bi(SESSION_USER.shortName, locale) })}
-        description={t("description")}
         actions={
           <>
             <DashboardExport />

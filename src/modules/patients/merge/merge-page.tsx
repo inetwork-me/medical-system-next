@@ -13,6 +13,7 @@ import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
 import { MobileActionBar, PageContainer } from "@/components/shell/page"
+import { PageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
 import { TODAY, type Patient, type Tag } from "../data"
 import { applyForm } from "../edit/apply"
@@ -214,18 +215,8 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
       </div>
 
       <PageContainer className="gap-4 md:gap-6">
-        <div className="hidden items-center gap-3 md:flex">
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon-sm" asChild>
-                <Link href="/patients?chip=duplicate" aria-label={t("back")}>
-                  <Icon name="arrow-left" size={20} />
-                </Link>
-              </Button>
-              <h1 className="text-xl font-semibold">{t("title")}</h1>
-            </div>
-            <Crumbs />
-          </div>
+        <MergeTitle />
+        <div className="hidden items-center justify-end gap-3 md:flex">
           <div className="flex items-center gap-2">
             <Button variant="outline" asChild>
               <Link href={`/patients/${keep.patient.id}`}>
@@ -411,32 +402,17 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
   )
 }
 
-function Crumbs() {
+function MergeTitle() {
   const t = useTranslations("patients")
   return (
-    <nav aria-label={t("page.breadcrumb")}>
-      <ol className="flex flex-wrap items-center gap-1.5 text-xs">
-        <li>
-          <Link href="/patients" className="text-primary hover:underline">
-            {t("title")}
-          </Link>
-        </li>
-        <li aria-hidden className="text-muted-foreground">
-          /
-        </li>
-        <li>
-          <Link href="/patients?chip=duplicate" className="text-primary hover:underline">
-            {t("merge.crumbDup")}
-          </Link>
-        </li>
-        <li aria-hidden className="text-muted-foreground">
-          /
-        </li>
-        <li aria-current="page" className="font-medium text-foreground">
-          {t("merge.crumb")}
-        </li>
-      </ol>
-    </nav>
+    <PageTitle
+      title={t("merge.title")}
+      back="/patients?chip=duplicate"
+      crumbs={[
+        { label: t("title"), href: "/patients" },
+        { label: t("merge.crumbDup"), href: "/patients?chip=duplicate" },
+      ]}
+    />
   )
 }
 

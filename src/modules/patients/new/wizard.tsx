@@ -13,6 +13,7 @@ import { DatePicker } from "@/components/ds/pickers"
 import { Segmented } from "@/components/ds/segmented"
 import { DropZone, UploadItem, toMb } from "@/components/ds/upload"
 import { MobileActionBar, PageContainer } from "@/components/shell/page"
+import { PageTitle } from "@/components/shell/page-title"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { TODAY, findByNationalId, type Patient, type Tag } from "../data"
@@ -284,11 +285,8 @@ export function NewPatientWizard() {
       </div>
 
       <PageContainer className="gap-4 md:gap-6">
-        <div ref={top} className="hidden scroll-mt-24 items-center gap-3 md:flex">
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <h1 className="text-xl font-semibold">{t("title")}</h1>
-            <Breadcrumb />
-          </div>
+        <WizardTitle />
+        <div ref={top} className="hidden scroll-mt-24 items-center justify-end gap-3 md:flex">
           {!done && (
             <div className="flex items-center gap-2">
               <Button variant="ghost" onClick={saveDraft}>
@@ -372,33 +370,9 @@ export function NewPatientWizard() {
   )
 }
 
-function Breadcrumb() {
+function WizardTitle() {
   const t = useTranslations("patients")
-  return (
-    <nav aria-label={t("page.breadcrumb")}>
-      <ol className="flex flex-wrap items-center gap-1.5 text-xs">
-        <li>
-          <Link href="/dashboard" className="text-primary hover:underline">
-            {t("page.dashboard")}
-          </Link>
-        </li>
-        <li aria-hidden className="text-muted-foreground">
-          /
-        </li>
-        <li>
-          <Link href="/patients" className="text-primary hover:underline">
-            {t("title")}
-          </Link>
-        </li>
-        <li aria-hidden className="text-muted-foreground">
-          /
-        </li>
-        <li aria-current="page" className="font-medium text-foreground">
-          {t("new.crumb")}
-        </li>
-      </ol>
-    </nav>
-  )
+  return <PageTitle title={t("new.title")} back="/patients" crumbs={[{ label: t("title"), href: "/patients" }]} />
 }
 
 /* ================================================================== stepper */

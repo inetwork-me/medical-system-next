@@ -5,21 +5,15 @@ import { useLocale, useTranslations } from "next-intl"
 import { notify } from "@/components/ds/toast"
 
 import { Link } from "@/i18n/navigation"
-import { IfModule } from "@/lib/modules"
+import { isModuleEnabled } from "@/lib/modules"
 import { bi } from "@/lib/mock/bi"
+import { ActionMenu } from "@/components/ds/action-menu"
 import { Field } from "@/components/ds/field"
 import { Icon } from "@/components/ds/icon"
 import { RadioOption } from "@/components/ds/radio-option"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { RadioGroup } from "@/components/ui/radio-group"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
@@ -27,10 +21,11 @@ import type { Patient } from "../data"
 import { toggleTag, usePatientsStore } from "../store"
 
 /**
- * Overlay · Row actions menu (anchored, bottom-end): View profile · Edit details · Book visit | Mark as VIP ·
- * Merge with another file | Ban patient · Archive file (destructive). Ban / Archive confirm in dialogs.
+ * Overlay · Row actions menu: View profile · Edit details · Book visit | Mark as VIP · Merge with another file |
+ * Ban patient · Archive file (destructive). Dropdown on desktop, bottom sheet (name + MRN) on mobile.
+ * Ban / Archive confirm in dialogs.
  */
-export function RowActions({ patient, trigger }: { patient: Patient; trigger?: React.ReactNode }) {
+export function RowActions({ patient, trigger }: { patient: Patient; trigger?: React.ReactElement }) {
   const t = useTranslations("patients")
   const locale = useLocale()
   const { setTags } = usePatientsStore()
@@ -40,64 +35,45 @@ export function RowActions({ patient, trigger }: { patient: Patient; trigger?: R
 
   return (
     <>
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
-          {trigger ?? (
+      <ActionMenu
+        title={name}
+        description={<bdi dir="ltr">MRN {patient.mrn}</bdi>}
+        trigger={
+          trigger ?? (
             <Button variant="ghost" size="icon-sm" aria-label={t("list.rowActions", { name })}>
               <Icon name="more" size={16} />
             </Button>
-          )}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-60">
-          <DropdownMenuItem asChild>
-            <Link href={`/patients/${patient.id}`}>
-              <Icon name="eye" size={16} />
-              {t("rowMenu.view")}
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={`/patients/${patient.id}/edit`}>
-              <Icon name="edit-2" size={16} />
-              {t("rowMenu.edit")}
-            </Link>
-          </DropdownMenuItem>
-          <IfModule id="appointments">
-            <DropdownMenuItem asChild>
-              <Link href={`/patients/${patient.id}?action=book`}>
-                <Icon name="calendar-add" size={16} />
-                {t("rowMenu.book")}
-              </Link>
-            </DropdownMenuItem>
-          </IfModule>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onSelect={() => {
-              setTags(patient.id, toggleTag(patient.tags, "vip", !isVip))
-              notify.success(isVip ? t("vipToast.off") : t("vipToast.on"), { description: t("vipToast.text", { name }) })
-            }}
-          >
-            <Icon name="star-1" size={16} />
-            {isVip ? t("rowMenu.unvip") : t("rowMenu.vip")}
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={`/patients/merge?a=${patient.id}${patient.duplicateOf ? `&b=${patient.duplicateOf}` : ""}`}>
-              <Icon name="people" size={16} />
-              {t("rowMenu.merge")}
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          {!patient.tags.includes("banned") && (
-            <DropdownMenuItem variant="destructive" onSelect={() => setDialog("ban")}>
-              <Icon name="lock" size={16} />
-              {t("rowMenu.ban")}
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem variant="destructive" onSelect={() => setDialog("archive")}>
-            <Icon name="trash" size={16} />
-            {t("rowMenu.archive")}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          )
+        }
+        groups={[
+          [
+            { key: "view", icon: "eye", label: t("rowMenu.view"), href: `/patients/${patient.id}` },
+            { key: "edit", icon: "edit-2", label: t("rowMenu.edit"), href: `/patients/${patient.id}/edit` },
+            isModuleEnabled("appointments") && { key: "book", icon: "calendar-add", label: t("rowMenu.book"), href: `/patients/${patient.id}?action=book` },
+          ],
+          [
+            {
+              key: "vip",
+              icon: "star-1",
+              label: isVip ? t("rowMenu.unvip") : t("rowMenu.vip"),
+              onSelect: () => {
+                setTags(patient.id, toggleTag(patient.tags, "vip", !isVip))
+                notify.success(isVip ? t("vipToast.off") : t("vipToast.on"), { description: t("vipToast.text", { name }) })
+              },
+            },
+            {
+              key: "merge",
+              icon: "people",
+              label: t("rowMenu.merge"),
+              href: `/patients/merge?a=${patient.id}${patient.duplicateOf ? `&b=${patient.duplicateOf}` : ""}`,
+            },
+          ],
+          [
+            !patient.tags.includes("banned") && { key: "ban", icon: "lock", label: t("rowMenu.ban"), destructive: true, onSelect: () => setDialog("ban") },
+            { key: "archive", icon: "trash", label: t("rowMenu.archive"), destructive: true, onSelect: () => setDialog("archive") },
+          ],
+        ]}
+      />
       <BanDialog patient={patient} open={dialog === "ban"} onOpenChange={(o) => setDialog(o ? "ban" : null)} />
       <ArchiveDialog patient={patient} open={dialog === "archive"} onOpenChange={(o) => setDialog(o ? "archive" : null)} />
     </>
@@ -183,7 +159,7 @@ export function ArchiveDialog({
   // Mock: the design's sample (Fahad) has 1 upcoming visit and SAR 180 due; others none.
   const sample = patient.id === "004891"
   const rows: [string, React.ReactNode][] = [
-    [t("patient"), <>{name} · <bdi dir="ltr">{patient.mrn}</bdi></>],
+    [t("patient"), <>{name} · <bdi dir="ltr">{locale === "ar" ? patient.mrn : `MRN ${patient.mrn}`}</bdi></>],
     [t("upcoming"), t("upcomingValue", { count: sample ? 1 : 0 })],
     [t("balance"), ts("sar", { amount: sample ? 180 : 0 })],
   ]

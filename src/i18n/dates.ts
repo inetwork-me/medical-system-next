@@ -23,15 +23,15 @@ export function dateFormatter(locale: string) {
   }
   const toDate = (d: Date | string) => (typeof d === "string" ? parseDay(d) : d)
   return {
-    /** 15 Nov 2026 */
-    short: (d: Date | string) => fmt({ day: "numeric", month: "short", year: "numeric" }).format(toDate(d)),
+    /** 02 Nov 2026 (design: two-digit day) */
+    short: (d: Date | string) => fmt({ day: "2-digit", month: "short", year: "numeric" }).format(toDate(d)),
     /** 04/07/1988 — date fields (DS date picker value), same in both languages */
     numeric: (d: Date | string) => {
       const x = toDate(d)
       return `${String(x.getDate()).padStart(2, "0")}/${String(x.getMonth() + 1).padStart(2, "0")}/${x.getFullYear()}`
     },
     /** 15 November 2026 */
-    long: (d: Date | string) => fmt({ day: "numeric", month: "long", year: "numeric" }).format(toDate(d)),
+    long: (d: Date | string) => fmt({ day: "2-digit", month: "long", year: "numeric" }).format(toDate(d)),
     /** 15 Nov */
     dayMonth: (d: Date | string) => fmt({ day: "numeric", month: "short" }).format(toDate(d)),
     /** Wednesday, 18 November */

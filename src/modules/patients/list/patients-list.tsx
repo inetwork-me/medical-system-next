@@ -155,10 +155,10 @@ export function PatientsList() {
                       aria-label={t("selectAll")}
                     />
                   </TableHead>
-                  <TableHead>{t("columns.patient")}</TableHead>
+                  <TableHead className="xl:w-58.5">{t("columns.patient")}</TableHead>
                   <TableHead className="hidden w-30 xl:table-cell">{t("columns.phone")}</TableHead>
                   <TableHead className="hidden w-22.5 xl:table-cell">{t("columns.region")}</TableHead>
-                  <TableHead className="xl:w-58">{t("columns.tags")}</TableHead>
+                  <TableHead>{t("columns.tags")}</TableHead>
                   <TableHead className="w-26">{t("columns.lastVisit")}</TableHead>
                   <TableHead className="hidden w-14 xl:table-cell">{t("columns.visits")}</TableHead>
                   <TableHead className="w-18">
@@ -276,8 +276,8 @@ function PatientCard({ p }: { p: Patient }) {
   const t = useTranslations("patients.list")
   const r = useRowText(p)
   return (
-    <li className="border-b last:border-0">
-      <Link href={`/patients/${p.id}`} className="flex items-start gap-3 rounded-lg px-1 py-3 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
+    <li className="flex items-start gap-1 border-b last:border-0">
+      <Link href={`/patients/${p.id}`} className="flex min-w-0 flex-1 items-start gap-3 rounded-lg px-1 py-3 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
         <Avatar>
           <AvatarFallback>{p.initials}</AvatarFallback>
         </Avatar>
@@ -290,8 +290,10 @@ function PatientCard({ p }: { p: Patient }) {
           {p.tags.length > 0 && <PatientTags tags={p.tags} />}
           <p className="text-xs text-muted-foreground">{t("lastVisitLine", { date: r.lastVisit })}</p>
         </div>
-        <Icon name="arrow-right-1" size={16} className="mt-1 text-muted-foreground" />
       </Link>
+      <div className="pt-2.5">
+        <RowActions patient={p} />
+      </div>
     </li>
   )
 }

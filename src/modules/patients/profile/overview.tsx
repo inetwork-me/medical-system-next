@@ -586,7 +586,7 @@ const signed = (v: number, n: (v: number) => string) => (v < 0 ? `−${n(Math.ab
 
 function BillRow({ label, amount, kind, n }: { label: string; amount?: number; kind: "group" | "item" | "total"; n: (v: number) => string }) {
   return (
-    <div className={cn("flex items-center gap-2 border-b px-3 py-2.5 text-xs last:border-0", kind === "item" && "ps-6", kind === "total" && "bg-muted")}>
+    <div className={cn("flex items-center gap-2 border-b px-3 py-2.5 text-xs last:border-0", kind === "item" && "pe-6", kind === "total" && "bg-muted")}>
       <span className={cn("flex-1", kind === "item" ? "text-muted-foreground" : "font-medium")}>{label}</span>
       {amount !== undefined && (
         <bdi dir="ltr" className={cn("font-medium tabular-nums", kind === "total" && "text-sm text-warning-soft-foreground")}>

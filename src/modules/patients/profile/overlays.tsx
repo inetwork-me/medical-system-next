@@ -83,7 +83,7 @@ export function OverlayProvider({ children, initial }: { children: React.ReactNo
 
 function KV({ rows, className }: { rows: [string, React.ReactNode][]; className?: string }) {
   return (
-    <dl className={cn("overflow-hidden rounded-lg bg-muted", className)}>
+    <dl className={cn("shrink-0 overflow-hidden rounded-lg bg-muted", className)}>
       {rows.map(([k, v]) => (
         <div key={k} className="flex items-start gap-3 border-b border-border px-3 py-2.5 text-xs last:border-0">
           <dt className="flex-1 text-muted-foreground">{k}</dt>
@@ -1034,7 +1034,7 @@ function Viewer({ record, name, onClose }: { record: PatientRecord; name: string
             <Icon name="arrow-left-1" size={16} />
           </button>
           <span className="font-medium text-zinc-50">
-            {page} / {pages}
+            <bdi dir="ltr">{page} / {pages}</bdi>
           </span>
           <button
             type="button"
@@ -1082,7 +1082,7 @@ function Sms({ patient, record, onClose }: { patient: Patient; record: PatientRe
             name: first,
             clinic: next.clinic ? b(next.clinic) : "",
             doctor: next.doctor ? b(next.doctor) : "",
-            when: `${day(next.date)} ${next.time ?? ""}`.trim(),
+            when: next.time ? t("dayAt", { day: day(next.date), time: next.time }) : day(next.date),
           })
         : t("bodies.reminderNone")
       : tpl === "results"

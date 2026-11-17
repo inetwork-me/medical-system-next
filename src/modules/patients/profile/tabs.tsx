@@ -84,7 +84,7 @@ function Filters({ select, chips }: { select: React.ReactNode; chips: React.Reac
   return (
     <div className="flex flex-col gap-3 @min-[45rem]/tab:flex-row @min-[45rem]/tab:flex-wrap @min-[45rem]/tab:items-center">
       {select}
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] @min-[45rem]/tab:mx-0 @min-[45rem]/tab:px-0">{chips}</div>
+      <div className="flex flex-wrap gap-2">{chips}</div>
     </div>
   )
 }
@@ -555,7 +555,7 @@ export function MedicalTab() {
 
       <div className={pair}>
         <PCard title={t("medical.vitals")} description={hist.length ? t("medical.vitalsText", { count: hist.length }) : undefined}>
-          <dl className="grid grid-cols-2 gap-2 @min-[24rem]/tab:grid-cols-4">
+          <dl className="grid grid-cols-4 gap-2">
             {vit.map(([k, v]) => (
               <div key={k} className="flex flex-col gap-0.5 rounded-lg bg-muted p-2.5">
                 <dt className="text-xs text-muted-foreground">{k}</dt>
@@ -665,17 +665,17 @@ export function FilesTab() {
         title={t("title")}
         description={t("count", {
           count: files.length,
-          size: fmtSize(summary.filesBytes),
+          size: locale === "ar" ? fmtSize(summary.filesBytes).replace(" MB", " ميجا").replace(" KB", " كيلو") : fmtSize(summary.filesBytes),
         })}
       >
-        <div className="-mx-5 flex gap-2 overflow-x-auto px-5 [scrollbar-width:none]">
+        <div className="flex flex-wrap gap-2">
           {groups.map((g) => (
             <FilterChip key={g} selected={group === g} count={count(g)} onClick={() => setGroup(g)}>
               {t(g)}
             </FilterChip>
           ))}
         </div>
-        <ul className="grid gap-3 @min-[45rem]/tab:grid-cols-2">
+        <ul className="grid grid-cols-[minmax(0,1fr)] gap-3 @min-[45rem]/tab:grid-cols-2">
           {shown.map((f) => (
             <li key={f.name} className="flex items-center gap-3 rounded-xl border bg-card p-3">
               <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-accent text-primary">

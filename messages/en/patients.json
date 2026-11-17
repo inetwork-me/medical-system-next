@@ -1387,7 +1387,8 @@
         "results": "{name}'s results are ready. Open the app or call us to review them with the doctor.",
         "payment": "A balance of SAR {amount} is due on {name}'s file. Pay at the desk or in the app."
       },
-      "noPhone": "No mobile number on this file."
+      "noPhone": "No mobile number on this file.",
+      "dayAt": "{day} at {time}"
     }
   }
 }

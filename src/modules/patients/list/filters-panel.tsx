@@ -169,7 +169,7 @@ export function FiltersPanel({ open, onOpenChange }: { open: boolean; onOpenChan
             <DrawerDescription>{t("description")}</DrawerDescription>
           </DrawerHeader>
           <DrawerBody>{body}</DrawerBody>
-          <DrawerFooter className="flex-row *:data-[slot=button]:flex-1">{actions}</DrawerFooter>
+          <DrawerFooter className="flex-col-reverse *:data-[slot=button]:w-full">{actions}</DrawerFooter>
         </DrawerContent>
       </Drawer>
     )

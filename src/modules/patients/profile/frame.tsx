@@ -8,11 +8,11 @@ import { notify } from "@/components/ds/toast"
 import { cn } from "@/lib/utils"
 import { Link, useRouter } from "@/i18n/navigation"
 import { IfModule } from "@/lib/modules"
+import { ActionMenu } from "@/components/ds/action-menu"
 import { Icon } from "@/components/ds/icon"
 import { EmptyState } from "@/components/ds/states"
 import { PageContainer } from "@/components/shell/page"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import type { Patient } from "../data"
 import { BanDialog, ArchiveDialog } from "../list/row-actions"
 import { toggleTag, usePatientsStore } from "../store"
@@ -170,56 +170,49 @@ function MoreActions({ patient, variant = "outline" }: { patient: Patient; varia
 
   return (
     <>
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
+      <ActionMenu
+        title={t("page.more")}
+        width="w-60"
+        trigger={
           <Button variant={variant} size="icon" aria-label={t("page.more")}>
             <Icon name="more" size={20} />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onSelect={() => window.print()}>
-            <Icon name="printer" size={16} />
-            {t("page.menu.print")}
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled={!data || exports.busy} onSelect={() => data && void exports.summaryPdf(data.patient, data.record)}>
-            <Icon name="document-download" size={16} />
-            {t("page.menu.pdf")}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => overlay.open({ kind: "sms" })}>
-            <Icon name="sms" size={16} />
-            {t("page.menu.sms")}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onSelect={() => {
-              setTags(patient.id, toggleTag(patient.tags, "vip", !isVip))
-              notify.success(isVip ? t("vipToast.off") : t("vipToast.on"), {
-                description: t("vipToast.text", { name }),
-              })
-            }}
-          >
-            <Icon name="star-1" size={16} />
-            {isVip ? t("rowMenu.unvip") : t("rowMenu.vip")}
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={`/patients/merge?a=${patient.id}${patient.duplicateOf ? `&b=${patient.duplicateOf}` : ""}`}>
-              <Icon name="people" size={16} />
-              {t("rowMenu.merge")}
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          {!patient.tags.includes("banned") && (
-            <DropdownMenuItem variant="destructive" onSelect={() => setDialog("ban")}>
-              <Icon name="lock" size={16} />
-              {t("rowMenu.ban")}
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem variant="destructive" onSelect={() => setDialog("archive")}>
-            <Icon name="trash" size={16} />
-            {t("rowMenu.archive")}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        }
+        groups={[
+          [
+            { key: "print", icon: "printer", label: t("page.menu.print"), onSelect: () => window.print() },
+            {
+              key: "pdf",
+              icon: "document-download",
+              label: t("page.menu.pdf"),
+              disabled: !data || exports.busy,
+              onSelect: () => data && void exports.summaryPdf(data.patient, data.record),
+            },
+            { key: "sms", icon: "sms", label: t("page.menu.sms"), onSelect: () => overlay.open({ kind: "sms" }) },
+          ],
+          [
+            {
+              key: "vip",
+              icon: "star-1",
+              label: isVip ? t("rowMenu.unvip") : t("rowMenu.vip"),
+              onSelect: () => {
+                setTags(patient.id, toggleTag(patient.tags, "vip", !isVip))
+                notify.success(isVip ? t("vipToast.off") : t("vipToast.on"), { description: t("vipToast.text", { name }) })
+              },
+            },
+            {
+              key: "merge",
+              icon: "people",
+              label: t("rowMenu.merge"),
+              href: `/patients/merge?a=${patient.id}${patient.duplicateOf ? `&b=${patient.duplicateOf}` : ""}`,
+            },
+          ],
+          [
+            !patient.tags.includes("banned") && { key: "ban", icon: "lock", label: t("rowMenu.ban"), destructive: true, onSelect: () => setDialog("ban") },
+            { key: "archive", icon: "trash", label: t("rowMenu.archive"), destructive: true, onSelect: () => setDialog("archive") },
+          ],
+        ]}
+      />
       <BanDialog patient={patient} open={dialog === "ban"} onOpenChange={(o) => setDialog(o ? "ban" : null)} />
       <ArchiveDialog
         patient={patient}

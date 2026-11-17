@@ -505,7 +505,7 @@ const FAHAD_RECORD: Omit<PatientRecord, "details" | "missing"> = {
       date: "2026-10-28",
       body: {
         en: "Symptoms improved. Added budesonide 200 mcg twice daily. Review in 3 weeks with an ACT score.",
-        ar: "الأعراض تحسنت. أضفنا بوديسونيد 200 ميكروغرام مرتين باليوم. نراجع بعد 3 أسابيع مع اختبار السيطرة على الربو.",
+        ar: "الأعراض تحسنت. أضفنا بوديسونيد 200 ميكروغرام مرتين باليوم. نراجع بعد 3 أسابيع.",
       },
     },
     {

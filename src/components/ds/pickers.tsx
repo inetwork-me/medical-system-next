@@ -99,7 +99,7 @@ export function DateRangePicker({
   const [open, setOpen] = React.useState(false)
   const [draft, setDraft] = React.useState<DateRange | undefined>(value)
   const label = (r?: DateRange) =>
-    r?.from && r.to ? dates.range(r.from, r.to) : r?.from ? dates.short(r.from) : ""
+    r?.from && r.to ? `${dates.numeric(r.from)} – ${dates.numeric(r.to)}` : r?.from ? dates.numeric(r.from) : ""
   const days = draft?.from && draft.to ? Math.round((+draft.to - +draft.from) / 86_400_000) + 1 : 0
 
   return (

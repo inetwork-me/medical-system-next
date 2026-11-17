@@ -45,7 +45,8 @@ export function PageTitle(props: PageTitleValue) {
 function useDefaultTitle(): PageTitleValue {
   const { current, pathname, label, tabLabel, t } = useNav()
   if (!current) return { title: "" }
-  if (current.id === "dashboard") return { title: label(current) }
+  // Dashboard: the greeting lives in the page (beside Export / New appointment), the top bar stays empty.
+  if (current.id === "dashboard") return { title: "" }
   const tab = activeTab(current, pathname)
   if (!tab?.ownTitle) return { title: label(current), crumbs: [{ label: t("nav.home"), href: "/dashboard" }] }
   return { title: tabLabel(current, tab.key), crumbs: [{ label: label(current), href: current.href }] }
@@ -90,7 +91,7 @@ export function HeaderTitle({ className }: { className?: string }) {
             </ol>
           </nav>
         )}
-        <h1 className="truncate text-lg leading-7 font-semibold text-foreground">{title}</h1>
+        {title && <h1 className="truncate text-lg leading-7 font-semibold text-foreground">{title}</h1>}
       </div>
     </div>
   )

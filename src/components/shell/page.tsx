@@ -10,9 +10,9 @@ import { activeTab, moduleTabs } from "@/lib/modules"
 import { Icon } from "@/components/ds/icon"
 import { useNav } from "./use-shell"
 
-/** Page content area (sheet 06): fluid up to 1536px, p-4 / md:p-6 / lg:p-8, sections gap-6. */
+/** Page content area (sheet 06): fills the space beside the sidebar / rail (grows when it collapses), p-4 / md:p-6 / lg:p-8, gap-6. */
 export function PageContainer({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("mx-auto flex w-full max-w-screen-2xl flex-col gap-6 p-4 md:p-6 lg:p-8", className)} {...props} />
+  return <div className={cn("flex w-full flex-col gap-6 p-4 md:p-6 lg:p-8", className)} {...props} />
 }
 
 /**

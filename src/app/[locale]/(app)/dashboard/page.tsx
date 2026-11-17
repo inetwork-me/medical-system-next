@@ -6,7 +6,7 @@ import { bi } from "@/lib/mock/bi"
 import { SESSION_USER } from "@/lib/mock/shell"
 import { Icon } from "@/components/ds/icon"
 import { Button } from "@/components/ui/button"
-import { PageContainer, PageHeader } from "@/components/shell/page"
+import { PageContainer } from "@/components/shell/page"
 import { PageTitle } from "@/components/shell/page-title"
 import { DashboardExport } from "@/modules/dashboard/export"
 import { AppointmentsWidget, AttentionWidget, BedsWidget, KpiRow, VisitsWidget } from "@/modules/dashboard/widgets"
@@ -28,22 +28,22 @@ export default async function DashboardPage() {
 
   return (
     <PageContainer>
-      <PageTitle title={t("title", { name: bi(SESSION_USER.shortName, locale) })} />
-      <PageHeader
-        actions={
-          <>
-            <DashboardExport />
-            <IfModule id="appointments">
-              <Button asChild>
-                <Link href="/appointments">
-                  <Icon name="add" />
-                  {t("newAppointment")}
-                </Link>
-              </Button>
-            </IfModule>
-          </>
-        }
-      />
+      {/* Dashboard only: the greeting sits in the page, beside Export / New appointment — the top bar stays empty. */}
+      <PageTitle title="" />
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
+        <h1 className="min-w-0 flex-1 text-2xl font-semibold tracking-tight text-foreground">{t("title", { name: bi(SESSION_USER.shortName, locale) })}</h1>
+        <div className="flex gap-2 *:data-[slot=button]:h-10 *:data-[slot=button]:flex-1 *:data-[slot=button]:px-6 md:*:data-[slot=button]:h-9 md:*:data-[slot=button]:flex-none md:*:data-[slot=button]:px-4">
+          <DashboardExport />
+          <IfModule id="appointments">
+            <Button asChild>
+              <Link href="/appointments/new">
+                <Icon name="add" />
+                {t("newAppointment")}
+              </Link>
+            </Button>
+          </IfModule>
+        </div>
+      </div>
       <KpiRow />
       <div className="grid gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-3">
         <VisitsWidget className="order-1 md:col-span-2" />

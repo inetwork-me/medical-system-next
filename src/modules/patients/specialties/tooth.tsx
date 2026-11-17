@@ -4,7 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
-import { FDI_ROWS, isUpper, toothType, type DentalChart, type Surface, type SurfaceState, type ToothRecord, type ToothType } from "./data"
+import { DENTITION_ROWS, isUpper, toothType, type DentalChart, type Dentition, type Surface, type SurfaceState, type ToothRecord, type ToothType } from "./data"
 
 /**
  * Dental / Tooth (Widgets · Specialties widgets): number row (+ plan dot), 28×40 glyph (roots up for the upper arch,
@@ -44,8 +44,8 @@ function sector(a0: number, a1: number, R = 12.5, r = 5, n = 10) {
   const inner = Array.from({ length: n + 1 }, (_, k) => pt(r, a1 - ((a1 - a0) * k) / n))
   return `M${[...outer, ...inner].join(" L")} Z`
 }
-type Side = "top" | "right" | "bottom" | "left"
-const SECTORS: Record<Side, string> = {
+export type Side = "top" | "right" | "bottom" | "left"
+export const SECTORS: Record<Side, string> = {
   top: sector(227, 313),
   right: sector(-43, 43),
   bottom: sector(47, 133),
@@ -195,6 +195,20 @@ export function useToothLabel() {
   }
 }
 
+/** Chart layers (workspace toolbar): what each one keeps of a tooth record. */
+export type Layer = "all" | "existing" | "planned" | "done"
+export function layerOf(r: ToothRecord | undefined, layer: Layer): ToothRecord | undefined {
+  if (!r || layer === "all") return r
+  const keep: Record<Exclude<Layer, "all">, SurfaceState[]> = { existing: ["existing"], planned: ["decay"], done: ["done"] }
+  const surfaces = Object.fromEntries(Object.entries(r.surfaces ?? {}).filter(([, v]) => keep[layer].includes(v!)))
+  return {
+    state: r.state,
+    surfaces,
+    ...(layer === "planned" && r.planned ? { planned: true as const } : {}),
+    ...(layer === "planned" && r.marks ? { marks: r.marks } : {}),
+  }
+}
+
 /**
  * Widget / Dental Chart. Sizes: Full (50px cells), Mini (44, tab on desktop), Tablet (40), Compact (38; four rows of 8, tab on tablet / mobile).
  * Always laid out as you face the patient: patient's right on the viewer's left, in both languages.
@@ -204,20 +218,33 @@ export function DentalChartView({
   size,
   selected = chart.selected,
   onSelect,
+  dentition = "permanent",
+  layer = "all",
   className,
 }: {
   chart: DentalChart
   size: "full" | "mini" | "tablet" | "compact"
   selected?: number | null
   onSelect?: (fdi: number) => void
+  dentition?: Dentition
+  layer?: Layer
   className?: string
 }) {
+  const ROWS = DENTITION_ROWS[dentition]
   const t = useTranslations("specialties.dental")
   const label = useToothLabel()
   const cell = { full: 50, mini: 44, tablet: 40, compact: 38 }[size]
   const gap = { full: 4, mini: 2, tablet: 1, compact: 2 }[size]
   const tooth = (fdi: number) => (
-    <Tooth key={fdi} fdi={fdi} record={chart.teeth[fdi]} selected={fdi === selected} width={cell} onSelect={onSelect} label={label(fdi, chart.teeth[fdi])} />
+    <Tooth
+      key={fdi}
+      fdi={fdi}
+      record={layerOf(chart.teeth[fdi], layer)}
+      selected={fdi === selected}
+      width={cell}
+      onSelect={onSelect}
+      label={label(fdi, chart.teeth[fdi])}
+    />
   )
   return (
     <div dir="ltr" className={cn("flex w-full flex-col gap-2.5", className)}>
@@ -232,7 +259,7 @@ export function DentalChartView({
             <span className="text-xs font-medium text-foreground" dir="auto">
               {t(arch === "upper" ? "upperJaw" : "lowerJaw")}
             </span>
-            {FDI_ROWS[arch].map((half) => (
+            {ROWS[arch].map((half) => (
               <div key={half[0]} className="flex justify-center rounded-lg bg-muted py-1" style={{ gap }}>
                 {half.map(tooth)}
               </div>
@@ -245,11 +272,11 @@ export function DentalChartView({
             <React.Fragment key={arch}>
               <div className={cn("flex", arch === "upper" ? "items-end" : "items-start")}>
                 <div className="flex" style={{ gap }}>
-                  {FDI_ROWS[arch][0].map(tooth)}
+                  {ROWS[arch][0].map(tooth)}
                 </div>
                 <span aria-hidden className="mx-px h-24 w-px shrink-0 self-center bg-border" />
                 <div className="flex" style={{ gap }}>
-                  {FDI_ROWS[arch][1].map(tooth)}
+                  {ROWS[arch][1].map(tooth)}
                 </div>
               </div>
               {arch === "upper" && <span aria-hidden className="my-2 h-px w-full bg-border" />}

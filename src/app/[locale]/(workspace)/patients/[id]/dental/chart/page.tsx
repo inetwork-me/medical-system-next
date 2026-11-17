@@ -1,0 +1,23 @@
+import { getLocale, getTranslations } from "next-intl/server"
+import { notFound } from "next/navigation"
+
+import { bi } from "@/lib/mock/bi"
+import { isTabEnabled } from "@/lib/modules"
+import { patientById } from "@/modules/patients/data"
+import { DentalChartWorkspace } from "@/modules/patients/specialties/dental-chart"
+
+type Props = { params: Promise<{ locale: string; id: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }
+
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params
+  const p = patientById(id)
+  const t = await getTranslations("specialties.ws")
+  return { title: p ? `${t("titleDental")} · ${bi(p.name, await getLocale())}` : t("titleDental") }
+}
+
+/** Patients · Dental chart workspace (?tooth=36 opens that tooth). Part of the patients.dental record tab. */
+export default async function DentalChartPage({ searchParams }: Props) {
+  if (!isTabEnabled("patients", "dental")) notFound()
+  const tooth = Number((await searchParams).tooth)
+  return <DentalChartWorkspace initialTooth={Number.isFinite(tooth) && tooth > 0 ? tooth : undefined} />
+}

@@ -13,7 +13,8 @@ import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
 import { Button } from "@/components/ui/button"
 import { PCard } from "../profile/side"
 import { usePatient, useText } from "../profile/use-patient"
-import { dentalRecord, dentalSummary, patientShare, specialtyHref, type DentalRecord, type InsuranceStatus, type PlanItem } from "./data"
+import { dentalSummary, patientShare, specialtyHref, type DentalRecord, type InsuranceStatus, type PlanItem } from "./data"
+import { useDentalRecord } from "./dental-store"
 import { DentalChartView, DentalLegend } from "./tooth"
 
 /**
@@ -24,9 +25,9 @@ import { DentalChartView, DentalLegend } from "./tooth"
 export function DentalTab() {
   const t = useTranslations("specialties.dental")
   const data = usePatient()
+  const rec = useDentalRecord(data?.patient.id ?? "")
   if (!data) return null
   const id = data.patient.id
-  const rec = dentalRecord(id)
   if (!rec)
     return (
       <div className="rounded-xl border bg-card">

@@ -131,6 +131,31 @@
         "pending": "بانتظار موافقة التأمين",
         "covered": "مغطى",
         "claimSent": "انرسلت المطالبة"
+      },
+      "col": {
+        "tooth": "السن",
+        "procedure": "الإجراء",
+        "fee": "السعر",
+        "insurance": "التأمين",
+        "pays": "على المريض",
+        "status": "الحالة"
+      },
+      "covers": "يغطي {pct}%",
+      "selectTooth": "اختر السن {n}",
+      "phase": {
+        "urgent": "1 · عاجل",
+        "restore": "2 · ترميم",
+        "prevent": "3 · وقاية",
+        "today": "اليوم"
+      },
+      "status": {
+        "planned": "مخطط",
+        "done": "انعمل"
+      },
+      "totals": {
+        "total": "الإجمالي",
+        "insurancePays": "على التأمين",
+        "patientPays": "على المريض"
       }
     },
     "card3d": {
@@ -149,5 +174,118 @@
       "text": "افتح مخطط الأسنان وسجّل أول كشف.",
       "start": "افتح مخطط الأسنان"
     }
+  },
+  "ws": {
+    "back": "ارجع لصفحة المريض",
+    "breadcrumb": "مسار التنقل",
+    "crumbEyes": "العيون",
+    "crumbDental": "الأسنان",
+    "titleEye": "فحص حركة العين",
+    "titleDental": "مخطط الأسنان",
+    "patientMeta": "{age} سنة ·",
+    "modes": {
+      "label": "طرق العرض",
+      "eye": {
+        "exam": "الفحص",
+        "anatomy": "التشريح",
+        "compare": "المقارنة"
+      },
+      "dental": {
+        "chart": "المخطط",
+        "3d": "ثلاثي الأبعاد",
+        "plan": "خطة العلاج",
+        "gums": "اللثة"
+      }
+    }
+  },
+  "chartWs": {
+    "print": "اطبع",
+    "save": "احفظ المخطط",
+    "saveShort": "احفظ",
+    "saved": "انحفظ المخطط",
+    "history": "السجل",
+    "pickTooth": "اختر سن أول",
+    "pickToothText": "اضغط على سن في المخطط وبعدين اختر العلاج.",
+    "chartTitle": "مخطط الأسنان",
+    "chartHint": "اضغط على السن وبعدين على أسطحه · FDI · وانت مقابل المريض",
+    "chartHintShort": "{dentition} · FDI",
+    "layers": {
+      "label": "طبقات المخطط",
+      "all": "الكل",
+      "existing": "سابق",
+      "planned": "مخطط",
+      "done": "انعمل"
+    },
+    "dentition": {
+      "label": "نوع الأسنان",
+      "permanent": "دائمة",
+      "mixed": "مختلطة",
+      "baby": "لبنية",
+      "permanentTeeth": "أسنان دائمة",
+      "mixedTeeth": "أسنان مختلطة",
+      "babyTeeth": "أسنان لبنية"
+    },
+    "viewOnly": "على الجوال للعرض بس. افتح المخطط على تابلت أو كمبيوتر عشان تعدّل.",
+    "emptyTitle": "ما فيه سجل أسنان للحين",
+    "emptyText": "هالمريض ما عنده مخطط أسنان للحين."
+  },
+  "tooth": {
+    "panelLabel": "السن {n}",
+    "close": "سكّر السن",
+    "noneTitle": "ما اخترت سن",
+    "noneText": "اضغط على سن في المخطط عشان تشوفه وتحدّثه.",
+    "surfaces": "الأسطح",
+    "condition": "الحالة",
+    "treatment": "العلاج",
+    "treatmentPlaceholder": "اختر العلاج",
+    "statusLabel": "الحالة",
+    "status": {
+      "existing": "سابق",
+      "planned": "مخطط",
+      "done": "انعمل"
+    },
+    "cond": {
+      "decay": "تسوس",
+      "filling": "حشوة",
+      "crown": "تلبيسة",
+      "rootCanal": "علاج عصب",
+      "extraction": "خلع",
+      "implant": "زراعة",
+      "sealant": "سد شقوق",
+      "fracture": "كسر",
+      "bridge": "جسر",
+      "missing": "مفقود"
+    },
+    "surface": {
+      "M": "الأمامي (M)",
+      "O": "الإطباقي (O)",
+      "D": "الخلفي (D)",
+      "B": "الخدّي (B)",
+      "L": "اللساني (L)"
+    },
+    "mark": {
+      "rootCanal": "عصب",
+      "crown": "تلبيسة",
+      "implant": "زراعة",
+      "bridge": "جسر",
+      "sealant": "سد شقوق",
+      "fracture": "كسر"
+    },
+    "plannedMarks": "{what} مخطط لها",
+    "healthy": "سليم",
+    "covers": "{payer} تغطي {pct}% · على المريض {pays}",
+    "needsApproval": "يحتاج موافقة مسبقة قبل ما نبدأ",
+    "noApproval": "ما يحتاج موافقة مسبقة",
+    "notes": "ملاحظات",
+    "xrays": "الأشعة · {count}",
+    "upload": "ارفع",
+    "noXrays": "ما فيه أشعة لهالسن للحين.",
+    "uploaded": "انضافت الأشعة",
+    "uploadedText": "{count, plural, one {صورة وحدة} two {صورتين} few {# صور} many {# صورة} other {# صورة}} للسن {n}.",
+    "clear": "امسح",
+    "update": "حدّث الخطة",
+    "updated": "انحدّث السن {n}",
+    "needTreatment": "اختر العلاج",
+    "needTreatmentText": "الشغل المخطط أو اللي انعمل يحتاج كود علاج."
   }
 }

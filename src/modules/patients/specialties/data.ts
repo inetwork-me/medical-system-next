@@ -146,9 +146,37 @@ export const FDI_ROWS = {
   ],
 } as const
 
+/** Baby (primary) teeth: FDI quadrants 5–8, positions 1–5. Mixed: permanent incisors + first molars, baby canines and molars. */
+export type Dentition = "permanent" | "mixed" | "baby"
+type Rows = { upper: readonly (readonly number[])[]; lower: readonly (readonly number[])[] }
+export const DENTITION_ROWS: Record<Dentition, Rows> = {
+  permanent: FDI_ROWS,
+  mixed: {
+    upper: [
+      [16, 55, 54, 53, 12, 11],
+      [21, 22, 63, 64, 65, 26],
+    ],
+    lower: [
+      [46, 85, 84, 83, 42, 41],
+      [31, 32, 73, 74, 75, 36],
+    ],
+  },
+  baby: {
+    upper: [
+      [55, 54, 53, 52, 51],
+      [61, 62, 63, 64, 65],
+    ],
+    lower: [
+      [85, 84, 83, 82, 81],
+      [71, 72, 73, 74, 75],
+    ],
+  },
+}
+
 export type ToothType = "incisor" | "canine" | "premolar" | "molar"
 export const toothType = (fdi: number): ToothType => {
   const p = fdi % 10
+  if (Math.floor(fdi / 10) >= 5) return p <= 2 ? "incisor" : p === 3 ? "canine" : "molar"
   return p <= 2 ? "incisor" : p === 3 ? "canine" : p <= 5 ? "premolar" : "molar"
 }
 /** Q1, Q2 (permanent) and Q5, Q6 (baby teeth) are the upper arch. */
@@ -188,8 +216,60 @@ const FAHAD_TEETH: DentalChart = {
   },
 }
 
-export const TOOTH_NAMES: Record<number, Bi> = {
-  36: { en: "Lower left first molar", ar: "الضرس الأول السفلي اليسار" },
+/** "Lower left first molar" — built from the FDI number (jaw, side, position). */
+const POS_NAME: Record<number, Bi> = {
+  1: { en: "central incisor", ar: "القاطع الأوسط" },
+  2: { en: "lateral incisor", ar: "القاطع الجانبي" },
+  3: { en: "canine", ar: "الناب" },
+  4: { en: "first premolar", ar: "الضاحك الأول" },
+  5: { en: "second premolar", ar: "الضاحك الثاني" },
+  6: { en: "first molar", ar: "الضرس الأول" },
+  7: { en: "second molar", ar: "الضرس الثاني" },
+  8: { en: "third molar (wisdom)", ar: "ضرس العقل" },
+}
+const BABY_POS: Record<number, Bi> = { ...POS_NAME, 4: { en: "first molar", ar: "الضرس الأول" }, 5: { en: "second molar", ar: "الضرس الثاني" } }
+export function toothName(fdi: number): Bi {
+  const q = Math.floor(fdi / 10)
+  const baby = q >= 5
+  const up = isUpper(fdi)
+  const right = [1, 4, 5, 8].includes(q)
+  const pos = (baby ? BABY_POS : POS_NAME)[fdi % 10]
+  const en = `${up ? "Upper" : "Lower"} ${right ? "right" : "left"} ${pos.en}${baby ? " (baby)" : ""}`
+  const ar = `${pos.ar} ${up ? "العلوي" : "السفلي"} ${right ? "اليمين" : "اليسار"}${baby ? " (لبني)" : ""}`
+  return { en: en.charAt(0).toUpperCase() + en.slice(1), ar }
+}
+
+/* ---------------------------------------------------------------- procedures (CDT) */
+
+export type Procedure = { cdt: string; name: Bi; fee: number; coveragePct: number; preApproval: boolean; mark?: ToothMark; condition?: Condition }
+export const PROCEDURES: Procedure[] = [
+  { cdt: "D3330", name: { en: "Root canal · molar", ar: "علاج عصب · ضرس" }, fee: 1800, coveragePct: 80, preApproval: true, mark: "rootCanal", condition: "rootCanal" },
+  { cdt: "D3310", name: { en: "Root canal · front tooth", ar: "علاج عصب · سن أمامي" }, fee: 1200, coveragePct: 80, preApproval: true, mark: "rootCanal", condition: "rootCanal" },
+  { cdt: "D2740", name: { en: "Porcelain crown", ar: "تلبيسة بورسلان" }, fee: 2200, coveragePct: 50, preApproval: true, mark: "crown", condition: "crown" },
+  { cdt: "D2391", name: { en: "Composite filling · 1 surface", ar: "حشوة تجميلية · سطح واحد" }, fee: 350, coveragePct: 80, preApproval: false, condition: "filling" },
+  { cdt: "D2392", name: { en: "Composite filling · 2 surfaces", ar: "حشوة تجميلية · سطحين" }, fee: 450, coveragePct: 80, preApproval: false, condition: "filling" },
+  { cdt: "D2330", name: { en: "Composite filling · front", ar: "حشوة أمامية" }, fee: 300, coveragePct: 80, preApproval: false, condition: "filling" },
+  { cdt: "D1351", name: { en: "Fissure sealant", ar: "سد الشقوق" }, fee: 150, coveragePct: 100, preApproval: false, mark: "sealant", condition: "sealant" },
+  { cdt: "D7140", name: { en: "Extraction", ar: "خلع" }, fee: 400, coveragePct: 80, preApproval: false, condition: "extraction" },
+  { cdt: "D6010", name: { en: "Implant", ar: "زراعة" }, fee: 5500, coveragePct: 30, preApproval: true, mark: "implant", condition: "implant" },
+  { cdt: "D6240", name: { en: "Bridge pontic", ar: "جسر" }, fee: 3200, coveragePct: 50, preApproval: true, mark: "bridge", condition: "bridge" },
+]
+export const procedureBy = (cdt: string) => PROCEDURES.find((p) => p.cdt === cdt)
+
+/** Tooth Panel condition chips. */
+export const CONDITIONS = ["decay", "filling", "crown", "rootCanal", "extraction", "implant", "sealant", "fracture", "bridge", "missing"] as const
+export type Condition = (typeof CONDITIONS)[number]
+
+/** Clinical note + x-rays per tooth (design: tooth 36). */
+export const TOOTH_NOTES: Record<number, Bi> = {
+  36: { en: "Deep decay reaching the nerve; tender on tapping. Root canal first, then a crown.", ar: "تسوس عميق واصل للعصب ويوجعه لما ننقر عليه. نبدأ بعلاج العصب وبعدها تلبيسة." },
+}
+export type Xray = { src: string; label: Bi }
+export const TOOTH_XRAYS: Record<number, Xray[]> = {
+  36: [
+    { src: "/specialties/dent_xray_bw.png", label: { en: "Bitewing · left", ar: "مجنحة · يسار" } },
+    { src: "/specialties/dent_xray_pa.png", label: { en: "Periapical · 36", ar: "ذروية · 36" } },
+  ],
 }
 
 /* ---------------------------------------------------------------- treatment plan */

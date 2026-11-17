@@ -131,6 +131,31 @@
         "pending": "Pre-approval pending",
         "covered": "Covered",
         "claimSent": "Claim sent"
+      },
+      "col": {
+        "tooth": "Tooth",
+        "procedure": "Procedure",
+        "fee": "Fee",
+        "insurance": "Insurance",
+        "pays": "Patient pays",
+        "status": "Status"
+      },
+      "covers": "Covers {pct}%",
+      "selectTooth": "Select tooth {n}",
+      "phase": {
+        "urgent": "1 · Urgent",
+        "restore": "2 · Restore",
+        "prevent": "3 · Prevent",
+        "today": "Today"
+      },
+      "status": {
+        "planned": "Planned",
+        "done": "Done"
+      },
+      "totals": {
+        "total": "Total",
+        "insurancePays": "Insurance pays",
+        "patientPays": "Patient pays"
       }
     },
     "card3d": {
@@ -149,5 +174,118 @@
       "text": "Open the dental chart to record the first check-up.",
       "start": "Open dental chart"
     }
+  },
+  "ws": {
+    "back": "Back to the patient page",
+    "breadcrumb": "Breadcrumb",
+    "crumbEyes": "Eyes",
+    "crumbDental": "Dental",
+    "titleEye": "Eye movement exam",
+    "titleDental": "Dental chart",
+    "patientMeta": "{age} yrs ·",
+    "modes": {
+      "label": "Workspace views",
+      "eye": {
+        "exam": "Exam",
+        "anatomy": "Anatomy",
+        "compare": "Compare"
+      },
+      "dental": {
+        "chart": "Chart",
+        "3d": "3D view",
+        "plan": "Treatment plan",
+        "gums": "Gums"
+      }
+    }
+  },
+  "chartWs": {
+    "print": "Print",
+    "save": "Save chart",
+    "saveShort": "Save",
+    "saved": "Chart saved",
+    "history": "History",
+    "pickTooth": "Pick a tooth first",
+    "pickToothText": "Tap a tooth on the chart, then choose the treatment.",
+    "chartTitle": "Dental chart",
+    "chartHint": "Tap a tooth, then its surfaces · FDI · as you face the patient",
+    "chartHintShort": "{dentition} · FDI",
+    "layers": {
+      "label": "Chart layers",
+      "all": "All",
+      "existing": "Existing",
+      "planned": "Planned",
+      "done": "Done"
+    },
+    "dentition": {
+      "label": "Dentition",
+      "permanent": "Permanent",
+      "mixed": "Mixed",
+      "baby": "Baby teeth",
+      "permanentTeeth": "Permanent teeth",
+      "mixedTeeth": "Mixed teeth",
+      "babyTeeth": "Baby teeth"
+    },
+    "viewOnly": "View only on phones. Open the chart on a tablet or computer to make changes.",
+    "emptyTitle": "No dental records yet",
+    "emptyText": "This patient has no dental chart yet."
+  },
+  "tooth": {
+    "panelLabel": "Tooth {n}",
+    "close": "Close tooth",
+    "noneTitle": "No tooth selected",
+    "noneText": "Tap a tooth on the chart to see and update it.",
+    "surfaces": "Surfaces",
+    "condition": "Condition",
+    "treatment": "Treatment",
+    "treatmentPlaceholder": "Choose a treatment",
+    "statusLabel": "Status",
+    "status": {
+      "existing": "Existing",
+      "planned": "Planned",
+      "done": "Done"
+    },
+    "cond": {
+      "decay": "Decay",
+      "filling": "Filling",
+      "crown": "Crown",
+      "rootCanal": "Root canal",
+      "extraction": "Extraction",
+      "implant": "Implant",
+      "sealant": "Sealant",
+      "fracture": "Fracture",
+      "bridge": "Bridge",
+      "missing": "Missing"
+    },
+    "surface": {
+      "M": "Mesial (M)",
+      "O": "Occlusal (O)",
+      "D": "Distal (D)",
+      "B": "Buccal (B)",
+      "L": "Lingual (L)"
+    },
+    "mark": {
+      "rootCanal": "Root canal",
+      "crown": "crown",
+      "implant": "implant",
+      "bridge": "bridge",
+      "sealant": "Sealant",
+      "fracture": "fracture"
+    },
+    "plannedMarks": "{what} planned",
+    "healthy": "Healthy",
+    "covers": "{payer} covers {pct}% · patient pays {pays}",
+    "needsApproval": "Needs pre-approval before starting",
+    "noApproval": "No pre-approval needed",
+    "notes": "Notes",
+    "xrays": "X-rays · {count}",
+    "upload": "Upload",
+    "noXrays": "No x-rays for this tooth yet.",
+    "uploaded": "X-ray added",
+    "uploadedText": "{count, plural, one {# image} other {# images}} added to tooth {n}.",
+    "clear": "Clear",
+    "update": "Update plan",
+    "updated": "Tooth {n} updated",
+    "needTreatment": "Choose a treatment",
+    "needTreatmentText": "Planned or done work needs a treatment code."
   }
 }

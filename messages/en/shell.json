@@ -29,6 +29,13 @@
       "list": "Patients list",
       "reports": "Reports",
       "payments": "Payments"
+    },
+    "appointments": {
+      "calendar": "Calendar",
+      "list": "List",
+      "waiting": "Waiting room",
+      "schedules": "Doctor schedules",
+      "reports": "Reports"
     }
   },
   "header": {

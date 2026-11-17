@@ -7,7 +7,7 @@ import { formats } from "./formats";
  * Messages are split per namespace: messages/{en,ar}/<namespace>.json.
  * Each module adds its namespace here (the module stays self-contained; hidden modules simply aren't rendered).
  */
-const namespaces = ["common", "shell", "auth", "dashboard", "patients"] as const;
+const namespaces = ["common", "shell", "auth", "dashboard", "patients", "appointments"] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;

@@ -29,6 +29,13 @@
       "list": "قائمة المرضى",
       "reports": "التقارير",
       "payments": "المدفوعات"
+    },
+    "appointments": {
+      "calendar": "التقويم",
+      "list": "القائمة",
+      "waiting": "غرفة الانتظار",
+      "schedules": "جداول الأطباء",
+      "reports": "التقارير"
     }
   },
   "header": {

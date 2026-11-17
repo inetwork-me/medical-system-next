@@ -36,6 +36,23 @@ export function dateFormatter(locale: string) {
     dayMonth: (d: Date | string) => fmt({ day: "numeric", month: "short" }).format(toDate(d)),
     /** Wednesday, 18 November */
     weekday: (d: Date | string) => fmt({ weekday: "long", day: "numeric", month: "long" }).format(toDate(d)),
+    /** Monday, 16 November 2026 */
+    full: (d: Date | string) => fmt({ weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(toDate(d)),
+    /**
+     * 15 – 19 Nov 2026 (AR: 15–19 نوفمبر 2026). Built by hand: Intl formatRange separators differ between the
+     * server's and the browser's ICU, which breaks hydration.
+     */
+    dayRange: (a: Date | string, b: Date | string) => {
+      const x = toDate(a)
+      const y = toDate(b)
+      const month = (d: Date) => fmt(locale === "ar" ? { month: "long", year: "numeric" } : { month: "short", year: "numeric" }).format(d)
+      const sep = locale === "ar" ? "–" : " – "
+      if (x.getUTCFullYear() === y.getUTCFullYear() && x.getUTCMonth() === y.getUTCMonth()) return `${x.getUTCDate()}${sep}${y.getUTCDate()} ${month(y)}`
+      const dm = (d: Date) => fmt({ day: "numeric", month: locale === "ar" ? "long" : "short" }).format(d)
+      return `${dm(x)}${sep}${dm(y)} ${y.getUTCFullYear()}`
+    },
+    /** Mon (week strips, column heads) */
+    weekdayShort: (d: Date | string) => fmt({ weekday: "short" }).format(toDate(d)),
     /** 1 – 15 Nov 2026 */
     range: (a: Date | string, b: Date | string) => fmt({ day: "numeric", month: "short", year: "numeric" }).formatRange(toDate(a), toDate(b)),
     /** Jan 2024 */

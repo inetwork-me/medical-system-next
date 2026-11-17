@@ -51,9 +51,11 @@ export function ModuleTabsNav({ module, counts, className }: { module: ModuleId;
   const tabs = moduleTabs(m)
   const current = activeTab(m, pathname)
   if (tabs.length < 2) return null
+  // Up to 3 tabs share the width on mobile; more than that scroll sideways (Appointments has 5).
+  const many = tabs.length > 3
   return (
-    <nav className={cn("md:overflow-x-auto md:[scrollbar-width:none]", className)}>
-      <div className="flex items-center gap-1 rounded-lg bg-muted p-1 md:inline-flex">
+    <nav className={cn(many ? "-mx-4 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:px-0" : "md:overflow-x-auto md:[scrollbar-width:none]", className)}>
+      <div className={cn("items-center gap-1 rounded-lg bg-muted p-1", many ? "inline-flex" : "flex md:inline-flex")}>
         {tabs.map((tab) => {
           const on = current?.key === tab.key
           return (
@@ -62,7 +64,11 @@ export function ModuleTabsNav({ module, counts, className }: { module: ModuleId;
               href={tab.href}
               aria-current={on ? "page" : undefined}
               data-state={on ? "active" : "inactive"}
-              className="inline-flex h-9 min-w-0 flex-1 items-center justify-center gap-2 rounded-md px-2 md:flex-none md:shrink-0 md:px-3.5 text-sm font-medium whitespace-nowrap text-muted-foreground outline-none transition-[color,background-color,box-shadow] hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-xs"
+              className={cn(
+                "inline-flex h-9 items-center justify-center gap-2 rounded-md text-sm",
+                many ? "shrink-0 px-3 md:px-3.5" : "min-w-0 flex-1 px-2 md:flex-none md:shrink-0 md:px-3.5",
+                " font-medium whitespace-nowrap text-muted-foreground outline-none transition-[color,background-color,box-shadow] hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-xs"
+              )}
             >
               {tab.icon && <Icon name={tab.icon} size={18} variant={on ? "bold" : "linear"} className="hidden md:block" />}
               {tabLabel(m, tab.key)}

@@ -10,8 +10,9 @@ import { Link } from "@/i18n/navigation"
 import { useIsMobile } from "@/hooks/use-media-query"
 import { Icon } from "@/components/ds/icon"
 import { useText } from "../profile/use-patient"
-import { specialtyHref } from "./data"
+import { specialtyHref, type Gaze, type Grades } from "./data"
 import { useEyeRecord } from "./eye-store"
+import { LiveEye } from "./three/live"
 
 /**
  * Eye · Patient view (1440 / 768 / 390): dark full-screen explanation for the patient. Top bar (close · title · step),
@@ -78,7 +79,7 @@ export function EyePatientView() {
           if (Math.abs(dx) > 50) go(step + ((dx < 0) !== rtl ? 1 : -1))
         }}
       >
-        <Stage look={shown} alt={t(`look.${shown}`)} />
+        <Stage look={shown} alt={t(`look.${shown}`)} grades={rec?.exams[0]?.grades} />
         <div className="relative flex flex-col gap-3.5 rounded-2xl border border-white/12 bg-slate-900/90 p-4 backdrop-blur md:p-5">
           <h2 className="text-base font-semibold md:text-xl">{t(`steps.${String(step) as "0" | "1" | "2"}.title`)}</h2>
           <p className="text-sm text-slate-300 md:text-base">{t(`steps.${String(step) as "0" | "1" | "2"}.text`)}</p>
@@ -121,8 +122,25 @@ export function EyePatientView() {
   )
 }
 
-/** The eyes (still renders until the 3D viewer): the patient-view renders when looking right, the front stills otherwise. */
-function Stage({ look, alt }: { look: Look; alt: string }) {
+/** The eyes: live 3D (the weak muscle in orange) over the still renders, which stay as the loading state / no-WebGL fallback. */
+function Stage({ look, alt, grades }: { look: Look; alt: string; grades?: Grades }) {
+  const [ready, setReady] = React.useState(false)
+  return (
+    <>
+      <div className={cn("transition-opacity duration-300", ready && "opacity-0")}>
+        <Still look={look} alt={alt} />
+      </div>
+      {grades && (
+        <div className="absolute inset-x-0 top-0 bottom-1/4">
+          <LiveEye grades={grades} gaze={GAZE_OF[look]} angle={30} mode="patient" onReady={() => setReady(true)} />
+        </div>
+      )}
+    </>
+  )
+}
+const GAZE_OF: Record<Look, Gaze> = { right: "right", ahead: "primary", left: "left" }
+
+function Still({ look, alt }: { look: Look; alt: string }) {
   if (look === "right")
     return (
       <div className="absolute inset-0">

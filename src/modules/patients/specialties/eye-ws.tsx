@@ -91,7 +91,7 @@ export function EyeAnatomyWorkspace() {
       ) : (
         <div className={cn("flex flex-col gap-4 xl:grid xl:grid-cols-[360px_minmax(0,1fr)_340px]", FILL)}>
           {mobile && <ViewOnly />}
-          <EyeViewport exam={exam} view={view} mode="anatomy" className="h-[300px] md:h-[420px] xl:order-2 xl:h-full" />
+          <EyeViewport exam={exam} view={view} mode="anatomy" onSelectMuscle={(m) => setView({ muscle: m })} className="h-[300px] md:h-[420px] xl:order-2 xl:h-full" />
           <div className="grid items-start gap-4 md:grid-cols-2 xl:contents">
             <MuscleInfo id={id} exam={exam} view={view} className="xl:order-3 xl:self-start" />
             <MuscleEditor

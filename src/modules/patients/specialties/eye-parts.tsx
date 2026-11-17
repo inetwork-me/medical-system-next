@@ -37,6 +37,7 @@ import {
   type Nystagmus,
 } from "./data"
 import { signExam, useTodayExam, type EyeView } from "./eye-store"
+import { LiveEye, type ViewerApi } from "./three/live"
 
 /** −3 / 0 / +1 grade chip: under-acting warning, over-acting info, normal muted. Always LTR. */
 export function GradeChip({ grade, className }: { grade: number; className?: string }) {
@@ -119,6 +120,7 @@ export function EyeViewport({
   className,
   compact,
   still,
+  onSelectMuscle,
 }: {
   exam: EyeExam
   view: EyeView
@@ -128,11 +130,16 @@ export function EyeViewport({
   compact?: boolean
   /** Override the still (Compare cards). */
   still?: Still
+  /** Anatomy: tap a muscle in the 3D scene. */
+  onSelectMuscle?: (m: MuscleKey) => void
 }) {
   const t = useTranslations("specialties.eyes")
   const { b, locale } = useText()
   const readout = useReadout(view, mode)
   const [zoom, setZoom] = React.useState(1)
+  // Live 3D on top of the still: the still is the loading state and the no-WebGL fallback.
+  const [ready, setReady] = React.useState(false)
+  const [api, setApi] = React.useState<ViewerApi | null>(null)
   const pics = stills(mode, view.gaze, view.muscle)
   const dir = locale === "ar" ? "rtl" : "ltr"
   const callout = (() => {
@@ -142,9 +149,10 @@ export function EyeViewport({
     return null
   })()
   const tools: { key: string; icon: IconName; label: string; onClick: (e: React.MouseEvent<HTMLElement>) => void }[] = [
-    { key: "in", icon: "search-zoom-in", label: t("sim.tools.zoomIn"), onClick: () => setZoom((z) => Math.min(2, z + 0.25)) },
-    { key: "out", icon: "search-zoom-out", label: t("sim.tools.zoomOut"), onClick: () => setZoom((z) => Math.max(1, z - 0.25)) },
-    { key: "reset", icon: "refresh", label: t("sim.tools.reset"), onClick: () => setZoom(1) },
+    ...(ready ? [{ key: "rotate", icon: "rotate-left" as IconName, label: t("sim.tools.rotate"), onClick: () => api?.toggleRotate() }] : []),
+    { key: "in", icon: "search-zoom-in", label: t("sim.tools.zoomIn"), onClick: () => (api ? api.zoomIn() : setZoom((z) => Math.min(2, z + 0.25))) },
+    { key: "out", icon: "search-zoom-out", label: t("sim.tools.zoomOut"), onClick: () => (api ? api.zoomOut() : setZoom((z) => Math.max(1, z - 0.25))) },
+    { key: "reset", icon: "refresh", label: t("sim.tools.reset"), onClick: () => (api ? api.reset() : setZoom(1)) },
     {
       key: "full",
       icon: "maximize-4",
@@ -161,7 +169,7 @@ export function EyeViewport({
       data-viewport
       className={cn("relative overflow-hidden rounded-[14px] bg-[radial-gradient(circle_at_50%_40%,#1e293b,#020617)]", className)}
     >
-      <div className="absolute inset-0 transition-transform duration-200" style={{ transform: `scale(${zoom})` }}>
+      <div className={cn("absolute inset-0 transition-[transform,opacity] duration-300", ready && "opacity-0")} style={{ transform: `scale(${zoom})` }}>
         {still ? (
           <Image src={still.src} alt={readout} fill sizes="600px" className={still.fit === "cover" ? "object-cover" : "object-contain"} />
         ) : (
@@ -171,7 +179,22 @@ export function EyeViewport({
           </>
         )}
       </div>
-      <div className="absolute inset-x-0 top-0 flex items-center gap-2 p-3 xl:p-4">
+      <LiveEye
+        grades={exam.grades}
+        gaze={view.gaze}
+        angle={view.angle}
+        eye={view.eye}
+        together={view.together}
+        showMuscles={view.showMuscles}
+        showLines={view.showLines}
+        selected={view.muscle}
+        selectedEye={view.muscleEye}
+        mode={compact ? "compact" : mode}
+        onSelectMuscle={onSelectMuscle}
+        onReady={() => setReady(true)}
+        apiRef={setApi}
+      />
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center gap-2 p-3 *:pointer-events-auto xl:p-4">
         <Glass className="me-auto font-medium">
           <Icon name="3d-rotate" size={16} className="text-slate-200" />
           {readout}
@@ -195,7 +218,7 @@ export function EyeViewport({
       </div>
       {callout && (
         // Anatomical: points at the right eye on the viewer's left in both languages.
-        <div dir="ltr" className="absolute inset-x-3 top-1/2 flex -translate-y-1/2 xl:inset-x-4">
+        <div dir="ltr" className="pointer-events-none absolute inset-x-3 top-1/2 flex -translate-y-1/2 xl:inset-x-4">
           <div dir={dir} className="flex max-w-64 flex-col gap-0.5 rounded-[10px] border border-[#F59E0B] bg-slate-900/90 px-3 py-2">
             <span className="text-xs font-medium text-[#FCD34D]">
               {t(`ews.callout${callout.eye}`, { muscle: b(callout.m.name).toLocaleLowerCase(locale), grade: formatGrade(callout.g) })}
@@ -204,7 +227,7 @@ export function EyeViewport({
           </div>
         </div>
       )}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2.5 p-3 xl:p-4">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-2.5 p-3 xl:p-4">
         {mode === "exam" && (
           <div dir="ltr" className="flex justify-around">
             {(["OD", "OS"] as const).map((eye) => (

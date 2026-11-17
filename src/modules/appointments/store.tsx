@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { appointmentsOn, NOW_MIN, type Appointment, type ApptStatus } from "./data"
+import { appointmentsOn, NOW_MIN, TIME_OFF, type Appointment, type ApptStatus, type TimeOff } from "./data"
 
 /**
  * Session changes on top of the mock data (no backend yet): status moves (check in, call in, no-show, cancel…) and
@@ -14,29 +14,39 @@ type Store = {
   setStatus: (id: string, status: ApptStatus, since?: number) => void
   remind: (id: string) => void
   collect: (id: string, paid?: boolean) => void
+  timeOff: TimeOff[]
+  addTimeOff: (t: TimeOff) => void
+  removeTimeOff: (id: string) => void
 }
 
-const KEY = "ms.appointments.changes"
+const KEY = "ms.appointments.session"
 const Ctx = React.createContext<Store | null>(null)
 
 export function AppointmentsStoreProvider({ children }: { children: React.ReactNode }) {
   const [changes, setChanges] = React.useState<Record<string, Change>>({})
+  const [added, setAdded] = React.useState<TimeOff[]>([])
   const loaded = React.useRef(false)
 
   React.useEffect(() => {
     try {
       const raw = sessionStorage.getItem(KEY)
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time restore from sessionStorage after hydration
-      if (raw) setChanges(JSON.parse(raw))
+      if (raw) {
+        // One-time restore from sessionStorage after hydration (not available during SSR).
+        const saved = JSON.parse(raw)
+        /* eslint-disable react-hooks/set-state-in-effect */
+        setChanges(saved.changes ?? {})
+        setAdded(saved.timeOff ?? [])
+        /* eslint-enable react-hooks/set-state-in-effect */
+      }
     } catch {}
     loaded.current = true
   }, [])
   React.useEffect(() => {
     if (!loaded.current) return
     try {
-      sessionStorage.setItem(KEY, JSON.stringify(changes))
+      sessionStorage.setItem(KEY, JSON.stringify({ changes, timeOff: added }))
     } catch {}
-  }, [changes])
+  }, [changes, added])
 
   const store = React.useMemo<Store>(
     () => ({
@@ -46,8 +56,11 @@ export function AppointmentsStoreProvider({ children }: { children: React.ReactN
         setChanges((c) => ({ ...c, [id]: { ...c[id], status, since: since ?? (status === "arrived" || status === "withDoctor" ? NOW_MIN : c[id]?.since) } })),
       collect: (id, paid = true) => setChanges((c) => ({ ...c, [id]: { ...c[id], paid } })),
       remind: (id) => setChanges((c) => ({ ...c, [id]: { ...c[id], reminded: true } })),
+      timeOff: [...TIME_OFF, ...added],
+      addTimeOff: (t) => setAdded((l) => [...l, t]),
+      removeTimeOff: (id) => setAdded((l) => l.filter((x) => x.id !== id)),
     }),
-    [changes]
+    [changes, added]
   )
   return <Ctx.Provider value={store}>{children}</Ctx.Provider>
 }
@@ -73,5 +86,9 @@ export function useAppointmentsOn() {
 export function useAppointmentActions() {
   const store = React.useContext(Ctx)
   if (!store) throw new Error("useAppointmentActions needs AppointmentsStoreProvider")
-  return { setStatus: store.setStatus, remind: store.remind, collect: store.collect }
+  return { setStatus: store.setStatus, remind: store.remind, collect: store.collect, addTimeOff: store.addTimeOff, removeTimeOff: store.removeTimeOff }
+}
+
+export function useTimeOff() {
+  return React.useContext(Ctx)?.timeOff ?? TIME_OFF
 }

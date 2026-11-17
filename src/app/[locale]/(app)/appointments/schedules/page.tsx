@@ -1,12 +1,12 @@
 import { getTranslations } from "next-intl/server"
 
-import { SoonTab } from "@/modules/appointments/soon"
+import { DoctorSchedules } from "@/modules/appointments/schedules/schedules"
 
 export async function generateMetadata() {
   return { title: (await getTranslations("shell.tabs.appointments"))("schedules") }
 }
 
-/** Appointments · schedules: built in a later slice from its FigCraft screens. */
-export default function Page() {
-  return <SoonTab tab="schedules" />
+/** Appointments · Doctor schedules: weekly hours, today's load, time off. */
+export default function SchedulesPage() {
+  return <DoctorSchedules />
 }

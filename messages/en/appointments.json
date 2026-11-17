@@ -179,5 +179,39 @@
     "collected": "Payment collected",
     "collectedText": "{name} · {doctor}",
     "finishedText": "{name} is ready to pay at reception."
+  },
+  "schedules": {
+    "title": "Doctor schedules",
+    "subtitle": "Working hours this week · Main branch",
+    "clinicSlots": "{clinic} · {n}-min slots",
+    "today": "Today",
+    "load": "{used} of {total} slots booked today",
+    "off": "Off",
+    "notWorking": "Not working",
+    "onLeave": "On leave {range}",
+    "addTimeOff": "Add time off",
+    "timeOff": {
+      "title": "Add time off",
+      "description": "Blocks the doctor's slots and offers to move booked patients",
+      "doctor": "Doctor",
+      "dates": "Dates",
+      "datesPlaceholder": "Pick the days",
+      "days": "{n, plural, one {1 day} other {# days}}",
+      "reason": "Reason",
+      "reasons": {
+        "annual": "Annual leave",
+        "sick": "Sick leave",
+        "training": "Conference or training",
+        "personal": "Personal",
+        "other": "Other"
+      },
+      "booked": "{count, plural, =0 {No patients are booked in these days.} one {1 patient is booked in these days. We'll text them options to move.} other {# patients are booked in these days. We'll text them options to move.}}",
+      "required": "Pick the dates",
+      "save": "Save time off",
+      "saved": "Time off saved",
+      "savedText": "{doctor} · {range}. {count, plural, =0 {No patients to move.} one {1 patient gets an SMS to move.} other {# patients get an SMS to move.}}",
+      "undo": "Undo",
+      "overlap": "{doctor} is already off on some of these days."
+    }
   }
 }

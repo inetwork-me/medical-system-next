@@ -274,3 +274,26 @@ export function monthCells(date: string) {
   const weeks = Math.ceil((toDate(first).getUTCDay() + days) / 7)
   return Array.from({ length: weeks * 7 }, (_, i) => addDays(start, i))
 }
+
+/* ---------------------------------------------------------------- doctor schedules (design · Doctor schedules) */
+
+/** Working hours Sunday → Saturday: "08–16", "off" (day off this week) or null (not a working day). */
+export type DayHours = string | "off" | null
+export const SCHEDULES: Record<DoctorId, { slot: number; week: DayHours[]; load: [number, number] }> = {
+  km: { slot: 30, week: ["08–16", "08–16", "08–16", "08–14", "08–16", null, "09–13"], load: [14, 16] },
+  az: { slot: 20, week: ["08–16", "08–16", "off", "08–16", "08–16", null, null], load: [18, 20] },
+  so: { slot: 45, week: ["09–17", "09–17", "09–17", "09–17", "09–13", null, "09–13"], load: [8, 12] },
+  hf: { slot: 30, week: ["08–16", "08–16", "08–16", "08–16", "08–16", null, null], load: [10, 14] },
+}
+
+export type TimeOffReason = "annual" | "sick" | "training" | "personal" | "other"
+export type TimeOff = { id: string; doctor: DoctorId; from: string; to: string; reason: TimeOffReason }
+/** Dr. Huda Fares is on leave 22–24 Nov (design). */
+export const TIME_OFF: TimeOff[] = [{ id: "to-hf-1", doctor: "hf", from: "2026-11-22", to: "2026-11-24", reason: "annual" }]
+
+/** Booked patients for a doctor between two dates (inclusive) — "N patients are booked in these days". */
+export function bookedBetween(doctor: DoctorId, from: string, to: string) {
+  let n = 0
+  for (let d = from; d <= to; d = addDays(d, 1)) n += appointmentsOn(d).filter((a) => a.doctor === doctor && a.status !== "cancelled" && a.patient).length
+  return n
+}

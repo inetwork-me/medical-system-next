@@ -1,7 +1,8 @@
 "use client"
 
+import { usePatientId } from "@/modules/patients/href"
 import * as React from "react"
-import { useParams, useSelectedLayoutSegment } from "next/navigation"
+import { useSelectedLayoutSegment } from "next/navigation"
 import { useFormatter, useLocale } from "next-intl"
 
 import { bi, type Bi } from "@/lib/mock/bi"
@@ -18,7 +19,7 @@ export const VISIBLE_PATIENT_TABS = PATIENT_TABS.filter((k) => (k !== "eyes" && 
 
 /** Current patient (from the session store, so VIP / ban changes show) + its page record. */
 export function usePatient() {
-  const { id } = useParams<{ id: string }>()
+  const id = usePatientId()
   const { get, savedForm, collections, changes } = usePatientsStore()
   const patient = get(id)
   const form = savedForm(id)

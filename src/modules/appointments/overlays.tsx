@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
 
@@ -276,7 +277,7 @@ function DetailsSheet({ a, open: isOpen, onOpenChange, onAction }: { a: LiveAppo
         )}
         {f.p && (
           <Button variant="ghost" size="sm" asChild>
-            <Link href={`/patients/${f.p.id}`}>{t("details.openFile")}</Link>
+            <Link href={patientHref(f.p.id)}>{t("details.openFile")}</Link>
           </Button>
         )}
       </div>

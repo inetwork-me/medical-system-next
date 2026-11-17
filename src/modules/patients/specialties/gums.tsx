@@ -1,7 +1,7 @@
 "use client"
 
+import { usePatientId } from "@/modules/patients/href"
 import * as React from "react"
-import { useParams } from "next/navigation"
 import { useFormatter, useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
@@ -20,7 +20,7 @@ import { Workspace } from "./workspace"
 /** Patients · Dental · Gum chart (1440 / 768): gum chart (Wide | Compact) + Gum health (side on desktop, below on tablet). */
 export function GumsWorkspace() {
   const t = useTranslations("specialties.chartWs")
-  const { id } = useParams<{ id: string }>()
+  const id = usePatientId()
   const rec = useDentalRecord(id)
   const [selected, setSelected] = useSelectedTooth(id)
   return (

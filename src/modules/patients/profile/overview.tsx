@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
@@ -350,7 +351,7 @@ export function FilesMini({ className }: { className?: string }) {
       description={t("filesMini.count", { count: record.files.length })}
       action={
         <Button variant="ghost" size="sm" asChild>
-          <Link href={`/patients/${patient.id}/files`}>
+          <Link href={patientHref(patient.id, "files")}>
             {t("filesMini.all")}
             <Icon name="arrow-right-1" size={16} />
           </Link>
@@ -375,7 +376,7 @@ export function FilesMini({ className }: { className?: string }) {
         <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed p-4 text-center">
           <p className="text-xs text-muted-foreground">{t("files.emptyText")}</p>
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/patients/${patient.id}/files`}>
+            <Link href={patientHref(patient.id, "files")}>
               <Icon name="document-upload" size={16} />
               {t("files.upload")}
             </Link>

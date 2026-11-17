@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
 
@@ -85,7 +86,7 @@ export function Workspace({
               {tp("title")}
             </Link>
             <span className="text-muted-foreground max-sm:hidden">/</span>
-            <Link href={`/patients/${p.id}`} className="truncate text-primary hover:underline">
+            <Link href={patientHref(p.id)} className="truncate text-primary hover:underline">
               {b(p.name)}
             </Link>
             <span className="text-muted-foreground">/</span>

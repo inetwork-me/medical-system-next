@@ -1,14 +1,20 @@
+import { setLocaleFrom } from "@/i18n/set-locale"
+import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 
-import { MergePatients } from "@/modules/patients/merge/merge-page"
+import { MergeRoute } from "@/modules/patients/merge/merge-route"
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
   return { title: (await getTranslations("patients.merge"))("title") }
 }
 
 /** Patients · Merge patients (?a = main file, ?b = file to close) + Merge confirmation. */
-export default async function MergePage({ searchParams }: PageProps<"/[locale]/patients/merge">) {
-  const sp = await searchParams
-  const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)
-  return <MergePatients a={one(sp.a)} b={one(sp.b)} />
+export default async function MergePage({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
+  return (
+    <Suspense>
+      <MergeRoute />
+    </Suspense>
+  )
 }

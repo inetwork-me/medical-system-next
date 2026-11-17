@@ -6,13 +6,21 @@ import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
 import { AppShell } from "@/components/shell/app-shell"
 import { SIDEBAR_COOKIE } from "@/components/shell/constants"
+import { AuthGate } from "@/components/auth/client-guards"
+import { STATIC_EXPORT } from "@/lib/static"
 
 /** Signed-in area: every module page renders inside the responsive app shell. */
 export default async function AppLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params
   if (!hasLocale(routing.locales, locale)) notFound()
   setRequestLocale(locale)
-  const collapsed = (await cookies()).get(SIDEBAR_COOKIE)?.value === "1"
+  // Static export has no request: the sidebar starts expanded and the sign-in check runs in the browser.
+  const collapsed = STATIC_EXPORT ? false : (await cookies()).get(SIDEBAR_COOKIE)?.value === "1"
 
-  return <AppShell defaultCollapsed={collapsed}>{children}</AppShell>
+  return (
+    <AppShell defaultCollapsed={collapsed}>
+      {STATIC_EXPORT && <AuthGate />}
+      {children}
+    </AppShell>
+  )
 }

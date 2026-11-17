@@ -1,7 +1,7 @@
 "use client"
 
+import { usePatientId } from "@/modules/patients/href"
 import * as React from "react"
-import { useParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 
 import { useDates } from "@/i18n/dates"
@@ -35,7 +35,7 @@ export function printOnly(el: HTMLElement | null) {
 /** Dental workspace bar actions: Print (icon on tablet) + Save chart ("Save" on tablet). Hidden on phones (view-only). */
 export function DentalActions() {
   const t = useTranslations("specialties.chartWs")
-  const { id } = useParams<{ id: string }>()
+  const id = usePatientId()
   const mobile = useIsMobile()
   const data = usePatient()
   const { b } = useText()

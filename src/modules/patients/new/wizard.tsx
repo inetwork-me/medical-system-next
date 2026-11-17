@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { notify } from "@/components/ds/toast"
@@ -460,7 +461,7 @@ function DuplicateCard({ patient, kind, value, onContinue }: { patient: Patient;
       </p>
       <div className="flex flex-wrap gap-2 pt-1">
         <Button size="sm" asChild>
-          <Link href={`/patients/${patient.id}`}>
+          <Link href={patientHref(patient.id)}>
             <Icon name="eye" size={16} />
             {t("new.duplicate.open")}
           </Link>
@@ -816,7 +817,7 @@ function Success({ mrn, name, sms, onAnother }: { mrn: string; name: string; sms
             id="appointments"
             fallback={
               <Button size="lg" asChild>
-                <Link href={`/patients/${mrn}`}>
+                <Link href={patientHref(mrn)}>
                   <Icon name="profile-circle" size={20} />
                   {t("done.open")}
                 </Link>
@@ -824,7 +825,7 @@ function Success({ mrn, name, sms, onAnother }: { mrn: string; name: string; sms
             }
           >
             <Button size="lg" asChild>
-              <Link href={`/patients/${mrn}?action=book`}>
+              <Link href={patientHref(mrn, undefined, { action: "book" })}>
                 <Icon name="calendar-add" size={20} />
                 {t("done.book")}
               </Link>

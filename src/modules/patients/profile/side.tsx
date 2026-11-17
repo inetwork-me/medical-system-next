@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
 
@@ -187,7 +188,7 @@ export function Attention({ className }: { className?: string }) {
         fields: fields.charAt(0).toUpperCase() + fields.slice(1),
       }),
       action: t("completeNow"),
-      href: `/patients/${p.id}/edit`,
+      href: patientHref(p.id, "edit"),
     },
     dup && {
       key: "duplicate",

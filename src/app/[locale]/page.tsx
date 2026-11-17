@@ -1,14 +1,14 @@
-import { cookies } from "next/headers"
 import { hasLocale } from "next-intl"
+import { setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
-import { redirect } from "@/i18n/navigation"
-import { routing } from "@/i18n/routing"
-import { SESSION_COOKIE } from "@/lib/session"
 
-/** Entry route: signed in → dashboard, otherwise → sign in. */
+import { routing } from "@/i18n/routing"
+import { HomeRedirect } from "@/components/auth/client-guards"
+
+/** Entry route: signed in → dashboard, otherwise → sign in (decided in the browser, so it also works as a static page). */
 export default async function Home({ params }: PageProps<"/[locale]">) {
   const { locale } = await params
   if (!hasLocale(routing.locales, locale)) notFound()
-  const signedIn = (await cookies()).has(SESSION_COOKIE)
-  redirect({ href: signedIn ? "/dashboard" : "/login", locale })
+  setRequestLocale(locale)
+  return <HomeRedirect />
 }

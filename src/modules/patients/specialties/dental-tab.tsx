@@ -1,5 +1,7 @@
 "use client"
 
+
+import { asset } from "@/lib/static"
 import * as React from "react"
 import Image from "next/image"
 import { useFormatter, useTranslations } from "next-intl"
@@ -194,7 +196,7 @@ function Mouth3dCard({ id, className }: { id: string; className?: string }) {
   return (
     <section className={cn("flex-col overflow-hidden rounded-xl border bg-card", className)}>
       <div className="relative h-[200px] bg-slate-900">
-        <Image src="/specialties/dent_card.png" alt={t("alt")} fill sizes="300px" className="object-cover" />
+        <Image src={asset("/specialties/dent_card.png")} alt={t("alt")} fill sizes="300px" className="object-cover" />
       </div>
       <div className="flex flex-col gap-2.5 p-4">
         <h2 className="text-base font-semibold">{t("title")}</h2>

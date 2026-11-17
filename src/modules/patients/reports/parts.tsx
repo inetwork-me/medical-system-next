@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { notify } from "@/components/ds/toast"
@@ -106,7 +107,7 @@ export function PatientCell({ patient, mrn, avatar = true }: { patient: Patient 
       )}
       <div className="flex min-w-0 flex-col">
         {patient ? (
-          <Link href={`/patients/${patient.id}`} className={cn("truncate hover:underline", avatar && "font-medium")}>
+          <Link href={patientHref(patient.id)} className={cn("truncate hover:underline", avatar && "font-medium")}>
             {b(patient.name)}
           </Link>
         ) : (

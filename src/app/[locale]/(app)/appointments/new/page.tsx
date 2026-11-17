@@ -1,14 +1,20 @@
+import { setLocaleFrom } from "@/i18n/set-locale"
+import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 
-import { NewAppointment } from "@/modules/appointments/new/new-appointment"
+import { NewAppointmentPage } from "@/modules/appointments/new/new-appointment-page"
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
   return { title: (await getTranslations("appointments"))("newAppointment") }
 }
 
 /** Appointments · New appointment (+ Conflict). Optional ?patient=MRN&doctor=az&date=2026-11-18 prefill the form. */
-export default async function NewAppointmentPage({ searchParams }: { searchParams: Promise<{ patient?: string; doctor?: string; date?: string }> }) {
-  const sp = await searchParams
-  const date = typeof sp.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) ? sp.date : undefined
-  return <NewAppointment initial={{ patient: sp.patient, doctor: sp.doctor, date }} />
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
+  return (
+    <Suspense>
+      <NewAppointmentPage />
+    </Suspense>
+  )
 }

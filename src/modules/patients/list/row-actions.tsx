@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { notify } from "@/components/ds/toast"
@@ -46,9 +47,9 @@ export function RowActions({ patient, trigger }: { patient: Patient; trigger?: R
         }
         groups={[
           [
-            { key: "view", icon: "eye", label: t("rowMenu.view"), href: `/patients/${patient.id}` },
-            { key: "edit", icon: "edit-2", label: t("rowMenu.edit"), href: `/patients/${patient.id}/edit` },
-            isModuleEnabled("appointments") && { key: "book", icon: "calendar-add", label: t("rowMenu.book"), href: `/patients/${patient.id}?action=book` },
+            { key: "view", icon: "eye", label: t("rowMenu.view"), href: patientHref(patient.id) },
+            { key: "edit", icon: "edit-2", label: t("rowMenu.edit"), href: patientHref(patient.id, "edit") },
+            isModuleEnabled("appointments") && { key: "book", icon: "calendar-add", label: t("rowMenu.book"), href: patientHref(patient.id, undefined, { action: "book" }) },
           ],
           [
             {

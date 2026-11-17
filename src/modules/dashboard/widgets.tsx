@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useFormatter, useLocale, useTranslations } from "next-intl"
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from "recharts"
@@ -243,7 +244,7 @@ function RowMenu({ mrn }: { mrn: string }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link href={`/patients/${mrn}`}>
+          <Link href={patientHref(mrn)}>
             <Icon name="profile-circle" size={16} />
             {t("openPatient")}
           </Link>

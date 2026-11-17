@@ -1,5 +1,7 @@
+import { asset } from "@/lib/static"
 import type { Bi } from "@/lib/mock/bi"
 import { patientById, patientDetails } from "../data"
+import { patientHref } from "../href"
 
 /**
  * Eyes & Dental (FigCraft page "Eyes & Dental", design v4.1). Copy and figures come from design-scripts/spec_widgets.py.
@@ -315,8 +317,8 @@ export const TOOTH_NOTES: Record<number, Bi> = {
 export type Xray = { src: string; label: Bi }
 export const TOOTH_XRAYS: Record<number, Xray[]> = {
   36: [
-    { src: "/specialties/dent_xray_bw.png", label: { en: "Bitewing · left", ar: "مجنحة · يسار" } },
-    { src: "/specialties/dent_xray_pa.png", label: { en: "Periapical · 36", ar: "ذروية · 36" } },
+    { src: asset("/specialties/dent_xray_bw.png"), label: { en: "Bitewing · left", ar: "مجنحة · يسار" } },
+    { src: asset("/specialties/dent_xray_pa.png"), label: { en: "Periapical · 36", ar: "ذروية · 36" } },
   ],
 }
 
@@ -812,14 +814,14 @@ export function insuranceSummary(r: DentalRecord) {
 /* ================================================================== routes (workspaces live outside the app shell) */
 
 export const specialtyHref = {
-  eyes: (id: string) => `/patients/${id}/eyes`,
-  eyeExam: (id: string, exam?: string) => `/patients/${id}/eyes/exam${exam ? `?exam=${exam}` : ""}`,
-  eyeAnatomy: (id: string) => `/patients/${id}/eyes/anatomy`,
-  eyeCompare: (id: string) => `/patients/${id}/eyes/compare`,
-  eyePatientView: (id: string) => `/patients/${id}/eyes/patient-view`,
-  dental: (id: string) => `/patients/${id}/dental`,
-  dentalChart: (id: string, tooth?: number) => `/patients/${id}/dental/chart${tooth ? `?tooth=${tooth}` : ""}`,
-  dental3d: (id: string) => `/patients/${id}/dental/3d`,
-  dentalPlan: (id: string) => `/patients/${id}/dental/plan`,
-  dentalGums: (id: string) => `/patients/${id}/dental/gums`,
+  eyes: (id: string) => patientHref(id, "eyes"),
+  eyeExam: (id: string, exam?: string) => patientHref(id, "eyes/exam", { exam }),
+  eyeAnatomy: (id: string) => patientHref(id, "eyes/anatomy"),
+  eyeCompare: (id: string) => patientHref(id, "eyes/compare"),
+  eyePatientView: (id: string) => patientHref(id, "eyes/patient-view"),
+  dental: (id: string) => patientHref(id, "dental"),
+  dentalChart: (id: string, tooth?: number) => patientHref(id, "dental/chart", { tooth }),
+  dental3d: (id: string) => patientHref(id, "dental/3d"),
+  dentalPlan: (id: string) => patientHref(id, "dental/plan"),
+  dentalGums: (id: string) => patientHref(id, "dental/gums"),
 }

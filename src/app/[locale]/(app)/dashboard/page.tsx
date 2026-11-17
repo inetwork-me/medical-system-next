@@ -1,3 +1,4 @@
+import { setLocaleFrom } from "@/i18n/set-locale"
 import { getLocale, getTranslations } from "next-intl/server"
 
 import { Link } from "@/i18n/navigation"
@@ -11,7 +12,8 @@ import { PageTitle } from "@/components/shell/page-title"
 import { DashboardExport } from "@/modules/dashboard/export"
 import { AppointmentsWidget, AttentionWidget, BedsWidget, KpiRow, VisitsWidget } from "@/modules/dashboard/widgets"
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
   const t = await getTranslations("shell.nav")
   return { title: t("dashboard") }
 }
@@ -22,7 +24,8 @@ export async function generateMetadata() {
  *  · md–lg visits, appointments (full width), then needs attention + beds side by side
  *  · mobile visits (6 months), needs attention, appointments (list), beds
  */
-export default async function DashboardPage() {
+export default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
   const t = await getTranslations("dashboard")
   const locale = await getLocale()
 

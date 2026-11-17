@@ -1,5 +1,7 @@
 "use client"
 
+
+import { asset } from "@/lib/static"
 import * as React from "react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
@@ -108,8 +110,8 @@ function SimulatorCard({ id, exam }: { id: string; exam: EyeExam }) {
     <section className="overflow-hidden rounded-xl border bg-card">
       <div data-viewport className="relative h-[200px] overflow-hidden bg-slate-900 @min-[45rem]/tab:h-[300px]">
         <div className="absolute inset-0 transition-transform duration-200" style={{ transform: `scale(${zoom})` }}>
-          <Image src="/specialties/eye_card_m.png" alt={t("alt")} fill sizes="400px" className="object-cover md:hidden" priority />
-          <Image src="/specialties/eye_card_d.png" alt={t("alt")} fill sizes="(min-width: 1280px) 816px, 100vw" className="object-cover max-md:hidden" priority />
+          <Image src={asset("/specialties/eye_card_m.png")} alt={t("alt")} fill sizes="400px" className="object-cover md:hidden" priority />
+          <Image src={asset("/specialties/eye_card_d.png")} alt={t("alt")} fill sizes="(min-width: 1280px) 816px, 100vw" className="object-cover max-md:hidden" priority />
         </div>
         <div className="absolute inset-x-0 top-0 flex items-center gap-2 p-3 @min-[45rem]/tab:p-4">
           <Glass className="me-auto font-medium">
@@ -280,7 +282,7 @@ function NineGaze({ exam }: { exam: EyeExam }) {
             return (
               <li key={g} className="flex min-w-0 flex-col items-center gap-1">
                 <span className="relative block h-[46px] w-full overflow-hidden rounded-md bg-slate-900 @min-[45rem]/tab:h-[110px]">
-                  <Image src={`/specialties/eye_9_${GAZE_IMG[g]}.png`} alt="" fill sizes="(min-width: 768px) 260px, 33vw" className="object-cover" />
+                  <Image src={asset(`/specialties/eye_9_${GAZE_IMG[g]}.png`)} alt="" fill sizes="(min-width: 768px) 260px, 33vw" className="object-cover" />
                   {limited && <span aria-hidden className="absolute inset-0 rounded-md border-2 border-warning" />}
                 </span>
                 <span dir="auto" className={cn("text-xs", limited ? "text-warning-soft-foreground" : "text-muted-foreground")}>

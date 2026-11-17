@@ -1,7 +1,10 @@
 "use client"
 
+
+import { asset } from "@/lib/static"
+import { usePatientId } from "@/modules/patients/href"
 import * as React from "react"
-import { useParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
@@ -23,7 +26,7 @@ import { Workspace } from "./workspace"
 
 /** Today's exam (editable), or a past exam opened from the history (`?exam=`), which is read-only. */
 function useEyeWs(examId?: string) {
-  const { id } = useParams<{ id: string }>()
+  const id = usePatientId()
   const today = useTodayExam(id)
   const rec = useEyeRecord(id)
   const [view, setView] = useEyeView(id)
@@ -56,7 +59,8 @@ function ViewOnly() {
 /** Desktop body height: viewport minus the 64px bar and 16px padding top and bottom. */
 const FILL = "xl:h-[calc(100svh-6rem)] xl:min-h-[640px]"
 
-export function EyeExamWorkspace({ examId }: { examId?: string }) {
+export function EyeExamWorkspace() {
+  const examId = useSearchParams().get("exam") ?? undefined
   const { id, exam, patch, view, setView, mobile, readOnly } = useEyeWs(examId)
   // Opening the exam on a tablet / computer starts today's exam (phones are view-only).
   React.useEffect(() => {
@@ -120,7 +124,7 @@ const RANK: Record<Diplopia, number> = { none: 0, right: 1, left: 1, vertical: 1
 
 export function EyeCompareWorkspace() {
   const t = useTranslations("specialties.eyes.ews.compare")
-  const { id } = useParams<{ id: string }>()
+  const id = usePatientId()
   const rec = useEyeRecord(id)
   const [view, setView] = useEyeView(id)
   const dates = useDates()
@@ -155,7 +159,7 @@ function CompareCard({ exam, label, view, still }: { exam: EyeExam; label: strin
   const dates = useDates()
   const worst = MUSCLES.map((m) => ({ m, g: exam.grades.OD[m.key] })).sort((a, b) => a.g - b.g)[0]
   // The before / after renders show the eyes looking right; other directions use the nine-gaze stills.
-  const src = view.gaze === "right" ? { src: `/specialties/${still}.png`, fit: "cover" as const } : undefined
+  const src = view.gaze === "right" ? { src: asset(`/specialties/${still}.png`), fit: "cover" as const } : undefined
   return (
     <section className="overflow-hidden rounded-[14px] border bg-card">
       <header className="flex items-center gap-2 p-4">

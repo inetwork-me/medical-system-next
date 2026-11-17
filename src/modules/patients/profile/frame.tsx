@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
@@ -36,7 +37,11 @@ export function PatientFrame({ children }: { children: React.ReactNode }) {
   const sp = useSearchParams()
   const [initialAction] = React.useState<OverlayKind | null>(() => (sp.get("action") === "book" ? { kind: "book" } : null))
   React.useEffect(() => {
-    if (sp.get("action")) window.history.replaceState(null, "", window.location.pathname)
+    if (!sp.get("action")) return
+    // Keep ?id= (the patient) — only drop the one-off action.
+    const url = new URL(window.location.href)
+    url.searchParams.delete("action")
+    window.history.replaceState(null, "", url.pathname + url.search)
   }, [sp])
   const tab = usePatientTab()
   // Keep showing the file while leaving after "Archive" (the store drops it at once).
@@ -107,7 +112,7 @@ function HeadingActions({ patient }: { patient: Patient }) {
   return (
     <div className="hidden items-center gap-2 md:flex">
       <Button variant="outline" asChild>
-        <Link href={`/patients/${patient.id}/edit`}>
+        <Link href={patientHref(patient.id, "edit")}>
           <Icon name="edit-2" size={20} />
           {t("edit")}
         </Link>
@@ -225,7 +230,7 @@ function PatientTabs({ active, id, counts }: { active: PatientTab; id: string; c
             <Link
               key={key}
               ref={on ? activeRef : undefined}
-              href={key === "overview" ? `/patients/${id}` : `/patients/${id}/${key}`}
+              href={patientHref(id, key === "overview" ? undefined : key)}
               aria-current={on ? "page" : undefined}
               data-state={on ? "active" : "inactive"}
               className={cn(

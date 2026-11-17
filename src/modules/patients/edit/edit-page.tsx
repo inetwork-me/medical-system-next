@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { notify } from "@/components/ds/toast"
@@ -104,7 +105,7 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
     error: shown,
   }
 
-  const back = `/patients/${p.id}`
+  const back = patientHref(p.id)
   const guard = useLeaveGuard(dirty)
   const leave = () => guard.leave(`/${locale}${back}`)
 
@@ -172,7 +173,7 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
           back={back}
           crumbs={[
             { label: tp("title"), href: "/patients" },
-            { label: b(p.name), href: `/patients/${p.id}` },
+            { label: b(p.name), href: patientHref(p.id) },
           ]}
         />
         <Heading onCancel={leave} onSave={onSave} />

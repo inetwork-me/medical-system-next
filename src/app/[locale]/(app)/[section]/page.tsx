@@ -1,3 +1,4 @@
+import { setLocaleFrom } from "@/i18n/set-locale"
 import { notFound } from "next/navigation"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 
@@ -22,6 +23,7 @@ export function generateStaticParams() {
 export const dynamicParams = false
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/[section]">) {
+  await setLocaleFrom(params)
   const { section } = await params
   const r = resolve(section)
   if (!r) return {}

@@ -1,5 +1,7 @@
 "use client"
 
+
+import { asset } from "@/lib/static"
 import * as React from "react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
@@ -83,7 +85,7 @@ const MUSCLE_COLORS = [
 type Still = { src: string; fit: "cover" | "contain" }
 /** Design stills standing in for the 3D viewer: portrait (desktop centre column) and landscape (tablet / cards). */
 function stills(mode: "exam" | "anatomy", gaze: Gaze, muscle: MuscleKey | null): { portrait: Still; landscape: Still } {
-  const s = (src: string, fit: Still["fit"] = "cover") => ({ src: `/specialties/${src}.png`, fit })
+  const s = (src: string, fit: Still["fit"] = "cover") => ({ src: asset(`/specialties/${src}.png`), fit })
   if (mode === "anatomy")
     return muscle === "LR" || !muscle
       ? { portrait: s("eye_ws_d_anat"), landscape: s("eye_ws_t_anat") }

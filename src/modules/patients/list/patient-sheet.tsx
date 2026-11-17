@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useFormatter, useLocale, useTranslations } from "next-intl"
 
@@ -65,7 +66,7 @@ function SheetBodyContent({ patient: p }: { patient: Patient }) {
       <div className="flex items-center gap-2 pe-10">
         <p className="flex-1 text-xs font-medium text-muted-foreground">{t("sheet.label")}</p>
         <Button variant="outline" size="sm" asChild>
-          <Link href={`/patients/${p.id}`}>
+          <Link href={patientHref(p.id)}>
             {t("sheet.openFull")}
             <Icon name="arrow-right-1" size={16} />
           </Link>
@@ -86,14 +87,14 @@ function SheetBodyContent({ patient: p }: { patient: Patient }) {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/patients/${p.id}/edit`}>
+            <Link href={patientHref(p.id, "edit")}>
               <Icon name="edit-2" size={16} />
               {t("sheet.edit")}
             </Link>
           </Button>
           <IfModule id="appointments">
             <Button size="sm" asChild>
-              <Link href={`/patients/${p.id}?action=book`}>
+              <Link href={patientHref(p.id, undefined, { action: "book" })}>
                 <Icon name="calendar-add" size={16} />
                 {t("sheet.book")}
               </Link>
@@ -106,7 +107,7 @@ function SheetBodyContent({ patient: p }: { patient: Patient }) {
       {p.tags.includes("incomplete") && (
         <Callout tone="warning" icon="warning-2" title={t("sheet.missingTitle")} text={t("sheet.missingText")}>
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/patients/${p.id}/edit`}>{t("sheet.completeNow")}</Link>
+            <Link href={patientHref(p.id, "edit")}>{t("sheet.completeNow")}</Link>
           </Button>
         </Callout>
       )}

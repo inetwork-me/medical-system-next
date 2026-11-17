@@ -1,7 +1,8 @@
 "use client"
 
+import { usePatientId } from "@/modules/patients/href"
 import * as React from "react"
-import { useParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
@@ -28,9 +29,12 @@ import { Workspace } from "./workspace"
  * plan, Tooth Panel on the side. Tablet: mode tabs, layers, tablet-size chart, Tooth Panel below. Phones: view-only.
  * One selection drives the chart, the plan rows and the panel (shared with the 3D view).
  */
-export function DentalChartWorkspace({ initialTooth }: { initialTooth?: number }) {
+export function DentalChartWorkspace() {
+  const sp = useSearchParams()
+  const toothParam = Number(sp.get("tooth"))
+  const initialTooth = Number.isFinite(toothParam) && toothParam > 0 ? toothParam : undefined
   const t = useTranslations("specialties.chartWs")
-  const { id } = useParams<{ id: string }>()
+  const id = usePatientId()
   const rec = useDentalRecord(id)
   const [selected, setSelected] = useSelectedTooth(id, initialTooth)
   const [layer, setLayer] = React.useState<Layer>("all")

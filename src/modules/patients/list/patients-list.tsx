@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useFormatter, useLocale, useTranslations } from "next-intl"
 
@@ -277,7 +278,7 @@ function PatientCard({ p }: { p: Patient }) {
   const r = useRowText(p)
   return (
     <li className="flex items-start gap-1 border-b last:border-0">
-      <Link href={`/patients/${p.id}`} className="flex min-w-0 flex-1 items-start gap-3 rounded-lg px-1 py-3 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
+      <Link href={patientHref(p.id)} className="flex min-w-0 flex-1 items-start gap-3 rounded-lg px-1 py-3 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
         <Avatar>
           <AvatarFallback>{p.initials}</AvatarFallback>
         </Avatar>

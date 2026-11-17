@@ -1,8 +1,10 @@
 "use client"
 
+
+import { asset } from "@/lib/static"
+import { usePatientId } from "@/modules/patients/href"
 import * as React from "react"
 import Image from "next/image"
-import { useParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
@@ -33,7 +35,7 @@ const PRESETS: Preset[] = ["front", "right", "left", "upper", "lower"]
 export function Dental3dWorkspace() {
   const t = useTranslations("specialties.d3")
   const tc = useTranslations("specialties.chartWs")
-  const { id } = useParams<{ id: string }>()
+  const id = usePatientId()
   const rec = useDentalRecord(id)
   const [selected, setSelected] = useSelectedTooth(id)
   const mobile = useIsMobile()
@@ -49,7 +51,7 @@ export function Dental3dWorkspace() {
           <div className="flex min-w-0 flex-col gap-4">
             <Viewport3d rec={rec} selected={selected} onSelect={setSelected} compact={mobile} className="h-[420px] md:h-[440px] xl:h-[640px] max-md:rounded-none" />
             <div className="grid grid-cols-3 gap-4 max-xl:hidden">
-              <Thumb src="/specialties/dent_occ_lower.png" label={t("occlusal")} />
+              <Thumb src={asset("/specialties/dent_occ_lower.png")} label={t("occlusal")} />
               {(selected != null ? (TOOTH_XRAYS[selected] ?? []) : []).map((x) => (
                 <Thumb key={x.src} src={x.src} label={b(x.label)} />
               ))}
@@ -180,7 +182,7 @@ function Viewport3d({
     upper: "perspective(1400px) rotateX(-14deg)",
     lower: "none",
   }
-  const src = preset === "lower" ? "/specialties/dent_occ_lower.png" : null
+  const src = preset === "lower" ? asset("/specialties/dent_occ_lower.png") : null
   // Patient's left (Q2 / Q3) shows on the viewer's right.
   const onRight = selected != null && !([1, 4, 5, 8].includes(Math.floor(selected / 10)))
   const tools: { key: string; icon: IconName; label: string; onClick: (e: React.MouseEvent<HTMLElement>) => void }[] = [
@@ -219,9 +221,9 @@ function Viewport3d({
           <Image src={src} alt={t(`preset.${preset}`)} fill sizes="100vw" className="object-contain" />
         ) : (
           <>
-            <Image src="/specialties/dent_m.png" alt={t("alt")} fill sizes="400px" className="object-cover md:hidden" priority />
-            <Image src="/specialties/dent_ws_t.png" alt={t("alt")} fill sizes="720px" className="object-cover max-md:hidden xl:hidden" priority />
-            <Image src="/specialties/dent_ws_d.png" alt={t("alt")} fill sizes="1032px" className="object-cover max-xl:hidden" priority />
+            <Image src={asset("/specialties/dent_m.png")} alt={t("alt")} fill sizes="400px" className="object-cover md:hidden" priority />
+            <Image src={asset("/specialties/dent_ws_t.png")} alt={t("alt")} fill sizes="720px" className="object-cover max-md:hidden xl:hidden" priority />
+            <Image src={asset("/specialties/dent_ws_d.png")} alt={t("alt")} fill sizes="1032px" className="object-cover max-xl:hidden" priority />
           </>
         )}
       </div>

@@ -1,3 +1,4 @@
+import { setLocaleFrom } from "@/i18n/set-locale"
 import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -12,6 +13,7 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
+  await setLocaleFrom(params)
   const { locale } = await params;
   const t = await getTranslations({ locale: hasLocale(routing.locales, locale) ? locale : "en", namespace: "common" });
   return { title: { default: t("app.name"), template: `%s · ${t("app.name")}` } };

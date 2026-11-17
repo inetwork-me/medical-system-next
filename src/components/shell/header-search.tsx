@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
 
@@ -68,7 +69,7 @@ function SearchPanel({ onClose }: { onClose: () => void }) {
             {results.map((p, i) => (
               <Link
                 key={p.id}
-                href={`/patients/${p.id}`}
+                href={patientHref(p.id)}
                 onClick={onClose}
                 className={cn(
                   "flex items-center gap-2.5 rounded-md p-2 outline-none transition-colors hover:bg-accent focus-visible:bg-accent",

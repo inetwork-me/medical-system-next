@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useFormatter, useTranslations } from "next-intl"
 import { notify } from "@/components/ds/toast"
@@ -695,7 +696,7 @@ function DupGroupCard({ group: g, onDismiss }: { group: ReturnType<typeof duplic
                   <AvatarFallback>{p.initials}</AvatarFallback>
                 </Avatar>
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <Link href={`/patients/${p.id}`} className="truncate text-sm font-medium hover:underline">
+                  <Link href={patientHref(p.id)} className="truncate text-sm font-medium hover:underline">
                     {b(p.name)}
                   </Link>
                   <bdi dir="ltr" className="text-xs text-muted-foreground tabular-nums rtl:text-right">
@@ -801,7 +802,7 @@ function IncompleteReport() {
           ]}
           item={(r) => (
             <div className="flex flex-col items-start gap-2">
-              <Link href={`/patients/${r.patient.id}`} className="text-sm font-medium hover:underline">
+              <Link href={patientHref(r.patient.id)} className="text-sm font-medium hover:underline">
                 {b(r.patient.name)}
               </Link>
               <MissingBadges fields={r.missing} />
@@ -847,7 +848,7 @@ function CompleteButton({ id }: { id: string }) {
   const t = useTranslations("patients.reports.incomplete")
   return (
     <Button variant="outline" size="sm" asChild>
-      <Link href={`/patients/${id}/edit`}>
+      <Link href={patientHref(id, "edit")}>
         <Icon name="edit-2" size={16} />
         {t("complete")}
       </Link>

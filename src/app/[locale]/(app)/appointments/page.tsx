@@ -1,14 +1,20 @@
+import { setLocaleFrom } from "@/i18n/set-locale"
+import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 
-import { CalendarScreen } from "@/modules/appointments/calendar/calendar"
-import { parseCalendarParams } from "@/modules/appointments/calendar/params"
+import { CalendarPage } from "@/modules/appointments/calendar/calendar-page"
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
   return { title: (await getTranslations("shell.nav"))("appointments") }
 }
 
 /** Appointments · Calendar · Day / Week / Month (?view=, ?date=). */
-export default async function AppointmentsCalendarPage({ searchParams }: { searchParams: Promise<{ view?: string; date?: string }> }) {
-  const { view, date } = parseCalendarParams(await searchParams)
-  return <CalendarScreen key={`${view}-${date}`} initialView={view} initialDate={date} />
+export default async function AppointmentsCalendarPage({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
+  return (
+    <Suspense>
+      <CalendarPage />
+    </Suspense>
+  )
 }

@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { notify } from "@/components/ds/toast"
@@ -199,7 +200,7 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
         },
       },
     })
-    router.push(`/patients/${keep.patient.id}`)
+    router.push(patientHref(keep.patient.id))
   }
 
   return (
@@ -207,7 +208,7 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
       {/* Mobile top bar */}
       <div data-mobile-page-bar className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-card px-3 md:hidden">
         <Button variant="ghost" size="icon" aria-label={t("cancel")} asChild>
-          <Link href={`/patients/${keep.patient.id}`}>
+          <Link href={patientHref(keep.patient.id)}>
             <Icon name="close-circle" size={24} />
           </Link>
         </Button>
@@ -219,7 +220,7 @@ function MergeView({ keep, drop }: { keep: Facts; drop: Facts }) {
         <div className="hidden items-center justify-end gap-3 md:flex">
           <div className="flex items-center gap-2">
             <Button variant="outline" asChild>
-              <Link href={`/patients/${keep.patient.id}`}>
+              <Link href={patientHref(keep.patient.id)}>
                 <Icon name="close-circle" size={20} />
                 {t("cancel")}
               </Link>

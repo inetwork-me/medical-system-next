@@ -1,8 +1,10 @@
 "use client"
 
+
+import { asset } from "@/lib/static"
+import { usePatientId } from "@/modules/patients/href"
 import * as React from "react"
 import Image from "next/image"
-import { useParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
@@ -26,7 +28,7 @@ const STEP_LOOK: Look[] = ["ahead", "right", "ahead"]
 
 export function EyePatientView() {
   const t = useTranslations("specialties.pv")
-  const { id } = useParams<{ id: string }>()
+  const id = usePatientId()
   const rec = useEyeRecord(id)
   const mobile = useIsMobile()
   const { b, locale } = useText()
@@ -144,9 +146,9 @@ function Still({ look, alt }: { look: Look; alt: string }) {
   if (look === "right")
     return (
       <div className="absolute inset-0">
-        <Image src="/specialties/eye_edu_m.png" alt={alt} fill sizes="100vw" className="object-cover md:hidden" priority />
-        <Image src="/specialties/eye_edu_t.png" alt={alt} fill sizes="100vw" className="object-cover max-md:hidden xl:hidden" priority />
-        <Image src="/specialties/eye_edu_d.png" alt={alt} fill sizes="100vw" className="object-cover max-xl:hidden" priority />
+        <Image src={asset("/specialties/eye_edu_m.png")} alt={alt} fill sizes="100vw" className="object-cover md:hidden" priority />
+        <Image src={asset("/specialties/eye_edu_t.png")} alt={alt} fill sizes="100vw" className="object-cover max-md:hidden xl:hidden" priority />
+        <Image src={asset("/specialties/eye_edu_d.png")} alt={alt} fill sizes="100vw" className="object-cover max-xl:hidden" priority />
       </div>
     )
   return (
@@ -158,7 +160,7 @@ function Still({ look, alt }: { look: Look; alt: string }) {
           look === "ahead" ? "aspect-[748/804] h-full" : "aspect-[480/200] w-full",
         )}
       >
-        <Image src={look === "ahead" ? "/specialties/eye_ws_d_primary.png" : "/specialties/eye_9_mid_l.png"} alt={alt} fill sizes="100vw" className="object-cover" />
+        <Image src={look === "ahead" ? asset("/specialties/eye_ws_d_primary.png") : asset("/specialties/eye_9_mid_l.png")} alt={alt} fill sizes="100vw" className="object-cover" />
       </div>
     </div>
   )

@@ -1,5 +1,6 @@
 "use client"
 
+import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useFormatter, useTranslations } from "next-intl"
 
@@ -133,7 +134,7 @@ export function TransactionsCard() {
             head: t("col.patient"),
             width: "minmax(0,1.2fr)",
             cell: (x) => (
-              <Link href={`/patients/${x.patient.id}`} className="truncate font-medium hover:underline">
+              <Link href={patientHref(x.patient.id)} className="truncate font-medium hover:underline">
                 {b(x.patient.name)}
               </Link>
             ),

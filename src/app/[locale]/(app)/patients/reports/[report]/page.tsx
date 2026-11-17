@@ -1,3 +1,4 @@
+import { setLocaleFrom } from "@/i18n/set-locale"
 import { notFound } from "next/navigation"
 import { getTranslations } from "next-intl/server"
 
@@ -9,6 +10,7 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/patients/reports/[report]">) {
+  await setLocaleFrom(params)
   const { report } = await params
   if (!REPORT_KEYS.includes(report as ReportKey)) return {}
   return { title: (await getTranslations("patients.reports.cards"))(`${report as ReportKey}.title`) }
@@ -16,6 +18,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/patients
 
 /** Patients · Report · <name> (activity, registrations, stay, visits, duplicates, incomplete). */
 export default async function ReportPage({ params }: PageProps<"/[locale]/patients/reports/[report]">) {
+  await setLocaleFrom(params)
   const { report } = await params
   if (!REPORT_KEYS.includes(report as ReportKey)) notFound()
   return <ReportBody report={report as ReportKey} />

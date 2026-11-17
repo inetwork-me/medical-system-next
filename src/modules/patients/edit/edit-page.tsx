@@ -263,7 +263,7 @@ function Heading({ patient, onCancel, onSave }: { patient: Patient; onCancel: ()
           <Button variant="ghost" size="icon-sm" aria-label={t("edit.back")} onClick={onCancel}>
             <Icon name="arrow-left" size={20} />
           </Button>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("edit.title")}</h1>
+          <h1 className="text-xl font-semibold">{t("edit.title")}</h1>
         </div>
         <nav aria-label={t("page.breadcrumb")}>
           <ol className="flex flex-wrap items-center gap-1.5 text-xs">
@@ -472,7 +472,7 @@ function SectionFields({ sectionKey }: { sectionKey: SectionKey }) {
       return (
         <>
           <TextField k="mobile" required dir="ltr" type="tel" icon="call" inputMode="tel" autoComplete="tel" placeholder="+966 5X XXX XXXX" />
-          <TextField k="whatsapp" dir="ltr" type="tel" icon="message" inputMode="tel" disabled={form.sameWhatsapp} placeholder="+966 5X XXX XXXX" />
+          <TextField k="whatsapp" dir="ltr" type="tel" icon="message" inputMode="tel" readOnly={form.sameWhatsapp} placeholder="+966 5X XXX XXXX" />
           <label className="flex cursor-pointer items-center gap-2 text-sm @min-[30rem]/sec:col-span-2">
             <Checkbox checked={form.sameWhatsapp} onCheckedChange={(v) => set("sameWhatsapp", v === true)} />
             {t("sameWhatsapp")}

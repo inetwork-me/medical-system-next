@@ -286,7 +286,7 @@ export function NewPatientWizard() {
       <PageContainer className="gap-4 md:gap-6">
         <div ref={top} className="hidden scroll-mt-24 items-center gap-3 md:flex">
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+            <h1 className="text-xl font-semibold">{t("title")}</h1>
             <Breadcrumb />
           </div>
           {!done && (
@@ -410,13 +410,13 @@ function Stepper({ step, onGo }: { step: Step; onGo: (s: Step) => void }) {
   return (
     <>
       {/* Full (md+) */}
-      <ol className="hidden items-center gap-2 rounded-xl border bg-card px-5 py-4 md:flex" aria-label={t("progress")}>
+      <ol className="hidden items-center gap-1.5 rounded-xl border bg-card px-4 py-4 md:flex lg:gap-2 lg:px-5" aria-label={t("progress")}>
         {STEP_KEYS.map((k, i) => {
           const n = (i + 1) as Step
           const state = n < step ? "done" : n === step ? "current" : "next"
           return (
             <React.Fragment key={k}>
-              <li className="flex shrink-0 items-center gap-2.5" aria-current={state === "current" ? "step" : undefined}>
+              <li className="flex shrink-0 items-center gap-2 lg:gap-2.5" aria-current={state === "current" ? "step" : undefined}>
                 <button
                   type="button"
                   disabled={state !== "done"}
@@ -436,7 +436,7 @@ function Stepper({ step, onGo }: { step: Step; onGo: (s: Step) => void }) {
                   <span className={cn("text-sm font-medium", state === "next" ? "text-muted-foreground" : "text-foreground")}>{t(`steps.${k}`)}</span>
                 </span>
               </li>
-              {n < 4 && <li aria-hidden className={cn("h-0.5 min-w-4 flex-1 rounded-full", n < step ? "bg-success" : "bg-border")} />}
+              {n < 4 && <li aria-hidden className={cn("h-0.5 min-w-2 flex-1 rounded-full lg:min-w-4", n < step ? "bg-success" : "bg-border")} />}
             </React.Fragment>
           )
         })}
@@ -587,7 +587,7 @@ function StepCard({
         {step === 2 && (
           <>
             <TextField k="mobile" required dir="ltr" type="tel" icon="call" inputMode="tel" autoComplete="tel" placeholder="+966 5X XXX XXXX" />
-            <TextField k="whatsapp" dir="ltr" type="tel" icon="message" inputMode="tel" disabled={form.sameWhatsapp} placeholder="+966 5X XXX XXXX" />
+            <TextField k="whatsapp" dir="ltr" type="tel" icon="message" inputMode="tel" readOnly={form.sameWhatsapp} placeholder="+966 5X XXX XXXX" />
             <CheckRow k="sameWhatsapp" wide />
             <TextField k="email" dir="ltr" type="email" icon="sms" autoComplete="email" placeholder="name@example.com" />
             <SelectField k="language" options="language" />
@@ -632,7 +632,7 @@ function StepCard({
               </>
             )}
             <SelectField k="bloodType" options="bloodTypeOrUnknown" />
-            <div className="flex items-end pb-2">
+            <div className="flex items-start pt-0.5">
               <CheckRow k="noAllergies" />
             </div>
             {!form.noAllergies && <ChipsField k="allergies" tone="destructive" add={tf("addAllergy")} />}
@@ -701,7 +701,7 @@ function Review({ onEdit }: { onEdit: (s: Step) => void }) {
       rows: [
         [t("new.review.name"), b({ en: f.nameEn || "—", ar: f.nameAr || f.nameEn || "—" })],
         [t("new.review.genderAge"), `${f.gender === "unset" ? "—" : t(`gender.single.${f.gender}`)} · ${age !== null ? t("new.summary.years", { n: age }) : "—"}`],
-        [t("new.review.birth"), f.birthDate ? dates.short(f.birthDate) : "—"],
+        [t("new.review.birth"), f.birthDate ? dates.numeric(f.birthDate) : "—"],
         [t("new.review.nationality"), L("nationality", f.nationality)],
         [L("idType", f.idType), ltr(f.idNumber)],
       ],
@@ -735,9 +735,9 @@ function Review({ onEdit }: { onEdit: (s: Step) => void }) {
   return (
     <div className="flex flex-col gap-4">
       {cards.map((c) => (
-        <section key={c.n} className="@container/sec flex flex-col gap-3 rounded-xl border bg-card p-4 md:p-6" aria-labelledby={`review-${c.n}`}>
+        <section key={c.n} className="@container/sec flex flex-col gap-4 rounded-xl border bg-card p-4 md:p-6" aria-labelledby={`review-${c.n}`}>
           <header className="flex items-start gap-3">
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
               <h2 id={`review-${c.n}`} className="text-lg font-semibold">
                 {t(`new.steps.s${c.n}`)}
               </h2>
@@ -825,7 +825,7 @@ function Success({ mrn, name, sms, onAnother }: { mrn: string; name: string; sms
   const t = useTranslations("patients.new")
   return (
     <div className="flex justify-center md:py-8 xl:py-12">
-      <section className="flex w-full max-w-140 flex-col items-center gap-4 rounded-2xl border bg-card p-6 text-center md:p-8" role="status">
+      <section className="flex w-full max-w-140 flex-col items-center gap-4 rounded-2xl border bg-card p-8 text-center" role="status">
         <span className="flex size-16 items-center justify-center rounded-full bg-success-soft text-success">
           <Icon name="tick-circle" size={32} />
         </span>

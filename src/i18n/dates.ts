@@ -25,6 +25,11 @@ export function dateFormatter(locale: string) {
   return {
     /** 15 Nov 2026 */
     short: (d: Date | string) => fmt({ day: "numeric", month: "short", year: "numeric" }).format(toDate(d)),
+    /** 04/07/1988 — date fields (DS date picker value), same in both languages */
+    numeric: (d: Date | string) => {
+      const x = toDate(d)
+      return `${String(x.getDate()).padStart(2, "0")}/${String(x.getMonth() + 1).padStart(2, "0")}/${x.getFullYear()}`
+    },
     /** 15 November 2026 */
     long: (d: Date | string) => fmt({ day: "numeric", month: "long", year: "numeric" }).format(toDate(d)),
     /** 15 Nov */

@@ -50,7 +50,7 @@ export function DatePicker({
       <PopoverTrigger asChild>
         <button type="button" className={cn(triggerClass, className)} data-placeholder={!value || undefined} {...aria}>
           <Icon name="calendar-2" size={16} className="text-muted-foreground" />
-          <span className="flex-1 truncate tabular-nums">{value ? dates.short(value) : placeholder}</span>
+          <span className="flex-1 truncate tabular-nums">{value ? dates.numeric(value) : placeholder}</span>
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-76 gap-3 shadow-md">

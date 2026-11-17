@@ -13,7 +13,7 @@ import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
 import { PCard } from "../profile/side"
 import { MUSCLES, type Diplopia, type EyeExam } from "./data"
 import { EyeActions, EyeViewport, FindingsForm, GazePad, MuscleEditor, MuscleInfo, formatGrade, useEyeText } from "./eye-parts"
-import { useEyeRecord, useEyeView, useTodayExam } from "./eye-store"
+import { startEyeExam, useEyeRecord, useEyeView, useTodayExam } from "./eye-store"
 import { Workspace } from "./workspace"
 
 /**
@@ -58,6 +58,10 @@ const FILL = "xl:h-[calc(100svh-6rem)] xl:min-h-[640px]"
 
 export function EyeExamWorkspace({ examId }: { examId?: string }) {
   const { id, exam, patch, view, setView, mobile, readOnly } = useEyeWs(examId)
+  // Opening the exam on a tablet / computer starts today's exam (phones are view-only).
+  React.useEffect(() => {
+    if (!examId && window.matchMedia("(min-width: 768px)").matches) startEyeExam(id)
+  }, [id, examId])
   return (
     <Workspace kind="eye" mode="exam" actions={exam && <EyeActions id={id} />}>
       {!exam ? (

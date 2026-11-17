@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { eyeRecord, type Eye, type EyeExam, type EyeRecord, type Gaze, type MuscleKey } from "./data"
+import { eyeRecord, newEyeExam, type Eye, type EyeExam, type EyeRecord, type Gaze, type MuscleKey } from "./data"
 
 /**
  * Session state of the eye workspaces, shared by Exam / Anatomy / Compare and the Eyes tab:
@@ -22,7 +22,8 @@ export type EyeView = {
 }
 export const DEFAULT_VIEW: EyeView = { gaze: "right", angle: 30, eye: "both", together: true, showMuscles: true, showLines: false, muscle: "LR", muscleEye: "OD" }
 
-type PatientEyes = { draft?: Partial<EyeExam>; signedAt?: string; view?: Partial<EyeView> }
+/** `started`: today's exam was opened (a new draft for patients without one). */
+type PatientEyes = { started?: boolean; draft?: Partial<EyeExam>; signedAt?: string; view?: Partial<EyeView> }
 type State = Record<string, PatientEyes>
 
 const KEY = "ms.eyes.session"
@@ -68,11 +69,13 @@ export function useEyeRecord(id: string): EyeRecord | null {
   const e = useEyes(id)
   return React.useMemo(() => {
     const base = eyeRecord(id)
-    if (!base || !e) return base
+    if (!e) return base
+    let exams = base?.exams ?? []
+    // Opening the exam starts today's draft from the latest signed exam (or a normal baseline for a first exam).
+    if (e.started && !exams.some((x) => x.kind === "today")) exams = [newEyeExam(exams.find((x) => x.status === "signed")), ...exams]
+    if (!exams.length) return null
     return {
-      exams: base.exams.map((x) =>
-        x.status === "draft" || x.kind === "today" ? { ...x, ...e.draft, ...(e.signedAt ? { status: "signed" as const } : {}) } : x,
-      ),
+      exams: exams.map((x) => (x.kind === "today" ? { ...x, ...e.draft, ...(e.signedAt ? { status: "signed" as const } : {}) } : x)),
     }
   }, [id, e])
 }
@@ -91,6 +94,11 @@ export function useEyeView(id: string): [EyeView, (p: Partial<EyeView>) => void]
   const view = React.useMemo(() => ({ ...DEFAULT_VIEW, ...e?.view }), [e?.view])
   const set = React.useCallback((p: Partial<EyeView>) => update(id, (s) => ({ ...s, view: { ...s.view, ...p } })), [id])
   return [view, set]
+}
+
+/** Start (or reopen) today's exam — called when the exam workspace opens on a tablet / computer. */
+export function startEyeExam(id: string) {
+  if (!state[id]?.started) update(id, (s) => ({ ...s, started: true }))
 }
 
 export function signExam(id: string) {

@@ -1,4 +1,5 @@
 import type { Bi } from "@/lib/mock/bi"
+import { patientById, patientDetails } from "../data"
 
 /**
  * Eyes & Dental (FigCraft page "Eyes & Dental", design v4.1). Copy and figures come from design-scripts/spec_widgets.py.
@@ -73,6 +74,7 @@ export type EyeExam = {
 
 /** ICD-10 codes offered on the eye exam (Latin code + name). */
 export const EYE_ICD: { code: string; name: Bi }[] = [
+  { code: "Z01.00", name: { en: "Routine eye exam, normal", ar: "فحص عيون روتيني · طبيعي" } },
   { code: "H49.21", name: { en: "Sixth nerve palsy, right eye", ar: "شلل العصب السادس · العين اليمنى" } },
   { code: "H49.22", name: { en: "Sixth nerve palsy, left eye", ar: "شلل العصب السادس · العين اليسرى" } },
   { code: "H49.11", name: { en: "Fourth nerve palsy, right eye", ar: "شلل العصب الرابع · العين اليمنى" } },
@@ -320,7 +322,7 @@ export const TOOTH_XRAYS: Record<number, Xray[]> = {
 
 /* ---------------------------------------------------------------- treatment plan */
 
-export type InsuranceStatus = "pending" | "covered" | "claimSent"
+export type InsuranceStatus = "pending" | "covered" | "claimSent" | "selfPay"
 export type PlanItem = {
   id: string
   phase: "urgent" | "restore" | "prevent" | "today"
@@ -392,8 +394,9 @@ const FAHAD_PLAN: PlanItem[] = [
   },
 ]
 
-export type DentalInsurance = { payer: Bi; payerShort: Bi; className: string; policy: string; annualLimit: number; used: number }
-const FAHAD_INSURANCE: DentalInsurance = { payer: { en: "Bupa Arabia", ar: "بوبا العربية" }, payerShort: { en: "Bupa", ar: "بوبا" }, className: "B", policy: "BP-2210 4471", annualLimit: 5000, used: 820 }
+/** `insured: false` = self-pay (no coverage, no pre-approval, no annual limit). */
+export type DentalInsurance = { insured: boolean; payer: Bi; payerShort: Bi; className: string; policy: string; annualLimit: number; used: number }
+const FAHAD_INSURANCE: DentalInsurance = { insured: true, payer: { en: "Bupa Arabia", ar: "بوبا العربية" }, payerShort: { en: "Bupa", ar: "بوبا" }, className: "B", policy: "BP-2210 4471", annualLimit: 5000, used: 820 }
 
 export type PreApprovalStep = "prepared" | "xrays" | "sent" | "decision"
 export type PreApproval = {
@@ -470,14 +473,277 @@ export type DentalRecord = {
   gums: Record<number, GumSite>
 }
 
+/* ---------------------------------------------------------------- sample patients (testing) */
+
+/** "Today" for the specialty screens (the design's exam / visit date). */
+export const SPEC_TODAY = "2026-11-17"
+
+/**
+ * Test data: besides Fahad (the design file), patients get one of a few sample histories, picked from the MRN
+ * (MRN mod 5): 0 normal eye check-up + dental, 1 dental only, 2 exotropia + dental, 3 fourth-nerve palsy + dental,
+ * 4 nothing (to try the empty states and starting a first exam / chart). Children get the teen dental sample.
+ */
+const bucket = (id: string) => Number(id) % 5
+
+const zero = { LR: 0, MR: 0, SR: 0, IR: 0, SO: 0, IO: 0 }
+const sampleExam = (e: Partial<EyeExam> & Pick<EyeExam, "id" | "date" | "kind" | "trend">): EyeExam => ({
+  doctor: REEM,
+  status: "signed",
+  grades: { OD: { ...zero }, OS: { ...zero } },
+  icd10: "Z01.00",
+  coverTest: "ortho",
+  deviation: { near: 0, far: 0 },
+  diplopia: "none",
+  headPosture: { kind: "none", deg: 0 },
+  nystagmus: "none",
+  acuity: { OD: "6/6", OS: "6/6" },
+  limited: [],
+  notes: { en: "", ar: "" },
+  ...e,
+})
+
+function sampleEyes(id: string): EyeExam[] | null {
+  const b = bucket(id)
+  if (b === 0)
+    return [
+      sampleExam({
+        id: `eye-${id}-1`,
+        date: "2026-09-14",
+        kind: "first",
+        trend: "baseline",
+        notes: { en: "Full movement in all nine positions. No deviation.", ar: "الحركة كاملة في الاتجاهات التسعة. ما فيه انحراف." },
+      }),
+    ]
+  if (b === 2)
+    return [
+      sampleExam({
+        id: `eye-${id}-2`,
+        date: "2026-10-12",
+        kind: "followUp",
+        trend: "improving",
+        grades: { OD: { ...zero }, OS: { ...zero, MR: -1 } },
+        icd10: "H50.10",
+        coverTest: "exotropia",
+        deviation: { near: 10, far: 12 },
+        diplopia: "right",
+        headPosture: { kind: "turnRight", deg: 5 },
+        acuity: { OD: "6/6", OS: "6/9" },
+        limited: ["right"],
+        notes: { en: "Convergence exercises helping. Recheck in 3 months.", ar: "تمارين التقريب قاعدة تفيد. نعيد الفحص بعد 3 شهور." },
+      }),
+      sampleExam({
+        id: `eye-${id}-1`,
+        date: "2026-06-02",
+        kind: "first",
+        trend: "baseline",
+        grades: { OD: { ...zero }, OS: { ...zero, MR: -2 } },
+        icd10: "H50.10",
+        coverTest: "exotropia",
+        deviation: { near: 18, far: 20 },
+        diplopia: "most",
+        headPosture: { kind: "turnRight", deg: 10 },
+        acuity: { OD: "6/6", OS: "6/9" },
+        limited: ["upR", "right", "downR"],
+        notes: { en: "Left eye drifts out when tired. Start convergence exercises.", ar: "العين اليسرى تطلع لبرّا لما يتعب. نبدأ تمارين التقريب." },
+      }),
+    ]
+  if (b === 3)
+    return [
+      sampleExam({
+        id: `eye-${id}-1`,
+        date: "2026-08-20",
+        kind: "first",
+        trend: "baseline",
+        grades: { OD: { ...zero, SO: -2, IO: 1 }, OS: { ...zero } },
+        icd10: "H49.11",
+        coverTest: "ortho",
+        diplopia: "vertical",
+        headPosture: { kind: "tiltLeft", deg: 10 },
+        limited: ["downL"],
+        notes: { en: "Vertical double vision reading. Prism glasses trial.", ar: "رؤية مزدوجة عمودية وقت القراية. نجرّب نظارة منشورية." },
+      }),
+    ]
+  return null
+}
+
+/** Today's new exam, started from the latest one (or a normal baseline). */
+export function newEyeExam(latest: EyeExam | undefined): EyeExam {
+  return {
+    ...(latest ?? sampleExam({ id: "", date: SPEC_TODAY, kind: "today", trend: "draft" })),
+    id: `eye-${SPEC_TODAY}`,
+    date: SPEC_TODAY,
+    status: "draft",
+    kind: "today",
+    trend: "draft",
+    notes: { en: "", ar: "" },
+  }
+}
+
+/** Patient's insurance from the profile ("Tawuniya · Class A"), or self-pay. */
+function insuranceOf(id: string, used: number): DentalInsurance {
+  const p = patientById(id)
+  const ins = p ? patientDetails(p).insurance : null
+  if (!ins) return { insured: false, payer: { en: "Self-pay", ar: "على حسابه" }, payerShort: { en: "Self-pay", ar: "على حسابه" }, className: "—", policy: "—", annualLimit: 0, used: 0 }
+  const [en, enCls] = ins.en.split(" · ")
+  const [ar] = ins.ar.split(" · ")
+  return {
+    insured: true,
+    payer: { en, ar },
+    payerShort: { en, ar },
+    className: (enCls ?? "").replace("Class ", "") || "A",
+    policy: `TW-${id.slice(-4)} ${String(Number(id) * 7).slice(-4)}`,
+    annualLimit: 5000,
+    used,
+  }
+}
+
+const planItem = (ins: DentalInsurance, i: Omit<PlanItem, "coveragePct" | "insuranceStatus" | "procedure" | "fee"> & { insuranceStatus?: InsuranceStatus }): PlanItem => {
+  const proc = procedureBy(i.cdt)!
+  return {
+    ...i,
+    procedure: proc.name,
+    fee: proc.fee,
+    coveragePct: ins.insured ? proc.coveragePct : 0,
+    insuranceStatus: !ins.insured ? "selfPay" : (i.insuranceStatus ?? (proc.preApproval && i.status === "planned" ? "pending" : i.status === "done" ? "claimSent" : "covered")),
+  }
+}
+
+const healthyGums = (teeth: Record<number, ToothRecord>): Record<number, GumSite> => {
+  const out: Record<number, GumSite> = {}
+  for (const fdi of [...GUM_UPPER, ...GUM_LOWER]) {
+    if (teeth[fdi]?.state === "missing") continue
+    out[fdi] = { depth: fdi % 2 ? [2, 2, 2] : [2, 1, 2], bleeding: [false, false, false], recession: 0, mobility: 0 }
+  }
+  return out
+}
+const GENERIC_HEALTH: GumHealth = {
+  plaquePct: 12,
+  risk: "low",
+  nextCleaning: "2027-05-17",
+  watch: null,
+  advice: [
+    { en: "Brush twice a day", ar: "فرّش مرتين باليوم" },
+    { en: "Floss daily", ar: "خيط الأسنان يومياً" },
+    { en: "Fluoride toothpaste", ar: "معجون فيه فلورايد" },
+  ],
+}
+const DOC_SAMI: Bi = { en: "Dr. Sami Odeh", ar: "د. سامي عودة" }
+
+function consentFor(id: string): Consent {
+  const p = patientById(id)
+  const minor = !!p && p.age < 18
+  return {
+    guardian: minor ? { name: { en: "Guardian", ar: "ولي الأمر" }, initials: "G", relation: { en: "Parent · guardian", ar: "الوالد · ولي الأمر" }, mobile: p!.mobile ?? "" } : null,
+    status: "unsigned",
+  }
+}
+
+/** A blank chart for a patient's first dental visit (all teeth healthy; wisdom teeth not erupted under 18). */
+export function newDentalRecord(id: string): DentalRecord {
+  const p = patientById(id)
+  const teeth: Record<number, ToothRecord> = p && p.age < 18 ? { 18: { state: "unerupted" }, 28: { state: "unerupted" }, 38: { state: "unerupted" }, 48: { state: "unerupted" } } : {}
+  return {
+    consent: consentFor(id),
+    gumHealth: GENERIC_HEALTH,
+    chart: { teeth, selected: 36 },
+    plan: [],
+    insurance: insuranceOf(id, 0),
+    preApproval: null,
+    history: [],
+    gums: healthyGums(teeth),
+  }
+}
+
+function sampleDental(id: string): DentalRecord | null {
+  const b = bucket(id)
+  if (b === 4) return null
+  const p = patientById(id)
+  const base = newDentalRecord(id)
+  const teen = !!p && p.age < 18
+  if (teen) {
+    const ins = insuranceOf(id, 300)
+    const teeth: Record<number, ToothRecord> = {
+      ...base.chart.teeth,
+      16: { surfaces: { O: "existing" } },
+      26: { surfaces: { O: "existing" } },
+      36: { surfaces: { O: "existing" } },
+      46: { surfaces: { O: "existing" } },
+      24: { surfaces: { D: "decay" }, planned: true },
+    }
+    return {
+      ...base,
+      insurance: ins,
+      chart: { teeth, selected: 24 },
+      plan: [planItem(ins, { id: "s1", phase: "restore", teeth: [24], cdt: "D2391", status: "planned" })],
+      history: [{ date: "2026-03-08", title: { en: "Fissure sealants · 16, 26, 36, 46", ar: "سد الشقوق · 16، 26، 36، 46" }, doctor: DOC_SAMI }],
+      gums: healthyGums(teeth),
+    }
+  }
+  if (b === 1) {
+    const ins = insuranceOf(id, 1450)
+    const teeth: Record<number, ToothRecord> = {
+      46: { state: "missing" },
+      36: { surfaces: { O: "existing", M: "existing", D: "existing", B: "existing", L: "existing" } },
+      17: { surfaces: { O: "existing" } },
+    }
+    const implant = planItem(ins, { id: "s1", phase: "restore", teeth: [46], cdt: "D6010", status: "planned" })
+    return {
+      ...base,
+      insurance: ins,
+      chart: { teeth: { ...teeth, 46: { state: "missing", planned: true, marks: ["implant"] } }, selected: 46 },
+      plan: [implant],
+      preApproval: ins.insured
+        ? {
+            items: ["s1"],
+            teeth: [46],
+            diagnosis: "K08.1",
+            diagnosisName: { en: "Loss of a tooth", ar: "فقدان سن" },
+            attachments: ["xrays", "chart", "note"],
+            steps: [{ key: "prepared", at: "2026-11-15T09:20" }, { key: "xrays" }, { key: "sent" }, { key: "decision" }],
+            current: "xrays",
+            status: "pending",
+            notifyGuardian: false,
+          }
+        : null,
+      history: [
+        { date: "2026-02-11", title: { en: "Extraction · 46", ar: "خلع · 46" }, doctor: DOC_SAMI },
+        { date: "2025-06-20", title: { en: "Porcelain crown · 36", ar: "تلبيسة بورسلان · 36" }, doctor: DOC_SAMI },
+      ],
+      gums: healthyGums(teeth),
+    }
+  }
+  const ins = insuranceOf(id, 600)
+  const teeth: Record<number, ToothRecord> = {
+    36: { surfaces: { O: "existing" } },
+    46: { surfaces: { O: "existing", D: "existing" } },
+    14: { surfaces: { O: "decay" }, planned: true },
+  }
+  return {
+    ...base,
+    insurance: ins,
+    chart: { teeth, selected: 14 },
+    plan: [
+      planItem(ins, { id: "s1", phase: "restore", teeth: [14], cdt: "D2391", status: "planned" }),
+      planItem(ins, { id: "s2", phase: "today", teeth: [46], cdt: "D2392", status: "done" }),
+    ],
+    history: [
+      { date: SPEC_TODAY, title: { en: "Composite filling · 46 (O, D)", ar: "حشوة · 46 (O, D)" }, doctor: DOC_SAMI },
+      { date: "2026-04-03", title: { en: "Cleaning & check-up", ar: "تنظيف وكشف" }, doctor: DOC_SAMI },
+    ],
+    gums: healthyGums(teeth),
+  }
+}
+
 /** Eye exams for a patient (null = none recorded yet). */
 export function eyeRecord(patientId: string): EyeRecord | null {
-  return patientId === FAHAD ? { exams: FAHAD_EYE } : null
+  if (patientId === FAHAD) return { exams: FAHAD_EYE }
+  const exams = sampleEyes(patientId)
+  return exams ? { exams } : null
 }
 
 /** Dental file for a patient (null = no dental visits yet). */
 export function dentalRecord(patientId: string): DentalRecord | null {
-  if (patientId !== FAHAD) return null
+  if (patientId !== FAHAD) return sampleDental(patientId)
   return {
     consent: {
       guardian: { name: { en: "Abdullah Al-Dosari", ar: "عبدالله الدوسري" }, initials: "AD", relation: { en: "Father · guardian", ar: "الأب · ولي الأمر" }, mobile: "059 300 1287" },

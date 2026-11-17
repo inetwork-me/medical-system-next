@@ -84,6 +84,15 @@ export function InsuranceCard({ id, rec, readOnly, className }: { id: string; re
   const amount = items.reduce((x, i) => x + i.fee, 0)
   const sent = !!pa?.steps.find((x) => x.key === "sent")?.at
   const when = (iso: string) => `${dates.dayMonth(iso)} · ${iso.slice(11, 16)}`
+  if (!rec.insurance.insured)
+    return (
+      <PCard title={t("title")} description={b(rec.insurance.payer)} className={className}>
+        <p className="flex items-start gap-2 rounded-[10px] bg-muted p-3 text-xs text-muted-foreground">
+          <Icon name="info-circle" size={18} className="shrink-0" />
+          {t("noInsurance")}
+        </p>
+      </PCard>
+    )
   return (
     <PCard title={t("title")} description={<bdi>{t("description", { payer: b(rec.insurance.payer), cls: rec.insurance.className, policy: rec.insurance.policy })}</bdi>} className={className}>
       <div className="flex flex-col gap-2">

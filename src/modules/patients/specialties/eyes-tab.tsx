@@ -197,7 +197,12 @@ function LatestFindings({ exam }: { exam: EyeExam }) {
         <bdi dir="ltr">{exam.icd10}</bdi> · {b(icdName(exam.icd10))}
       </>,
     ],
-    [t("deviation"), t("deviationValue", { type: t(`cover.${exam.coverTest}`), near: exam.deviation.near, far: exam.deviation.far })],
+    [
+      t("deviation"),
+      exam.deviation.near || exam.deviation.far
+        ? t("deviationValue", { type: t(`cover.${exam.coverTest}`), near: exam.deviation.near, far: exam.deviation.far })
+        : t(`cover.${exam.coverTest}`),
+    ],
     [t("diplopia"), tx.diplopia(exam.diplopia), exam.diplopia !== "none"],
     [t("headPosture"), tx.posture(exam.headPosture)],
     [t("nystagmus"), tx.nystagmus(exam.nystagmus)],

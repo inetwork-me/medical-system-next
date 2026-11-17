@@ -304,7 +304,8 @@
       "ins": {
         "pending": "Pre-approval pending",
         "covered": "Covered",
-        "claimSent": "Claim sent"
+        "claimSent": "Claim sent",
+        "selfPay": "Self-pay"
       },
       "col": {
         "tooth": "Tooth",
@@ -330,7 +331,9 @@
         "total": "Total",
         "insurancePays": "Insurance pays",
         "patientPays": "Patient pays"
-      }
+      },
+      "descriptionSelf": "{planned} planned · {done} done today · Self-pay",
+      "empty": "No treatment planned yet. Tap a tooth on the chart to add one."
     },
     "card3d": {
       "title": "3D mouth view",
@@ -341,7 +344,8 @@
     "history": {
       "title": "Dental history",
       "description": "{count, plural, one {# visit} other {# visits}} · since {since}",
-      "done": "Done"
+      "done": "Done",
+      "none": "No dental visits yet"
     },
     "empty": {
       "title": "No dental records yet",
@@ -460,7 +464,8 @@
     "update": "Update plan",
     "updated": "Tooth {n} updated",
     "needTreatment": "Choose a treatment",
-    "needTreatmentText": "Planned or done work needs a treatment code."
+    "needTreatmentText": "Planned or done work needs a treatment code.",
+    "selfPay": "Not insured · patient pays {pays}"
   },
   "ins": {
     "title": "Insurance & approvals",
@@ -493,7 +498,8 @@
       "note": "Clinical note",
       "notify": "Text the guardian when {payer} replies",
       "send": "Send to {payer}"
-    }
+    },
+    "noInsurance": "No insurance on file. The patient pays the full fee; nothing to send for approval."
   },
   "consent": {
     "title": "Patient consent",

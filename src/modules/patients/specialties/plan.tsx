@@ -37,7 +37,11 @@ export function PlanTable({
   return (
     <PCard
       title={t("title")}
-      description={t("description", { planned: s.planned, done: s.doneToday, payer: b(rec.insurance.payerShort), cls: rec.insurance.className })}
+      description={
+        rec.insurance.insured
+          ? t("description", { planned: s.planned, done: s.doneToday, payer: b(rec.insurance.payerShort), cls: rec.insurance.className })
+          : t("descriptionSelf", { planned: s.planned, done: s.doneToday })
+      }
       className={className}
       action={
         onAdd && (
@@ -61,6 +65,13 @@ export function PlanTable({
             </tr>
           </thead>
           <tbody>
+            {!rec.plan.length && (
+              <tr className="border-t">
+                <td colSpan={6} className="px-4 py-6 text-center text-sm text-muted-foreground">
+                  {t("empty")}
+                </td>
+              </tr>
+            )}
             {rec.plan.map((i) => {
               const on = selected != null && i.teeth.includes(selected)
               return (

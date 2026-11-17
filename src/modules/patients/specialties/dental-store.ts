@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { dentalRecord, procedureBy, TOOTH_NOTES, type Condition, type DentalRecord, type PlanItem, type Surface, type ToothMark, type ToothRecord } from "./data"
+import { dentalRecord, newDentalRecord, procedureBy, TOOTH_NOTES, type Condition, type DentalRecord, type PlanItem, type Surface, type ToothMark, type ToothRecord } from "./data"
 import type { Bi } from "@/lib/mock/bi"
 
 /**
@@ -12,6 +12,8 @@ import type { Bi } from "@/lib/mock/bi"
  */
 
 type PatientEdits = {
+  /** A first dental chart was opened for a patient without dental records. */
+  started?: boolean
   teeth?: Record<number, ToothRecord>
   plan?: PlanItem[]
   notes?: Record<number, string>
@@ -72,7 +74,7 @@ function useEdits(id: string): PatientEdits | undefined {
 export function useDentalRecord(id: string): DentalRecord | null {
   const edits = useEdits(id)
   return React.useMemo(() => {
-    const base = dentalRecord(id)
+    const base = dentalRecord(id) ?? (edits?.started ? newDentalRecord(id) : null)
     if (!base) return null
     if (!edits) return base
     return {
@@ -184,8 +186,8 @@ export function applyDraft(id: string, rec: DentalRecord, fdi: number, d: ToothD
           procedure: proc.name,
           cdt: proc.cdt,
           fee: proc.fee,
-          coveragePct: proc.coveragePct,
-          insuranceStatus: d.status === "done" ? "claimSent" : proc.preApproval ? "pending" : "covered",
+          coveragePct: rec.insurance.insured ? proc.coveragePct : 0,
+          insuranceStatus: !rec.insurance.insured ? "selfPay" : d.status === "done" ? "claimSent" : proc.preApproval ? "pending" : "covered",
           status: d.status === "done" ? "done" : "planned",
         },
       ]
@@ -199,6 +201,11 @@ export function applyDraft(id: string, rec: DentalRecord, fdi: number, d: ToothD
     ...(marks.size ? { marks: [...marks] } : {}),
   }
   update(id, (e) => ({ ...e, teeth: { ...e.teeth, [fdi]: next }, plan, notes: { ...e.notes, [fdi]: d.notes } }))
+}
+
+/** Open a blank chart for a patient's first dental visit (no-op when they already have one). */
+export function startDentalChart(id: string) {
+  if (!dentalRecord(id) && !state[id]?.started) update(id, (e) => ({ ...e, started: true }))
 }
 
 export function markChartSaved(id: string) {

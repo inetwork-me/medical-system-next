@@ -127,7 +127,7 @@ export function useSarFn() {
 
 /* ---------------------------------------------------------------- treatment plan (compact) */
 
-export const INS_TONE: Record<InsuranceStatus, StatusTone> = { pending: "warning", covered: "success", claimSent: "info" }
+export const INS_TONE: Record<InsuranceStatus, StatusTone> = { pending: "warning", covered: "success", claimSent: "info", selfPay: "neutral" }
 
 export function PlanCompact({ rec, addHref, className }: { rec: DentalRecord; addHref: string; className?: string }) {
   const t = useTranslations("specialties.dental.plan")
@@ -137,7 +137,11 @@ export function PlanCompact({ rec, addHref, className }: { rec: DentalRecord; ad
   return (
     <PCard
       title={t("title")}
-      description={t("description", { planned: s.planned, done: s.doneToday, payer: b(rec.insurance.payerShort), cls: rec.insurance.className })}
+      description={
+        rec.insurance.insured
+          ? t("description", { planned: s.planned, done: s.doneToday, payer: b(rec.insurance.payerShort), cls: rec.insurance.className })
+          : t("descriptionSelf", { planned: s.planned, done: s.doneToday })
+      }
       className={cn("max-md:p-4", className)}
       action={
         <Button variant="ghost" size="sm" asChild className="max-md:hidden">
@@ -148,6 +152,7 @@ export function PlanCompact({ rec, addHref, className }: { rec: DentalRecord; ad
         </Button>
       }
     >
+      {!rec.plan.length && <p className="text-sm text-muted-foreground">{t("empty")}</p>}
       <ul>
         {rec.plan.map((i: PlanItem) => {
           const sel = i.teeth.includes(rec.chart.selected)
@@ -215,7 +220,7 @@ function DentalHistory({ rec }: { rec: DentalRecord }) {
   return (
     <PCard
       title={t("title")}
-      description={t("description", { count: h.length, since: dates.monthYear(h[h.length - 1].date) })}
+      description={h.length ? t("description", { count: h.length, since: dates.monthYear(h[h.length - 1].date) }) : t("none")}
       className="max-md:p-4"
     >
       <ul>

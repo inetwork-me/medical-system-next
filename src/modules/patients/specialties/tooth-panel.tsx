@@ -122,7 +122,7 @@ function PanelBody({ id, rec, fdi, onClose, readOnly, className }: { id: string;
       <div className="flex flex-col gap-3">
         <Field label={t("treatment")} required>
           {(control) => (
-            <Select value={d.treatment ?? ""} onValueChange={(v) => set({ treatment: v })} disabled={readOnly}>
+            <Select value={d.treatment ?? ""} onValueChange={(v) => set({ treatment: v, status: d.status === "existing" ? "planned" : d.status })} disabled={readOnly}>
               <SelectTrigger {...control} id={`treatment-${fdi}`} className="w-full">
                 <SelectValue placeholder={t("treatmentPlaceholder")} />
               </SelectTrigger>
@@ -161,13 +161,15 @@ function PanelBody({ id, rec, fdi, onClose, readOnly, className }: { id: string;
           <Icon name="shield-tick" size={18} className="shrink-0" />
           <div className="flex flex-col gap-0.5 text-xs">
             <span className="font-medium tabular-nums">
-              {t("covers", {
-                payer: b(rec.insurance.payerShort),
-                pct: proc.coveragePct,
-                pays: sar(Math.round((proc.fee * (100 - proc.coveragePct)) / 100)),
-              })}
+              {rec.insurance.insured
+                ? t("covers", {
+                    payer: b(rec.insurance.payerShort),
+                    pct: proc.coveragePct,
+                    pays: sar(Math.round((proc.fee * (100 - proc.coveragePct)) / 100)),
+                  })
+                : t("selfPay", { pays: sar(proc.fee) })}
             </span>
-            <span>{proc.preApproval ? t("needsApproval") : t("noApproval")}</span>
+            {rec.insurance.insured && <span>{proc.preApproval ? t("needsApproval") : t("noApproval")}</span>}
           </div>
         </div>
       )}

@@ -17,7 +17,7 @@ import { PCard } from "../profile/side"
 import { useText } from "../profile/use-patient"
 import type { Dentition } from "./data"
 import { DentalActions } from "./dental-actions"
-import { useDentalRecord, useSelectedTooth } from "./dental-store"
+import { startDentalChart, useDentalRecord, useSelectedTooth } from "./dental-store"
 import { PlanTable } from "./plan"
 import { DentalChartView, DentalLegend, type Layer } from "./tooth"
 import { ToothPanel } from "./tooth-panel"
@@ -37,6 +37,10 @@ export function DentalChartWorkspace({ initialTooth }: { initialTooth?: number }
   const [dentition, setDentition] = React.useState<Dentition>("permanent")
   const [history, setHistory] = React.useState(false)
   const mobile = useIsMobile()
+  // A patient's first dental visit: opening the chart on a tablet / computer starts a blank chart.
+  React.useEffect(() => {
+    if (window.matchMedia("(min-width: 768px)").matches) startDentalChart(id)
+  }, [id])
 
   const addTreatment = () => {
     if (selected == null) {
@@ -165,7 +169,9 @@ function HistorySheet({ open, onOpenChange, rec }: { open: boolean; onOpenChange
       <SheetContent>
         <SheetHeader>
           <SheetTitle>{t("title")}</SheetTitle>
-          <SheetDescription>{t("description", { count: rec.history.length, since: dates.monthYear(rec.history[rec.history.length - 1].date) })}</SheetDescription>
+          <SheetDescription>
+            {rec.history.length ? t("description", { count: rec.history.length, since: dates.monthYear(rec.history[rec.history.length - 1].date) }) : t("none")}
+          </SheetDescription>
         </SheetHeader>
         <SheetBody>
           <ul>

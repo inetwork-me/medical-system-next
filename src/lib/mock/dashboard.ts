@@ -10,6 +10,11 @@ export const VISITS = {
   inPerson: [62, 70, 66, 78, 72, 84, 80, 88, 76, 92, 86, 95],
   telehealth: [30, 34, 38, 40, 46, 44, 50, 54, 52, 58, 60, 64],
 }
+/** Same months of the previous year (Patient visits · "Last year"). */
+export const VISITS_LAST_YEAR = {
+  inPerson: [54, 58, 61, 66, 63, 71, 69, 74, 70, 79, 77, 83],
+  telehealth: [18, 21, 22, 26, 28, 27, 31, 34, 33, 37, 39, 42],
+}
 
 export type AppointmentStatus = "completed" | "inProgress" | "confirmed" | "pending" | "cancelled"
 

@@ -18,6 +18,7 @@ import {
   STATUS_TONE,
   TODAY_APPOINTMENTS,
   VISITS,
+  VISITS_LAST_YEAR,
   VISITS_YEAR,
 } from "@/lib/mock/dashboard"
 import { Icon } from "@/components/ds/icon"
@@ -107,15 +108,19 @@ export function VisitsWidget({ className }: { className?: string }) {
   const rtl = useLocale() === "ar"
   const [ref, width] = useElementWidth<HTMLDivElement>()
   const compact = width > 0 && width < 480
-  const months = compact ? 6 : 12
-  const [range, setRange] = React.useState("thisYear")
+  const [range, setRange] = React.useState<"thisYear" | "lastYear" | "last6">("thisYear")
+  // Narrow cards (mobile) always show the last 6 months (design); wide cards follow the range picker.
+  const shown = compact ? "last6" : range
+  const months = shown === "last6" ? 6 : 12
+  const year = shown === "lastYear" ? VISITS_YEAR - 1 : VISITS_YEAR
+  const series = shown === "lastYear" ? VISITS_LAST_YEAR : VISITS
 
   const config = { inPerson: { ...visitsConfig.inPerson, label: t("inPerson") }, telehealth: { ...visitsConfig.telehealth, label: t("telehealth") } }
-  const data = VISITS.inPerson
+  const data = series.inPerson
     .map((v, i) => ({
-      month: format.dateTime(new Date(VISITS_YEAR, i, 1), { month: "short", calendar: "gregory" }),
+      month: format.dateTime(new Date(year, i, 1), { month: "short", calendar: "gregory" }),
       inPerson: v,
-      telehealth: VISITS.telehealth[i],
+      telehealth: series.telehealth[i],
     }))
     .slice(12 - months)
   const bars = [
@@ -128,12 +133,12 @@ export function VisitsWidget({ className }: { className?: string }) {
       <Widget
         className="h-full"
         title={t("title")}
-        description={compact ? t("descriptionShort") : t("description", { year: VISITS_YEAR })}
+        description={shown === "last6" ? t("descriptionShort") : t("description", { year })}
         action={
           compact ? (
             <WidgetMenu />
           ) : (
-            <Select value={range} onValueChange={setRange}>
+            <Select value={range} onValueChange={(v) => setRange(v as typeof range)}>
               <SelectTrigger className="w-33" aria-label={t("range")}>
                 <SelectValue />
               </SelectTrigger>

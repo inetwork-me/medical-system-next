@@ -7,6 +7,7 @@ import { SESSION_USER } from "@/lib/mock/shell"
 import { Icon } from "@/components/ds/icon"
 import { Button } from "@/components/ui/button"
 import { PageContainer, PageHeader } from "@/components/shell/page"
+import { DashboardExport } from "@/modules/dashboard/export"
 import { AppointmentsWidget, AttentionWidget, BedsWidget, KpiRow, VisitsWidget } from "@/modules/dashboard/widgets"
 
 export async function generateMetadata() {
@@ -31,10 +32,7 @@ export default async function DashboardPage() {
         description={t("description")}
         actions={
           <>
-            <Button variant="outline">
-              <Icon name="export" size={20} />
-              {t("export")}
-            </Button>
+            <DashboardExport />
             <IfModule id="appointments">
               <Button asChild>
                 <Link href="/appointments">

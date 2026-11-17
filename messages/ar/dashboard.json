@@ -49,5 +49,30 @@
     "title": "إشغال الأسرّة",
     "description": "حسب القسم · لحظي",
     "occupied": "{used} / {total}"
+  },
+  "exportDialog": {
+    "description": "لوحة اليوم · اختر وش تبي تضيف",
+    "excelHint": "كل قسم في ورقة لحاله",
+    "include": "يشمل",
+    "sections": {
+      "kpis": "الملخص"
+    },
+    "col": {
+      "metric": "المؤشر",
+      "value": "القيمة",
+      "change": "التغيّر",
+      "month": "الشهر",
+      "time": "الوقت",
+      "item": "البند",
+      "details": "التفاصيل",
+      "department": "القسم",
+      "occupied": "المشغول",
+      "total": "الأسرّة",
+      "rate": "نسبة الإشغال"
+    },
+    "pdfBrand": "النظام الطبي · الفرع الرئيسي",
+    "pdfTitle": "ملخص لوحة التحكم",
+    "pdfMeta": "{date} · آخر تحديث {time}",
+    "downloadedText": "{count, plural, one {انحفظ قسم واحد} two {انحفظ قسمين} other {انحفظت # أقسام}} كملف {format}."
   }
 }

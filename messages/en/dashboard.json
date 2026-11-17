@@ -49,5 +49,30 @@
     "title": "Bed occupancy",
     "description": "By department · live",
     "occupied": "{used} / {total}"
+  },
+  "exportDialog": {
+    "description": "Today's dashboard · pick what to include",
+    "excelHint": "One sheet per section",
+    "include": "Include",
+    "sections": {
+      "kpis": "Summary"
+    },
+    "col": {
+      "metric": "Metric",
+      "value": "Value",
+      "change": "Change",
+      "month": "Month",
+      "time": "Time",
+      "item": "Item",
+      "details": "Details",
+      "department": "Department",
+      "occupied": "Occupied",
+      "total": "Beds",
+      "rate": "Occupancy"
+    },
+    "pdfBrand": "Medical System · Main branch",
+    "pdfTitle": "Dashboard summary",
+    "pdfMeta": "{date} · updated {time}",
+    "downloadedText": "{count, plural, one {1 section} other {# sections}} saved as {format}."
   }
 }

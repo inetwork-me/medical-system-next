@@ -14,6 +14,8 @@ type Store = {
   setStatus: (id: string, status: ApptStatus, since?: number) => void
   remind: (id: string) => void
   collect: (id: string, paid?: boolean) => void
+  added: Appointment[]
+  book: (a: Appointment) => void
   timeOff: TimeOff[]
   addTimeOff: (t: TimeOff) => void
   removeTimeOff: (id: string) => void
@@ -25,6 +27,7 @@ const Ctx = React.createContext<Store | null>(null)
 export function AppointmentsStoreProvider({ children }: { children: React.ReactNode }) {
   const [changes, setChanges] = React.useState<Record<string, Change>>({})
   const [added, setAdded] = React.useState<TimeOff[]>([])
+  const [booked, setBooked] = React.useState<Appointment[]>([])
   const loaded = React.useRef(false)
 
   React.useEffect(() => {
@@ -36,6 +39,7 @@ export function AppointmentsStoreProvider({ children }: { children: React.ReactN
         /* eslint-disable react-hooks/set-state-in-effect */
         setChanges(saved.changes ?? {})
         setAdded(saved.timeOff ?? [])
+        setBooked(saved.booked ?? [])
         /* eslint-enable react-hooks/set-state-in-effect */
       }
     } catch {}
@@ -44,9 +48,9 @@ export function AppointmentsStoreProvider({ children }: { children: React.ReactN
   React.useEffect(() => {
     if (!loaded.current) return
     try {
-      sessionStorage.setItem(KEY, JSON.stringify({ changes, timeOff: added }))
+      sessionStorage.setItem(KEY, JSON.stringify({ changes, timeOff: added, booked }))
     } catch {}
-  }, [changes, added])
+  }, [changes, added, booked])
 
   const store = React.useMemo<Store>(
     () => ({
@@ -56,11 +60,13 @@ export function AppointmentsStoreProvider({ children }: { children: React.ReactN
         setChanges((c) => ({ ...c, [id]: { ...c[id], status, since: since ?? (status === "arrived" || status === "withDoctor" ? NOW_MIN : c[id]?.since) } })),
       collect: (id, paid = true) => setChanges((c) => ({ ...c, [id]: { ...c[id], paid } })),
       remind: (id) => setChanges((c) => ({ ...c, [id]: { ...c[id], reminded: true } })),
+      added: booked,
+      book: (a) => setBooked((l) => [...l, a]),
       timeOff: [...TIME_OFF, ...added],
       addTimeOff: (t) => setAdded((l) => [...l, t]),
       removeTimeOff: (id) => setAdded((l) => l.filter((x) => x.id !== id)),
     }),
-    [changes, added]
+    [changes, added, booked]
   )
   return <Ctx.Provider value={store}>{children}</Ctx.Provider>
 }
@@ -80,13 +86,27 @@ const withChange = (a: Appointment, c?: Change): LiveAppointment => ({
 export function useAppointmentsOn() {
   const store = React.useContext(Ctx)
   const changes = store?.changes
-  return React.useCallback((date: string) => appointmentsOn(date).map((a) => withChange(a, changes?.[a.id])), [changes])
+  const booked = store?.added
+  return React.useCallback(
+    (date: string) =>
+      [...appointmentsOn(date), ...(booked ?? []).filter((a) => a.date === date)]
+        .sort((a, b) => a.start - b.start)
+        .map((a) => withChange(a, changes?.[a.id])),
+    [changes, booked]
+  )
 }
 
 export function useAppointmentActions() {
   const store = React.useContext(Ctx)
   if (!store) throw new Error("useAppointmentActions needs AppointmentsStoreProvider")
-  return { setStatus: store.setStatus, remind: store.remind, collect: store.collect, addTimeOff: store.addTimeOff, removeTimeOff: store.removeTimeOff }
+  return {
+    setStatus: store.setStatus,
+    remind: store.remind,
+    collect: store.collect,
+    addTimeOff: store.addTimeOff,
+    removeTimeOff: store.removeTimeOff,
+    book: store.book,
+  }
 }
 
 export function useTimeOff() {

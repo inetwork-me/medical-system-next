@@ -231,6 +231,11 @@ export function appointmentsOn(date: string): Appointment[] {
       )
     }
   }
+  // Design · New appointment · Conflict: Dr. Ahmed Zaki already has Layan Ali at 11:00 on 18 Nov.
+  if (date === "2026-11-18") {
+    list = list.filter((a) => !(a.doctor === "az" && a.start < t("11:20") && a.start + a.duration > t("11:00")))
+    list.push({ id: "2026-11-18-az-layan", date, doctor: "az", start: t("11:00"), duration: 20, patient: { en: "Layan Ali", ar: "ليان علي" }, reason: { en: "Check-up", ar: "كشف" }, status: "confirmed" })
+  }
   list.sort((a, b) => a.start - b.start || DOCTORS.findIndex((d) => d.id === a.doctor) - DOCTORS.findIndex((d) => d.id === b.doctor))
   cache.set(date, list)
   return list
@@ -296,4 +301,59 @@ export function bookedBetween(doctor: DoctorId, from: string, to: string) {
   let n = 0
   for (let d = from; d <= to; d = addDays(d, 1)) n += appointmentsOn(d).filter((a) => a.doctor === doctor && a.status !== "cancelled" && a.patient).length
   return n
+}
+
+/* ---------------------------------------------------------------- booking (design · New appointment) */
+
+export type Service = { key: string; name: Bi; minutes: number; fee: number }
+/** Services per clinic (doctor), with length and fee in SAR. */
+export const SERVICES: Record<DoctorId, Service[]> = {
+  km: [
+    { key: "consultation", name: { en: "Consultation", ar: "استشارة" }, minutes: 30, fee: 500 },
+    { key: "follow-up", name: { en: "Follow-up", ar: "متابعة" }, minutes: 30, fee: 400 },
+    { key: "ecg", name: { en: "ECG review", ar: "مراجعة تخطيط" }, minutes: 30, fee: 450 },
+    { key: "stress", name: { en: "Stress test", ar: "اختبار الجهد" }, minutes: 60, fee: 900 },
+  ],
+  az: [
+    { key: "follow-up", name: { en: "Follow-up", ar: "متابعة" }, minutes: 20, fee: 350 },
+    { key: "check-up", name: { en: "Check-up", ar: "كشف" }, minutes: 20, fee: 300 },
+    { key: "vaccination", name: { en: "Vaccination", ar: "تطعيم" }, minutes: 20, fee: 150 },
+  ],
+  so: [
+    { key: "check-up", name: { en: "Check-up", ar: "كشف" }, minutes: 45, fee: 200 },
+    { key: "cleaning", name: { en: "Cleaning", ar: "تنظيف" }, minutes: 45, fee: 300 },
+    { key: "filling", name: { en: "Filling", ar: "حشوة" }, minutes: 45, fee: 450 },
+    { key: "root-canal", name: { en: "Root canal", ar: "علاج عصب" }, minutes: 90, fee: 1200 },
+  ],
+  hf: [
+    { key: "follow-up", name: { en: "Follow-up", ar: "متابعة" }, minutes: 30, fee: 400 },
+    { key: "consultation", name: { en: "Consultation", ar: "استشارة" }, minutes: 30, fee: 500 },
+    { key: "physio", name: { en: "Physio review", ar: "مراجعة علاج طبيعي" }, minutes: 30, fee: 350 },
+  ],
+}
+
+export type Slot = { start: number; held: boolean; past: boolean }
+
+/**
+ * Bookable start times for a doctor on a day: every slot inside working hours, minus lunch. A few are "held" (kept
+ * for walk-ins, greyed like the design); past times today are greyed too. Booked times stay pickable — picking one
+ * shows the conflict, so reception can double-book urgent cases.
+ */
+/** Design · New appointment: Dr. Ahmed Zaki on 18 Nov has 08:20, 09:00, 11:20 and 14:10 greyed. */
+const HELD_AZ_18 = ["08:20", "09:00", "11:20", "14:10"].map(t)
+
+export function slotsFor(doctor: DoctorId, date: string): Slot[] {
+  const day = new Date(`${date}T12:00:00Z`).getUTCDay()
+  const hours = SCHEDULES[doctor].week[day]
+  if (!hours || hours === "off") return []
+  const [open, close] = hours.split("–").map((h) => Number(h) * 60)
+  const step = SCHEDULES[doctor].slot
+  const lunch = breaksFor(doctor)
+  const out: Slot[] = []
+  for (let m = open; m + step <= close; m += step) {
+    if (lunch.some((b) => m < b.start + b.duration && m + step > b.start)) continue
+    const held = date === "2026-11-18" && doctor === "az" ? HELD_AZ_18.includes(m) : hash(`${date}|${doctor}|held|${m}`) % 6 === 0
+    out.push({ start: m, held, past: date < TODAY || (date === TODAY && m <= NOW_MIN) })
+  }
+  return out
 }

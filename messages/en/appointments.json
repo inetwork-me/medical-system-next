@@ -213,5 +213,82 @@
       "undo": "Undo",
       "overlap": "{doctor} is already off on some of these days."
     }
+  },
+  "new": {
+    "title": "New appointment",
+    "cancel": "Cancel",
+    "patient": {
+      "title": "Patient",
+      "text": "Search by name, MRN, mobile or ID",
+      "find": "Find patient",
+      "placeholder": "Name, MRN, mobile or ID…",
+      "results": "Matching patients",
+      "none": "No patient matches “{q}”",
+      "meta": "MRN {mrn} · {age} yrs",
+      "guardian": "guardian {name}",
+      "balance": "Balance SAR {n}",
+      "change": "Change patient",
+      "notRegistered": "Not registered? Add a new patient",
+      "required": "Pick the patient first"
+    },
+    "service": {
+      "title": "Service",
+      "text": "Clinic, doctor and visit type",
+      "clinic": "Clinic",
+      "doctor": "Doctor",
+      "service": "Service",
+      "serviceOption": "{name} · {n} min · SAR {fee}",
+      "visitType": "Visit type",
+      "inPerson": "In person",
+      "telehealth": "Telehealth"
+    },
+    "when": {
+      "title": "Date & time",
+      "text": "Available slots for {doctor}",
+      "morning": "{date} · morning",
+      "afternoon": "Afternoon",
+      "held": "Held for walk-ins",
+      "past": "Already passed",
+      "noSlots": "{doctor} isn't working on this day.",
+      "onLeave": "{doctor} is on leave on this day.",
+      "closed": "The clinic is closed on Fridays.",
+      "required": "Pick a time",
+      "conflict": "{doctor} already has {patient} at {time} on {date}. Pick another time, or double-book if it's urgent.",
+      "doubleBook": "Double-book anyway (urgent)",
+      "doubleBookText": "Needs a reason and is logged",
+      "reason": "Reason for double-booking",
+      "reasonPlaceholder": "e.g. high fever, can't wait",
+      "reasonRequired": "Write the reason"
+    },
+    "reminders": {
+      "title": "Reminders & notes",
+      "text": "How we remind the patient",
+      "sms": "SMS reminder",
+      "smsText": "24 h and 2 h before",
+      "whatsapp": "WhatsApp confirmation",
+      "whatsappText": "Asks the patient to confirm",
+      "note": "Note for the doctor",
+      "notePlaceholder": "Anything the doctor should know"
+    },
+    "summary": {
+      "title": "Appointment summary",
+      "text": "Review before booking",
+      "patient": "Patient",
+      "doctor": "Doctor",
+      "date": "Date",
+      "time": "Time",
+      "service": "Service",
+      "serviceValue": "{name} · {n} min",
+      "fee": "Fee",
+      "feeValue": "SAR {n}",
+      "insurance": "Insurance",
+      "insured": "{plan} · patient pays SAR {n}",
+      "selfPay": "Self-pay",
+      "conflict": "Time conflict — choose another slot",
+      "book": "Book appointment"
+    },
+    "booked": "Appointment booked",
+    "bookedText": "{name} · {date} · {time} · {doctor}. {reminder, select, yes {Reminder scheduled.} other {No reminder.}}",
+    "view": "View"
   }
 }

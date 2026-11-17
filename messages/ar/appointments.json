@@ -213,5 +213,82 @@
       "undo": "تراجع",
       "overlap": "{doctor} عنده إجازة في بعض هالأيام."
     }
+  },
+  "new": {
+    "title": "موعد جديد",
+    "cancel": "إلغاء",
+    "patient": {
+      "title": "المريض",
+      "text": "دوّر بالاسم أو رقم الملف أو الجوال أو الهوية",
+      "find": "ابحث عن المريض",
+      "placeholder": "الاسم أو رقم الملف أو الجوال أو الهوية…",
+      "results": "المرضى المطابقين",
+      "none": "ما فيه مريض يطابق “{q}”",
+      "meta": "MRN {mrn} · {age} سنة",
+      "guardian": "ولي الأمر {name}",
+      "balance": "عليه {n} ر.س",
+      "change": "غيّر المريض",
+      "notRegistered": "مو مسجّل؟ أضف مريض جديد",
+      "required": "اختر المريض أول"
+    },
+    "service": {
+      "title": "الخدمة",
+      "text": "العيادة والطبيب ونوع الزيارة",
+      "clinic": "العيادة",
+      "doctor": "الطبيب",
+      "service": "الخدمة",
+      "serviceOption": "{name} · {n} دقيقة · {fee} ر.س",
+      "visitType": "نوع الزيارة",
+      "inPerson": "حضوري",
+      "telehealth": "عن بُعد"
+    },
+    "when": {
+      "title": "اليوم والوقت",
+      "text": "الأوقات المتاحة عند {doctor}",
+      "morning": "{date} · الصبح",
+      "afternoon": "العصر",
+      "held": "محجوز للحالات بدون موعد",
+      "past": "الوقت فات",
+      "noSlots": "{doctor} ما يداوم هاليوم.",
+      "onLeave": "{doctor} عنده إجازة هاليوم.",
+      "closed": "العيادة مقفلة يوم الجمعة.",
+      "required": "اختر الوقت",
+      "conflict": "{doctor} عنده {patient} الساعة {time} يوم {date}. اختر وقت ثاني، أو احجز فوقه لو الحالة مستعجلة.",
+      "doubleBook": "احجز فوقه (حالة مستعجلة)",
+      "doubleBookText": "يحتاج سبب وينحفظ في السجل",
+      "reason": "سبب الحجز فوق موعد",
+      "reasonPlaceholder": "مثلاً: حرارة عالية وما يقدر ينتظر",
+      "reasonRequired": "اكتب السبب"
+    },
+    "reminders": {
+      "title": "التذكير والملاحظات",
+      "text": "كيف نذكّر المريض",
+      "sms": "تذكير برسالة",
+      "smsText": "قبل 24 ساعة وقبل ساعتين",
+      "whatsapp": "تأكيد بالواتساب",
+      "whatsappText": "يطلب من المريض يأكد",
+      "note": "ملاحظة للطبيب",
+      "notePlaceholder": "أي شي لازم يعرفه الطبيب"
+    },
+    "summary": {
+      "title": "ملخص الموعد",
+      "text": "راجعه قبل الحجز",
+      "patient": "المريض",
+      "doctor": "الطبيب",
+      "date": "اليوم",
+      "time": "الوقت",
+      "service": "الخدمة",
+      "serviceValue": "{name} · {n} دقيقة",
+      "fee": "الرسوم",
+      "feeValue": "{n} ر.س",
+      "insurance": "التأمين",
+      "insured": "{plan} · يدفع {n} ر.س",
+      "selfPay": "على حسابه",
+      "conflict": "فيه تعارض بالوقت، اختر وقت ثاني",
+      "book": "احجز الموعد"
+    },
+    "booked": "انحجز الموعد",
+    "bookedText": "{name} · {date} · {time} · {doctor}. {reminder, select, yes {التذكير مجدول.} other {بدون تذكير.}}",
+    "view": "اعرض"
   }
 }

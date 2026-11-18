@@ -13,6 +13,7 @@ import { StatusBadge } from "@/components/ds/status-badge"
 import { Widget } from "@/components/ds/widget"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { DoctorName } from "@/modules/doctors/link"
 import { Checklist } from "../settings"
 import { CLINICS_TODAY, checklistOf, isSettingUp, FLOW_HOURS, MONTH_FROM, NOW_HOUR, flowOf, queueOf, type Clinic, type RoomStatus } from "../data"
 import { ClinicTile } from "../parts"
@@ -163,7 +164,9 @@ function OnDuty({ clinic: c, className }: { clinic: Clinic; className?: string }
                 <AvatarFallback>{d.initials}</AvatarFallback>
               </Avatar>
               <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
-                <span className="truncate text-sm font-medium">{b(d.name)}</span>
+                <DoctorName en={d.name.en} className="truncate text-sm font-medium">
+                  {b(d.name)}
+                </DoctorName>
                 <StatusBadge tone={d.today.tone}>{b(d.today.label)}</StatusBadge>
               </div>
             </li>

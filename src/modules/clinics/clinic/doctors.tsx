@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { Bi } from "@/lib/mock/bi"
+import { DoctorName } from "@/modules/doctors/link"
 import type { Clinic, ClinicDoctor } from "../data"
 import { arFor } from "../parts"
 import { updateClinic, useClinics } from "../store"
@@ -133,7 +134,9 @@ function Who({ d }: { d: ClinicDoctor }) {
         <AvatarFallback>{d.initials}</AvatarFallback>
       </Avatar>
       <div className="flex min-w-0 flex-col">
-        <span className="truncate font-medium">{b(d.name)}</span>
+        <DoctorName en={d.name.en} className="truncate font-medium">
+          {b(d.name)}
+        </DoctorName>
         <span className="truncate text-xs text-muted-foreground">{b(d.role)}</span>
       </div>
     </div>

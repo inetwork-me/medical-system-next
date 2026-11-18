@@ -34,11 +34,46 @@ export type Doctor = {
   awayNote?: Bi
   /** Today: seen / booked, next free slot ("HH:MM", or an ISO day when away). */
   today: { seen: number; booked: number; nextFree: string }
-  /** This month: visits, rating. */
-  month: { visits: number; rating: string }
+  /** This month (1st → today). */
+  month: DoctorMonth
   credentials: Credential[]
   active: boolean
+  ext: string
+  yearsExp: number
+  languages: Bi
+  /** Patient ages seen (Pediatrics: 0–14); null = all ages. */
+  ages: [number, number] | null
+  /** Booking settings (override the clinic rules). */
+  booking: { visitMin: number; maxPerDay: number; online: boolean; acceptsNew: boolean; telehealth: boolean }
+  /** Weekly hours: shifts per weekday. */
+  week: Record<Weekday, Shift[]>
+  /** Booked per day this week (Sun 15 – Thu 19 Nov). */
+  booked: Record<Weekday, number>
+  /** Annual leave days used this year (balance 21). */
+  leaveUsed: number
 }
+
+export type Weekday = "sun" | "mon" | "tue" | "wed" | "thu" | "fri" | "sat"
+export const WEEKDAYS: Weekday[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+/** "08:00", "16:00"; telehealth shifts are video visits. */
+export type Shift = { from: string; to: string; telehealth?: boolean }
+export type DoctorMonth = {
+  visits: number
+  rating: string
+  reviews: number
+  /** Average consult, minutes. */
+  consult: number
+  noShow: number
+  utilisation: number
+  /** SAR thousands. */
+  revenue: number
+  /** Visits vs last month, %. */
+  delta: number
+}
+type Base = Omit<Doctor, "month" | "ext" | "yearsExp" | "languages" | "ages" | "booking" | "week" | "booked" | "leaveUsed"> & {
+  month: { visits: number; rating: string }
+}
+export const ANNUAL_LEAVE = 21
 
 const bi = (en: string, ar: string): Bi => ({ en, ar })
 
@@ -59,7 +94,7 @@ function creds(n: number, own: Credential[] = []): Credential[] {
 }
 
 /* ---------------------------------------------------------------- the 9 design doctors */
-const DESIGN: Doctor[] = [
+const DESIGN: Base[] = [
   {
     key: "zaki",
     initials: "AZ",
@@ -270,7 +305,7 @@ const initialsOf = (name: string) =>
     .join("")
     .toUpperCase()
 
-const OTHER: Doctor[] = EXTRA.map(([key, name, female, clinic, room, grade, status, seen, booked, next, visits, rating], i) => ({
+const OTHER: Base[] = EXTRA.map(([key, name, female, clinic, room, grade, status, seen, booked, next, visits, rating], i) => ({
   key,
   initials: initialsOf(name.en),
   name,
@@ -298,7 +333,53 @@ const OTHER: Doctor[] = EXTRA.map(([key, name, female, clinic, room, grade, stat
   active: true,
 }))
 
-export const DOCTORS: Doctor[] = [...DESIGN, ...OTHER]
+/* ---------------------------------------------------------------- profile, hours and month figures */
+const DAY_SHIFT: Shift[] = [{ from: "08:00", to: "16:00" }]
+const LATE_SHIFT: Shift[] = [{ from: "14:00", to: "22:00" }]
+const TELE: Shift = { from: "20:00", to: "22:00", telehealth: true }
+const OFF = { fri: [] as Shift[], sat: [] as Shift[] }
+
+/** REP (design): utilisation %, average consult (min), no-show %, reviews, revenue (SAR K). */
+const REP: Record<string, [number, number, number, number, number]> = {
+  zaki: [88, 14, 4.6, 128, 148],
+  shehri: [92, 12, 6.9, 141, 132],
+  saud: [81, 15, 5.2, 117, 121],
+  odeh: [86, 32, 3.8, 96, 214],
+  mansour: [94, 19, 3.1, 88, 236],
+  qahtani: [84, 13, 5.0, 74, 118],
+  otaibi: [76, 21, 6.0, 63, 102],
+  fares: [70, 18, 6.6, 52, 109],
+  hamdan: [34, 11, 4.0, 31, 38],
+  kamal: [79, 19, 5.9, 90, 96],
+}
+
+function profile(b: Base, i: number): Doctor {
+  const zaki = b.key === "zaki"
+  const later = b.status === "later"
+  const shift = later ? LATE_SHIFT : DAY_SHIFT
+  const week: Record<Weekday, Shift[]> = zaki
+    ? { sun: DAY_SHIFT, mon: [...DAY_SHIFT, TELE], tue: DAY_SHIFT, wed: [...DAY_SHIFT, TELE], thu: [{ from: "08:00", to: "13:00" }], ...OFF }
+    : { sun: shift, mon: shift, tue: shift, wed: shift, thu: shift, ...OFF }
+  const perDay = b.today.booked || Math.round(b.month.visits / 13)
+  const booked: Record<Weekday, number> = zaki
+    ? { sun: 18, mon: 22, tue: 17, wed: 18, thu: 11, fri: 0, sat: 0 }
+    : { sun: perDay + 2, mon: perDay + 3, tue: Math.max(0, perDay - 2), wed: b.today.booked, thu: Math.max(0, perDay - 4), fri: 0, sat: 0 }
+  const [utilisation, consult, noShow, reviews, revenue] = REP[b.key] ?? [78 + (i % 5) * 3, 15 + (i % 4) * 2, 4 + (i % 3) * 0.8, 40 + i * 3, 80 + i * 6]
+  return {
+    ...b,
+    month: { ...b.month, reviews, consult, noShow: Math.round(noShow * 10) / 10, utilisation, revenue, delta: zaki ? 5 : ((i * 7) % 11) - 4 },
+    ext: zaki ? "1121" : String(1100 + i * 7),
+    yearsExp: zaki ? 18 : b.grade === "consultant" ? 14 + (i % 6) : b.grade === "specialist" ? 6 + (i % 5) : 2 + (i % 2),
+    languages: i % 3 === 2 ? { en: "Arabic · English · French", ar: "عربي · إنجليزي · فرنسي" } : { en: "Arabic · English", ar: "عربي · إنجليزي" },
+    ages: b.clinic === "peds" ? [0, 14] : null,
+    booking: { visitMin: zaki ? 15 : 20, maxPerDay: zaki ? 24 : 20, online: true, acceptsNew: b.status !== "leave", telehealth: zaki },
+    week,
+    booked,
+    leaveUsed: zaki ? 9 : 4 + (i % 8),
+  }
+}
+
+export const DOCTORS: Doctor[] = [...DESIGN, ...OTHER].map(profile)
 export const doctorByKey = (key: string) => DOCTORS.find((d) => d.key === key)
 /** Head of a clinic (Clinics key). */
 export const headOf = (clinic: string) => DOCTORS.find((d) => d.headOf === clinic)
@@ -351,3 +432,78 @@ export function doctorKpis(list: Doctor[]) {
     expired: due.filter((c) => credStatus(c) === "expired").length,
   }
 }
+
+/* ---------------------------------------------------------------- today's patients */
+export type VisitState = "done" | "inRoom" | "waiting" | "checkedIn" | "free" | "booked"
+export type Visit = { time: string; patient?: Bi; reason: Bi; state: VisitState; waited?: number }
+
+const ZAKI_TODAY: Visit[] = [
+  { time: "08:30", patient: bi("Yousef Al-Amri", "يوسف العمري"), reason: bi("Follow-up", "متابعة"), state: "done" },
+  { time: "08:45", patient: bi("Jana Al-Harthi", "جنى الحارثي"), reason: bi("Vaccination", "تطعيم"), state: "done" },
+  { time: "10:20", patient: bi("Lina Haddad", "لينا حداد"), reason: bi("Follow-up", "متابعة"), state: "inRoom" },
+  { time: "10:40", patient: bi("Omar Al-Harbi", "عمر الحربي"), reason: bi("Fever · urgent", "حرارة · مستعجل"), state: "waiting", waited: 18 },
+  { time: "11:00", patient: bi("Sara Ahmed", "سارة أحمد"), reason: bi("New patient", "مريض جديد"), state: "checkedIn" },
+  { time: "11:30", reason: bi("Free slot", "موعد فاضي"), state: "free" },
+  { time: "11:45", patient: bi("Fahad Al-Dosari", "فهد الدوسري"), reason: bi("Asthma follow-up", "متابعة الربو"), state: "booked" },
+]
+const POOL: Bi[] = [
+  bi("Huda Al-Ghamdi", "هدى الغامدي"),
+  bi("Nasser Al-Qahtani", "ناصر القحطاني"),
+  bi("Reema Al-Shahri", "ريما الشهري"),
+  bi("Abdulaziz Al-Otaibi", "عبدالعزيز العتيبي"),
+  bi("Maha Saleh", "مها صالح"),
+  bi("Khalid Al-Zahrani", "خالد الزهراني"),
+  bi("Dana Al-Mutlaq", "دانة المطلق"),
+  bi("Saleh Al-Juhani", "صالح الجهني"),
+  bi("Ghada Al-Harbi", "غادة الحربي"),
+]
+const REASONS: Bi[] = [bi("Follow-up", "متابعة"), bi("New patient", "مريض جديد"), bi("Results review", "مراجعة نتايج"), bi("Consultation", "استشارة")]
+const at = (min: number) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`
+
+/** Today's list: the design's for Dr. Ahmed Zaki, a steady pattern around 10:40 for the others (none when away). */
+export function todayOf(d: Doctor): Visit[] {
+  if (d.key === "zaki") return ZAKI_TODAY
+  if (d.status === "off" || d.status === "leave") return []
+  const n = DOCTORS.findIndex((x) => x.key === d.key)
+  const step = d.booking.visitMin
+  const states: VisitState[] =
+    d.status === "later"
+      ? ["booked", "booked", "booked", "booked", "booked"]
+      : d.status === "late"
+        ? ["done", "inRoom", "waiting", "waiting", "waiting", "checkedIn", "booked"]
+        : ["done", "done", "inRoom", "waiting", "checkedIn", "booked", "booked"]
+  const start = d.status === "later" ? 14 * 60 : 10 * 60 + 40 - step * states.indexOf("inRoom")
+  return states.map((state, i) => ({
+    time: at(start + i * step),
+    patient: POOL[(n + i) % POOL.length],
+    reason: REASONS[(n + i) % REASONS.length],
+    state,
+    ...(state === "waiting" ? { waited: 6 + i * 4 } : {}),
+  }))
+}
+
+/* ---------------------------------------------------------------- leave */
+export type LeaveType = "annual" | "sick" | "conference" | "training" | "dayOff"
+export type LeaveStatus = "pending" | "approved" | "declined"
+export type Leave = {
+  id: string
+  doctor: string
+  type: LeaveType
+  from: string
+  to: string
+  /** Cover doctor (roster key), or a name for a doctor outside the roster. */
+  cover?: string
+  coverName?: Bi
+  status: LeaveStatus
+  /** Bookings that fall in these dates. */
+  bookings: number
+  place?: Bi
+  note?: Bi
+}
+export const LEAVES: Leave[] = [
+  { id: "lv-zaki-annual", doctor: "zaki", type: "annual", from: "2026-12-22", to: "2026-12-26", cover: "saud", status: "approved", bookings: 0 },
+  { id: "lv-zaki-conf", doctor: "zaki", type: "conference", from: "2027-02-10", to: "2027-02-10", status: "pending", bookings: 6, place: bi("Riyadh", "الرياض") },
+  { id: "lv-qahtani", doctor: "qahtani", type: "annual", from: "2026-12-07", to: "2026-12-11", cover: "harbi", status: "pending", bookings: 19 },
+  { id: "lv-shehri", doctor: "shehri", type: "conference", from: "2027-01-14", to: "2027-01-16", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "pending", bookings: 11 },
+  { id: "lv-hamdan", doctor: "hamdan", type: "annual", from: "2026-11-08", to: "2026-11-19", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "approved", bookings: 12 },
+]

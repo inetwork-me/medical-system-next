@@ -72,5 +72,119 @@
   "exported": "تم تصدير قائمة الأطباء",
   "exportedText": "الملف {file} موجود في التنزيلات.",
   "room": "غرفة {n}",
-  "place": "{clinic} · غرفة {room}"
+  "place": "{clinic} · غرفة {room}",
+  "page": {
+    "tabsLabel": "أقسام صفحة الطبيب",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "schedule": "الجدول",
+      "patients": "المرضى",
+      "performance": "الأداء",
+      "credentials": "الرخص والشهادات",
+      "settings": "الإعدادات"
+    },
+    "back": "رجوع للأطباء",
+    "more": "إجراءات ثانية",
+    "edit": "تعديل",
+    "book": "احجز موعد",
+    "notFoundTitle": "ما لقينا الطبيب",
+    "notFoundText": "هالطبيب مو موجود في القائمة، يمكن انشال.",
+    "backToList": "رجوع للأطباء"
+  },
+  "header": {
+    "head": "{title} · رئيس عيادة {clinic}",
+    "headF": "{title} · رئيسة عيادة {clinic}",
+    "ids": "الهيئة {no} · تحويلة {ext}",
+    "statusRoom": "{status} · غرفة {room}",
+    "years": "خبرة {n} سنة",
+    "ages": "الأعمار {from}–{to}",
+    "acceptsNew": "يستقبل مرضى جدد",
+    "acceptsNewF": "تستقبل مرضى جدد",
+    "noNew": "ما يستقبل مرضى جدد",
+    "noNewF": "ما تستقبل مرضى جدد"
+  },
+  "today": {
+    "title": "مرضى اليوم",
+    "text": "انكشف على {seen} من {booked} · أقرب موعد فاضي {time}",
+    "textLater": "{booked} محجوز · البداية {time}",
+    "dayView": "عرض اليوم",
+    "empty": "ما فيه مرضى اليوم",
+    "state": {
+      "done": "خلص",
+      "inRoom": "في غرفة {room}",
+      "waiting": "ينتظر · {n} دقيقة",
+      "checkedIn": "سجّل وصوله",
+      "free": "متاح للحجز",
+      "booked": "محجوز"
+    }
+  },
+  "week": {
+    "title": "مرضى هالأسبوع",
+    "text": "المحجوزين كل يوم · {range}"
+  },
+  "month": {
+    "title": "هالشهر",
+    "text": "{range} · مقارنة بمتوسط {clinic}",
+    "visits": "الزيارات",
+    "visitsDelta": "{d}% عن {month}",
+    "consult": "متوسط الكشف",
+    "min": "{n} د",
+    "clinicMin": "العيادة {n} د",
+    "noShow": "نسبة الغياب",
+    "clinicPct": "العيادة {n}%",
+    "rating": "التقييم",
+    "reviews": "{n} تقييم"
+  },
+  "works": {
+    "title": "يشتغل في",
+    "titleF": "تشتغل في",
+    "text": "{clinics, plural, one {عيادة وحدة} two {عيادتين} few {# عيادات} other {# عيادة}} · {h} ساعة بالأسبوع",
+    "head": "{clinic} · رئيس العيادة",
+    "headF": "{clinic} · رئيسة العيادة",
+    "member": "{clinic}",
+    "where": "{days} · غرفة {room}",
+    "telehealth": "العيادة عن بُعد",
+    "teleWhere": "{days} · {hours}",
+    "openClinic": "افتح {clinic}",
+    "and": " و"
+  },
+  "creds": {
+    "title": "الرخص والشهادات",
+    "text": "{n, plural, =0 {كلها سارية} other {# تحتاج تجديد قريب}}",
+    "viewAll": "اعرض الكل",
+    "until": "لين {date}",
+    "name": {
+      "scfhs": "تسجيل الهيئة",
+      "moh": "رخصة مزاولة المهنة",
+      "bls": "BLS",
+      "pals": "PALS",
+      "acls": "ACLS",
+      "malpractice": "تأمين الأخطاء الطبية"
+    },
+    "status": {
+      "valid": "سارية",
+      "expired": "منتهية",
+      "left": "باقي {n, plural, few {# أيام} other {# يوم}}"
+    }
+  },
+  "leave": {
+    "title": "الإجازات",
+    "text": "رصيد الإجازة السنوية {year}",
+    "left": "باقي {n, plural, few {# أيام} other {# يوم}}",
+    "used": "استخدم {used} من {total}",
+    "cover": "البديل {name}",
+    "none": "ما فيه إجازات محجوزة",
+    "type": {
+      "annual": "إجازة سنوية",
+      "sick": "إجازة مرضية",
+      "conference": "مؤتمر",
+      "training": "تدريب",
+      "dayOff": "راحة"
+    },
+    "status": {
+      "approved": "معتمدة",
+      "pending": "بانتظار الاعتماد",
+      "declined": "مرفوضة"
+    }
+  }
 }

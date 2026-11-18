@@ -72,5 +72,119 @@
   "exported": "Doctors list exported",
   "exportedText": "{file} is in your downloads.",
   "room": "Room {n}",
-  "place": "{clinic} · Room {room}"
+  "place": "{clinic} · Room {room}",
+  "page": {
+    "tabsLabel": "Doctor sections",
+    "tabs": {
+      "overview": "Overview",
+      "schedule": "Schedule",
+      "patients": "Patients",
+      "performance": "Performance",
+      "credentials": "Credentials",
+      "settings": "Settings"
+    },
+    "back": "Back to doctors",
+    "more": "More actions",
+    "edit": "Edit",
+    "book": "Book visit",
+    "notFoundTitle": "Doctor not found",
+    "notFoundText": "This doctor isn't in the list. They may have been removed.",
+    "backToList": "Back to doctors"
+  },
+  "header": {
+    "head": "{title} · Head of {clinic}",
+    "ids": "SCFHS {no} · Ext. {ext}",
+    "statusRoom": "{status} · Room {room}",
+    "years": "{n} years' experience",
+    "ages": "Ages {from}–{to}",
+    "acceptsNew": "Accepts new patients",
+    "noNew": "Not taking new patients",
+    "headF": "{title} · Head of {clinic}",
+    "acceptsNewF": "Accepts new patients",
+    "noNewF": "Not taking new patients"
+  },
+  "today": {
+    "title": "Today's patients",
+    "text": "{seen} of {booked} seen · next free slot {time}",
+    "textLater": "{booked} booked · starts {time}",
+    "dayView": "Day view",
+    "empty": "No patients today",
+    "state": {
+      "done": "Done",
+      "inRoom": "In room {room}",
+      "waiting": "Waiting · {n} min",
+      "checkedIn": "Checked in",
+      "free": "Bookable",
+      "booked": "Booked"
+    }
+  },
+  "week": {
+    "title": "Patients this week",
+    "text": "Booked per day · {range}"
+  },
+  "month": {
+    "title": "This month",
+    "text": "{range} · vs {clinic} average",
+    "visits": "Visits",
+    "visitsDelta": "{d}% vs {month}",
+    "consult": "Avg consult",
+    "min": "{n} min",
+    "clinicMin": "Clinic {n} min",
+    "noShow": "No-show rate",
+    "clinicPct": "Clinic {n}%",
+    "rating": "Rating",
+    "reviews": "{n} reviews"
+  },
+  "works": {
+    "title": "Works in",
+    "text": "{clinics, plural, one {# clinic} other {# clinics}} · {h} hours a week",
+    "head": "{clinic} · head",
+    "member": "{clinic}",
+    "where": "{days} · Room {room}",
+    "telehealth": "Telehealth",
+    "teleWhere": "{days} · {hours}",
+    "openClinic": "Open {clinic}",
+    "and": ", ",
+    "titleF": "Works in",
+    "headF": "{clinic} · head"
+  },
+  "creds": {
+    "title": "Licence & credentials",
+    "text": "{n, plural, =0 {All valid} one {# needs renewal soon} other {# need renewal soon}}",
+    "viewAll": "View all",
+    "until": "Until {date}",
+    "name": {
+      "scfhs": "SCFHS registration",
+      "moh": "MOH practice licence",
+      "bls": "BLS",
+      "pals": "PALS",
+      "acls": "ACLS",
+      "malpractice": "Malpractice insurance"
+    },
+    "status": {
+      "valid": "Valid",
+      "expired": "Expired",
+      "left": "{n, plural, one {# day left} other {# days left}}"
+    }
+  },
+  "leave": {
+    "title": "Leave",
+    "text": "Annual balance {year}",
+    "left": "{n, plural, one {# day left} other {# days left}}",
+    "used": "{used} of {total} used",
+    "cover": "cover {name}",
+    "none": "No leave booked",
+    "type": {
+      "annual": "Annual leave",
+      "sick": "Sick leave",
+      "conference": "Conference",
+      "training": "Training",
+      "dayOff": "Day off"
+    },
+    "status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "declined": "Declined"
+    }
+  }
 }

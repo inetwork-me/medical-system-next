@@ -342,12 +342,22 @@ export type Slot = { start: number; held: boolean; past: boolean }
 /** Design · New appointment: Dr. Ahmed Zaki on 18 Nov has 08:20, 09:00, 11:20 and 14:10 greyed. */
 const HELD_AZ_18 = ["08:20", "09:00", "11:20", "14:10"].map(t)
 
-export function slotsFor(doctor: DoctorId, date: string): Slot[] {
+/**
+ * Limits from the doctor's clinic (Clinics · Schedule: hours, closures, booking rules), passed in by the screens so
+ * this module doesn't depend on Clinics: closed → no slots; otherwise slots stay inside from–to, every `step` min.
+ */
+export type ClinicLimits = { closed: true } | { closed: false; from: number; to: number; step: number }
+
+export function slotsFor(doctor: DoctorId, date: string, clinic?: ClinicLimits | null): Slot[] {
   const day = new Date(`${date}T12:00:00Z`).getUTCDay()
   const hours = SCHEDULES[doctor].week[day]
-  if (!hours || hours === "off") return []
-  const [open, close] = hours.split("–").map((h) => Number(h) * 60)
-  const step = SCHEDULES[doctor].slot
+  if (!hours || hours === "off" || clinic?.closed) return []
+  let [open, close] = hours.split("–").map((h) => Number(h) * 60)
+  if (clinic) {
+    open = Math.max(open, clinic.from)
+    close = Math.min(close, clinic.to)
+  }
+  const step = clinic?.step ?? SCHEDULES[doctor].slot
   const lunch = breaksFor(doctor)
   const out: Slot[] = []
   for (let m = open; m + step <= close; m += step) {

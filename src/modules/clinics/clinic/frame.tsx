@@ -19,20 +19,24 @@ import { CLINIC_TABS, clinicHref, type ClinicTab } from "../href"
 import { useClinic } from "../store"
 import { useClinicText } from "../text"
 
-const Ctx = React.createContext<Clinic | null>(null)
+const Ctx = React.createContext<{ clinic: Clinic; tab: ClinicTab } | null>(null)
 
 /** The clinic of the current clinic page (inside ClinicFrame). */
 export function useCurrentClinic(): Clinic {
   const c = React.useContext(Ctx)
   if (!c) throw new Error("useCurrentClinic outside ClinicFrame")
-  return c
+  return c.clinic
 }
 
 /** Clinic key from ?id= */
 export const useClinicKey = () => useSearchParams().get("id") ?? ""
 
-/** Active clinic tab from the route segment under /clinics/clinic. */
+/** Active clinic tab, from the route segment under /clinics/clinic (read by the frame, which is the layout). */
 export function useClinicTab(): ClinicTab {
+  return React.useContext(Ctx)?.tab ?? "overview"
+}
+
+function useSegmentTab(): ClinicTab {
   const seg = useSelectedLayoutSegment()
   return (CLINIC_TABS as readonly string[]).includes(seg ?? "") ? (seg as ClinicTab) : "overview"
 }
@@ -57,7 +61,8 @@ export function ClinicFrame({ children }: { children: React.ReactNode }) {
   const tn = useTranslations("shell.nav")
   const { b } = useClinicText()
   const clinic = useClinic(useClinicKey())
-  const tab = useClinicTab()
+  const tab = useSegmentTab()
+  const value = React.useMemo(() => (clinic ? { clinic, tab } : null), [clinic, tab])
 
   if (!clinic) {
     return (
@@ -86,7 +91,7 @@ export function ClinicFrame({ children }: { children: React.ReactNode }) {
   const crumbs = [{ label: tn("clinics"), href: "/clinics" }]
   if (tab === "settings") crumbs.push({ label: name, href: clinicHref(clinic.key) })
   return (
-    <Ctx.Provider value={clinic}>
+    <Ctx.Provider value={value}>
       <PageTitle title={name} crumbs={crumbs} back="/clinics" />
       <MobileBar clinic={clinic} />
       {children}
@@ -159,11 +164,19 @@ function MobileBar({ clinic }: { clinic: Clinic }) {
 function ClinicTabs({ active, clinic }: { active: ClinicTab; clinic: Clinic }) {
   const t = useTranslations("clinics.page")
   const activeRef = React.useRef<HTMLAnchorElement>(null)
+  const navRef = React.useRef<HTMLElement>(null)
+  // Scroll only the tab strip (scrollIntoView would also scroll the page sideways in RTL).
   React.useEffect(() => {
-    activeRef.current?.scrollIntoView({ block: "nearest", inline: "nearest" })
+    const nav = navRef.current
+    const el = activeRef.current
+    if (!nav || !el) return
+    const n = nav.getBoundingClientRect()
+    const r = el.getBoundingClientRect()
+    if (r.left < n.left) nav.scrollBy({ left: r.left - n.left - 16 })
+    else if (r.right > n.right) nav.scrollBy({ left: r.right - n.right + 16 })
   }, [active])
   return (
-    <nav aria-label={t("tabsLabel")} className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:px-0">
+    <nav ref={navRef} aria-label={t("tabsLabel")} className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:px-0">
       <div className="inline-flex items-center gap-0.5 rounded-lg bg-muted p-[3px]">
         {CLINIC_TABS.map((key) => {
           const on = key === active

@@ -2,6 +2,7 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@/components/ds/icon"
+import { Switch } from "@/components/ui/switch"
 import type { TileTone } from "./data"
 
 const TILE: Record<TileTone, string> = {
@@ -31,3 +32,34 @@ export function StatBox({ label, value, className, valueClassName }: { label: Re
     </div>
   )
 }
+
+/** Bordered switch row (Booking rules, Settings): label + hint, switch at the end. */
+export function SwitchCard({
+  label,
+  hint,
+  checked,
+  onCheckedChange,
+  disabled,
+  className,
+}: {
+  label: React.ReactNode
+  hint?: React.ReactNode
+  checked: boolean
+  onCheckedChange: (v: boolean) => void
+  disabled?: boolean
+  className?: string
+}) {
+  const id = React.useId()
+  return (
+    <div className={cn("flex items-center gap-3 rounded-lg border p-3", className)}>
+      <label htmlFor={id} className="flex min-w-0 flex-1 cursor-pointer flex-col gap-0.5">
+        <span className="text-sm font-medium">{label}</span>
+        {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
+      </label>
+      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} />
+    </div>
+  )
+}
+
+/** Arabic "to/for the clinic": الأطفال → للأطفال, otherwise لـ + name. English returns "to <name>" wording via messages. */
+export const arFor = (name: string) => (name.startsWith("ال") ? `لل${name.slice(2)}` : `لـ${name}`)

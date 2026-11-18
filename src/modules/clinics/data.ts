@@ -153,8 +153,18 @@ const PEDS_SERVICES: Service[] = [
 
 const DAY = ["08:00–14:00", "16:00–22:00"]
 const PEDS_HOURS: Record<Weekday, string[]> = { sun: DAY, mon: DAY, tue: DAY, wed: DAY, thu: ["08:00–14:00", "16:00–20:00"], fri: [], sat: ["16:00–22:00"] }
-const STD_HOURS: Record<Weekday, string[]> = { sun: DAY, mon: DAY, tue: DAY, wed: DAY, thu: DAY, fri: [], sat: ["16:00–22:00"] }
+// Other clinics also run Saturday mornings (Appointments: Dr. Khaled Mansour and Dr. Sami Odeh work Saturdays 09–13).
+const STD_HOURS: Record<Weekday, string[]> = { sun: DAY, mon: DAY, tue: DAY, wed: DAY, thu: DAY, fri: [], sat: DAY }
 const STD_RULES: BookingRules = { slotMin: 15, gapMin: 5, maxDaysAhead: 30, online: true, walkIns: true, walkInsPerHour: 2 }
+/** Visit length + gap = the Appointments slot of the clinic's doctors (Pediatrics 15 + 5 = Dr. Ahmed Zaki's 20 min). */
+const RULES: Record<string, Partial<BookingRules>> = {
+  cardio: { slotMin: 25 },
+  dental: { slotMin: 40 },
+  ortho: { slotMin: 25 },
+}
+
+/** Appointments doctors (data shared with that module) → their clinic. */
+export const APPT_DOCTOR_CLINIC: Record<string, string> = { az: "peds", so: "dental", km: "cardio", hf: "ortho" }
 const STD_CLOSURES: Closure[] = [
   { date: "2026-12-01", reason: bi("Staff training · until 12 PM", "تدريب الموظفين · لين 12 الظهر"), kind: "halfDay" },
   { date: "2027-02-22", reason: bi("Founding Day", "يوم التأسيس"), kind: "holiday" },
@@ -373,7 +383,7 @@ export const CLINICS: Clinic[] = ROWS.map(([key, icon, name, short, specialty, t
     doctors: peds ? PEDS_DOCTORS : doctorsOf(key, head, status),
     rooms: peds ? PEDS_ROOMS : roomsOf(key),
     hours: peds ? PEDS_HOURS : STD_HOURS,
-    rules: STD_RULES,
+    rules: { ...STD_RULES, ...RULES[key] },
     closures: STD_CLOSURES,
     services: peds ? PEDS_SERVICES : servicesOf(key),
     specialtyTools: { eyes: key === "eyes", dental: key === "dental" },

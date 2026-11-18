@@ -41,7 +41,7 @@ function subscribe(l: () => void) {
 function list(): Clinic[] {
   load()
   if (cache?.state === state) return cache.list
-  const all = [...CLINICS, ...state.added].map((c) => (state.edits[c.key] ? { ...c, ...state.edits[c.key] } : c))
+  const all = [...CLINICS, ...state.added].map((c) => (state.edits[c.key] ? { ...c, ...state.edits[c.key] } : c)).filter((c) => !c.archived)
   cache = { state, list: all }
   return all
 }
@@ -57,9 +57,10 @@ export function useClinic(key: string): Clinic | undefined {
   return useClinics().find((c) => c.key === key)
 }
 
-/** Merge fields into a clinic. */
+/** Merge fields into a clinic (archived ones too, so Archive can be undone). */
 export function updateClinic(key: string, patch: Partial<Clinic> | ((c: Clinic) => Partial<Clinic>)) {
-  const current = list().find((c) => c.key === key)
+  const base = [...CLINICS, ...state.added].find((c) => c.key === key)
+  const current = base && (state.edits[key] ? { ...base, ...state.edits[key] } : base)
   if (!current) return
   const fields = typeof patch === "function" ? patch(current) : patch
   if (state.added.some((c) => c.key === key)) {

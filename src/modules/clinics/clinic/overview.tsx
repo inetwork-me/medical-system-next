@@ -13,9 +13,10 @@ import { StatusBadge } from "@/components/ds/status-badge"
 import { Widget } from "@/components/ds/widget"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { CLINICS_TODAY, FLOW_HOURS, MONTH_FROM, NOW_HOUR, flowOf, queueOf, type Clinic, type RoomStatus } from "../data"
+import { Checklist } from "../settings"
+import { CLINICS_TODAY, checklistOf, isSettingUp, FLOW_HOURS, MONTH_FROM, NOW_HOUR, flowOf, queueOf, type Clinic, type RoomStatus } from "../data"
 import { ClinicTile } from "../parts"
-import { STATUS_TONE, useClinicText } from "../text"
+import { statusTone, useClinicText } from "../text"
 import { ClinicPage, OverviewActions, useCurrentClinic } from "./frame"
 
 /**
@@ -28,6 +29,7 @@ export function ClinicOverview() {
   const c = useCurrentClinic()
   return (
     <ClinicPage actions={<OverviewActions />}>
+      {isSettingUp(c) && <Checklist done={checklistOf(c)} clinicKey={c.key} />}
       <ClinicHeader clinic={c} />
       <div className="@container/ov">
         <div className="grid grid-cols-1 gap-4 @xl/ov:grid-cols-2 @5xl/ov:grid-cols-[minmax(0,1fr)_22.5rem] @5xl/ov:items-start @5xl/ov:gap-6">
@@ -53,7 +55,7 @@ export function ClinicHeader({ clinic: c }: { clinic: Clinic }) {
   const facts = [
     t("doctors", { n: c.doctors.length }),
     t("rooms", { n: c.rooms.length }),
-    c.ages ? t("ages", { from: c.ages[0], to: c.ages[1] }) : t("allAges"),
+    !c.ages ? t("allAges") : c.ages[1] >= 120 ? t("agesFrom", { from: c.ages[0] }) : t("ages", { from: c.ages[0], to: c.ages[1] }),
     c.rules.online ? t("online") : t("onlineOff"),
   ]
   return (
@@ -64,9 +66,11 @@ export function ClinicHeader({ clinic: c }: { clinic: Clinic }) {
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-xl font-semibold">{b(c.name)}</h2>
-              <StatusBadge tone={STATUS_TONE[c.status]}>{status(c)}</StatusBadge>
+              <StatusBadge tone={statusTone(c)}>{status(c)}</StatusBadge>
             </div>
-            <p className="text-xs text-muted-foreground">{t("subtitle", { floor: c.floor, wing: c.wing, ext: c.ext, branch: b(c.branch) })}</p>
+            <p className="text-xs text-muted-foreground">
+              {c.floor ? t("subtitle", { floor: c.floor, wing: c.wing, ext: c.ext || "—", branch: b(c.branch) }) : b(c.branch)}
+            </p>
           </div>
         </div>
         <ul className="flex flex-wrap gap-1.5">

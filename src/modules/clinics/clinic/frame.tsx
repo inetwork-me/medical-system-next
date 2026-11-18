@@ -14,7 +14,7 @@ import { EmptyState } from "@/components/ds/states"
 import { PageContainer, PageHeader } from "@/components/shell/page"
 import { PageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
-import type { Clinic } from "../data"
+import { isSettingUp, type Clinic } from "../data"
 import { CLINIC_TABS, clinicHref, type ClinicTab } from "../href"
 import { useClinic } from "../store"
 import { useClinicText } from "../text"
@@ -124,7 +124,7 @@ export function OverviewActions() {
         </Link>
       </Button>
       <IfModule id="appointments">
-        <Button asChild>
+        <Button asChild className={cn(isSettingUp(c) && "hidden")}>
           <Link href={bookVisitHref(c)}>
             <Icon name="calendar-add" size={24} />
             {t("book")}

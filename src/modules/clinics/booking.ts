@@ -1,7 +1,7 @@
 "use client"
 
 import { isModuleEnabled } from "@/lib/modules"
-import { APPT_DOCTOR_CLINIC, CLINICS_TODAY, WEEKDAYS, type Clinic } from "./data"
+import { APPT_DOCTOR_CLINIC, CLINICS_TODAY, WEEKDAYS, isSettingUp, type Clinic } from "./data"
 import { useClinics } from "./store"
 
 /** "08:00–14:00" → [480, 840] */
@@ -14,7 +14,7 @@ const addDays = (iso: string, n: number) => {
 }
 
 /** What a clinic allows on a day: closed, or open between from–to (minutes), slots every `step` minutes. */
-export type ClinicDayLimits = { closed: true; why: "dayOff" | "holiday" | "paused" | "tooFar" } | { closed: false; from: number; to: number; step: number }
+export type ClinicDayLimits = { closed: true; why: "dayOff" | "holiday" | "paused" | "tooFar" | "setup" | "archived" } | { closed: false; from: number; to: number; step: number }
 
 /**
  * A clinic's booking limits for a date, from its Schedule tab: day switch and shifts (the outer bounds of the day),
@@ -22,7 +22,9 @@ export type ClinicDayLimits = { closed: true; why: "dayOff" | "holiday" | "pause
  * length + gap as the slot step.
  */
 export function clinicDayLimits(c: Clinic, date: string, today = CLINICS_TODAY): ClinicDayLimits {
-  if (c.status === "paused" && c.pausedUntil && date < c.pausedUntil) return { closed: true, why: "paused" }
+  if (c.archived) return { closed: true, why: "archived" }
+  if (isSettingUp(c)) return { closed: true, why: "setup" }
+  if (c.pausedUntil && date < c.pausedUntil && (c.pausedFrom ? date >= c.pausedFrom : c.status === "paused")) return { closed: true, why: "paused" }
   if (date > addDays(today, c.rules.maxDaysAhead)) return { closed: true, why: "tooFar" }
   const closure = c.closures.find((x) => x.date === date)
   if (closure?.kind === "holiday") return { closed: true, why: "holiday" }

@@ -65,6 +65,12 @@ export type Clinic = {
   /** Paused clinics: back on this day, with the reason shown on the card. */
   pausedUntil?: string
   pauseNote?: Bi
+  /** A pause set from Settings: closed from this day until the day before pausedUntil. */
+  pausedFrom?: string
+  /** Archived from Settings: hidden from the list and from booking. */
+  archived?: boolean
+  /** Created with New clinic: hidden from booking until the checklist is done. */
+  isNew?: boolean
   closesAt: string
   doctorCount: number
   roomCount: number
@@ -425,7 +431,7 @@ const REASONS: Bi[] = [bi("Follow-up", "متابعة"), bi("New patient", "مر�
 /** Next in line: the patients waiting now (longest first), then the next booking. */
 export function queueOf(c: Clinic): QueueItem[] {
   if (c.key === "peds") return PEDS_QUEUE
-  if (c.status === "paused") return []
+  if (c.status === "paused" || !c.today.booked) return []
   const n = Math.min(c.today.waiting, 3)
   const seed = c.key.length
   const at = (i: number) => {
@@ -475,3 +481,72 @@ export function clinicKpis(list: Clinic[] = CLINICS) {
 
 /** Average wait over 20 min shows in warning text (brief §5). */
 export const LONG_WAIT = 20
+
+/* ---------------------------------------------------------------- New clinic checklist */
+export type ChecklistKey = "name" | "location" | "hours" | "services" | "doctor"
+export const CHECKLIST: ChecklistKey[] = ["name", "location", "hours", "services", "doctor"]
+
+/** "Before you open it": which of the 5 steps a clinic has done. */
+export function checklistOf(c: Pick<Clinic, "name" | "specialty" | "branch" | "floor" | "hours" | "services" | "doctors">): Record<ChecklistKey, boolean> {
+  return {
+    name: !!c.name.en.trim() && !!c.name.ar.trim() && !!c.specialty.en.trim(),
+    location: !!c.branch.en && c.floor > 0,
+    hours: WEEKDAYS.some((d) => c.hours[d].length > 0),
+    services: c.services.some((s) => s.active),
+    doctor: c.doctors.length > 0,
+  }
+}
+
+/** A new clinic stays hidden from booking until every checklist step is done. */
+export const isSettingUp = (c: Clinic) => !!c.isNew && !Object.values(checklistOf(c)).every(Boolean)
+
+const EMPTY_WEEK: Record<Weekday, string[]> = { sun: [], mon: [], tue: [], wed: [], thu: [], fri: [], sat: [] }
+
+/** A clinic made with New clinic: no hours, services or rooms yet (the checklist asks for them), today and month at 0. */
+export function blankClinic(key: string, fields: Partial<Clinic>): Clinic {
+  return {
+    key,
+    name: bi("", ""),
+    short: bi("", ""),
+    specialty: bi("", ""),
+    icon: "hospital",
+    tone: "accent",
+    head: bi("", ""),
+    headInitials: "",
+    floor: 0,
+    wing: "",
+    ext: "",
+    whatsapp: "",
+    branch: RIYADH,
+    ages: null,
+    status: "open",
+    closesAt: "22:00",
+    doctorCount: 0,
+    roomCount: 0,
+    today: { seen: 0, booked: 0, waiting: 0, avgWait: 0 },
+    month: { visits: 0, utilisation: 0, noShow: 0, rating: "—", reviews: 0, revenue: 0, insuredPct: 0, visitsDelta: 0, noShowDelta: 0 },
+    doctors: [],
+    rooms: [],
+    hours: EMPTY_WEEK,
+    rules: STD_RULES,
+    closures: [],
+    services: [],
+    specialtyTools: { eyes: false, dental: false },
+    isNew: true,
+    ...fields,
+  }
+}
+
+/** Specialties offered in Settings / New clinic (the 9 clinics' plus two common ones). */
+export const SPECIALTIES: Bi[] = [
+  ...CLINICS.map((c) => c.specialty),
+  bi("Family medicine", "طب الأسرة"),
+  bi("General surgery", "الجراحة العامة"),
+]
+
+/** Shared doctors list (heads and clinic doctors) for "Head of clinic". */
+export const ALL_DOCTORS = (list: Clinic[]) => {
+  const seen = new Map<string, { name: Bi; initials: string }>()
+  for (const c of list) for (const d of c.doctors) if (!seen.has(d.name.en)) seen.set(d.name.en, { name: d.name, initials: d.initials })
+  return [...seen.values()]
+}

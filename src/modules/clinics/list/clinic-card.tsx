@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress"
 import { LONG_WAIT, type Clinic } from "../data"
 import { clinicHref } from "../href"
 import { ClinicTile, StatBox } from "../parts"
-import { STATUS_TONE, useClinicText } from "../text"
+import { statusTone, useClinicText } from "../text"
 
 /**
  * Widget / Clinic Card (Clinics list): tile · name over "Floor · Wing" · ⋯; status badge; "Seen today" n / booked with a
@@ -53,7 +53,7 @@ export function ClinicCard({ clinic: c }: { clinic: Clinic }) {
         />
       </div>
 
-      <StatusBadge tone={STATUS_TONE[c.status]}>{status(c)}</StatusBadge>
+      <StatusBadge tone={statusTone(c)}>{status(c)}</StatusBadge>
 
       {paused ? (
         c.pauseNote && <p className="rounded-lg bg-muted p-3 text-xs text-muted-foreground">{b(c.pauseNote)}</p>

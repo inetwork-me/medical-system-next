@@ -21,7 +21,7 @@ import { toggleTag, usePatientsStore } from "../store"
 import { usePatientExports } from "./exports"
 import { OverlayProvider, useOverlay, type OverlayKind } from "./overlays"
 import { ProfileCard } from "./side"
-import { VISIBLE_PATIENT_TABS, usePatient, usePatientTab, useText, type PatientTab } from "./use-patient"
+import { usePatient, usePatientTab, usePatientTabs, useText, type PatientTab } from "./use-patient"
 
 /**
  * Patient page frame (Patients · Patient page · 1440 / 768 / 390):
@@ -216,6 +216,7 @@ function MoreActions({ patient, variant = "outline" }: { patient: Patient; varia
 /** Patient tabs: muted track, active = card pill + shadow-xs (no icons). The active tab scrolls into view on mobile. */
 function PatientTabs({ active, id, counts }: { active: PatientTab; id: string; counts: { visits: number; files: number } }) {
   const t = useTranslations("patients.page")
+  const tabs = usePatientTabs()
   const activeRef = React.useRef<HTMLAnchorElement>(null)
   React.useEffect(() => {
     activeRef.current?.scrollIntoView({ block: "nearest", inline: "nearest" })
@@ -223,7 +224,7 @@ function PatientTabs({ active, id, counts }: { active: PatientTab; id: string; c
   return (
     <nav aria-label={t("tabsLabel")} className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:px-0">
       <div className="inline-flex items-center gap-0.5 rounded-lg bg-muted p-[3px]">
-        {VISIBLE_PATIENT_TABS.map((key) => {
+        {tabs.map((key) => {
           const on = key === active
           const label = key === "visits" || key === "files" ? t(`tabs.${key}`, { count: counts[key] }) : t(`tabs.${key}`)
           return (

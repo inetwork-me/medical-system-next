@@ -7,6 +7,7 @@ import { useFormatter, useLocale } from "next-intl"
 
 import { bi, type Bi } from "@/lib/mock/bi"
 import { isTabEnabled } from "@/lib/modules"
+import { useSpecialtyTabs } from "@/modules/clinics/specialty-tabs"
 import { applyForm } from "../edit/apply"
 import { usePatientsStore } from "../store"
 import { applyChanges, applyCollections, patientRecord, recordSummary } from "./record"
@@ -16,6 +17,12 @@ export type PatientTab = (typeof PATIENT_TABS)[number]
 
 /** Tabs shown for the active branch: Eyes / Dental are record tabs that a branch can switch off (config/modules.ts). */
 export const VISIBLE_PATIENT_TABS = PATIENT_TABS.filter((k) => (k !== "eyes" && k !== "dental") || isTabEnabled("patients", k))
+
+/** Visible tabs, also following the clinics' Specialty tools switches (Clinics · Settings). */
+export function usePatientTabs(): PatientTab[] {
+  const on = useSpecialtyTabs()
+  return PATIENT_TABS.filter((k) => (k !== "eyes" && k !== "dental") || on[k])
+}
 
 /** Current patient (from the session store, so VIP / ban changes show) + its page record. */
 export function usePatient() {

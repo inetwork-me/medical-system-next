@@ -44,4 +44,6 @@ export const STATUS_TONE = { in: "success", late: "warning", later: "info", off:
  * "+5%"): each run is wrapped in LRI … PDI so the bidi algorithm can't flip it. All-Latin text ("4.8 / 5") is wrapped whole.
  */
 export const ltr = (s: string) =>
-  !/[\u0600-\u06ff]/.test(s) ? `\u2066${s}\u2069` : s.replace(/([+\u2212-]?\d[\d.,:]*%?(?:\u2013\d[\d.,:]*%?)?)/g, "\u2066$1\u2069")
+  !/[\u0600-\u06ff]/.test(s)
+    ? `\u2066${s}\u2069`
+    : s.replace(/[+\u2212]?[A-Za-z0-9][A-Za-z0-9.,:%\u2013-]*/g, (m) => (/\d/.test(m) ? `\u2066${m}\u2069` : m))

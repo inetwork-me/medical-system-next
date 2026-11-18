@@ -72,6 +72,10 @@ export type DoctorMonth = {
   revenue: number
   /** Visits vs last month, %. */
   delta: number
+  /** Average wait before being seen, min. */
+  wait: number
+  /** Follow-ups that came back, %. */
+  returnRate: number
 }
 type Base = Omit<Doctor, "month" | "ext" | "yearsExp" | "languages" | "ages" | "booking" | "week" | "booked" | "leaveUsed"> & {
   month: { visits: number; rating: string }
@@ -353,8 +357,11 @@ const REP: Record<string, [number, number, number, number, number]> = {
   otaibi: [76, 21, 6.0, 63, 102],
   fares: [70, 18, 6.6, 52, 109],
   hamdan: [34, 11, 4.0, 31, 38],
-  kamal: [79, 19, 5.9, 90, 96],
+  kamal: [79, 19, 5.9, 90, 43],
 }
+
+/** Wait before seen (min) and follow-ups that return (%) — the design's Pediatrics figures, generated for the rest. */
+const PERF: Record<string, [number, number]> = { zaki: [11, 72], saud: [12, 66], kamal: [16, 54] }
 
 function profile(b: Base, i: number): Doctor {
   const zaki = b.key === "zaki"
@@ -370,7 +377,7 @@ function profile(b: Base, i: number): Doctor {
   const [utilisation, consult, noShow, reviews, revenue] = REP[b.key] ?? [78 + (i % 5) * 3, 15 + (i % 4) * 2, 4 + (i % 3) * 0.8, 40 + i * 3, 80 + i * 6]
   return {
     ...b,
-    month: { ...b.month, reviews, consult, noShow: Math.round(noShow * 10) / 10, utilisation, revenue, delta: zaki ? 5 : ((i * 7) % 11) - 4 },
+    month: { ...b.month, reviews, consult, noShow: Math.round(noShow * 10) / 10, utilisation, revenue, delta: zaki ? 5 : ((i * 7) % 11) - 4, wait: (PERF[b.key] ?? [9 + (i % 7), 0])[0], returnRate: (PERF[b.key] ?? [0, 58 + ((i * 5) % 20)])[1] },
     ext: zaki ? "1121" : String(1100 + i * 7),
     yearsExp: zaki ? 18 : b.grade === "consultant" ? 14 + (i % 6) : b.grade === "specialist" ? 6 + (i % 5) : 2 + (i % 2),
     languages: i % 3 === 2 ? { en: "Arabic · English · French", ar: "عربي · إنجليزي · فرنسي" } : { en: "Arabic · English", ar: "عربي · إنجليزي" },
@@ -510,6 +517,75 @@ export const LEAVES: Leave[] = [
   { id: "lv-shehri", doctor: "shehri", type: "conference", from: "2027-01-14", to: "2027-01-16", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "pending", bookings: 11 },
   { id: "lv-hamdan", doctor: "hamdan", type: "annual", from: "2026-11-08", to: "2026-11-19", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "approved", bookings: 12 },
 ]
+
+/* ---------------------------------------------------------------- patients (Patients tab) */
+/** next: ISO date, null (none booked) or "overdue". */
+export type DoctorPatient = { initials: string; name: Bi; mrn: string; age: Bi; last: string; next: string | null | "overdue"; condition: Bi; payer: Bi; isNew?: boolean }
+
+const BUPA = bi("Bupa", "بوبا")
+const TAW = bi("Tawuniya", "التعاونية")
+const ZAKI_PATIENTS: DoctorPatient[] = [
+  { initials: "YA", name: bi("Yousef Al-Amri", "يوسف العمري"), mrn: "MRN-20418", age: bi("8 y", "8 سنوات"), last: "2026-11-18", next: "2026-12-16", condition: bi("Asthma", "ربو"), payer: BUPA },
+  { initials: "JH", name: bi("Jana Al-Harthi", "جنى الحارثي"), mrn: "MRN-21877", age: bi("14 m", "14 شهر"), last: "2026-11-18", next: "2027-01-18", condition: bi("Vaccines due", "تطعيمات مستحقة"), payer: TAW },
+  { initials: "LH", name: bi("Lina Haddad", "لينا حداد"), mrn: "MRN-19022", age: bi("6 y", "6 سنوات"), last: "2026-11-18", next: null, condition: bi("Iron deficiency", "نقص حديد"), payer: bi("Cash", "كاش") },
+  { initials: "OH", name: bi("Omar Al-Harbi", "عمر الحربي"), mrn: "MRN-22310", age: bi("3 y", "3 سنوات"), last: "2026-11-02", next: null, condition: bi("Recurrent fever", "حرارة متكررة"), payer: bi("MedGulf", "ميدغلف") },
+  { initials: "FD", name: bi("Fahad Al-Dosari", "فهد الدوسري"), mrn: "MRN-17654", age: bi("11 y", "11 سنة"), last: "2026-10-21", next: "2026-11-18", condition: bi("Asthma", "ربو"), payer: BUPA },
+  { initials: "RM", name: bi("Reem Al-Mutairi", "ريم المطيري"), mrn: "MRN-23001", age: bi("5 m", "5 شهور"), last: "2026-11-09", next: "2026-12-09", condition: bi("Growth check", "متابعة نمو"), payer: BUPA, isNew: true },
+  { initials: "AS", name: bi("Abdullah Al-Shammari", "عبدالله الشمري"), mrn: "MRN-15530", age: bi("13 y", "13 سنة"), last: "2026-09-28", next: "overdue", condition: bi("Type 1 diabetes", "سكري نوع 1"), payer: TAW },
+]
+const CONDITIONS: Bi[] = [bi("Follow-up", "متابعة"), bi("Hypertension", "ضغط"), bi("Type 2 diabetes", "سكري نوع 2"), bi("Check-up", "فحص دوري"), bi("Post-op review", "مراجعة بعد العملية")]
+const PAYERS: Bi[] = [BUPA, TAW, bi("Cash", "كاش"), bi("MedGulf", "ميدغلف")]
+
+/** The doctor's patients (last 12 months): the design's list for Dr. Ahmed Zaki, a short sample for the others. */
+export function patientsOf(d: Doctor): DoctorPatient[] {
+  if (d.key === "zaki") return ZAKI_PATIENTS
+  const n = DOCTORS.findIndex((x) => x.key === d.key)
+  const lasts = ["2026-11-16", "2026-11-10", "2026-11-03", "2026-10-27", "2026-10-12", "2026-09-30"]
+  const nexts: DoctorPatient["next"][] = ["2026-12-14", null, "2026-12-01", "overdue", "2027-01-05", null]
+  return lasts.map((last, i) => {
+    const name = POOL[(n + i) % POOL.length]
+    const age = 24 + ((n + i * 7) % 50)
+    return {
+      initials: name.en.replace(/Al-/g, "").split(/\s+/).slice(0, 2).map((w) => w[0]).join(""),
+      name,
+      mrn: `MRN-${16000 + n * 211 + i * 37}`,
+      age: bi(`${age} y`, `${age} سنة`),
+      last,
+      next: nexts[i],
+      condition: CONDITIONS[(n + i) % CONDITIONS.length],
+      payer: PAYERS[(n + i) % PAYERS.length],
+      ...(i === 1 ? { isNew: true } : {}),
+    }
+  })
+}
+/** Panel figures behind the filter (the design's 1,240 / 23 / 18 for Dr. Ahmed Zaki). */
+export const panelOf = (d: Doctor) =>
+  d.key === "zaki" ? { all: 1240, due: 23, newMonth: 18 } : { all: d.month.visits * 3, due: Math.round(d.month.visits / 18), newMonth: Math.round(d.month.visits / 23) }
+/** Follow-up due: overdue, or the next visit within 30 days. */
+export const isFollowUpDue = (p: DoctorPatient) => p.next === "overdue" || (!!p.next && daysUntil(p.next) <= 30)
+
+/* ---------------------------------------------------------------- performance */
+export type Review = { stars: number; text: Bi; by: Bi; date: string }
+const ZAKI_REVIEWS: Review[] = [
+  { stars: 5, text: bi("Explained everything to us calmly. My son wasn't scared at all.", "شرح لنا كل شي بهدوء، وولدي ما خاف أبد."), by: bi("Parent of Yousef", "أم يوسف"), date: "2026-11-18" },
+  { stars: 5, text: bi("On time and very thorough with the vaccine plan.", "على الموعد ودقيق مرة في جدول التطعيمات."), by: bi("Parent of Jana", "أبو جنى"), date: "2026-11-12" },
+  { stars: 4, text: bi("Great doctor, but we waited 25 minutes.", "دكتور ممتاز، بس انتظرنا 25 دقيقة."), by: bi("Parent of Omar", "أم عمر"), date: "2026-11-02" },
+]
+/** Recent patient reviews: the design's for Dr. Ahmed Zaki, three general ones for the others. */
+export function reviewsOf(d: Doctor): Review[] {
+  if (d.key === "zaki") return ZAKI_REVIEWS
+  const n = DOCTORS.findIndex((x) => x.key === d.key)
+  const first = (v: Bi) => ({ en: v.en.split(" ")[0], ar: v.ar.split(" ")[0] })
+  return [
+    { stars: 5, text: bi("Listened carefully and explained the plan clearly.", "سمعني زين وشرح الخطة بوضوح."), by: first(POOL[n % POOL.length]), date: "2026-11-15" },
+    { stars: 5, text: bi("Very professional, and the follow-up call was a nice touch.", "محترف مرة، وحلوة مكالمة المتابعة."), by: first(POOL[(n + 2) % POOL.length]), date: "2026-11-08" },
+    { stars: 4, text: bi("Good visit, but the clinic was running late.", "الزيارة زينة، بس العيادة كانت متأخرة."), by: first(POOL[(n + 4) % POOL.length]), date: "2026-10-30" },
+  ]
+}
+/** Visits per month, Jun → Nov (Nov so far). */
+export const historyOf = (d: Doctor) =>
+  d.key === "zaki" ? [588, 402, 455, 640, 676, 412] : [1.42, 0.98, 1.1, 1.55, 1.64, 1].map((f) => Math.round(d.month.visits * f))
+export const HISTORY_MONTHS = ["2026-06-15", "2026-07-15", "2026-08-15", "2026-09-15", "2026-10-15", "2026-11-15"]
 
 /* ---------------------------------------------------------------- leave helpers */
 const addDay = (iso: string, n: number) => {

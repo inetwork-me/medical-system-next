@@ -263,5 +263,69 @@
     "sentText": "{dates} · waiting for approval",
     "sub": "Goes to the medical director for approval",
     "notify": "Text patients about the change"
+  },
+  "patients": {
+    "title": "{name}'s patients",
+    "text": "Patients he saw in the last 12 months",
+    "textF": "Patients she saw in the last 12 months",
+    "export": "Export",
+    "search": "Search name or file number…",
+    "filter": {
+      "label": "Show",
+      "all": "All · {n}",
+      "due": "Follow-up due · {n}",
+      "new": "New this month · {n}"
+    },
+    "col": {
+      "patient": "Patient",
+      "mrn": "File no.",
+      "age": "Age",
+      "last": "Last visit",
+      "next": "Next visit",
+      "condition": "Condition",
+      "payer": "Payer"
+    },
+    "overdue": "Overdue",
+    "lastVisit": "Last visit {date}",
+    "showing": "Showing {shown} of {total} patients",
+    "empty": "No patients match",
+    "emptyText": "Try another name or file number.",
+    "clear": "Clear search",
+    "menu": "Patient actions",
+    "open": "Open patient file",
+    "noFile": "No file in Patients yet",
+    "book": "Book follow-up",
+    "exported": "Patient list exported",
+    "exportedText": "{file} is in your downloads.",
+    "sheet": "Patients"
+  },
+  "perf": {
+    "chart": "Visits per month",
+    "chartText": "{range} · {month} so far",
+    "reviews": "Patient reviews",
+    "reviewsText": "★ {rating} · {n} reviews this year",
+    "by": "{by} · {date}",
+    "compare": "Compared with {clinic}",
+    "compareText": "{range} · clinic average of {n, plural, one {# doctor} other {# doctors}}",
+    "col": {
+      "measure": "Measure",
+      "clinic": "Clinic average",
+      "diff": "Difference"
+    },
+    "m": {
+      "visits": "Visits",
+      "consult": "Avg consult time",
+      "wait": "Wait before seen",
+      "noShow": "No-show rate",
+      "return": "Follow-ups that return",
+      "rating": "Rating",
+      "revenue": "Revenue"
+    },
+    "better": "Better",
+    "worse": "Lower",
+    "same": "Same",
+    "clinicValue": "Clinic {v}",
+    "revenueValue": "SAR {n}K",
+    "stars": "{n} out of 5 stars"
   }
 }

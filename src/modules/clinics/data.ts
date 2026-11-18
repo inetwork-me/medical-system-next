@@ -19,7 +19,16 @@ export type Payer = "cash" | "bupa" | "tawuniya" | "medgulf"
 /** Payer columns keep this order everywhere. */
 export const PAYERS: Payer[] = ["cash", "bupa", "tawuniya", "medgulf"]
 
-export type Service = { id: string; name: Bi; code: string; minutes: number; prices: Record<Payer, number>; active: boolean }
+/** Prices in SAR excluding VAT. `pending` = new prices saved with a later "Applies from" date. */
+export type Service = {
+  id: string
+  name: Bi
+  code: string
+  minutes: number
+  prices: Record<Payer, number>
+  active: boolean
+  pending?: { prices: Record<Payer, number>; from: string }
+}
 export type RoomStatus = "inUse" | "free" | "cleaning" | "closed"
 export type Room = { number: string; type: Bi; status: RoomStatus; occupant?: Bi; since?: string; readyIn?: number; equipment: Bi[] }
 export type DoctorTone = "info" | "success" | "neutral"

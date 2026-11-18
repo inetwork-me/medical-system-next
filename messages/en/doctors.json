@@ -327,5 +327,108 @@
     "clinicValue": "Clinic {v}",
     "revenueValue": "SAR {n}K",
     "stars": "{n} out of 5 stars"
+  },
+  "credTab": {
+    "title": "Licences & certificates",
+    "text": "We remind the doctor 60, 30 and 7 days before expiry",
+    "add": "Add",
+    "col": {
+      "credential": "Credential",
+      "number": "Number",
+      "issuer": "Issued by",
+      "expires": "Expires",
+      "status": "Status"
+    },
+    "full": {
+      "scfhs": "SCFHS registration",
+      "moh": "MOH practice licence",
+      "bls": "Basic Life Support (BLS)",
+      "pals": "Pediatric Advanced Life Support (PALS)",
+      "acls": "Advanced Cardiac Life Support (ACLS)",
+      "malpractice": "Malpractice insurance"
+    },
+    "grade": {
+      "consultant": "Consultant",
+      "specialist": "Specialist",
+      "resident": "Resident"
+    },
+    "line": "{number} · until {date}",
+    "renew": "Renew",
+    "view": "View document",
+    "noFile": "No scan on file yet",
+    "actions": "Actions",
+    "cme": "CME hours",
+    "cmeText": "{cycle} cycle · {n} hours needed for renewal",
+    "cmeOf": "{earned} of {required} hours",
+    "cmeLeft": "{n} to go",
+    "cmeDone": "Done for this cycle",
+    "hours": "{n} h",
+    "priv": "Clinical privileges",
+    "privText": "Approved by the medical director · reviewed yearly",
+    "approved": "Approved",
+    "underReview": "Under review",
+    "gradeF": {
+      "consultant": "Consultant",
+      "specialist": "Specialist",
+      "resident": "Resident"
+    }
+  },
+  "board": {
+    "export": "Export",
+    "tile": {
+      "expired": "Expired",
+      "d30": "Within 30 days",
+      "d60": "Within 60 days",
+      "valid": "Valid"
+    },
+    "cap": {
+      "expired": "{n, plural, =0 {Everyone can be booked} one {Doctor can't be booked} other {# doctors can't be booked}}",
+      "d30": "Reminder sent",
+      "d60": "Reminders scheduled",
+      "valid": "Across {n} doctors"
+    },
+    "title": "Renewals due",
+    "text": "Next {n} days · sorted by expiry",
+    "remindAll": "Remind all",
+    "remind": "Remind",
+    "renew": "Renew",
+    "col": {
+      "doctor": "Doctor",
+      "credential": "Credential",
+      "expires": "Expires",
+      "status": "Status"
+    },
+    "expiredAgo": "Expired {n, plural, one {# day} other {# days}} ago",
+    "left": "{n, plural, one {# day left} other {# days left}}",
+    "line": "{credential} · until {date}",
+    "empty": "Nothing due in the next {n} days",
+    "reminded": "Reminder sent",
+    "remindedText": "By SMS and email",
+    "remindedAll": "Reminders sent",
+    "remindedAllText": "{n, plural, one {# doctor} other {# doctors}} · by SMS and email",
+    "exported": "Credentials exported",
+    "exportedText": "{file} is in your downloads.",
+    "sheet": "Credentials"
+  },
+  "renew": {
+    "title": "Renew {name}",
+    "addTitle": "Add credential",
+    "text": "Upload the new certificate",
+    "credential": "Credential",
+    "current": "{name} · expires {date}",
+    "type": "Credential",
+    "number": "Certificate number",
+    "expiry": "New expiry date",
+    "issuer": "Issued by",
+    "cancel": "Cancel",
+    "save": "Save",
+    "required": "Required",
+    "future": "Pick a date after today",
+    "file": "Certificate",
+    "remove": "Remove file",
+    "toast": "{name} renewed",
+    "toastText": "Valid until {date}",
+    "added": "{name} added",
+    "addedText": "Valid until {date}"
   }
 }

@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
-import { enabledModules } from "@/lib/modules"
+import { activeTab, enabledModules } from "@/lib/modules"
 import { bi } from "@/lib/mock/bi"
 import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
 import { Icon } from "@/components/ds/icon"
@@ -23,7 +23,10 @@ import { useLocaleSwitch, useNav } from "./use-shell"
  * ghost icon buttons: search (→ top panel), language (→ other locale), notifications (→ bottom sheet).
  */
 export function MobileAppBar({ className }: { className?: string }) {
-  const { current, label, t } = useNav()
+  const { current, label, tabLabel, pathname, t } = useNav()
+  const tab = current ? activeTab(current, pathname) : undefined
+  // Tabs with their own title (Header v2: "Doctors › Credentials") show that title here too.
+  const title = current ? (tab?.ownTitle ? tabLabel(current, tab.key) : label(current)) : ""
   const tc = useTranslations("common")
   const { other, switchLocale } = useLocaleSwitch()
   const [sheet, setSheet] = React.useState<null | "user" | "search" | "notifications">(null)
@@ -42,7 +45,7 @@ export function MobileAppBar({ className }: { className?: string }) {
             <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>
           </Avatar>
         </button>
-        <p className="ms-1 min-w-0 flex-1 truncate text-lg font-semibold text-foreground">{current ? label(current) : ""}</p>
+        <p className="ms-1 min-w-0 flex-1 truncate text-lg font-semibold text-foreground">{title}</p>
         <Button variant="ghost" size="icon" aria-label={tc("actions.search")} onClick={() => setSheet("search")}>
           <Icon name="search-normal-1" size={24} />
         </Button>

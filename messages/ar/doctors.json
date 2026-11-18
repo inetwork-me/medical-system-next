@@ -327,5 +327,108 @@
     "clinicValue": "العيادة {v}",
     "revenueValue": "{n} ألف ر.س",
     "stars": "{n} من 5 نجوم"
+  },
+  "credTab": {
+    "title": "الرخص والشهادات",
+    "text": "نذكّر الطبيب قبل الانتهاء بـ 60 و30 و7 أيام",
+    "add": "أضف",
+    "col": {
+      "credential": "الشهادة",
+      "number": "الرقم",
+      "issuer": "الجهة",
+      "expires": "تنتهي",
+      "status": "الحالة"
+    },
+    "full": {
+      "scfhs": "تسجيل الهيئة",
+      "moh": "رخصة مزاولة المهنة",
+      "bls": "الإنعاش الأساسي (BLS)",
+      "pals": "إنعاش الأطفال المتقدم (PALS)",
+      "acls": "إنعاش القلب المتقدم (ACLS)",
+      "malpractice": "تأمين الأخطاء الطبية"
+    },
+    "grade": {
+      "consultant": "استشاري",
+      "specialist": "أخصائي",
+      "resident": "مقيم"
+    },
+    "line": "{number} · لين {date}",
+    "renew": "جدّد",
+    "view": "اعرض المستند",
+    "noFile": "ما فيه نسخة مرفوعة للحين",
+    "actions": "الإجراءات",
+    "cme": "ساعات التعليم الطبي",
+    "cmeText": "دورة {cycle} · لازم {n} ساعة للتجديد",
+    "cmeOf": "{earned} من {required} ساعة",
+    "cmeLeft": "باقي {n}",
+    "cmeDone": "اكتملت لهالدورة",
+    "hours": "{n} س",
+    "priv": "الصلاحيات السريرية",
+    "privText": "معتمدة من المدير الطبي · تراجع كل سنة",
+    "approved": "معتمدة",
+    "underReview": "تحت المراجعة",
+    "gradeF": {
+      "consultant": "استشارية",
+      "specialist": "أخصائية",
+      "resident": "مقيمة"
+    }
+  },
+  "board": {
+    "export": "تصدير",
+    "tile": {
+      "expired": "منتهية",
+      "d30": "خلال 30 يوم",
+      "d60": "خلال 60 يوم",
+      "valid": "سارية"
+    },
+    "cap": {
+      "expired": "{n, plural, =0 {الكل ينحجز عندهم} one {الطبيب ما ينحجز عنده} other {# أطباء ما ينحجز عندهم}}",
+      "d30": "انرسل تذكير",
+      "d60": "التذكيرات مجدولة",
+      "valid": "لـ {n} طبيب"
+    },
+    "title": "التجديدات المستحقة",
+    "text": "الـ {n} يوم الجاية · مرتبة حسب تاريخ الانتهاء",
+    "remindAll": "ذكّر الكل",
+    "remind": "ذكّر",
+    "renew": "جدّد",
+    "col": {
+      "doctor": "الطبيب",
+      "credential": "الشهادة",
+      "expires": "تنتهي",
+      "status": "الحالة"
+    },
+    "expiredAgo": "منتهية من {n, plural, few {# أيام} other {# يوم}}",
+    "left": "باقي {n, plural, few {# أيام} other {# يوم}}",
+    "line": "{credential} · لين {date}",
+    "empty": "ما فيه شي مستحق خلال {n} يوم",
+    "reminded": "انرسل التذكير",
+    "remindedText": "برسالة وإيميل",
+    "remindedAll": "انرسلت التذكيرات",
+    "remindedAllText": "{n, plural, one {طبيب واحد} two {طبيبين} few {# أطباء} other {# طبيب}} · برسالة وإيميل",
+    "exported": "تم تصدير الشهادات",
+    "exportedText": "الملف {file} موجود في التنزيلات.",
+    "sheet": "الشهادات"
+  },
+  "renew": {
+    "title": "تجديد {name}",
+    "addTitle": "أضف شهادة",
+    "text": "ارفع الشهادة الجديدة",
+    "credential": "الشهادة",
+    "current": "{name} · تنتهي {date}",
+    "type": "الشهادة",
+    "number": "رقم الشهادة",
+    "expiry": "تاريخ الانتهاء الجديد",
+    "issuer": "الجهة",
+    "cancel": "إلغاء",
+    "save": "احفظ",
+    "required": "مطلوب",
+    "future": "اختر تاريخ بعد اليوم",
+    "file": "الشهادة",
+    "remove": "شيل الملف",
+    "toast": "انجددت {name}",
+    "toastText": "سارية لين {date}",
+    "added": "انضافت {name}",
+    "addedText": "سارية لين {date}"
   }
 }

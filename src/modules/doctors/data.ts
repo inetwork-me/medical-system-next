@@ -12,7 +12,7 @@ export type DoctorStatus = "in" | "late" | "later" | "off" | "leave"
 export type Grade = "consultant" | "specialist" | "resident"
 
 export type CredentialType = "scfhs" | "moh" | "bls" | "pals" | "acls" | "malpractice"
-export type Credential = { type: CredentialType; number: string; issuer: Bi; issued: string; expires: string; required: boolean }
+export type Credential = { type: CredentialType; number: string; issuer: Bi; issued: string; expires: string; required: boolean; /** Scan uploaded with Renew (this session). */ fileName?: string }
 
 export type Doctor = {
   key: string
@@ -89,12 +89,16 @@ const MOH = bi("Ministry of Health", "وزارة الصحة")
 const SHA = bi("Saudi Heart Association", "جمعية القلب السعودية")
 const TAWUNIYA = bi("Tawuniya", "التعاونية")
 
+/** PALS for the Pediatrics doctors. */
+const PALS = (n: number): Credential => ({ type: "pals", number: `PALS-3${1000 + n * 23}`, issuer: SHA, issued: "2025-05-20", expires: "2027-05-20", required: true })
+
 /** The standard set every doctor holds; a doctor's own entries replace these by type. */
 function creds(n: number, own: Credential[] = []): Credential[] {
   const base: Credential[] = [
     { type: "scfhs", number: `RM-1${n % 10}-00${41200 + n * 37}`, issuer: SCFHS, issued: "2025-03-14", expires: "2028-03-14", required: true },
     { type: "moh", number: `ML-2${10 + n}-${4100 + n * 13}`, issuer: MOH, issued: "2024-06-30", expires: "2027-06-30", required: true },
-    { type: "bls", number: `BLS-8${8000 + n * 11}`, issuer: SHA, issued: "2025-02-02", expires: "2027-02-02", required: true },
+    { type: "bls", number: `BLS-8${8000 + n * 11}`, issuer: SHA, issued: `2025-0${4 + (n % 6)}-15`, expires: `2027-0${4 + (n % 6)}-15`, required: true },
+    { type: "acls", number: `ACLS-6${1000 + n * 17}`, issuer: SHA, issued: "2025-09-15", expires: "2027-09-15", required: false },
     { type: "malpractice", number: `TW-MP-7${7000 + n * 9}`, issuer: TAWUNIYA, issued: "2026-01-01", expires: "2027-12-31", required: true },
   ]
   return [...base.filter((b) => !own.some((o) => o.type === b.type)), ...own]
@@ -189,7 +193,7 @@ const DESIGN: Base[] = [
     statusLabel: bi("Starts 2 PM", "تبدأ 2 الظهر"),
     today: { seen: 0, booked: 12, nextFree: "14:00" },
     month: { visits: 356, rating: "4.9" },
-    credentials: creds(4),
+    credentials: creds(4, [PALS(4)]),
     active: true,
   },
   {
@@ -336,7 +340,7 @@ const OTHER: Base[] = EXTRA.map(([key, name, female, clinic, room, grade, status
     : {}),
   today: { seen, booked, nextFree: next },
   month: { visits, rating },
-  credentials: creds(10 + i),
+  credentials: creds(10 + i, clinic === "peds" ? [PALS(10 + i)] : []),
   active: true,
 }))
 
@@ -613,3 +617,60 @@ export function bookingsBetween(d: Doctor, from: string, to: string) {
     return n + Math.round(d.booked[weekdayOf(x)] * fill)
   }, 0)
 }
+
+/* ---------------------------------------------------------------- CME and clinical privileges (Credentials tab) */
+export type Cme = { cycle: string; required: number; courses: { name: Bi; hours: number }[] }
+export type Privilege = { name: Bi; status: "approved" | "underReview" }
+
+const ZAKI_CME: Cme = {
+  cycle: "2026",
+  required: 50,
+  courses: [
+    { name: bi("Saudi Pediatric Conference", "المؤتمر السعودي لطب الأطفال"), hours: 12 },
+    { name: bi("Asthma update · online", "مستجدات الربو · أونلاين"), hours: 6 },
+    { name: bi("Neonatal resuscitation", "إنعاش حديثي الولادة"), hours: 8 },
+    { name: bi("Grand rounds · Pediatrics", "الاجتماعات العلمية · الأطفال"), hours: 8 },
+  ],
+}
+/** CME hours this cycle (50 needed for SCFHS renewal). The design lists 3 of Dr. Ahmed's courses; the 4th makes up his 34 hours. */
+export function cmeOf(d: Doctor): Cme {
+  if (d.key === "zaki") return ZAKI_CME
+  const n = DOCTORS.findIndex((x) => x.key === d.key)
+  return {
+    cycle: "2026",
+    required: 50,
+    courses: [
+      { name: bi("Annual scientific meeting", "الملتقى العلمي السنوي"), hours: 10 + (n % 5) },
+      { name: bi("Infection control · online", "مكافحة العدوى · أونلاين"), hours: 4 },
+      { name: bi("Grand rounds", "الاجتماعات العلمية"), hours: 6 + (n % 9) },
+    ],
+  }
+}
+export const cmeEarned = (c: Cme) => c.courses.reduce((s, x) => s + x.hours, 0)
+
+const PRIVILEGES: Record<string, Privilege[]> = {
+  peds: [
+    { name: bi("General pediatrics", "طب الأطفال العام"), status: "approved" },
+    { name: bi("Procedural sedation", "التخدير الخفيف للإجراءات"), status: "approved" },
+    { name: bi("Neonatal care", "رعاية حديثي الولادة"), status: "approved" },
+    { name: bi("Allergy testing", "فحوصات الحساسية"), status: "underReview" },
+  ],
+}
+/** Clinical privileges: the design's for Pediatrics, the clinic's core privilege otherwise. */
+export function privilegesOf(d: Doctor, clinicName: Bi): Privilege[] {
+  if (PRIVILEGES[d.clinic]) return d.key === "zaki" ? PRIVILEGES[d.clinic] : PRIVILEGES[d.clinic].slice(0, 2)
+  return [
+    { name: bi(`General ${clinicName.en.toLowerCase()}`, `${clinicName.ar} العام`), status: "approved" },
+    { name: bi("Procedural sedation", "التخدير الخفيف للإجراءات"), status: d.grade === "consultant" ? "approved" : "underReview" },
+  ]
+}
+
+/* ---------------------------------------------------------------- credentials board */
+/** Board buckets: expired · within 30 days · within 60 days · valid. */
+export type CredBucket = "expired" | "d30" | "d60" | "valid"
+export function credBucket(c: Credential): CredBucket {
+  const n = daysUntil(c.expires)
+  return n < 0 ? "expired" : n <= 30 ? "d30" : n <= 60 ? "d60" : "valid"
+}
+/** "Renewals due" window: expired and everything expiring in the next 120 days. */
+export const RENEWAL_WINDOW = 120

@@ -160,6 +160,133 @@ const STD_CLOSURES: Closure[] = [
   { date: "2027-02-22", reason: bi("Founding Day", "يوم التأسيس"), kind: "holiday" },
 ]
 
+/* ---------------------------------------------------------------- rooms board (design BOARD) */
+type BoardRoom = { number: string; status: RoomStatus; clinic: string }
+const board = (rows: [string, RoomStatus, string][]): BoardRoom[] => rows.map(([number, status, clinic]) => ({ number, status, clinic }))
+export const BOARD: { floor: number; rooms: BoardRoom[] }[] = [
+  {
+    floor: 1,
+    rooms: board([
+      ["101", "inUse", "peds"],
+      ["102", "free", "peds"],
+      ["103", "cleaning", "peds"],
+      ["104", "inUse", "peds"],
+      ["110", "inUse", "internal"],
+      ["111", "inUse", "internal"],
+      ["112", "free", "internal"],
+      ["113", "inUse", "internal"],
+      ["120", "inUse", "ortho"],
+      ["121", "free", "ortho"],
+    ]),
+  },
+  {
+    floor: 2,
+    rooms: board([
+      ["201", "inUse", "dental"],
+      ["202", "inUse", "dental"],
+      ["203", "inUse", "dental"],
+      ["204", "cleaning", "dental"],
+      ["205", "free", "dental"],
+      ["210", "inUse", "eyes"],
+      ["211", "inUse", "eyes"],
+      ["220", "inUse", "obgyn"],
+      ["221", "free", "obgyn"],
+      ["222", "cleaning", "obgyn"],
+    ]),
+  },
+  {
+    floor: 3,
+    rooms: board([
+      ["301", "inUse", "cardio"],
+      ["302", "inUse", "cardio"],
+      ["303", "free", "cardio"],
+      ["310", "inUse", "derma"],
+      ["311", "free", "derma"],
+      ["320", "closed", "ent"],
+      ["321", "closed", "ent"],
+    ]),
+  },
+]
+
+/* ---------------------------------------------------------------- other clinics' details (derived; the design details Pediatrics only) */
+const OTHER_DOCTORS: Record<string, Bi[]> = {
+  dental: [bi("Dr. Faisal Al-Harbi", "د. فيصل الحربي"), bi("Dr. Rawan Al-Zahrani", "د. روان الزهراني"), bi("Dr. Omar Nasser", "د. عمر ناصر")],
+  eyes: [bi("Dr. Bandar Al-Qahtani", "د. بندر القحطاني")],
+  cardio: [bi("Dr. Hessa Al-Dossary", "د. حصة الدوسري")],
+  internal: [bi("Dr. Saad Al-Mutairi", "د. سعد المطيري"), bi("Dr. Amal Al-Shammari", "د. أمل الشمري"), bi("Dr. Waleed Hassan", "د. وليد حسن")],
+  derma: [bi("Dr. Lulwa Al-Rashid", "د. لولوة الرشيد")],
+  ortho: [bi("Dr. Turki Al-Anazi", "د. تركي العنزي")],
+  obgyn: [bi("Dr. Abeer Al-Sulami", "د. عبير السلمي"), bi("Dr. Nouf Al-Harthi", "د. نوف الحارثي")],
+}
+const FEMALE = /Rawan|Amal|Hessa|Lulwa|Abeer|Nouf|Reem|Nora|Huda|Mona|Lama/
+
+function doctorsOf(key: string, head: Bi, status: ClinicStatus): ClinicDoctor[] {
+  const rooms = roomsOf(key)
+  return [head, ...(OTHER_DOCTORS[key] ?? [])].map((name, i) => {
+    const she = FEMALE.test(name.en)
+    const room = rooms[i]?.number
+    const today: ClinicDoctor["today"] =
+      status === "paused"
+        ? { tone: "neutral", label: bi("On leave", "في إجازة") }
+        : i % 3 === 0 && room
+          ? { tone: "info", label: bi(`In session · Room ${room}`, `مع مريض · غرفة ${room}`) }
+          : i % 3 === 1
+            ? { tone: "success", label: bi("Available", she ? "متاحة" : "متاح") }
+            : { tone: "neutral", label: bi("On break · back 1:30 PM", she ? "استراحة · ترجع 1:30 م" : "استراحة · يرجع 1:30 م") }
+    return {
+      initials: initialsOf(name.en),
+      name,
+      role: i === 0 ? bi("Consultant · head of clinic", she ? "استشارية · رئيسة العيادة" : "استشاري · رئيس العيادة") : bi("Specialist", she ? "أخصائية" : "أخصائي"),
+      days: i % 2 ? bi("Sat–Wed", "السبت–الأربعاء") : bi("Sun–Thu", "الأحد–الخميس"),
+      hours: i % 2 ? "14:00–22:00" : "08:00–16:00",
+      today,
+      month: 380 - i * 47,
+      rating: ["4.8", "4.7", "4.9", "4.6"][i % 4],
+    }
+  })
+}
+
+const ROOM_TYPE: Record<string, [Bi, Bi[]]> = {
+  dental: [bi("Dental chair", "كرسي أسنان"), [bi("Dental unit", "وحدة أسنان"), bi("X-ray sensor", "حساس أشعة")]],
+  eyes: [bi("Eye exam", "فحص عيون"), [bi("Slit lamp", "مصباح شقي"), bi("Eye chart", "لوحة نظر")]],
+  cardio: [bi("Consultation", "كشف"), [bi("ECG", "جهاز تخطيط"), bi("Exam bed", "سرير كشف")]],
+  ent: [bi("Consultation", "كشف"), [bi("Endoscope", "منظار"), bi("Exam chair", "كرسي كشف")]],
+}
+const DEFAULT_ROOM: [Bi, Bi[]] = [bi("Consultation", "كشف"), [bi("Exam bed", "سرير كشف")]]
+
+function roomsOf(key: string): Room[] {
+  const [type, equipment] = ROOM_TYPE[key] ?? DEFAULT_ROOM
+  return BOARD.flatMap((f) => f.rooms)
+    .filter((r) => r.clinic === key)
+    .map((r) => ({
+      number: r.number,
+      type,
+      status: r.status,
+      equipment,
+      ...(r.status === "inUse" ? { since: "10:15" } : {}),
+      ...(r.status === "cleaning" ? { readyIn: 5 } : {}),
+    }))
+}
+
+const SERVICES_BY_CLINIC: Record<string, Service[]> = {
+  dental: [
+    svc("dental-clean", bi("Cleaning & check-up", "تنظيف وكشف"), "D1120", 45, 400, 320, 300, 330),
+    svc("dental-rc", bi("Root canal · molar", "علاج عصب · ضرس"), "D3330", 90, 1800, 1440, 1400, 1500),
+  ],
+  eyes: [svc("eyes-move", bi("Eye movement exam", "فحص حركة العين"), "92060", 30, 450, 380, 360, 390)],
+  cardio: [
+    svc("cardio-ecg", bi("ECG", "تخطيط القلب"), "93000", 15, 200, 170, 160, 175),
+    svc("cardio-echo", bi("Echocardiogram", "إيكو القلب"), "93306", 40, 950, 800, 780, 820),
+  ],
+}
+function servicesOf(key: string): Service[] {
+  return [
+    svc(`${key}-new`, bi("New patient consultation", "كشف مريض جديد"), "99203", 20, 350, 300, 290, 310),
+    svc(`${key}-fu`, bi("Follow-up visit", "زيارة متابعة"), "99213", 15, 250, 220, 210, 220),
+    ...(SERVICES_BY_CLINIC[key] ?? []),
+  ]
+}
+
 /* ---------------------------------------------------------------- the 9 clinics */
 type Row = [
   key: string,
@@ -230,7 +357,7 @@ export const CLINICS: Clinic[] = ROWS.map(([key, icon, name, short, specialty, t
       : {}),
     closesAt: "22:00",
     doctorCount: docs,
-    roomCount: rooms,
+    roomCount: roomsOf(key).length || rooms,
     today: { seen, booked, waiting, avgWait: wait },
     month: {
       visits: rep[0],
@@ -243,17 +370,67 @@ export const CLINICS: Clinic[] = ROWS.map(([key, icon, name, short, specialty, t
       visitsDelta: 6,
       noShowDelta: -0.9,
     },
-    doctors: peds ? PEDS_DOCTORS : [],
-    rooms: peds ? PEDS_ROOMS : [],
+    doctors: peds ? PEDS_DOCTORS : doctorsOf(key, head, status),
+    rooms: peds ? PEDS_ROOMS : roomsOf(key),
     hours: peds ? PEDS_HOURS : STD_HOURS,
     rules: STD_RULES,
     closures: STD_CLOSURES,
-    services: peds ? PEDS_SERVICES : [],
+    services: peds ? PEDS_SERVICES : servicesOf(key),
     specialtyTools: { eyes: key === "eyes", dental: key === "dental" },
   }
 })
 
 export const clinicByKey = (key: string) => CLINICS.find((c) => c.key === key)
+
+/* ---------------------------------------------------------------- today: next in line, patients by hour */
+export type QueueState = "waiting" | "checkedIn" | "booked"
+export type QueueItem = { time: string; patient: Bi; reason: Bi; state: QueueState; waited?: number }
+
+const PEDS_QUEUE: QueueItem[] = [
+  { time: "10:40", patient: bi("Lina Haddad", "لينا حداد"), reason: bi("Follow-up", "متابعة"), state: "waiting", waited: 18 },
+  { time: "10:50", patient: bi("Omar Al-Harbi", "عمر الحربي"), reason: bi("Vaccination", "تطعيم"), state: "waiting", waited: 9 },
+  { time: "11:00", patient: bi("Sara Ahmed", "سارة أحمد"), reason: bi("New patient", "مريض جديد"), state: "checkedIn" },
+  { time: "11:15", patient: bi("Fahad Al-Dosari", "فهد الدوسري"), reason: bi("Asthma follow-up", "متابعة الربو"), state: "booked" },
+]
+const PATIENT_POOL: Bi[] = [
+  bi("Noura Al-Saleh", "نورة الصالح"),
+  bi("Yousef Al-Amri", "يوسف العمري"),
+  bi("Maha Khalil", "مها خليل"),
+  bi("Abdullah Al-Faraj", "عبدالله الفرج"),
+  bi("Reem Saad", "ريم سعد"),
+  bi("Hamad Al-Ali", "حمد العلي"),
+  bi("Dana Al-Harbi", "دانة الحربي"),
+]
+const REASONS: Bi[] = [bi("Follow-up", "متابعة"), bi("New patient", "مريض جديد"), bi("Check-up", "كشف دوري")]
+
+/** Next in line: the patients waiting now (longest first), then the next booking. */
+export function queueOf(c: Clinic): QueueItem[] {
+  if (c.key === "peds") return PEDS_QUEUE
+  if (c.status === "paused") return []
+  const n = Math.min(c.today.waiting, 3)
+  const seed = c.key.length
+  const at = (i: number) => {
+    const m = 10 * 60 + 40 + i * 10
+    return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`
+  }
+  const pick = (i: number) => ({ patient: PATIENT_POOL[(seed + i) % PATIENT_POOL.length], reason: REASONS[(seed + i) % REASONS.length] })
+  return [
+    ...Array.from({ length: n }, (_, i): QueueItem => ({ time: at(i), ...pick(i), state: "waiting", waited: Math.max(2, c.today.avgWait + 6 - i * 7) })),
+    { time: at(n), ...pick(n), state: "booked" },
+  ]
+}
+
+/** Clinic hours on the flow chart: 8 AM → 9 PM. */
+export const FLOW_HOURS = Array.from({ length: 14 }, (_, i) => 8 + i)
+const PEDS_FLOW = [3, 6, 7, 6, 5, 2, 0, 0, 4, 5, 3, 1, 0, 0]
+/** Patients by hour today (seen so far + booked). Other clinics follow the Pediatrics profile scaled to their bookings. */
+export function flowOf(c: Clinic): number[] {
+  if (c.key === "peds") return PEDS_FLOW
+  const total = PEDS_FLOW.reduce((s, v) => s + v, 0)
+  return PEDS_FLOW.map((v) => Math.round((v * c.today.booked) / total))
+}
+/** The current hour (10 AM) is highlighted on the chart. */
+export const NOW_HOUR = 10
 
 /** Doctors on duty today across all clinics (design KPI: 18 of 23). */
 export const DOCTORS_ON_DUTY = 18

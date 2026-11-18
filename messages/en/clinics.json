@@ -62,5 +62,73 @@
     "booked": "Booked today",
     "waiting": "Waiting",
     "avgWait": "Avg wait (min)"
+  },
+  "page": {
+    "tabs": {
+      "overview": "Overview",
+      "doctors": "Doctors · {n}",
+      "schedule": "Schedule",
+      "services": "Services & prices",
+      "rooms": "Rooms",
+      "settings": "Settings"
+    },
+    "tabsLabel": "Clinic sections",
+    "edit": "Edit",
+    "book": "Book visit",
+    "back": "Back to clinics",
+    "more": "More actions",
+    "notFoundTitle": "Clinic not found",
+    "notFoundText": "It may have been archived, or the link is wrong.",
+    "backToList": "Back to clinics"
+  },
+  "header": {
+    "subtitle": "Floor {floor} · Wing {wing} · Ext. {ext} · {branch}",
+    "doctors": "{n, plural, one {# doctor} other {# doctors}}",
+    "rooms": "{n, plural, one {# room} other {# rooms}}",
+    "ages": "Ages {from}–{to}",
+    "allAges": "All ages",
+    "online": "Online booking on",
+    "onlineOff": "Online booking off"
+  },
+  "flow": {
+    "title": "Patients by hour",
+    "text": "Today · seen so far and booked",
+    "am": "{h}a",
+    "pm": "{h}p"
+  },
+  "month": {
+    "title": "This month",
+    "visits": "Visits",
+    "visitsDelta": "{d} vs {month}",
+    "noShow": "No-show rate",
+    "noShowDelta": "{d} pts",
+    "rating": "Rating",
+    "reviews": "{n} reviews",
+    "revenue": "Revenue",
+    "revenueValue": "SAR {n}K",
+    "insured": "{n}% insurance"
+  },
+  "duty": {
+    "title": "Doctors on duty",
+    "text": "{on} of {all} today",
+    "empty": "No doctors on duty today"
+  },
+  "queue": {
+    "title": "Next in line",
+    "text": "{n} waiting · longest {m} min",
+    "textNone": "Nobody waiting",
+    "waitingRoom": "Waiting room",
+    "waiting": "Waiting · {n} min",
+    "checkedIn": "Checked in",
+    "booked": "Booked",
+    "empty": "No patients in line"
+  },
+  "roomsNow": {
+    "title": "Rooms now",
+    "inUse": "In use",
+    "free": "Free",
+    "cleaning": "Cleaning",
+    "closed": "Closed",
+    "summary": "{inUse} in use · {free} free · {cleaning} cleaning"
   }
 }

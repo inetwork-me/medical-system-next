@@ -62,5 +62,73 @@
     "booked": "محجوز اليوم",
     "waiting": "ينتظرون",
     "avgWait": "متوسط الانتظار (د)"
+  },
+  "page": {
+    "tabs": {
+      "overview": "نظرة عامة",
+      "doctors": "الأطباء · {n}",
+      "schedule": "الجدول",
+      "services": "الخدمات والأسعار",
+      "rooms": "الغرف",
+      "settings": "الإعدادات"
+    },
+    "tabsLabel": "أقسام العيادة",
+    "edit": "تعديل",
+    "book": "احجز موعد",
+    "back": "رجوع للعيادات",
+    "more": "خيارات أكثر",
+    "notFoundTitle": "ما لقينا العيادة",
+    "notFoundText": "يمكن انأرشفت، أو الرابط غلط.",
+    "backToList": "رجوع للعيادات"
+  },
+  "header": {
+    "subtitle": "الدور {floor} · الجناح {wing} · تحويلة {ext} · {branch}",
+    "doctors": "{n, plural, one {طبيب واحد} two {طبيبين} few {# أطباء} many {# طبيب} other {# طبيب}}",
+    "rooms": "{n, plural, one {غرفة وحدة} two {غرفتين} few {# غرف} many {# غرفة} other {# غرفة}}",
+    "ages": "الأعمار {from}–{to}",
+    "allAges": "كل الأعمار",
+    "online": "الحجز أونلاين شغّال",
+    "onlineOff": "الحجز أونلاين موقف"
+  },
+  "flow": {
+    "title": "المرضى حسب الساعة",
+    "text": "اليوم · اللي انكشف عليهم والمحجوزين",
+    "am": "{h}ص",
+    "pm": "{h}م"
+  },
+  "month": {
+    "title": "هالشهر",
+    "visits": "الزيارات",
+    "visitsDelta": "{d} عن {month}",
+    "noShow": "نسبة الغياب",
+    "noShowDelta": "{d} نقطة",
+    "rating": "التقييم",
+    "reviews": "{n} تقييم",
+    "revenue": "الدخل",
+    "revenueValue": "{n} ألف ر.س",
+    "insured": "{n}% تأمين"
+  },
+  "duty": {
+    "title": "الأطباء المناوبين",
+    "text": "{on} من {all} اليوم",
+    "empty": "ما فيه أطباء مناوبين اليوم"
+  },
+  "queue": {
+    "title": "اللي عليهم الدور",
+    "text": "{n} ينتظرون · أطول انتظار {m} دقيقة",
+    "textNone": "ما أحد ينتظر",
+    "waitingRoom": "غرفة الانتظار",
+    "waiting": "ينتظر · {n, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+    "checkedIn": "سجّل وصوله",
+    "booked": "محجوز",
+    "empty": "ما فيه مرضى في الدور"
+  },
+  "roomsNow": {
+    "title": "الغرف الحين",
+    "inUse": "مشغولة",
+    "free": "فاضية",
+    "cleaning": "تنظيف",
+    "closed": "مسكّرة",
+    "summary": "{inUse} مشغولة · {free} فاضية · {cleaning} تنظيف"
   }
 }

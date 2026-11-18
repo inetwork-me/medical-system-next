@@ -5,7 +5,7 @@
     "patients": "Patients",
     "appointments": "Appointments",
     "doctors": "Doctors",
-    "departments": "Departments",
+    "clinics": "Clinics",
     "records": "Medical records",
     "recordsShort": "Records",
     "lab": "Lab results",
@@ -35,6 +35,12 @@
       "list": "List",
       "waiting": "Waiting room",
       "schedules": "Doctor schedules",
+      "reports": "Reports"
+    },
+    "clinics": {
+      "list": "Clinics",
+      "prices": "Services & prices",
+      "rooms": "Rooms",
       "reports": "Reports"
     }
   },

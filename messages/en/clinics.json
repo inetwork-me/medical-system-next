@@ -1,0 +1,66 @@
+{
+  "export": "Export",
+  "addClinic": "Add clinic",
+  "open": "Open",
+  "clinicMenu": "Clinic menu",
+  "status": {
+    "open": "Open · until {time}",
+    "busy": "Busy · long wait",
+    "paused": "Paused · back {date}"
+  },
+  "statusShort": {
+    "open": "Open",
+    "busy": "Busy",
+    "paused": "Paused"
+  },
+  "place": "Floor {floor} · Wing {wing}",
+  "min": "{n} min",
+  "card": {
+    "seenToday": "Seen today",
+    "waiting": "Waiting",
+    "avgWait": "Avg wait",
+    "doctors": "Doctors"
+  },
+  "kpi": {
+    "clinics": "Clinics",
+    "open": "{n} open",
+    "rightNow": "right now",
+    "onDuty": "Doctors on duty",
+    "of": "of {n}",
+    "today": "today",
+    "patients": "Patients today",
+    "vsLast": "vs last {day}",
+    "avgWait": "Average wait",
+    "longest": "longest",
+    "longestValue": "{clinic} {n}",
+    "minutes": "{n} min"
+  },
+  "filters": {
+    "search": "Search clinics or doctors…",
+    "branch": "Branch",
+    "status": "Status",
+    "all": "All"
+  },
+  "showMore": "Show {n} more clinics",
+  "empty": "No clinics match",
+  "emptyText": "Try another search or status.",
+  "clearFilters": "Clear filters",
+  "menu": {
+    "open": "Open clinic",
+    "settings": "Clinic settings"
+  },
+  "exported": "Clinics list exported",
+  "exportedText": "{file} is in your downloads.",
+  "col": {
+    "clinic": "Clinic",
+    "status": "Status",
+    "place": "Location",
+    "head": "Head of clinic",
+    "doctors": "Doctors",
+    "rooms": "Rooms",
+    "seen": "Seen today",
+    "booked": "Booked today",
+    "waiting": "Waiting",
+    "avgWait": "Avg wait (min)"
+  }
+}

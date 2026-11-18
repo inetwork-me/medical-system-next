@@ -20,15 +20,27 @@ export function PageContainer({ className, ...props }: React.ComponentProps<"div
  * so the page header is the tabs row. xl: tabs at the start, actions at the end. md–lg: tabs, then the actions under
  * them (start-aligned). Mobile: actions (equal lg buttons) above the tabs. Without tabs the actions sit at the end.
  */
-export function PageHeader({ tabs, actions, className }: { tabs?: React.ReactNode; actions?: React.ReactNode; className?: string }) {
+export function PageHeader({
+  tabs,
+  actions,
+  mobileTabsFirst = false,
+  className,
+}: {
+  tabs?: React.ReactNode
+  actions?: React.ReactNode
+  /** Mobile: tabs above the actions (Clinics design) instead of the actions on top. */
+  mobileTabsFirst?: boolean
+  className?: string
+}) {
   if (!tabs && !actions) return null
   return (
     <div className={cn("flex flex-col gap-4 md:gap-3 xl:flex-row xl:items-center", className)}>
-      {tabs && <div className="order-2 min-w-0 md:order-1 xl:flex-1">{tabs}</div>}
+      {tabs && <div className={cn("min-w-0 md:order-1 xl:flex-1", mobileTabsFirst ? "order-1" : "order-2")}>{tabs}</div>}
       {actions && (
         <div
           className={cn(
-            "order-1 flex gap-2 md:order-2 xl:ms-auto",
+            "flex gap-2 md:order-2 xl:ms-auto",
+            mobileTabsFirst ? "order-2" : "order-1",
             "*:data-[slot=button]:h-10 *:data-[slot=button]:flex-1 *:data-[slot=button]:px-6 md:*:data-[slot=button]:h-9 md:*:data-[slot=button]:flex-none md:*:data-[slot=button]:px-4",
             !tabs && "md:justify-end"
           )}

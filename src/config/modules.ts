@@ -12,7 +12,7 @@ export type ModuleId =
   | "patients"
   | "appointments"
   | "doctors"
-  | "departments"
+  | "clinics"
   | "records"
   | "lab"
   | "billing"
@@ -86,7 +86,21 @@ export const MODULES: ModuleDef[] = [
     ],
   },
   { id: "doctors", icon: "people", href: "/doctors", group: "main", labelKey: "doctors", mobile: "more", built: false },
-  { id: "departments", icon: "hospital", href: "/departments", group: "main", labelKey: "departments", mobile: "more", built: false },
+  {
+    id: "clinics",
+    icon: "hospital",
+    href: "/clinics",
+    group: "main",
+    labelKey: "clinics",
+    mobile: "more",
+    built: true,
+    tabs: [
+      { key: "list", href: "/clinics" },
+      { key: "prices", href: "/clinics/prices", ownTitle: true },
+      { key: "rooms", href: "/clinics/rooms", ownTitle: true },
+      { key: "reports", href: "/clinics/reports", ownTitle: true },
+    ],
+  },
   { id: "records", icon: "clipboard-text", href: "/records", group: "clinical", labelKey: "records", shortLabelKey: "recordsShort", mobile: "more", built: false },
   { id: "lab", icon: "glass", href: "/lab-results", group: "clinical", labelKey: "lab", shortLabelKey: "labShort", mobile: "more", built: false },
   { id: "billing", icon: "receipt-2", href: "/billing", group: "admin", labelKey: "billing", mobile: "more", built: false },

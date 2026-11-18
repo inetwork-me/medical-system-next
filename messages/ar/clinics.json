@@ -1,0 +1,66 @@
+{
+  "export": "تصدير",
+  "addClinic": "أضف عيادة",
+  "open": "افتح",
+  "clinicMenu": "قائمة العيادة",
+  "status": {
+    "open": "مفتوحة · لين {time}",
+    "busy": "زحمة · انتظار طويل",
+    "paused": "موقفة · ترجع {date}"
+  },
+  "statusShort": {
+    "open": "مفتوحة",
+    "busy": "زحمة",
+    "paused": "موقفة"
+  },
+  "place": "الدور {floor} · الجناح {wing}",
+  "min": "{n} د",
+  "card": {
+    "seenToday": "انكشف عليهم اليوم",
+    "waiting": "ينتظرون",
+    "avgWait": "متوسط الانتظار",
+    "doctors": "الأطباء"
+  },
+  "kpi": {
+    "clinics": "العيادات",
+    "open": "{n} مفتوحة",
+    "rightNow": "الحين",
+    "onDuty": "الأطباء المناوبين",
+    "of": "من {n}",
+    "today": "اليوم",
+    "patients": "مرضى اليوم",
+    "vsLast": "عن {day} اللي فات",
+    "avgWait": "متوسط الانتظار",
+    "longest": "الأطول",
+    "longestValue": "{clinic} {n}",
+    "minutes": "{n} دقيقة"
+  },
+  "filters": {
+    "search": "دوّر عيادة أو طبيب…",
+    "branch": "الفرع",
+    "status": "الحالة",
+    "all": "الكل"
+  },
+  "showMore": "اعرض {n} عيادات زيادة",
+  "empty": "ما فيه عيادات مطابقة",
+  "emptyText": "جرّب بحث أو حالة ثانية.",
+  "clearFilters": "امسح الفلاتر",
+  "menu": {
+    "open": "افتح العيادة",
+    "settings": "إعدادات العيادة"
+  },
+  "exported": "تم تصدير قائمة العيادات",
+  "exportedText": "الملف {file} موجود في التنزيلات.",
+  "col": {
+    "clinic": "العيادة",
+    "status": "الحالة",
+    "place": "الموقع",
+    "head": "رئيس العيادة",
+    "doctors": "الأطباء",
+    "rooms": "الغرف",
+    "seen": "انكشف عليهم اليوم",
+    "booked": "محجوز اليوم",
+    "waiting": "ينتظرون",
+    "avgWait": "متوسط الانتظار (د)"
+  }
+}

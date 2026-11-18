@@ -23,7 +23,6 @@ import {
   ANNUAL_LEAVE,
   CRED_TONE,
   DOCTORS_TODAY,
-  LEAVES,
   WEEKDAYS,
   credStatus,
   daysUntil,
@@ -36,7 +35,8 @@ import {
   type Weekday,
 } from "../data"
 import { doctorHref } from "../href"
-import { useDoctors } from "../store"
+import { RequestLeaveDialog } from "../leave-dialog"
+import { useDoctors, useLeaves } from "../store"
 import { STATUS_TONE, ltr, useDoctorText } from "../text"
 import { DoctorPage, OverviewActions, useCurrentDoctor } from "./frame"
 
@@ -53,7 +53,7 @@ export const shiftHours = (s: Shift) => (minutes(s.to) - minutes(s.from)) / 60
 export const weekHours = (d: Doctor) => WEEKDAYS.reduce((n, w) => n + d.week[w].reduce((m, s) => m + shiftHours(s), 0), 0)
 
 /** "Sun–Thu" for a run of days, else "Mon, Wed" / "الاثنين والأربعاء". */
-function useDaysLabel() {
+export function useDaysLabel() {
   const { dates } = useDoctorText()
   const t = useTranslations("doctors.works")
   return (days: Weekday[]) => {
@@ -389,18 +389,27 @@ function CredSummary({ doctor: d, className }: { doctor: Doctor; className?: str
 }
 
 /** Widget / Doctor Leave: annual balance (n days left · used of 21, bar) and the upcoming leave with its status. */
-export function LeaveCard({ doctor: d, className, action }: { doctor: Doctor; className?: string; action?: React.ReactNode }) {
+export function LeaveCard({ doctor: d, className }: { doctor: Doctor; className?: string }) {
   const t = useTranslations("doctors.leave")
+  const tr = useTranslations("doctors.request")
   const { b, dates } = useDoctorText()
   const doctors = useDoctors()
-  const upcoming = LEAVES.filter((l) => l.doctor === d.key && l.to >= DOCTORS_TODAY && l.status !== "declined").sort((a, z) => a.from.localeCompare(z.from))
+  const [requesting, setRequesting] = React.useState(false)
+  const upcoming = useLeaves().filter((l) => l.doctor === d.key && l.to >= DOCTORS_TODAY && l.status !== "declined").sort((a, z) => a.from.localeCompare(z.from))
   const left = ANNUAL_LEAVE - d.leaveUsed
   const coverOf = (key?: string, name?: { en: string; ar: string }) => {
     const c = key ? doctors.find((x) => x.key === key)?.name : name
     return c ? b(c) : ""
   }
   return (
-    <Widget title={t("title")} description={t("text", { year: DOCTORS_TODAY.slice(0, 4) })} className={cn("gap-3 p-5", className)} action={action}>
+    <Widget title={t("title")} description={t("text", { year: DOCTORS_TODAY.slice(0, 4) })} className={cn("gap-3 p-5", className)}
+      action={
+        <Button variant="ghost" size="sm" className="-me-2 shrink-0" onClick={() => setRequesting(true)}>
+          <Icon name="add" size={16} />
+          {tr("open")}
+        </Button>
+      }
+    >
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-lg font-semibold tabular-nums">{t("left", { n: left })}</span>
         <span className="text-xs text-muted-foreground tabular-nums">{t("used", { used: d.leaveUsed, total: ANNUAL_LEAVE })}</span>
@@ -425,6 +434,7 @@ export function LeaveCard({ doctor: d, className, action }: { doctor: Doctor; cl
           })}
         </ul>
       )}
+      {requesting && <RequestLeaveDialog doctorKey={d.key} onOpenChange={setRequesting} />}
     </Widget>
   )
 }

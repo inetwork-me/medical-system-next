@@ -44,7 +44,7 @@ export type Doctor = {
   /** Patient ages seen (Pediatrics: 0–14); null = all ages. */
   ages: [number, number] | null
   /** Booking settings (override the clinic rules). */
-  booking: { visitMin: number; maxPerDay: number; online: boolean; acceptsNew: boolean; telehealth: boolean }
+  booking: DoctorBooking
   /** Weekly hours: shifts per weekday. */
   week: Record<Weekday, Shift[]>
   /** Booked per day this week (Sun 15 – Thu 19 Nov). */
@@ -52,6 +52,9 @@ export type Doctor = {
   /** Annual leave days used this year (balance 21). */
   leaveUsed: number
 }
+
+/** Booking settings that override the clinic rules; visitMin null = the clinic's visit length. */
+export type DoctorBooking = { visitMin: number | null; maxPerDay: number; online: boolean; acceptsNew: boolean; telehealth: boolean }
 
 export type Weekday = "sun" | "mon" | "tue" | "wed" | "thu" | "fri" | "sat"
 export const WEEKDAYS: Weekday[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
@@ -372,7 +375,7 @@ function profile(b: Base, i: number): Doctor {
     yearsExp: zaki ? 18 : b.grade === "consultant" ? 14 + (i % 6) : b.grade === "specialist" ? 6 + (i % 5) : 2 + (i % 2),
     languages: i % 3 === 2 ? { en: "Arabic · English · French", ar: "عربي · إنجليزي · فرنسي" } : { en: "Arabic · English", ar: "عربي · إنجليزي" },
     ages: b.clinic === "peds" ? [0, 14] : null,
-    booking: { visitMin: zaki ? 15 : 20, maxPerDay: zaki ? 24 : 20, online: true, acceptsNew: b.status !== "leave", telehealth: zaki },
+    booking: { visitMin: zaki ? 15 : null, maxPerDay: zaki ? 24 : 20, online: true, acceptsNew: b.status !== "leave", telehealth: zaki },
     week,
     booked,
     leaveUsed: zaki ? 9 : 4 + (i % 8),
@@ -465,7 +468,7 @@ export function todayOf(d: Doctor): Visit[] {
   if (d.key === "zaki") return ZAKI_TODAY
   if (d.status === "off" || d.status === "leave") return []
   const n = DOCTORS.findIndex((x) => x.key === d.key)
-  const step = d.booking.visitMin
+  const step = d.booking.visitMin ?? 20
   const states: VisitState[] =
     d.status === "later"
       ? ["booked", "booked", "booked", "booked", "booked"]
@@ -507,3 +510,30 @@ export const LEAVES: Leave[] = [
   { id: "lv-shehri", doctor: "shehri", type: "conference", from: "2027-01-14", to: "2027-01-16", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "pending", bookings: 11 },
   { id: "lv-hamdan", doctor: "hamdan", type: "annual", from: "2026-11-08", to: "2026-11-19", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "approved", bookings: 12 },
 ]
+
+/* ---------------------------------------------------------------- leave helpers */
+const addDay = (iso: string, n: number) => {
+  const d = new Date(`${iso}T12:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + n)
+  return d.toISOString().slice(0, 10)
+}
+const daysIn = (from: string, to: string) => {
+  const out: string[] = []
+  for (let x = from; x <= to && out.length < 400; x = addDay(x, 1)) out.push(x)
+  return out
+}
+const weekdayOf = (iso: string) => WEEKDAYS[new Date(`${iso}T12:00:00Z`).getUTCDay()]
+/** Days in a range the doctor normally works in clinic. */
+export const workingDays = (d: Doctor, from: string, to: string) => daysIn(from, to).filter((x) => d.week[weekdayOf(x)].some((s) => !s.telehealth)).length
+/**
+ * Booked visits that fall in a range: this week's per-day figures, thinned out the further ahead the day is (most
+ * bookings are made in the last few weeks).
+ */
+export function bookingsBetween(d: Doctor, from: string, to: string) {
+  return daysIn(from, to).reduce((n, x) => {
+    const ahead = daysUntil(x)
+    if (ahead < 0) return n
+    const fill = ahead <= 1 ? 1 : Math.max(0.1, 1 - ahead / 52)
+    return n + Math.round(d.booked[weekdayOf(x)] * fill)
+  }, 0)
+}

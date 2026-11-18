@@ -353,14 +353,29 @@ const HELD_AZ_18 = ["08:20", "09:00", "11:20", "14:10"].map(t)
  * Limits from the doctor's clinic (Clinics · Schedule: hours, closures, booking rules), passed in by the screens so
  * this module doesn't depend on Clinics: closed → no slots; otherwise slots stay inside from–to, every `step` min.
  */
-export type ClinicLimits = { closed: true } | { closed: false; from: number; to: number; step: number }
+export type ClinicLimits =
+  | { closed: true }
+  | {
+      closed: false
+      from: number
+      to: number
+      step: number
+      /** From the Doctors module: the doctor's own shifts replace this module's SCHEDULES for the day. */
+      own?: boolean
+      /** Slots only inside these shifts (minutes). */
+      ranges?: [number, number][]
+      /** Most slots offered in a day (the doctor's "Max per day"). */
+      max?: number
+    }
 
 export function slotsFor(doctor: DoctorId, date: string, clinic?: ClinicLimits | null): Slot[] {
   const day = new Date(`${date}T12:00:00Z`).getUTCDay()
-  const hours = SCHEDULES[doctor].week[day]
-  if (!hours || hours === "off" || clinic?.closed) return []
-  let [open, close] = hours.split("–").map((h) => Number(h) * 60)
-  if (clinic) {
+  if (clinic?.closed) return []
+  const own = clinic && clinic.own
+  const hours = own ? `${clinic.from / 60}–${clinic.to / 60}` : SCHEDULES[doctor].week[day]
+  if (!hours || hours === "off") return []
+  let [open, close] = own ? [clinic.from, clinic.to] : hours.split("–").map((h) => Number(h) * 60)
+  if (clinic && !own) {
     open = Math.max(open, clinic.from)
     close = Math.min(close, clinic.to)
   }
@@ -369,6 +384,8 @@ export function slotsFor(doctor: DoctorId, date: string, clinic?: ClinicLimits |
   const out: Slot[] = []
   for (let m = open; m + step <= close; m += step) {
     if (lunch.some((b) => m < b.start + b.duration && m + step > b.start)) continue
+    if (clinic?.ranges && !clinic.ranges.some(([a, z]) => m >= a && m + step <= z)) continue
+    if (clinic?.max && out.length >= clinic.max) break
     const held = date === "2026-11-18" && doctor === "az" ? HELD_AZ_18.includes(m) : hash(`${date}|${doctor}|held|${m}`) % 6 === 0
     out.push({ start: m, held, past: date < TODAY || (date === TODAY && m <= NOW_MIN) })
   }

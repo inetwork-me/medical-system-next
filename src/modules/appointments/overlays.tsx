@@ -22,7 +22,7 @@ import { RadioGroup } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 import { Textarea } from "@/components/ui/textarea"
-import { useClinicLimits } from "@/modules/clinics/booking"
+import { useBookingLimits } from "@/modules/doctors/booking"
 import { allPatients, patientDetails, type Patient } from "@/modules/patients/data"
 import { STATUS_TONE } from "./calendar/agenda"
 import { addDays, doctorById, hhmm, isClosed, NOW_MIN, SERVICES, slotsFor, TODAY, type Appointment } from "./data"
@@ -530,7 +530,7 @@ function RescheduleDialog({ a, onOpenChange }: { a: LiveAppointment; onOpenChang
   const leave = timeOff.find((o) => o.doctor === a.doctor && o.from <= date && o.to >= date)
   // Free times only: booked ones are greyed (unlike New appointment, a move never double-books).
   const taken = on(date).filter((x) => x.doctor === a.doctor && x.status !== "cancelled" && x.id !== a.id)
-  const clinicLimits = useClinicLimits()
+  const clinicLimits = useBookingLimits()
   const slots = leave || isClosed(date) ? [] : slotsFor(a.doctor, date, clinicLimits(a.doctor, date)).map((s) => ({ ...s, held: s.held || taken.some((x) => x.start < s.start + a.duration && x.start + x.duration > s.start) }))
 
   const confirm = () => {

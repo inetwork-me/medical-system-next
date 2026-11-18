@@ -21,7 +21,7 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { allPatients, filterPatients, patientById, patientDetails, type Patient } from "@/modules/patients/data"
 import { UnsavedDialog, useLeaveGuard } from "@/modules/patients/edit/leave-guard"
-import { useClinicLimits } from "@/modules/clinics/booking"
+import { useBookingLimits } from "@/modules/doctors/booking"
 import { addMonths, DOCTORS, doctorById, hhmm, isClosed, monthCells, SERVICES, slotsFor, TODAY, type DoctorId } from "../data"
 import { useAppointmentActions, useAppointmentsOn, useTimeOff } from "../store"
 
@@ -66,7 +66,7 @@ export function NewAppointment({ initial }: { initial: NewAppointmentInitial }) 
   const svc = SERVICES[doctor].find((s) => s.key === service) ?? SERVICES[doctor][0]
   const docName = bi(doc.name, locale)
   const leave = timeOff.find((o) => o.doctor === doctor && o.from <= date && o.to >= date)
-  const clinicLimits = useClinicLimits()
+  const clinicLimits = useBookingLimits()
   const slots = leave || isClosed(date) ? [] : slotsFor(doctor, date, clinicLimits(doctor, date))
   const clash =
     time === null ? undefined : on(date).find((a) => a.doctor === doctor && a.status !== "cancelled" && a.start < time + svc.minutes && a.start + a.duration > time)

@@ -475,5 +475,26 @@
     "doctor": "At least 1 doctor",
     "note": "The clinic stays hidden from booking until all 5 are done.",
     "setup": "Setting up · {n} of {total} done"
+  },
+  "report": {
+    "export": "Export",
+    "chart": "Visits by clinic",
+    "compare": "Clinic comparison",
+    "sorted": "Sorted by visits",
+    "col": {
+      "clinic": "Clinic",
+      "visits": "Visits",
+      "utilisation": "Utilisation",
+      "wait": "Avg wait",
+      "noShow": "No-show",
+      "revenue": "Revenue"
+    },
+    "revenue": "SAR {n}K",
+    "visits": "{n} visits",
+    "line": "{u} used · wait {w} · {r}",
+    "lineNoWait": "{u} used · {r}",
+    "exported": "Clinics report exported",
+    "exportedText": "{file} is in your downloads.",
+    "sheet": "Clinics report"
   }
 }

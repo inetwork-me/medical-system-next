@@ -1,0 +1,76 @@
+{
+  "export": "تصدير",
+  "addDoctor": "أضف طبيب",
+  "open": "افتح",
+  "book": "احجز",
+  "doctorMenu": "قائمة الطبيب",
+  "menu": {
+    "open": "افتح صفحة الطبيب",
+    "schedule": "الجدول",
+    "settings": "الإعدادات"
+  },
+  "kpi": {
+    "doctors": "الأطباء",
+    "onDuty": "{n} مناوب",
+    "today": "اليوم",
+    "booked": "المحجوزين اليوم",
+    "vsLast": "عن {day} اللي فات",
+    "away": "غايبين",
+    "onLeave": "{n} في إجازة",
+    "offToday": "{n} إجازة اليوم",
+    "due": "شهادات مستحقة",
+    "expired": "{n} منتهية",
+    "next60": "خلال 60 يوم"
+  },
+  "filters": {
+    "search": "دوّر طبيب أو تخصص…",
+    "clinic": "العيادة",
+    "allClinics": "كل العيادات",
+    "status": "الحالة",
+    "all": "الكل",
+    "in": "في العيادة",
+    "later": "بعدين اليوم",
+    "away": "غايبين"
+  },
+  "card": {
+    "patientsToday": "مرضى اليوم",
+    "nextFree": "أقرب موعد",
+    "rating": "التقييم",
+    "thisMonth": "هالشهر"
+  },
+  "cred": {
+    "short": {
+      "scfhs": "تسجيل الهيئة",
+      "moh": "رخصة مزاولة المهنة",
+      "bls": "شهادة BLS",
+      "pals": "شهادة PALS",
+      "acls": "شهادة ACLS",
+      "malpractice": "تأمين الأخطاء الطبية"
+    },
+    "expiresIn": "{name} · باقي {n, plural, few {# أيام} other {# يوم}}",
+    "expiredAgo": "{name} · منتهية من {n, plural, few {# أيام} other {# يوم}}",
+    "blocked": "ما ينحجز له لين يتجدد"
+  },
+  "showing": "يعرض {shown} من {total} طبيب",
+  "showMore": "اعرض أكثر",
+  "showMoreN": "اعرض {n} طبيب زيادة",
+  "empty": "ما فيه أطباء بهالبحث",
+  "emptyText": "جرّب اسم أو عيادة أو حالة ثانية.",
+  "clearFilters": "امسح الفلاتر",
+  "col": {
+    "doctor": "الطبيب",
+    "title": "المسمى",
+    "clinic": "العيادة",
+    "room": "الغرفة",
+    "status": "الحالة",
+    "seen": "انكشف عليهم اليوم",
+    "booked": "المحجوزين اليوم",
+    "nextFree": "أقرب موعد",
+    "rating": "التقييم",
+    "month": "هالشهر"
+  },
+  "exported": "تم تصدير قائمة الأطباء",
+  "exportedText": "الملف {file} موجود في التنزيلات.",
+  "room": "غرفة {n}",
+  "place": "{clinic} · غرفة {room}"
+}

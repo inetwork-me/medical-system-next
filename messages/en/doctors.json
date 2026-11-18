@@ -1,0 +1,76 @@
+{
+  "export": "Export",
+  "addDoctor": "Add doctor",
+  "open": "Open",
+  "book": "Book",
+  "doctorMenu": "Doctor menu",
+  "menu": {
+    "open": "Open doctor page",
+    "schedule": "Schedule",
+    "settings": "Settings"
+  },
+  "kpi": {
+    "doctors": "Doctors",
+    "onDuty": "{n} on duty",
+    "today": "today",
+    "booked": "Booked today",
+    "vsLast": "vs last {day}",
+    "away": "Away",
+    "onLeave": "{n} on leave",
+    "offToday": "{n} off today",
+    "due": "Credentials due",
+    "expired": "{n} expired",
+    "next60": "next 60 days"
+  },
+  "filters": {
+    "search": "Search doctors or specialties…",
+    "clinic": "Clinic",
+    "allClinics": "All clinics",
+    "status": "Status",
+    "all": "All",
+    "in": "In clinic",
+    "later": "Later today",
+    "away": "Away"
+  },
+  "card": {
+    "patientsToday": "Patients today",
+    "nextFree": "Next free",
+    "rating": "Rating",
+    "thisMonth": "This month"
+  },
+  "cred": {
+    "short": {
+      "scfhs": "SCFHS registration",
+      "moh": "MOH practice licence",
+      "bls": "BLS",
+      "pals": "PALS",
+      "acls": "ACLS",
+      "malpractice": "Malpractice insurance"
+    },
+    "expiresIn": "{name} expires in {n, plural, one {# day} other {# days}}",
+    "expiredAgo": "{name} expired {n, plural, one {# day} other {# days}} ago",
+    "blocked": "Can't be booked until it's renewed"
+  },
+  "showing": "Showing {shown} of {total} doctors",
+  "showMore": "Show more",
+  "showMoreN": "Show {n} more doctors",
+  "empty": "No doctors match",
+  "emptyText": "Try another name, clinic or status.",
+  "clearFilters": "Clear filters",
+  "col": {
+    "doctor": "Doctor",
+    "title": "Title",
+    "clinic": "Clinic",
+    "room": "Room",
+    "status": "Status",
+    "seen": "Seen today",
+    "booked": "Booked today",
+    "nextFree": "Next free",
+    "rating": "Rating",
+    "month": "This month"
+  },
+  "exported": "Doctors list exported",
+  "exportedText": "{file} is in your downloads.",
+  "room": "Room {n}",
+  "place": "{clinic} · Room {room}"
+}

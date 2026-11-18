@@ -1,5 +1,6 @@
 import type { IconName } from "@/components/ds/icon"
 import type { Bi } from "@/lib/mock/bi"
+import { DOCTORS, doctorByName, doctorsIn, headOf } from "@/modules/doctors/data"
 
 /**
  * Clinics module mock data — figures from design-scripts/clinic_widgets.py (CLINICS, DOCS, QUEUE, ROOMS, PRICES,
@@ -234,21 +235,15 @@ export const BOARD: { floor: number; rooms: BoardRoom[] }[] = [
 ]
 
 /* ---------------------------------------------------------------- other clinics' details (derived; the design details Pediatrics only) */
-const OTHER_DOCTORS: Record<string, Bi[]> = {
-  dental: [bi("Dr. Faisal Al-Harbi", "د. فيصل الحربي"), bi("Dr. Rawan Al-Zahrani", "د. روان الزهراني"), bi("Dr. Omar Nasser", "د. عمر ناصر")],
-  eyes: [bi("Dr. Bandar Al-Qahtani", "د. بندر القحطاني")],
-  cardio: [bi("Dr. Hessa Al-Dossary", "د. حصة الدوسري")],
-  internal: [bi("Dr. Saad Al-Mutairi", "د. سعد المطيري"), bi("Dr. Amal Al-Shammari", "د. أمل الشمري"), bi("Dr. Waleed Hassan", "د. وليد حسن")],
-  derma: [bi("Dr. Lulwa Al-Rashid", "د. لولوة الرشيد")],
-  ortho: [bi("Dr. Turki Al-Anazi", "د. تركي العنزي")],
-  obgyn: [bi("Dr. Abeer Al-Sulami", "د. عبير السلمي"), bi("Dr. Nouf Al-Harthi", "د. نوف الحارثي")],
-}
-const FEMALE = /Rawan|Amal|Hessa|Lulwa|Abeer|Nouf|Reem|Nora|Huda|Mona|Lama/
+/** Each clinic's doctors after the head, from the shared roster (Doctors module). */
+const OTHER_DOCTORS: Record<string, Bi[]> = Object.fromEntries(
+  [...new Set(DOCTORS.map((d) => d.clinic))].map((k) => [k, doctorsIn(k).filter((d) => d.headOf !== k).map((d) => d.name)])
+)
 
 function doctorsOf(key: string, head: Bi, status: ClinicStatus): ClinicDoctor[] {
   const rooms = roomsOf(key)
   return [head, ...(OTHER_DOCTORS[key] ?? [])].map((name, i) => {
-    const she = FEMALE.test(name.en)
+    const she = doctorByName(name.en)?.female ?? false
     const room = rooms[i]?.number
     const today: ClinicDoctor["today"] =
       status === "paused"
@@ -335,16 +330,18 @@ type Row = [
   rep: [number, number, number, number],
 ]
 
+const HEAD = (clinic: string) => headOf(clinic)!.name
+
 const ROWS: Row[] = [
-  ["peds", "happyemoji", bi("Pediatrics", "الأطفال"), bi("Peds", "أطفال"), bi("Pediatrics", "طب الأطفال"), "info", bi("Dr. Ahmed Zaki", "د. أحمد زكي"), 3, 4, 42, 56, 4, 11, "open", 1, "A", "1120", [1048, 82, 5.8, 312]],
-  ["dental", "health", bi("Dental", "الأسنان"), bi("Dental", "أسنان"), bi("Dentistry", "طب الأسنان"), "accent", bi("Dr. Sami Odeh", "د. سامي عودة"), 4, 5, 31, 38, 3, 9, "open", 2, "B", "1210", [702, 88, 4.1, 486]],
-  ["eyes", "eye", bi("Ophthalmology", "العيون"), bi("Eyes", "عيون"), bi("Ophthalmology", "طب العيون"), "success", bi("Dr. Reem Al-Otaibi", "د. ريم العتيبي"), 2, 3, 18, 24, 2, 14, "open", 2, "A", "1230", [418, 74, 6.2, 168]],
-  ["cardio", "heart", bi("Cardiology", "القلب"), bi("Cardio", "قلب"), bi("Cardiology", "طب القلب"), "destructive", bi("Dr. Khaled Mansour", "د. خالد منصور"), 2, 3, 22, 26, 6, 23, "busy", 3, "A", "1310", [506, 91, 3.9, 402]],
-  ["internal", "health", bi("Internal medicine", "الباطنية"), bi("Internal", "باطنية"), bi("Internal medicine", "الطب الباطني"), "accent", bi("Dr. Majed Al-Shehri", "د. ماجد الشهري"), 4, 5, 48, 60, 5, 15, "open", 1, "B", "1140", [1210, 79, 7.4, 338]],
-  ["derma", "brush-2", bi("Dermatology", "الجلدية"), bi("Derma", "جلدية"), bi("Dermatology", "الأمراض الجلدية"), "warning", bi("Dr. Nora Al-Qahtani", "د. نورة القحطاني"), 2, 2, 19, 22, 1, 8, "open", 3, "B", "1330", [455, 85, 5.1, 221]],
-  ["ortho", "activity", bi("Orthopedics", "العظام"), bi("Ortho", "عظام"), bi("Orthopedics", "جراحة العظام"), "info", bi("Dr. Huda Fares", "د. هدى فارس"), 2, 3, 14, 20, 2, 12, "open", 1, "C", "1160", [330, 68, 6.8, 190]],
-  ["obgyn", "lovely", bi("Obstetrics & gynecology", "النساء والولادة"), bi("OB/GYN", "نساء"), bi("Obstetrics & gynecology", "النساء والولادة"), "destructive", bi("Dr. Mona Al-Ghamdi", "د. منى الغامدي"), 3, 4, 25, 30, 3, 10, "open", 2, "C", "1250", [590, 81, 4.4, 260]],
-  ["ent", "sound", bi("Ear, nose & throat", "الأنف والأذن والحنجرة"), bi("ENT", "أنف"), bi("Otolaryngology", "الأنف والأذن والحنجرة"), "muted", bi("Dr. Tariq Hamdan", "د. طارق حمدان"), 1, 2, 0, 0, 0, 0, "paused", 3, "C", "1350", [96, 22, 0, 31]],
+  ["peds", "happyemoji", bi("Pediatrics", "الأطفال"), bi("Peds", "أطفال"), bi("Pediatrics", "طب الأطفال"), "info", HEAD("peds"), 3, 4, 42, 56, 4, 11, "open", 1, "A", "1120", [1048, 82, 5.8, 312]],
+  ["dental", "health", bi("Dental", "الأسنان"), bi("Dental", "أسنان"), bi("Dentistry", "طب الأسنان"), "accent", HEAD("dental"), 4, 5, 31, 38, 3, 9, "open", 2, "B", "1210", [702, 88, 4.1, 486]],
+  ["eyes", "eye", bi("Ophthalmology", "العيون"), bi("Eyes", "عيون"), bi("Ophthalmology", "طب العيون"), "success", HEAD("eyes"), 2, 3, 18, 24, 2, 14, "open", 2, "A", "1230", [418, 74, 6.2, 168]],
+  ["cardio", "heart", bi("Cardiology", "القلب"), bi("Cardio", "قلب"), bi("Cardiology", "طب القلب"), "destructive", HEAD("cardio"), 2, 3, 22, 26, 6, 23, "busy", 3, "A", "1310", [506, 91, 3.9, 402]],
+  ["internal", "health", bi("Internal medicine", "الباطنية"), bi("Internal", "باطنية"), bi("Internal medicine", "الطب الباطني"), "accent", HEAD("internal"), 4, 5, 48, 60, 5, 15, "open", 1, "B", "1140", [1210, 79, 7.4, 338]],
+  ["derma", "brush-2", bi("Dermatology", "الجلدية"), bi("Derma", "جلدية"), bi("Dermatology", "الأمراض الجلدية"), "warning", HEAD("derma"), 2, 2, 19, 22, 1, 8, "open", 3, "B", "1330", [455, 85, 5.1, 221]],
+  ["ortho", "activity", bi("Orthopedics", "العظام"), bi("Ortho", "عظام"), bi("Orthopedics", "جراحة العظام"), "info", HEAD("ortho"), 2, 3, 14, 20, 2, 12, "open", 1, "C", "1160", [330, 68, 6.8, 190]],
+  ["obgyn", "lovely", bi("Obstetrics & gynecology", "النساء والولادة"), bi("OB/GYN", "نساء"), bi("Obstetrics & gynecology", "النساء والولادة"), "destructive", HEAD("obgyn"), 3, 4, 25, 30, 3, 10, "open", 2, "C", "1250", [590, 81, 4.4, 260]],
+  ["ent", "sound", bi("Ear, nose & throat", "الأنف والأذن والحنجرة"), bi("ENT", "أنف"), bi("Otolaryngology", "الأنف والأذن والحنجرة"), "muted", HEAD("ent"), 1, 2, 0, 0, 0, 0, "paused", 3, "C", "1350", [96, 22, 0, 31]],
 ]
 
 const initialsOf = (name: string) =>

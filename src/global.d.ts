@@ -8,12 +8,13 @@ import type patients from "../messages/en/patients.json";
 import type appointments from "../messages/en/appointments.json";
 import type specialties from "../messages/en/specialties.json";
 import type clinics from "../messages/en/clinics.json";
+import type doctors from "../messages/en/doctors.json";
 
 // English messages are the type source; ar/*.json must have the same keys.
 declare module "next-intl" {
   interface AppConfig {
     Locale: (typeof routing.locales)[number];
-    Messages: { common: typeof common; shell: typeof shell; auth: typeof auth; dashboard: typeof dashboard; patients: typeof patients; appointments: typeof appointments; specialties: typeof specialties; clinics: typeof clinics };
+    Messages: { common: typeof common; shell: typeof shell; auth: typeof auth; dashboard: typeof dashboard; patients: typeof patients; appointments: typeof appointments; specialties: typeof specialties; clinics: typeof clinics; doctors: typeof doctors };
     Formats: typeof formats;
   }
 }

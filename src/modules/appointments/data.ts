@@ -1,4 +1,6 @@
 import type { Bi } from "@/lib/mock/bi"
+import { clinicByKey } from "@/modules/clinics/data"
+import { APPT_DOCTOR_KEY, doctorByKey } from "@/modules/doctors/data"
 
 /**
  * Appointments mock data (FigCraft · Appointments). "Today" is Mon 16 Nov 2026 and "now" is 10:40, like the design.
@@ -16,12 +18,17 @@ export const DAY_END = 16 * 60
 export type DoctorId = "km" | "az" | "so" | "hf"
 export type Doctor = { id: DoctorId; initials: string; name: Bi; clinic: Bi; color: string; room: number }
 
-export const DOCTORS: Doctor[] = [
-  { id: "km", initials: "KM", name: { en: "Dr. Khaled Mansour", ar: "د. خالد منصور" }, clinic: { en: "Cardiology", ar: "القلب" }, color: "var(--chart-1)", room: 3 },
-  { id: "az", initials: "AZ", name: { en: "Dr. Ahmed Zaki", ar: "د. أحمد زكي" }, clinic: { en: "Pediatrics", ar: "الأطفال" }, color: "var(--chart-2)", room: 1 },
-  { id: "so", initials: "SO", name: { en: "Dr. Sami Odeh", ar: "د. سامي عودة" }, clinic: { en: "Dental", ar: "الأسنان" }, color: "var(--chart-3)", room: 5 },
-  { id: "hf", initials: "HF", name: { en: "Dr. Huda Fares", ar: "د. هدى فارس" }, clinic: { en: "Orthopedics", ar: "العظام" }, color: "var(--chart-4)", room: 2 },
+/** The Appointments board's 4 doctors, from the shared roster (Doctors module). */
+const BOARD_LOOK: { id: DoctorId; color: string; room: number }[] = [
+  { id: "km", color: "var(--chart-1)", room: 3 },
+  { id: "az", color: "var(--chart-2)", room: 1 },
+  { id: "so", color: "var(--chart-3)", room: 5 },
+  { id: "hf", color: "var(--chart-4)", room: 2 },
 ]
+export const DOCTORS: Doctor[] = BOARD_LOOK.map(({ id, color, room }) => {
+  const d = doctorByKey(APPT_DOCTOR_KEY[id])!
+  return { id, initials: d.initials, name: d.name, clinic: clinicByKey(d.clinic)!.name, color, room }
+})
 export const doctorById = (id: DoctorId) => DOCTORS.find((d) => d.id === id)!
 
 export type ApptStatus = "booked" | "confirmed" | "arrived" | "withDoctor" | "completed" | "noShow" | "cancelled"

@@ -23,6 +23,10 @@ const ICONS = {
   "record-circle": Iconsax.RecordCircle,
   "send-2": Iconsax.Send2,
   layer: Iconsax.Layer,
+  // Doctors (Design System · "Added icons · Doctors")
+  teacher: Iconsax.Teacher,
+  "user-remove": Iconsax.UserRemove,
+  "user-tick": Iconsax.UserTick,
   // Clinics (Design System · "Added icons · Clinics")
   happyemoji: Iconsax.Happyemoji,
   "brush-2": Iconsax.Brush2,

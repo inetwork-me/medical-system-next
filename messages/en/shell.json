@@ -42,6 +42,12 @@
       "prices": "Services & prices",
       "rooms": "Rooms",
       "reports": "Reports"
+    },
+    "doctors": {
+      "list": "Doctors",
+      "credentials": "Credentials",
+      "leave": "Leave & cover",
+      "reports": "Reports"
     }
   },
   "header": {

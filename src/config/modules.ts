@@ -85,7 +85,21 @@ export const MODULES: ModuleDef[] = [
       { key: "reports", href: "/appointments/reports", ownTitle: true },
     ],
   },
-  { id: "doctors", icon: "people", href: "/doctors", group: "main", labelKey: "doctors", mobile: "more", built: false },
+  {
+    id: "doctors",
+    icon: "people",
+    href: "/doctors",
+    group: "main",
+    labelKey: "doctors",
+    mobile: "more",
+    built: true,
+    tabs: [
+      { key: "list", href: "/doctors" },
+      { key: "credentials", href: "/doctors/credentials", ownTitle: true },
+      { key: "leave", href: "/doctors/leave", ownTitle: true },
+      { key: "reports", href: "/doctors/reports", ownTitle: true },
+    ],
+  },
   {
     id: "clinics",
     icon: "hospital",

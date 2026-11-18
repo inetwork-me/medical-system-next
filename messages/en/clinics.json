@@ -310,5 +310,62 @@
     "toastText": "It's bookable now",
     "nameRequired": "Enter the service name",
     "priceRequired": "Enter the cash price"
+  },
+  "rooms": {
+    "title": "Rooms & equipment",
+    "text": "{n, plural, one {# room} other {# rooms}} · live status",
+    "add": "Add room",
+    "status": {
+      "inUse": "In use",
+      "free": "Free",
+      "cleaning": "Cleaning",
+      "closed": "Closed"
+    },
+    "since": "{who} · since {time}",
+    "inUseSince": "In use · since {time}",
+    "ready": "Ready",
+    "readyIn": "Cleaning · ready in {n} min",
+    "closedText": "Closed while the clinic is paused",
+    "empty": "No rooms yet",
+    "emptyText": "Add the clinic's rooms so they show on the live board."
+  },
+  "board": {
+    "title": "Rooms board",
+    "text": "Live · updates every minute",
+    "floor": "Floor {n}",
+    "legend": "Legend",
+    "open": "Room {n} · {clinic} · {status}",
+    "names": {
+      "peds": "Pediatrics",
+      "dental": "Dental",
+      "eyes": "Ophthalmology",
+      "cardio": "Cardiology",
+      "internal": "Internal",
+      "derma": "Dermatology",
+      "ortho": "Orthopedics",
+      "obgyn": "OB/GYN",
+      "ent": "ENT"
+    }
+  },
+  "addRoom": {
+    "title": "Add room",
+    "text": "Rooms show on the live board",
+    "number": "Room number",
+    "type": "Type",
+    "equipment": "Equipment",
+    "equipmentPh": "e.g. Exam bed, otoscope",
+    "types": {
+      "consultation": "Consultation",
+      "procedures": "Procedures",
+      "vaccination": "Vaccination",
+      "dental": "Dental chair",
+      "eye": "Eye exam"
+    },
+    "cancel": "Cancel",
+    "confirm": "Add room",
+    "toast": "Room {n} added",
+    "toastText": "It shows on the rooms board",
+    "required": "Enter the room number",
+    "taken": "Room {n} already exists"
   }
 }

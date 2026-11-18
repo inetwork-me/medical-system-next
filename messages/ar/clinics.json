@@ -310,5 +310,62 @@
     "toastText": "صارت متاحة للحجز",
     "nameRequired": "اكتب اسم الخدمة",
     "priceRequired": "اكتب سعر الكاش"
+  },
+  "rooms": {
+    "title": "الغرف والأجهزة",
+    "text": "{n, plural, one {غرفة وحدة} two {غرفتين} few {# غرف} many {# غرفة} other {# غرفة}} · الحالة مباشرة",
+    "add": "أضف غرفة",
+    "status": {
+      "inUse": "مشغولة",
+      "free": "فاضية",
+      "cleaning": "تنظيف",
+      "closed": "مسكّرة"
+    },
+    "since": "{who} · من {time}",
+    "inUseSince": "مشغولة · من {time}",
+    "ready": "جاهزة",
+    "readyIn": "تنظيف · تجهز بعد {n, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+    "closedText": "مسكّرة لين ترجع العيادة",
+    "empty": "ما فيه غرف للحين",
+    "emptyText": "أضف غرف العيادة عشان تظهر في اللوحة المباشرة."
+  },
+  "board": {
+    "title": "لوحة الغرف",
+    "text": "مباشر · يتحدث كل دقيقة",
+    "floor": "الدور {n}",
+    "legend": "دليل الألوان",
+    "open": "غرفة {n} · {clinic} · {status}",
+    "names": {
+      "peds": "الأطفال",
+      "dental": "الأسنان",
+      "eyes": "العيون",
+      "cardio": "القلب",
+      "internal": "الباطنية",
+      "derma": "الجلدية",
+      "ortho": "العظام",
+      "obgyn": "النساء",
+      "ent": "الأنف والأذن"
+    }
+  },
+  "addRoom": {
+    "title": "إضافة غرفة",
+    "text": "الغرف تظهر في لوحة الغرف",
+    "number": "رقم الغرفة",
+    "type": "النوع",
+    "equipment": "الأجهزة",
+    "equipmentPh": "مثال: سرير كشف، منظار أذن",
+    "types": {
+      "consultation": "كشف",
+      "procedures": "إجراءات",
+      "vaccination": "تطعيمات",
+      "dental": "كرسي أسنان",
+      "eye": "فحص عيون"
+    },
+    "cancel": "إلغاء",
+    "confirm": "أضف الغرفة",
+    "toast": "انضافت غرفة {n}",
+    "toastText": "تظهر في لوحة الغرف",
+    "required": "اكتب رقم الغرفة",
+    "taken": "غرفة {n} موجودة من قبل"
   }
 }

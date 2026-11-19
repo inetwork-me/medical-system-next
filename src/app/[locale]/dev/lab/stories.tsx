@@ -33,6 +33,7 @@ import { CriticalCallDialog } from "@/modules/labs/order/call-dialog"
 import { ReleaseDialog } from "@/modules/labs/order/release-dialog"
 import { ValidationQueue } from "@/modules/labs/validation"
 import { SampleDetail } from "@/modules/labs/order/sample"
+import { ResultEntryWidget } from "@/modules/labs/order/entry"
 import { PatientReport } from "@/modules/labs/order/report"
 import { SendDialog } from "@/modules/labs/order/send-dialog"
 import { TestCatalog } from "@/modules/labs/catalog"
@@ -141,6 +142,7 @@ export function LabStories() {
         <>
           <WidgetStory name="Widget / Lab Order Header" wide={1120} compact={358} render={() => <OrderHeader order={live142} />} />
           <WidgetStory name="Widget / Lab Results" wide={736} compact={358} render={() => <LabResults order={live142} onLogCall={() => setDialog("call")} />} />
+          <WidgetStory name="Widget / Lab Result Entry (Lipid panel)" wide={736} compact={358} render={() => <ResultEntryWidget order={live142} test="lipid" />} />
           <WidgetStory name="Widget / Lab Sample Detail" wide={736} compact={358} render={() => <SampleDetail order={live142} onPrint={() => {}} />} />
           <WidgetStory name="Widget / Lab Patient Report (staff)" wide={816} compact={358} render={() => <PatientReport order={live142} />} />
           <WidgetStory name="Widget / Lab Patient Report (patient app: released only)" wide={816} compact={358} render={() => <PatientReport order={live142} audience="patient" />} />

@@ -75,7 +75,26 @@ export function EnterResults() {
   return <EntryForm key={panel.test} order={o} panel={panel} canEdit={labCan(role, "enter")} canSubmit={labCan(role, "submit")} onDone={() => router.push(orderHref(o.no))} />
 }
 
-function EntryForm({ order: o, panel, canEdit, canSubmit, onDone }: { order: LabOrder; panel: Panel; canEdit: boolean; canSubmit: boolean; onDone: () => void }) {
+/**
+ * Widget / Lab Result Entry, as a hook: the entry card and its actions (Save draft · Submit for validation), so the
+ * order page puts the actions in its header / mobile bar and the preview story beside the card.
+ */
+export function useResultEntry({
+  order: o,
+  panel,
+  canEdit,
+  canSubmit,
+  onDone,
+  autoFocus = true,
+}: {
+  order: LabOrder
+  panel: Panel
+  canEdit: boolean
+  canSubmit: boolean
+  onDone?: () => void
+  /** Focus the missing value on open (the design's Focus state); off in the preview stories. */
+  autoFocus?: boolean
+}) {
   const t = useTranslations("labs.entry")
   const { b } = useLabText()
   const dates = useDates()
@@ -98,7 +117,7 @@ function EntryForm({ order: o, panel, canEdit, canSubmit, onDone }: { order: Lab
 
   // The missing value starts in Focus state (design), so the tech can type it straight away.
   React.useEffect(() => {
-    if (firstMissing) refs.current[firstMissing]?.focus()
+    if (autoFocus && firstMissing) refs.current[firstMissing]?.focus()
     // Only on open.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -127,7 +146,7 @@ function EntryForm({ order: o, panel, canEdit, canSubmit, onDone }: { order: Lab
     const step = applyStep(o.no, (x) => submit(x, panel.test, numbers, comment.trim() || undefined, "ali", LAB_NOW))
     if (!step.ok) return
     toast.success(t("submitted", { panel: title }), { description: t("submittedText") })
-    onDone()
+    onDone?.()
   }
 
   const strip =
@@ -167,138 +186,163 @@ function EntryForm({ order: o, panel, canEdit, canSubmit, onDone }: { order: Lab
     )
   }
 
-  return (
-    <OrderPage actions={<div className="hidden gap-2 md:flex">{actions}</div>} className="max-md:pb-24">
-      <OrderHeader order={o} />
-      <div className="grid grid-cols-1 items-start gap-4 md:gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="@container/en flex min-w-0 flex-col gap-4 rounded-xl border bg-card p-4 @2xl/en:p-5">
-          <header className="flex items-start gap-3">
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <h2 className="text-lg font-semibold text-foreground">{t("title", { panel: title })}</h2>
-              {tube && (
-                <p className="text-xs text-muted-foreground tabular-nums">
-                  <bdi>
-                    {o.fasting && o.fastingHours
-                      ? t("text", { tube: capFirst(b(TUBES[tube.type].the)), barcode: ltrRun(barcodeOf(o, tube.no)), h: o.fastingHours })
-                      : t("textNoFast", { tube: capFirst(b(TUBES[tube.type].the)), barcode: ltrRun(barcodeOf(o, tube.no)) })}
-                  </bdi>
-                </p>
-              )}
-            </div>
-            {canEdit && imported > 0 && (
-              <Button variant="ghost" size="sm" onClick={importValues}>
-                <Icon name="import" size={24} />
-                {t("import")}
-              </Button>
-            )}
-          </header>
+  const card = (
+    <section className="@container/en flex min-w-0 flex-col gap-4 rounded-xl border bg-card p-4 @2xl/en:p-5">
+      <header className="flex items-start gap-3">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <h2 className="text-lg font-semibold text-foreground">{t("title", { panel: title })}</h2>
+          {tube && (
+            <p className="text-xs text-muted-foreground tabular-nums">
+              <bdi>
+                {o.fasting && o.fastingHours
+                  ? t("text", { tube: capFirst(b(TUBES[tube.type].the)), barcode: ltrRun(barcodeOf(o, tube.no)), h: o.fastingHours })
+                  : t("textNoFast", { tube: capFirst(b(TUBES[tube.type].the)), barcode: ltrRun(barcodeOf(o, tube.no)) })}
+              </bdi>
+            </p>
+          )}
+        </div>
+        {canEdit && imported > 0 && (
+          <Button variant="ghost" size="sm" onClick={importValues}>
+            <Icon name="import" size={24} />
+            {t("import")}
+          </Button>
+        )}
+      </header>
 
-          <p className="flex items-start gap-2 rounded-lg bg-info-soft p-3 text-xs font-medium text-info-soft-foreground">
-            <Icon name="info-circle" size={18} className="shrink-0" />
-            <bdi>{strip}</bdi>
-          </p>
+      <p className="flex items-start gap-2 rounded-lg bg-info-soft p-3 text-xs font-medium text-info-soft-foreground">
+        <Icon name="info-circle" size={18} className="shrink-0" />
+        <bdi>{strip}</bdi>
+      </p>
 
-          {total === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("noAnalytes")}</p>
-          ) : (
-            <>
-              {/* Wide: table */}
-              <div className="hidden overflow-hidden rounded-lg border @2xl/en:block">
-                <table className="w-full table-fixed border-collapse text-sm">
-                  <colgroup>
-                    <col />
-                    <col className="w-[164px]" />
-                    <col className="w-[92px]" />
-                    <col className="w-[102px]" />
-                    <col className="w-[102px]" />
-                  </colgroup>
-                  <thead className="bg-muted">
-                    <tr>
-                      {(["test", "result", "unit", "ref", "flag"] as const).map((k) => (
-                        <th key={k} className="h-10 px-1.5 text-start text-xs font-medium text-muted-foreground first:ps-4 last:pe-4">
-                          {t(`col.${k}`)}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {panel.results.map((r) => {
-                      const v = numbers[r.analyte]
-                      const empty = parsed[r.analyte] === null
-                      const td = "px-1.5 py-2.5 align-middle first:ps-4 last:pe-4"
-                      return (
-                        <tr key={r.analyte} className={cn("border-t", empty && "bg-warning-soft")}>
-                          <td className={cn(td, "font-medium")}>{b(analyteOf(r.analyte)!.name)}</td>
-                          <td className={td}>{input(r.analyte)}</td>
-                          <td className={cn(td, "text-xs text-muted-foreground")}>
-                            <Latin>{r.unit}</Latin>
-                          </td>
-                          <td className={cn(td, "text-xs text-muted-foreground")}>
-                            <Latin>{refText(r)}</Latin>
-                          </td>
-                          <td className={td}>{empty ? <span className="text-xs text-muted-foreground">—</span> : <FlagChip flag={flagFor(r.analyte, v, o.patient)} />}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              {/* Compact: stacked rows */}
-              <ul className="flex flex-col overflow-hidden rounded-lg border @2xl/en:hidden">
+      {total === 0 ? (
+        <p className="text-sm text-muted-foreground">{t("noAnalytes")}</p>
+      ) : (
+        <>
+          {/* Wide: table */}
+          <div className="hidden overflow-hidden rounded-lg border @2xl/en:block">
+            <table className="w-full table-fixed border-collapse text-sm">
+              <colgroup>
+                <col />
+                <col className="w-[164px]" />
+                <col className="w-[92px]" />
+                <col className="w-[102px]" />
+                <col className="w-[102px]" />
+              </colgroup>
+              <thead className="bg-muted">
+                <tr>
+                  {(["test", "result", "unit", "ref", "flag"] as const).map((k) => (
+                    <th key={k} className="h-10 px-1.5 text-start text-xs font-medium text-muted-foreground first:ps-4 last:pe-4">
+                      {t(`col.${k}`)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
                 {panel.results.map((r) => {
                   const v = numbers[r.analyte]
                   const empty = parsed[r.analyte] === null
+                  const td = "px-1.5 py-2.5 align-middle first:ps-4 last:pe-4"
                   return (
-                    <li key={r.analyte} className={cn("flex flex-col gap-2 border-b px-4 py-2.5 last:border-b-0", empty && "bg-warning-soft")}>
-                      <div className="flex items-center gap-2">
-                        <span className="min-w-0 flex-1 text-sm font-medium">{b(analyteOf(r.analyte)!.name)}</span>
-                        <span className="text-xs text-muted-foreground">
-                          <bdi>{t("ref", { ref: ltrRun(refText(r)) })}</bdi>
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {input(r.analyte, "flex-1")}
-                        <span className="text-xs text-muted-foreground">
-                          <Latin>{r.unit}</Latin>
-                        </span>
-                        {empty ? <span className="text-xs text-muted-foreground">—</span> : <FlagChip flag={flagFor(r.analyte, v, o.patient)} />}
-                      </div>
-                    </li>
+                    <tr key={r.analyte} className={cn("border-t", empty && "bg-warning-soft")}>
+                      <td className={cn(td, "font-medium")}>{b(analyteOf(r.analyte)!.name)}</td>
+                      <td className={td}>{input(r.analyte)}</td>
+                      <td className={cn(td, "text-xs text-muted-foreground")}>
+                        <Latin>{r.unit}</Latin>
+                      </td>
+                      <td className={cn(td, "text-xs text-muted-foreground")}>
+                        <Latin>{refText(r)}</Latin>
+                      </td>
+                      <td className={td}>{empty ? <span className="text-xs text-muted-foreground">—</span> : <FlagChip flag={flagFor(r.analyte, v, o.patient)} />}</td>
+                    </tr>
                   )
                 })}
-              </ul>
-            </>
-          )}
+              </tbody>
+            </table>
+          </div>
+          {/* Compact: stacked rows */}
+          <ul className="flex flex-col overflow-hidden rounded-lg border @2xl/en:hidden">
+            {panel.results.map((r) => {
+              const v = numbers[r.analyte]
+              const empty = parsed[r.analyte] === null
+              return (
+                <li key={r.analyte} className={cn("flex flex-col gap-2 border-b px-4 py-2.5 last:border-b-0", empty && "bg-warning-soft")}>
+                  <div className="flex items-center gap-2">
+                    <span className="min-w-0 flex-1 text-sm font-medium">{b(analyteOf(r.analyte)!.name)}</span>
+                    <span className="text-xs text-muted-foreground">
+                      <bdi>{t("ref", { ref: ltrRun(refText(r)) })}</bdi>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {input(r.analyte, "flex-1")}
+                    <span className="text-xs text-muted-foreground">
+                      <Latin>{r.unit}</Latin>
+                    </span>
+                    {empty ? <span className="text-xs text-muted-foreground">—</span> : <FlagChip flag={flagFor(r.analyte, v, o.patient)} />}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </>
+      )}
 
-          {tried && missing.length > 0 && (
-            <p role="alert" className="flex items-start gap-2 rounded-lg bg-destructive-soft p-3 text-xs font-medium text-destructive-soft-foreground">
-              <Icon name="danger" size={18} className="shrink-0" />
-              {t("missing", { n: missing.length })}
-            </p>
-          )}
-          {criticalNow.map((r) => (
-            <p key={r.analyte} role="alert" className="flex items-start gap-2 rounded-lg bg-destructive-soft p-3 text-xs font-medium text-destructive-soft-foreground">
-              <Icon name="danger" size={18} className="shrink-0" />
-              <bdi>{t("critical", { analyte: b(analyteOf(r.analyte)!.name), value: ltrRun(`${values[r.analyte]} ${r.unit}`) })}</bdi>
-            </p>
-          ))}
-          {deltas.map(({ r, pct }) => (
-            <p key={r.analyte} role="status" className="flex items-start gap-2 rounded-lg bg-warning-soft p-3 text-xs font-medium text-warning-soft-foreground">
-              <Icon name="warning-2" size={18} className="shrink-0" />
-              <bdi>
-                {r.previous?.date
-                  ? t("delta", { analyte: b(analyteOf(r.analyte)!.name), dir: pct > 0 ? "up" : "down", pct: Math.abs(pct), date: dates.dayMonth(r.previous.date) })
-                  : t("deltaNoDate", { analyte: b(analyteOf(r.analyte)!.name), dir: pct > 0 ? "up" : "down", pct: Math.abs(pct) })}
-              </bdi>
-            </p>
-          ))}
+      {tried && missing.length > 0 && (
+        <p role="alert" className="flex items-start gap-2 rounded-lg bg-destructive-soft p-3 text-xs font-medium text-destructive-soft-foreground">
+          <Icon name="danger" size={18} className="shrink-0" />
+          {t("missing", { n: missing.length })}
+        </p>
+      )}
+      {criticalNow.map((r) => (
+        <p key={r.analyte} role="alert" className="flex items-start gap-2 rounded-lg bg-destructive-soft p-3 text-xs font-medium text-destructive-soft-foreground">
+          <Icon name="danger" size={18} className="shrink-0" />
+          <bdi>{t("critical", { analyte: b(analyteOf(r.analyte)!.name), value: ltrRun(`${values[r.analyte]} ${r.unit}`) })}</bdi>
+        </p>
+      ))}
+      {deltas.map(({ r, pct }) => (
+        <p key={r.analyte} role="status" className="flex items-start gap-2 rounded-lg bg-warning-soft p-3 text-xs font-medium text-warning-soft-foreground">
+          <Icon name="warning-2" size={18} className="shrink-0" />
+          <bdi>
+            {r.previous?.date
+              ? t("delta", { analyte: b(analyteOf(r.analyte)!.name), dir: pct > 0 ? "up" : "down", pct: Math.abs(pct), date: dates.dayMonth(r.previous.date) })
+              : t("deltaNoDate", { analyte: b(analyteOf(r.analyte)!.name), dir: pct > 0 ? "up" : "down", pct: Math.abs(pct) })}
+          </bdi>
+        </p>
+      ))}
 
-          <Field label={t("comment")}>{(p) => <Textarea {...p} rows={3} value={comment} onChange={(e) => setComment(e.target.value)} disabled={!canEdit} />}</Field>
-        </section>
-        <OrderSide order={o} />
+      <Field label={t("comment")}>{(p) => <Textarea {...p} rows={3} value={comment} onChange={(e) => setComment(e.target.value)} disabled={!canEdit} />}</Field>
+    </section>
+  )
+  return { card, actions }
+}
+
+function EntryForm(props: { order: LabOrder; panel: Panel; canEdit: boolean; canSubmit: boolean; onDone: () => void }) {
+  const { card, actions } = useResultEntry(props)
+  return (
+    <OrderPage actions={<div className="hidden gap-2 md:flex">{actions}</div>} className="max-md:pb-24">
+      <OrderHeader order={props.order} />
+      <div className="grid grid-cols-1 items-start gap-4 md:gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        {card}
+        <OrderSide order={props.order} />
       </div>
       <MobileActionBar>{actions}</MobileActionBar>
     </OrderPage>
+  )
+}
+
+/** Widget / Lab Result Entry on its own (preview stories): the card with its actions under it. */
+export function ResultEntryWidget({ order, test }: { order: LabOrder; test?: string }) {
+  const panel = order.panels.find((p) => p.test === test && enterable(p)) ?? order.panels.find(enterable)
+  if (!panel) return null
+  return <ResultEntryInner key={panel.test} order={order} panel={panel} />
+}
+
+function ResultEntryInner({ order, panel }: { order: LabOrder; panel: Panel }) {
+  const { card, actions } = useResultEntry({ order, panel, canEdit: true, canSubmit: true, autoFocus: false })
+  return (
+    <div className="flex flex-col gap-3">
+      {card}
+      <div className="flex flex-wrap justify-end gap-2">{actions}</div>
+    </div>
   )
 }
 

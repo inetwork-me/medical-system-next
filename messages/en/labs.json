@@ -570,5 +570,70 @@
     "red": "red",
     "urine": "urine cup",
     "bottle": "culture bottles"
+  },
+  "catalog": {
+    "export": "Export",
+    "exported": "Test catalog exported",
+    "title": "Test catalog",
+    "text": "{tests} tests · {panels} panels · prices before VAT",
+    "add": "Add test",
+    "search": "Search test name or code…",
+    "filter": {
+      "label": "Section",
+      "all": "All",
+      "chemistry": "Chemistry",
+      "hematology": "Hematology",
+      "hormones": "Hormones",
+      "microbiology": "Microbiology",
+      "panels": "Panels"
+    },
+    "col": {
+      "code": "Code",
+      "test": "Test",
+      "section": "Section",
+      "tube": "Tube",
+      "tat": "TAT",
+      "price": "Price",
+      "active": "Active"
+    },
+    "tatH": "{n} h",
+    "tatD": "{n, plural, one {1 day} other {# days}}",
+    "price": "SAR {n}",
+    "noPrice": "—",
+    "line": "{code} · {section} · {tat} · {price}",
+    "activeLabel": "{test} active",
+    "on": "{test} is active",
+    "onText": "Doctors can order it again.",
+    "off": "{test} is off",
+    "offText": "It won't show in New lab order.",
+    "empty": "No test matches",
+    "emptyText": "Try another name or code.",
+    "clear": "Clear search"
+  },
+  "reports": {
+    "export": "Export",
+    "exported": "Lab report exported",
+    "month": "This month",
+    "monthText": "{range} · vs {prev}",
+    "kpi": {
+      "tests": "Tests done",
+      "testsDelta": "{n} vs {prev}",
+      "tat": "Routine TAT",
+      "tatValue": "{n} h",
+      "tatTarget": "Target {n} h",
+      "stat": "STAT within 1 h",
+      "statTarget": "Target {n}",
+      "rejected": "Rejected samples",
+      "rejectedTarget": "Target under {n}",
+      "critical": "Critical calls in 30 min",
+      "criticalLate": "{n} late · {min} min"
+    },
+    "perDay": "Tests per day",
+    "perDayText": "Last 2 weeks · Sun–Thu",
+    "perDayAria": "Tests per day over the last two weeks, today highlighted",
+    "top": "Top tests",
+    "topText": "Share of this month",
+    "reasons": "Why samples were rejected",
+    "reasonsText": "{n} samples this month"
   }
 }

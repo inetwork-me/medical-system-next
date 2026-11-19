@@ -240,6 +240,44 @@ export const HEMOLYSIS_SENSITIVE = ["k"]
 /** Where the design's analyzer results come from. */
 export const ANALYZER = "Cobas c311"
 
+/** Catalog totals (design: "186 tests · 24 panels"); the sample catalog lists the designed rows. */
+export const CATALOG_TOTALS = { tests: 186, panels: 24 } as const
+/** Tests that are panels (several results from one order): the catalog's "Panels" filter. */
+export const PANEL_TESTS = ["cbc", "lipid", "kidney", "lytes", "urine"]
+
+/** Lab · Reports sample month (design: 1–19 Nov 2026 vs October). */
+export const LAB_REPORT = {
+  from: "2026-11-01",
+  to: LAB_TODAY,
+  testsDone: 4812,
+  testsDeltaPct: 7,
+  routineTatH: 2.4,
+  routineTargetH: 4,
+  statWithin1hPct: 94,
+  statTargetPct: 90,
+  rejectedPct: 1.8,
+  rejectedTargetPct: 2,
+  criticalOnTime: 41,
+  criticalTotal: 42,
+  criticalLateMin: 34,
+  /** Last 2 weeks, Sun–Thu; the last bar is today. */
+  perDay: [286, 301, 274, 312, 248, 295, 318, 290, 306, 262],
+  topTests: [
+    { test: "cbc", n: 1120 },
+    { test: "hba1c", n: 640 },
+    { test: "lipid", n: 512 },
+    { test: "vitd", n: 488 },
+    { test: "tsh", n: 401 },
+  ],
+  rejections: [
+    { reason: "hemolyzed" as RejectReason, n: 38 },
+    { reason: "clotted" as RejectReason, n: 21 },
+    { reason: "qns" as RejectReason, n: 16 },
+    { reason: "wrongTube" as RejectReason, n: 8 },
+    { reason: "label" as RejectReason, n: 4 },
+  ],
+}
+
 /**
  * Diagnoses for New lab order (ICD-10). The design shows one (E10.9); the rest are common lab-order codes until the
  * full ICD-10 search lands (design gap).

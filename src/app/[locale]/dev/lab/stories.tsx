@@ -35,6 +35,10 @@ import { ValidationQueue } from "@/modules/labs/validation"
 import { SampleDetail } from "@/modules/labs/order/sample"
 import { PatientReport } from "@/modules/labs/order/report"
 import { SendDialog } from "@/modules/labs/order/send-dialog"
+import { TestCatalog } from "@/modules/labs/catalog"
+import { LabReport } from "@/modules/labs/reports"
+import { Summary } from "@/modules/labs/new-order"
+import { tubesFor as tubesForTests } from "@/modules/labs/machine"
 import { useLabOrder } from "@/modules/labs/store"
 import { Button } from "@/components/ui/button"
 import { FlagChip, LabStatusBadge, Latin, PriorityChip, StatChip, TubeDot, TubeLabel, useB } from "@/modules/labs/parts"
@@ -115,6 +119,21 @@ export function LabStories() {
           <div className="w-90">
             <TubeGuide />
           </div>
+        </div>
+      </Box>
+      <WidgetStory name="Widget / Lab Test Catalog" wide={1120} compact={358} render={() => <TestCatalog />} />
+      <WidgetStory name="Widget / Lab Report" wide={1120} compact={358} render={() => <LabReport />} />
+      <Box title="Widget / New Lab Order Summary · 280">
+        <div className="w-70">
+          <Summary
+            tests={["hba1c", "kidney", "lytes", "lipid", "urine"]}
+            tubes={tubesForTests(["hba1c", "kidney", "lytes", "lipid", "urine"])}
+            priority="stat"
+            total={425}
+            covers={340}
+            payer="Bupa"
+            place="room"
+          />
         </div>
       </Box>
       <WidgetStory name="Widget / Lab Validation Queue" wide={1120} compact={358} render={() => <ValidationQueue onLogCall={() => setDialog("call")} />} />

@@ -570,5 +570,70 @@
     "red": "أحمر",
     "urine": "علبة بول",
     "bottle": "قناني مزرعة"
+  },
+  "catalog": {
+    "export": "تصدير",
+    "exported": "تصدّر دليل التحاليل",
+    "title": "دليل التحاليل",
+    "text": "{tests} تحليل · {panels} باقة · الأسعار قبل الضريبة",
+    "add": "أضف تحليل",
+    "search": "دوّر اسم التحليل أو الكود…",
+    "filter": {
+      "label": "القسم",
+      "all": "الكل",
+      "chemistry": "الكيمياء",
+      "hematology": "الدم",
+      "hormones": "الهرمونات",
+      "microbiology": "الأحياء الدقيقة",
+      "panels": "الباقات"
+    },
+    "col": {
+      "code": "الكود",
+      "test": "التحليل",
+      "section": "القسم",
+      "tube": "الأنبوب",
+      "tat": "مدة النتيجة",
+      "price": "السعر",
+      "active": "مفعّل"
+    },
+    "tatH": "{n, plural, one {ساعة} two {ساعتين} few {# ساعات} other {# ساعة}}",
+    "tatD": "{n, plural, one {يوم} two {يومين} few {# أيام} other {# يوم}}",
+    "price": "{n} ر.س",
+    "noPrice": "—",
+    "line": "{code} · {section} · {tat} · {price}",
+    "activeLabel": "{test} مفعّل",
+    "on": "انفعّل {test}",
+    "onText": "يقدر الأطباء يطلبونه مرة ثانية.",
+    "off": "انوقف {test}",
+    "offText": "ما راح يطلع في طلب تحليل جديد.",
+    "empty": "ما فيه تحليل مطابق",
+    "emptyText": "جرّب اسم أو كود ثاني.",
+    "clear": "امسح البحث"
+  },
+  "reports": {
+    "export": "تصدير",
+    "exported": "تصدّر تقرير المختبر",
+    "month": "هالشهر",
+    "monthText": "{range} · مقارنة بـ{prev}",
+    "kpi": {
+      "tests": "التحاليل",
+      "testsDelta": "{n} عن {prev}",
+      "tat": "مدة النتيجة العادية",
+      "tatValue": "{n} س",
+      "tatTarget": "الهدف {n} س",
+      "stat": "العاجل خلال ساعة",
+      "statTarget": "الهدف {n}",
+      "rejected": "العينات المرفوضة",
+      "rejectedTarget": "الهدف أقل من {n}",
+      "critical": "بلاغات حرجة خلال 30 د",
+      "criticalLate": "{n} متأخر · {min} د"
+    },
+    "perDay": "التحاليل كل يوم",
+    "perDayText": "آخر أسبوعين · الأحد–الخميس",
+    "perDayAria": "عدد التحاليل كل يوم لآخر أسبوعين، واليوم مظلل",
+    "top": "أكثر التحاليل",
+    "topText": "نسبتها من الشهر",
+    "reasons": "ليش انرفضت العينات",
+    "reasonsText": "{n} عينة هالشهر"
   }
 }

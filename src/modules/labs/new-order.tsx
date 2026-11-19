@@ -22,7 +22,6 @@ import {
   ICD10,
   LAB_NOW,
   READY_PANELS,
-  TESTS,
   TUBES,
   testOf,
   type CollectionPlace,
@@ -35,7 +34,7 @@ import { bandFor, tubesFor } from "./machine"
 import { KvRow } from "./order/call-dialog"
 import { TubeDot, ltrRun, useSoon } from "./parts"
 import { labCan } from "./roles"
-import { addOrder, nextOrderNo, nextTicket, useLabOrders, useLabRole } from "./store"
+import { addOrder, nextOrderNo, nextTicket, useCatalog, useLabOrders, useLabRole } from "./store"
 import { LabCard } from "./samples"
 import { useLabText } from "./text"
 
@@ -87,6 +86,7 @@ export function NewLabOrder() {
   const soon = useSoon()
   const doctors = useDoctors()
   const patients = usePatientOptions()
+  const catalog = useCatalog()
 
   const [patientKey, setPatientKey] = React.useState<string>("")
   const [tests, setTests] = React.useState<string[]>([])
@@ -235,7 +235,7 @@ export function NewLabOrder() {
 
           <LabCard title={t("tests")} text={t("testsText")} className="md:p-6">
             <Combobox
-              options={TESTS.filter((x) => x.active && !tests.includes(x.key)).map((x) => ({ value: x.key, label: `${b(x.name)} · ${x.code}` }))}
+              options={catalog.filter((x) => x.active && !tests.includes(x.key)).map((x) => ({ value: x.key, label: `${b(x.name)} · ${x.code}` }))}
               value=""
               onChange={addTest}
               placeholder={t("testSearch")}

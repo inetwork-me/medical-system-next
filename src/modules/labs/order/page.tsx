@@ -4,7 +4,6 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 
 import { Icon } from "@/components/ds/icon"
-import { EmptyState } from "@/components/ds/states"
 import { Button } from "@/components/ui/button"
 import { RejectDialog, defaultRejectTube } from "../reject-dialog"
 import { labCan } from "../roles"
@@ -57,19 +56,6 @@ export function OrderResults() {
       {open === "reject" && <RejectDialog orderNo={o.no} onOpenChange={close} />}
       {open === "release" && <ReleaseDialog orderNo={o.no} onOpenChange={close} onLogCall={() => setOpen("call")} />}
       {open === "call" && <CriticalCallDialog orderNo={o.no} onOpenChange={close} />}
-    </OrderPage>
-  )
-}
-
-/** Order tabs built in later steps (Sample, Report, Enter results). */
-export function OrderSoon({ step }: { step: number }) {
-  const t = useTranslations("labs.order")
-  const ts = useTranslations("labs.soon")
-  return (
-    <OrderPage>
-      <div className="rounded-xl border bg-card">
-        <EmptyState icon="glass" title={ts("title")} description={t("soon", { n: step })} className="py-16" />
-      </div>
     </OrderPage>
   )
 }

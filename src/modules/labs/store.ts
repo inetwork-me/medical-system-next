@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { ORDERS, type LabOrder, type LabRole } from "./data"
+import { ORDERS, TESTS, type LabOrder, type LabRole, type TestDef } from "./data"
 import type { Step } from "./machine"
 
 /**
@@ -10,10 +10,10 @@ import type { Step } from "./machine"
  * logged, released, new orders). Kept in sessionStorage like the other module stores; the status machine
  * (machine.ts) decides every change, the store only applies it.
  */
-type State = { edits: Record<string, LabOrder>; added: LabOrder[]; role: LabRole }
+type State = { edits: Record<string, LabOrder>; added: LabOrder[]; role: LabRole; active: Record<string, boolean> }
 
 const KEY = "ms.labs.session"
-let state: State = { edits: {}, added: [], role: "lead" }
+let state: State = { edits: {}, added: [], role: "lead", active: {} }
 let loaded = false
 const listeners = new Set<() => void>()
 let cache: { state: State; list: LabOrder[] } | null = null
@@ -109,4 +109,25 @@ export function useLabRole(): LabRole {
 export function setLabRole(role: LabRole) {
   load()
   commit({ ...state, role })
+}
+
+/* ---------------------------------------------------------------- catalog */
+
+let catalogCache: { state: State; list: TestDef[] } | null = null
+function catalog(): TestDef[] {
+  load()
+  if (catalogCache?.state === state) return catalogCache.list
+  const list = TESTS.map((t) => (t.key in state.active ? { ...t, active: state.active[t.key] } : t))
+  catalogCache = { state, list }
+  return list
+}
+
+/** The test catalog with this session's Active switches (inactive tests can't be ordered). */
+export function useCatalog(): TestDef[] {
+  return React.useSyncExternalStore(subscribe, catalog, () => TESTS)
+}
+
+export function setTestActive(key: string, active: boolean) {
+  load()
+  commit({ ...state, active: { ...state.active, [key]: active } })
 }

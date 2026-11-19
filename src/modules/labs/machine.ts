@@ -1,5 +1,6 @@
 import {
   LAB_NOW,
+  ORDER_OF_DRAW,
   addMins,
   analyteOf,
   minsBetween,
@@ -336,5 +337,10 @@ export function tubesFor(tests: string[]) {
     if (!t) continue
     by.set(t.tube, [...(by.get(t.tube) ?? []), k])
   }
-  return [...by.entries()].map(([type, ts], i) => ({ no: i + 1, type: type as LabOrder["tubes"][number]["type"], tests: ts, volumeMl: Math.max(0, ...ts.map((k) => testOf(k)?.volumeMl ?? 0)) || undefined, state: "pending" as const }))
+  // Tubes are numbered (and labelled) in the order of draw; urine cups and culture bottles come last.
+  const rank = (type: string) => {
+    const i = ORDER_OF_DRAW.findIndex((x) => x.tube === type)
+    return i === -1 ? ORDER_OF_DRAW.length : i
+  }
+  return [...by.entries()].sort((a, z) => rank(a[0]) - rank(z[0])).map(([type, ts], i) => ({ no: i + 1, type: type as LabOrder["tubes"][number]["type"], tests: ts, volumeMl: Math.max(0, ...ts.map((k) => testOf(k)?.volumeMl ?? 0)) || undefined, state: "pending" as const }))
 }

@@ -240,6 +240,21 @@ export const HEMOLYSIS_SENSITIVE = ["k"]
 /** Where the design's analyzer results come from. */
 export const ANALYZER = "Cobas c311"
 
+/**
+ * Diagnoses for New lab order (ICD-10). The design shows one (E10.9); the rest are common lab-order codes until the
+ * full ICD-10 search lands (design gap).
+ */
+export const ICD10: { code: string; name: Bi }[] = [
+  { code: "E10.9", name: bi("Type 1 diabetes", "سكري نوع 1") },
+  { code: "E11.9", name: bi("Type 2 diabetes", "سكري نوع 2") },
+  { code: "D50.9", name: bi("Iron deficiency anemia", "أنيميا نقص الحديد") },
+  { code: "E03.9", name: bi("Hypothyroidism", "قصور الغدة الدرقية") },
+  { code: "I10", name: bi("Essential hypertension", "ضغط الدم المرتفع") },
+  { code: "E78.5", name: bi("Hyperlipidemia", "ارتفاع الدهون") },
+  { code: "R50.9", name: bi("Fever", "حرارة") },
+  { code: "Z00.0", name: bi("General check-up", "فحص عام") },
+]
+
 /** The lab on the report letterhead and its verify link (Order page · Report). */
 export const LAB_FACILITY = { phone: "+966 11 400 2200", verifyUrl: "alnoor.sa/verify" } as const
 

@@ -1,9 +1,15 @@
 import { setLocaleFrom } from "@/i18n/set-locale"
+import { getTranslations } from "next-intl/server"
 
-import { LabSoon } from "@/modules/labs/soon"
+import { NewLabOrder } from "@/modules/labs/new-order"
 
-/** Built in a later Labs step (CODE_CHAT_LABS.md §5). */
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   await setLocaleFrom(params)
-  return <LabSoon />
+  return { title: (await getTranslations("labs.newOrder"))("title") }
+}
+
+/** Lab · New lab order. */
+export default async function NewOrderPage({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
+  return <NewLabOrder />
 }

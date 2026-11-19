@@ -10,6 +10,7 @@ import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { Segmented } from "@/components/ds/segmented"
 import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@/hooks/use-media-query"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -55,8 +56,9 @@ export type AddTestForm = {
 const SECTIONS: Section[] = ["chemistry", "hematology", "hormones", "microbiology", "urine"]
 /** Codes are numbered per section: 1xxx hematology, 2xxx chemistry, 3xxx hormones, 4xxx microbiology, 5xxx urine. */
 const SECTION_PREFIX: Record<Section, number> = { hematology: 1, chemistry: 2, hormones: 3, microbiology: 4, urine: 5 }
-/** Desktop shows the first five tubes on one row (design), then the rest wrap. */
-const TUBE_ORDER: TubeKey[] = ["gold", "lav", "blue", "green", "red", "grey", "urine", "bottle"]
+/** The designed tube chips: five on desktop / tablet, the first four on mobile (they wrap). */
+const TUBE_ORDER: TubeKey[] = ["gold", "lav", "blue", "green", "red"]
+const MOBILE_TUBES = 4
 const SAMPLE_TYPES: SampleType[] = ["serum", "plasma", "wholeBlood", "urine"]
 const RESULT_TYPES: ResultType[] = ["number", "text", "posneg"]
 const DECIMALS = ["0", "1", "2", "3"]
@@ -425,6 +427,7 @@ function DetailsStep({
   const ts = useTranslations("labs.section")
   const { b, ar } = useLabText()
   const tat = useTat()
+  const mobile = useIsMobile()
   return (
     <>
       <Group icon="document-text" title={t("basics")}>
@@ -481,7 +484,7 @@ function DetailsStep({
             </span>
           </span>
           <div role="radiogroup" aria-labelledby="add-test-tube" aria-invalid={!!errs.tube || undefined} className="flex flex-wrap gap-2">
-            {TUBE_ORDER.map((k) => {
+            {TUBE_ORDER.slice(0, mobile ? MOBILE_TUBES : TUBE_ORDER.length).map((k) => {
               const on = f.tube === k
               return (
                 <button

@@ -614,5 +614,31 @@
     "assigned": "{clinic} · {role}",
     "assignedWhere": "{day, select, sun {الأحد} mon {الاثنين} tue {الثلاثاء} wed {الأربعاء} thu {الخميس} fri {الجمعة} other {السبت}} · {hours} · غرفة {room}",
     "startsOn": " · من {date}"
+  },
+  "report": {
+    "export": "تصدير",
+    "chart": "الزيارات حسب الطبيب",
+    "compare": "مقارنة الأطباء",
+    "sorted": "مرتبة حسب الزيارات · الاستغلال = المحجوز ÷ المواعيد المتاحة",
+    "col": {
+      "doctor": "الطبيب",
+      "clinic": "العيادة",
+      "visits": "الزيارات",
+      "utilisation": "الاستغلال",
+      "consult": "مدة الكشف",
+      "noShow": "الغياب",
+      "rating": "التقييم",
+      "revenue": "الدخل"
+    },
+    "min": "{n} د",
+    "revenue": "{n} ألف ر.س",
+    "visits": "{n} زيارة",
+    "line": "استغلال {u} · {m} د للكشف · ★ {r}",
+    "exported": "انصدّر تقرير الأطباء",
+    "exportedText": "الملف {file} موجود في التنزيلات.",
+    "sheet": "تقرير الأطباء",
+    "showMore": "اعرض {n} أطباء زيادة",
+    "showLess": "اعرض أقل",
+    "empty": "ما فيه زيارات هالشهر للحين"
   }
 }

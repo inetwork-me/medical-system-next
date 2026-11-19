@@ -614,5 +614,31 @@
     "assigned": "{clinic} · {role}",
     "assignedWhere": "{day, select, sun {Sun} mon {Mon} tue {Tue} wed {Wed} thu {Thu} fri {Fri} other {Sat}} · {hours} · Room {room}",
     "startsOn": " · from {date}"
+  },
+  "report": {
+    "export": "Export",
+    "chart": "Visits by doctor",
+    "compare": "Doctor comparison",
+    "sorted": "Sorted by visits · utilisation = booked ÷ available slots",
+    "col": {
+      "doctor": "Doctor",
+      "clinic": "Clinic",
+      "visits": "Visits",
+      "utilisation": "Utilisation",
+      "consult": "Avg consult",
+      "noShow": "No-show",
+      "rating": "Rating",
+      "revenue": "Revenue"
+    },
+    "min": "{n} min",
+    "revenue": "SAR {n}K",
+    "visits": "{n} visits",
+    "line": "{u} used · {m} min a visit · ★ {r}",
+    "exported": "Doctors report exported",
+    "exportedText": "{file} is in your downloads.",
+    "sheet": "Doctors report",
+    "showMore": "Show {n} more doctors",
+    "showLess": "Show fewer",
+    "empty": "No visits yet this month"
   }
 }

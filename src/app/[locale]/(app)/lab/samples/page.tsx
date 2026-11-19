@@ -1,9 +1,15 @@
 import { setLocaleFrom } from "@/i18n/set-locale"
+import { getTranslations } from "next-intl/server"
 
-import { LabSoon } from "@/modules/labs/soon"
+import { Samples } from "@/modules/labs/samples"
 
-/** Built in a later Labs step (CODE_CHAT_LABS.md §5). */
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   await setLocaleFrom(params)
-  return <LabSoon />
+  return { title: (await getTranslations("shell.tabs.lab"))("samples") }
+}
+
+/** Lab · Samples: collection queue, samples today, rejected today, tube guide. */
+export default async function SamplesPage({ params }: { params: Promise<{ locale: string }> }) {
+  await setLocaleFrom(params)
+  return <Samples />
 }

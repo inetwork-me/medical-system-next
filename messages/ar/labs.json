@@ -28,7 +28,19 @@
     "clotted": "متجلطة",
     "qns": "الكمية ما تكفي",
     "wrongTube": "أنبوب غلط",
-    "label": "الملصق ما يطابق"
+    "label": "الملصق ما يطابق",
+    "title": "ترفض العينة؟",
+    "text": "{no} · {tube} {barcode}",
+    "falseHigh": "{analyte} {value} ممكن يكون مرتفع غلط لو العينة متحللة.",
+    "reason": "السبب",
+    "recollect": "اطلب عينة جديدة الحين",
+    "tell": "بلّغ {doctor}",
+    "cancel": "إلغاء",
+    "confirm": "ارفض العينة",
+    "toast": "انرفضت العينة",
+    "toastBoth": "انطلبت عينة جديدة · وانبلّغ {doctor}",
+    "toastNew": "انطلبت عينة جديدة",
+    "toastTold": "انبلّغ {doctor}"
   },
   "step": {
     "ordered": "انطلب",
@@ -140,5 +152,57 @@
   "labels": {
     "toast": "انطبعت الملصقات",
     "toastText": "{n, plural, one {ملصق واحد} two {ملصقين} few {# ملصقات} other {# ملصق}} · طابعة {printer}"
+  },
+  "samples": {
+    "printLabels": "اطبع الملصقات",
+    "collectNext": "اسحب اللي بعده",
+    "queue": {
+      "title": "طابور السحب",
+      "text": "{n, plural, one {واحد ينتظر} two {اثنين ينتظرون} few {# ينتظرون} other {# ينتظرون}} · غرف السحب {rooms}",
+      "callNext": "نادِ اللي بعده",
+      "waiting": "ينتظر",
+      "mins": "{n, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+      "line": "{no} · {tests}",
+      "recollect": "{no} · إعادة سحب، {reason}",
+      "collect": "اسحب",
+      "empty": "ما فيه أحد ينتظر",
+      "emptyText": "الطلبات الجديدة تدخل الطابور أول ما يوصل المريض.",
+      "called": "انادى {name}",
+      "calledText": "رقم {ticket} · غرفة السحب {room}"
+    },
+    "tracker": {
+      "title": "عينات اليوم",
+      "text": "{collected} انسحبت · {received} وصلت · {transit} في الطريق",
+      "scan": "امسح عينة",
+      "col": {
+        "barcode": "الباركود",
+        "patient": "المريض",
+        "tube": "الأنبوب",
+        "collected": "السحب",
+        "received": "الاستلام",
+        "status": "الحالة"
+      },
+      "state": {
+        "collected": "في الطريق",
+        "received": "في الطابور",
+        "analyzer": "على الجهاز",
+        "resulted": "طلعت النتيجة",
+        "rejected": "مرفوضة"
+      }
+    },
+    "rejected": {
+      "title": "المرفوضة اليوم",
+      "text": "{n, plural, one {عينة} two {عينتين} few {# عينات} other {# عينة}} · {pct} من اليوم",
+      "line": "{reason} · {tube}",
+      "recollecting": "تنسحب الحين",
+      "done": "انسحبت {time}",
+      "sms": "وصلها رسالة",
+      "none": "ما انطلبت عينة",
+      "empty": "ما فيه عينات مرفوضة اليوم"
+    },
+    "guide": {
+      "title": "دليل الأنابيب",
+      "text": "اسحب بهالترتيب"
+    }
   }
 }

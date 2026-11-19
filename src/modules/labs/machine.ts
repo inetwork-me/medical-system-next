@@ -16,6 +16,7 @@ import {
   type RefBand,
   type RejectReason,
   type Result,
+  type Tube,
 } from "./data"
 
 /*
@@ -97,9 +98,12 @@ export function flagCounts(o: LabOrder): Record<Flag, number> {
 /* ------------------------------------------------------------------ status */
 
 /** Tubes waiting to be (re)collected. */
-export const tubesToCollect = (o: LabOrder) => o.tubes.filter((t) => t.state === "pending")
+export const tubesToCollect = (o: LabOrder) =>
+  o.tubes.filter((t) => t.state === "pending").sort((a, z) => (a.recollectOf ?? a.no) - (z.recollectOf ?? z.no))
 /** A tube was rejected and a new sample is requested, not collected yet → "Recollect". */
-export const isRecollect = (o: LabOrder) => o.tubes.some((t) => t.state === "pending" && t.rejections?.at(-1)?.recollect)
+export const isRecollect = (o: LabOrder) => o.tubes.some((t) => t.state === "pending" && t.recollectOf !== undefined)
+/** Tubes still in play (rejected ones are kept for the record only). */
+export const liveTubes = (o: LabOrder) => o.tubes.filter((t) => t.state !== "rejected")
 
 /**
  * Order status, derived from the tubes and panels:
@@ -215,16 +219,18 @@ export function reject(
   at: string
 ): Step {
   const tube = o.tubes.find((t) => t.no === tubeNo)
-  if (!tube || tube.state === "pending") return no("notCollected")
-  const rej = { reason, at, by, recollect: opts.recollect, toldDoctor: opts.toldDoctor }
+  if (!tube || tube.state === "pending" || tube.state === "rejected") return no("notCollected")
+  const rejection = { reason, at, by, recollect: opts.recollect, toldDoctor: opts.toldDoctor }
+  const tubes: Tube[] = o.tubes.map((t) => (t.no === tubeNo ? { ...t, state: "rejected" as const, rejection } : t))
+  // A new sample gets its own tube (and label) number; it carries the same tests.
+  if (opts.recollect)
+    tubes.push({ no: Math.max(...o.tubes.map((t) => t.no)) + 1, type: tube.type, tests: tube.tests, volumeMl: tube.volumeMl, state: "pending", recollectOf: tube.no })
   return ok({
     ...o,
-    tubes: o.tubes.map((t) =>
-      t.no === tubeNo ? { ...t, state: opts.recollect ? ("pending" as const) : ("rejected" as const), collectedAt: undefined, receivedAt: undefined, rejections: [...(t.rejections ?? []), rej] } : t
-    ),
+    tubes,
     panels: o.panels.map((p) => (tube.tests.includes(p.test) && p.state !== "released" ? { ...p, state: "waiting" as const, dueAt: undefined, results: p.results.map((r) => ({ ...r, value: null, flag: null })) } : p)),
-    ticket: opts.recollect ? (opts.ticket ?? o.ticket) : o.ticket,
-    queuedAt: opts.recollect ? at : o.queuedAt,
+    ticket: opts.recollect ? (o.ticket ?? opts.ticket) : o.ticket,
+    queuedAt: opts.recollect ? (o.queuedAt ?? at) : o.queuedAt,
     events: log(o, { at, kind: "rejected", by }),
   })
 }
@@ -311,7 +317,7 @@ export function stepper(o: LabOrder): { key: StepKey; at?: string; state: "done"
   const times: Record<StepKey, string | undefined> = {
     ordered: o.createdAt,
     collected: tubesToCollect(o).length ? undefined : first("collected"),
-    received: o.tubes.every((t) => t.receivedAt) ? first("received") : undefined,
+    received: liveTubes(o).every((t) => t.receivedAt) ? first("received") : undefined,
     resulted: o.panels.some((p) => p.resultedAt) ? (o.panels.map((p) => p.resultedAt).filter(Boolean).sort().at(-1) as string) : undefined,
     validated: o.panels.some((p) => p.validatedAt) ? first("validated") : undefined,
     released: statusOf(o) === "ready" ? first("released") : undefined,

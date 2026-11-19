@@ -28,7 +28,19 @@
     "clotted": "Clotted",
     "qns": "Not enough blood",
     "wrongTube": "Wrong tube",
-    "label": "Label doesn't match"
+    "label": "Label doesn't match",
+    "title": "Reject this sample?",
+    "text": "{no} · {tube} {barcode}",
+    "falseHigh": "{analyte} {value} may be falsely high if the sample is hemolyzed.",
+    "reason": "Reason",
+    "recollect": "Ask for a new sample now",
+    "tell": "Tell {doctor}",
+    "cancel": "Cancel",
+    "confirm": "Reject sample",
+    "toast": "Sample rejected",
+    "toastBoth": "New sample requested · {doctor} told",
+    "toastNew": "New sample requested",
+    "toastTold": "{doctor} told"
   },
   "step": {
     "ordered": "Ordered",
@@ -140,5 +152,57 @@
   "labels": {
     "toast": "Labels printed",
     "toastText": "{n, plural, one {# label} other {# labels}} · printer {printer}"
+  },
+  "samples": {
+    "printLabels": "Print labels",
+    "collectNext": "Collect next",
+    "queue": {
+      "title": "Collection queue",
+      "text": "{n} waiting · collection rooms {rooms}",
+      "callNext": "Call next",
+      "waiting": "Waiting",
+      "mins": "{n} min",
+      "line": "{no} · {tests}",
+      "recollect": "{no} · recollect, {reason}",
+      "collect": "Collect",
+      "empty": "Nobody is waiting",
+      "emptyText": "New orders join the queue when the patient arrives.",
+      "called": "{name} called",
+      "calledText": "Ticket {ticket} · collection room {room}"
+    },
+    "tracker": {
+      "title": "Samples today",
+      "text": "{collected} collected · {received} received · {transit} in transit",
+      "scan": "Scan sample",
+      "col": {
+        "barcode": "Barcode",
+        "patient": "Patient",
+        "tube": "Tube",
+        "collected": "Collected",
+        "received": "Received",
+        "status": "Status"
+      },
+      "state": {
+        "collected": "In transit",
+        "received": "In queue",
+        "analyzer": "On analyzer",
+        "resulted": "Resulted",
+        "rejected": "Rejected"
+      }
+    },
+    "rejected": {
+      "title": "Rejected today",
+      "text": "{n, plural, one {# sample} other {# samples}} · {pct} of today",
+      "line": "{reason} · {tube}",
+      "recollecting": "Recollecting",
+      "done": "Done {time}",
+      "sms": "SMS sent",
+      "none": "No new sample",
+      "empty": "No rejected samples today"
+    },
+    "guide": {
+      "title": "Tube guide",
+      "text": "Draw in this order"
+    }
   }
 }

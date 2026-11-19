@@ -278,8 +278,10 @@ export type Tube = {
   receivedAt?: string
   /** Rack / storage note once resulted ("stored rack B4"). */
   rack?: string
-  /** Every time this tube was rejected; the latest one with recollect = true puts the order back to collect. */
-  rejections?: Rejection[]
+  /** Why this sample was rejected (state "rejected"; its times stay for the tracker). */
+  rejection?: Rejection
+  /** A new sample replacing a rejected tube (its number). */
+  recollectOf?: number
 }
 
 export type Result = {
@@ -516,7 +518,9 @@ function lite(o: Lite): LabOrder {
     receivedAt: collected && o.receivedAt !== null ? o.receivedAt : undefined,
   }))
   if (o.rejection) {
-    tubes[0] = { ...tubes[0], collectedAt: o.collectedAt, receivedAt: o.receivedAt ?? undefined, state: "pending", rejections: [o.rejection] }
+    // The first tube was rejected after reception; with "new sample" a replacement tube waits in the queue.
+    tubes[0] = { ...tubes[0], state: "rejected", collectedAt: o.collectedAt, collectedBy: "hanan", receivedAt: o.receivedAt ?? undefined, rejection: o.rejection }
+    if (o.rejection.recollect) tubes.push({ ...tubes[0], no: tubes.length + 1, state: "pending", collectedAt: undefined, collectedBy: undefined, receivedAt: undefined, rejection: undefined, recollectOf: 1 })
   }
   const panelState: PanelState = o.status === "validate" ? "validate" : o.status === "ready" ? "released" : o.status === "lab" ? "analyzer" : "waiting"
   const panels: Panel[] = o.tests.map((test, i) => ({
@@ -765,3 +769,15 @@ export const OTHER_TODAY = { collect: 8, collectStat: 2, lab: 16, validate: 4, r
 
 /** Worklist KPI context the mock can't compute (no history yet). */
 export const WORKLIST_TRENDS = { vsLastWeekPct: 8, avgInLabMin: 46 } as const
+
+/** Samples collected / received today outside the sample orders (Samples today: "142 collected · 138 received"). */
+export const OTHER_SAMPLES = { collected: 129, received: 126 } as const
+
+/** Collection rooms in use (Collection queue subtitle; Call next sends the patient to the first). */
+export const COLLECTION_ROOMS = [1, 2] as const
+
+/** Earlier rejections today on orders outside the sample list (Rejected today). */
+export const OTHER_REJECTIONS: { name: Bi; reason: RejectReason; tube?: TubeKey; at: string; outcome: "done" | "sms"; doneAt?: string }[] = [
+  { name: bi("Badr Al-Otaibi", "بدر العتيبي"), reason: "clotted", tube: "lav", at: `${LAB_TODAY}T09:31`, outcome: "done", doneAt: `${LAB_TODAY}T09:50` },
+  { name: bi("Hind Al-Zahrani", "هند الزهراني"), reason: "qns", at: `${LAB_TODAY}T09:12`, outcome: "sms" },
+]

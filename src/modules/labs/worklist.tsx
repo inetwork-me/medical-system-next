@@ -278,7 +278,7 @@ function useRowText() {
     }
     if (s === "collect") return t("line.collect", { n: minsBetween(o.queuedAt ?? o.createdAt, LAB_NOW), sex: o.patient.sex })
     if (s === "rejected") {
-      const rej = o.tubes.flatMap((x) => x.rejections ?? []).sort((a, z) => a.at.localeCompare(z.at)).at(-1)
+      const rej = o.tubes.flatMap((x) => (x.rejection ? [x.rejection] : [])).sort((a, z) => a.at.localeCompare(z.at)).at(-1)
       return rej ? t("line.rejected", { reason: tr(`reject.${rej.reason}`), time: timeOf(rej.at) }) : ""
     }
     const at = panels.map((p) => p.releasedAt).filter(Boolean).sort().at(-1)

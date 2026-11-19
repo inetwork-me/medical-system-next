@@ -26,6 +26,13 @@ import { CollectDialog } from "@/modules/labs/collect-dialog"
 import { TodaysOrders } from "@/modules/labs/worklist"
 import { CollectionQueue, RejectedToday, SampleTracker, TubeGuide } from "@/modules/labs/samples"
 import { RejectDialog } from "@/modules/labs/reject-dialog"
+import { OrderHeader } from "@/modules/labs/order/header"
+import { LabResults } from "@/modules/labs/order/results"
+import { OrderSide } from "@/modules/labs/order/side"
+import { CriticalCallDialog } from "@/modules/labs/order/call-dialog"
+import { ReleaseDialog } from "@/modules/labs/order/release-dialog"
+import { ValidationQueue } from "@/modules/labs/validation"
+import { useLabOrder } from "@/modules/labs/store"
 import { Button } from "@/components/ui/button"
 import { FlagChip, LabStatusBadge, Latin, PriorityChip, StatChip, TubeDot, TubeLabel, useB } from "@/modules/labs/parts"
 
@@ -84,6 +91,8 @@ function WidgetStory({ name, wide, compact, render }: { name: string; wide: numb
 export function LabStories() {
   const [collecting, setCollecting] = React.useState<string | null>(null)
   const [rejecting, setRejecting] = React.useState(false)
+  const [dialog, setDialog] = React.useState<"call" | "release" | null>(null)
+  const live142 = useLabOrder("LAB-0142")
   const b = useB()
   const t = useTranslations("labs")
   const run = React.useMemo(() => machineRun(), [])
@@ -105,13 +114,31 @@ export function LabStories() {
           </div>
         </div>
       </Box>
-      <Box title="Overlay · Reject sample (opened from the order page in step 4)">
-        <div>
+      <WidgetStory name="Widget / Lab Validation Queue" wide={1120} compact={358} render={() => <ValidationQueue onLogCall={() => setDialog("call")} />} />
+      {live142 && (
+        <>
+          <WidgetStory name="Widget / Lab Order Header" wide={1120} compact={358} render={() => <OrderHeader order={live142} />} />
+          <WidgetStory name="Widget / Lab Results" wide={736} compact={358} render={() => <LabResults order={live142} onLogCall={() => setDialog("call")} />} />
+          <Box title="Widget / Lab Order Side · 360">
+            <div className="w-90">
+              <OrderSide order={live142} />
+            </div>
+          </Box>
+        </>
+      )}
+      <Box title="Overlays · Reject sample · Log critical call · Validate & release (LAB-0142)">
+        <div className="flex flex-wrap gap-2">
           <Button variant="destructive" onClick={() => setRejecting(true)}>
-            Reject LAB-0142 · gold tube
+            Reject sample
           </Button>
+          <Button variant="destructive" onClick={() => setDialog("call")}>
+            Log critical call
+          </Button>
+          <Button onClick={() => setDialog("release")}>Validate &amp; release</Button>
         </div>
       </Box>
+      {dialog === "call" && <CriticalCallDialog orderNo="LAB-0142" onOpenChange={(o) => !o && setDialog(null)} />}
+      {dialog === "release" && <ReleaseDialog orderNo="LAB-0142" onOpenChange={(o) => !o && setDialog(null)} onLogCall={() => setDialog("call")} />}
       {rejecting && <RejectDialog orderNo="LAB-0142" onOpenChange={setRejecting} />}
       {collecting && <CollectDialog orderNo={collecting} onOpenChange={(o) => !o && setCollecting(null)} />}
 

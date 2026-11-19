@@ -204,5 +204,174 @@
       "title": "دليل الأنابيب",
       "text": "اسحب بهالترتيب"
     }
+  },
+  "order": {
+    "title": "{no} · {name}",
+    "mobileTitle": "الطلب",
+    "more": "المزيد",
+    "back": "رجوع",
+    "notFound": "ما لقينا الطلب",
+    "notFoundText": "ممكن يكون من يوم ثاني أو فرع ثاني.",
+    "backToList": "ارجع لقائمة العمل",
+    "tabs": {
+      "label": "الطلب",
+      "results": "النتائج",
+      "sample": "العينة",
+      "report": "التقرير"
+    },
+    "reject": "ارفض العينة",
+    "validate": "اعتمد وأرسل",
+    "header": {
+      "sub": "{age} · {sex} · {mrn}",
+      "subPayer": "{age} · {sex} · {mrn} · {payer}",
+      "line": "{no} · طلبه {doctor} · {clinic} · {time}",
+      "critical": "{n} حرج",
+      "stepOf": "الخطوة {n} من 6 · {text}",
+      "now": {
+        "ordered": "بانتظار السحب",
+        "collected": "العينات في الطريق للمختبر",
+        "received": "العينات في المختبر",
+        "resulted": "النتائج تندخل",
+        "validated": "النتائج بانتظار الاعتماد",
+        "released": "النتائج تنرسل",
+        "done": "انرسلت النتائج"
+      }
+    },
+    "sex": {
+      "male": "ذكر",
+      "female": "أنثى"
+    },
+    "banner": {
+      "title": "قيمة حرجة: {analyte} {value}",
+      "text": "بلّغ {doctor} قبل {time} وسجّل إنه عاد القيمة.",
+      "overdue": "بلّغ {doctor} الحين (فات وقت {time}) وسجّل إنه عاد القيمة.",
+      "hemolysis": "العينة ممكن تكون متحللة، فكّر في عينة جديدة.",
+      "log": "سجّل البلاغ"
+    },
+    "panel": {
+      "resulted": "طلعت",
+      "released": "انرسلت",
+      "meta": "طلعت {time} · {instrument}",
+      "metaNoInst": "طلعت {time}",
+      "col": {
+        "test": "التحليل",
+        "result": "النتيجة",
+        "flag": "التقييم",
+        "unit": "الوحدة",
+        "ref": "الطبيعي",
+        "prev": "السابق"
+      },
+      "refLine": "الطبيعي {ref} · قبل {prev}",
+      "refOnly": "الطبيعي {ref}",
+      "noResults": "نتائج هالتحليل مو موجودة في البيانات التجريبية."
+    },
+    "pending": {
+      "analyzer": "على الجهاز",
+      "waiting": "في الطابور",
+      "draft": "انحفظت مسودة",
+      "collect": "بانتظار العينة",
+      "due": "{state} · متوقعة {time}",
+      "enter": "أدخل النتائج"
+    },
+    "side": {
+      "clinical": "المعلومات السريرية",
+      "clinicalText": "من طلب الطبيب",
+      "diagnosis": "التشخيص",
+      "fasting": "الصيام",
+      "fastingYes": "إيه · {h, plural, one {ساعة} two {ساعتين} few {# ساعات} other {# ساعة}}",
+      "fastingYesNoH": "إيه",
+      "fastingNo": "لا",
+      "medicines": "الأدوية",
+      "allergies": "الحساسية",
+      "payer": "الدفع",
+      "payerApproved": "{payer} · موافق عليه",
+      "history": "الطلبات السابقة",
+      "historyText": "آخر 12 شهر",
+      "all": "الكل",
+      "noHistory": "ما فيه طلبات تحاليل قبل."
+    },
+    "soon": "تجي مع الخطوة {n} من بناء المختبر."
+  },
+  "call": {
+    "title": "تسجيل بلاغ حرج",
+    "text": "{analyte} {value} · الطبيعي {ref}",
+    "patient": "المريض",
+    "doctor": "الطبيب",
+    "doctorExt": "{doctor} · تحويلة {ext}",
+    "resulted": "طلعت",
+    "callBy": "بلّغ قبل",
+    "left": "{time} · باقي {n, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+    "overdue": "{time} · متأخر {n, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+    "spokeTo": "كلّمت",
+    "how": "الطريقة",
+    "howOpt": {
+      "phone": "اتصال",
+      "inPerson": "وجهاً لوجه",
+      "secureMessage": "رسالة آمنة"
+    },
+    "time": "وقت الاتصال",
+    "readBack": "الطبيب عاد القيمة",
+    "instruction": "توجيه الطبيب",
+    "cancel": "إلغاء",
+    "confirm": "احفظ البلاغ",
+    "toast": "انسجّل البلاغ الحرج",
+    "toastText": "{doctor} · {time} · بعد النتيجة بـ {n, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}"
+  },
+  "release": {
+    "title": "تعتمد وترسل النتائج؟",
+    "text": "{no} · {ready} من {total} تحاليل جاهزة",
+    "info": "{flags}، والبلاغ الحرج انسجّل {time}.",
+    "infoNoCall": "{flags}.",
+    "flags": "فيه {c, plural, =0 {} one {قيمة حرجة} two {قيمتين حرجة} other {# قيم حرجة}}{both, select, true { و} other {}}{h, plural, =0 {} one {قيمة مرتفعة} two {قيمتين مرتفعة} other {# مرتفعة}}",
+    "noFlags": "كل القيم طبيعية.",
+    "blocked": "{n, plural, one {فيه قيمة حرجة ما انبلّغ عنها} two {فيه قيمتين حرجة ما انبلّغ عنها} other {فيه # قيم حرجة ما انبلّغ عنها}}. سجّل البلاغ قبل ما ترسل.",
+    "logCall": "سجّل الاتصال",
+    "later": "تنرسل بعدين",
+    "normal": "طبيعية",
+    "critical": "{n} حرج",
+    "high": "{n, plural, one {1 مرتفع} other {# مرتفعة}}",
+    "low": "{n} منخفض",
+    "app": "تظهر في تطبيق المريض الحين",
+    "appGuardian": "يوصل ولي الأمر إشعار",
+    "appPatient": "يوصل المريض إشعار",
+    "comment": "ملاحظة على التقرير (اختياري)",
+    "cancel": "إلغاء",
+    "confirm": "اعتمد وأرسل",
+    "toast": "انرسلت النتائج",
+    "toastApp": "{doctor} وتطبيق المريض",
+    "toastDoctor": "{doctor}",
+    "nothing": "ما فيه نتائج بانتظار الاعتماد."
+  },
+  "results": {
+    "pageTitle": "النتائج بانتظار الاعتماد",
+    "export": "تصدير",
+    "exported": "تصدّرت قائمة الاعتماد",
+    "alert": "{n, plural, one {فيه قيمة حرجة ما انبلّغ عنها} two {فيه قيمتين حرجة ما انبلّغ عنها} other {فيه # قيم حرجة ما انبلّغ عنها}}",
+    "alertLine": "{analyte} {value} · {patient} · بلّغ {doctor} قبل {time}",
+    "logCall": "سجّل الاتصال",
+    "title": "بانتظار الاعتماد",
+    "text": "{n, plural, one {طلب واحد} two {طلبين} few {# طلبات} other {# طلب}} · الأقدم أول · الهدف 30 دقيقة",
+    "col": {
+      "order": "الطلب",
+      "patient": "المريض",
+      "tests": "التحاليل",
+      "flags": "القيم",
+      "resulted": "طلعت",
+      "waiting": "تنتظر"
+    },
+    "review": "راجع",
+    "openOrder": "افتح الطلب {no}",
+    "mins": "{n, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+    "hours": "{h, plural, one {ساعة} two {ساعتين} few {# ساعات} other {# ساعة}} و{m, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+    "hoursOnly": "{h, plural, one {ساعة} two {ساعتين} few {# ساعات} other {# ساعة}}",
+    "cardLine": "{no} · تنتظر {wait}",
+    "flags": {
+      "critical": "{n} حرج",
+      "high": "{n, plural, one {1 مرتفع} other {# مرتفعة}}",
+      "low": "{n} منخفض",
+      "normal": "طبيعية"
+    },
+    "empty": "ما فيه شي بانتظار الاعتماد",
+    "emptyText": "النتائج المرسلة تطلع هنا."
   }
 }

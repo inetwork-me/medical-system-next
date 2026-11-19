@@ -234,6 +234,9 @@ export const LAB_STAFF: LabStaff[] = [
 ]
 export const staffOf = (key: string) => LAB_STAFF.find((s) => s.key === key)
 
+/** Analytes hemolysis pushes up falsely (hemolysis notes on the critical banner and Reject sample). */
+export const HEMOLYSIS_SENSITIVE = ["k"]
+
 /** Where the design's analyzer results come from. */
 export const ANALYZER = "Cobas c311"
 
@@ -292,7 +295,8 @@ export type Result = {
   refLow?: number
   refHigh?: number
   flag: Flag | null
-  previous?: { value: number; date: string }
+  /** The last result; the date shows only when the design gives one ("8.4 · Aug"). */
+  previous?: { value: number; date?: string }
   instrument?: string
   /** Typed by the tech instead of imported from the analyzer. */
   manual?: boolean
@@ -390,7 +394,7 @@ const ABDULLAH = P({
   allergies: bi("None known", "ما فيه"),
 })
 
-const r = (analyte: string, value: number | null, flag: Flag | null, previous?: [number, string], extra: Partial<Result> = {}): Result => {
+const r = (analyte: string, value: number | null, flag: Flag | null, previous?: [number, string?], extra: Partial<Result> = {}): Result => {
   const a = analyteOf(analyte)!
   const band = a.ref[0]
   return {
@@ -434,10 +438,10 @@ const LAB_0142: LabOrder = {
       state: "validate",
       resultedAt: T("10:52"),
       results: [
-        r("na", 136, null, [138, "2026-08-21"], { instrument: ANALYZER, resultedAt: T("10:52") }),
-        r("k", 6.8, "C", [4.3, "2026-08-21"], { instrument: ANALYZER, resultedAt: T("10:52") }),
-        r("cl", 101, null, [102, "2026-08-21"], { instrument: ANALYZER, resultedAt: T("10:52") }),
-        r("hco3", 20, "L", [24, "2026-08-21"], { instrument: ANALYZER, resultedAt: T("10:52") }),
+        r("na", 136, null, [138], { instrument: ANALYZER, resultedAt: T("10:52") }),
+        r("k", 6.8, "C", [4.3], { instrument: ANALYZER, resultedAt: T("10:52") }),
+        r("cl", 101, null, [102], { instrument: ANALYZER, resultedAt: T("10:52") }),
+        r("hco3", 20, "L", [24], { instrument: ANALYZER, resultedAt: T("10:52") }),
       ],
     },
     {
@@ -445,8 +449,8 @@ const LAB_0142: LabOrder = {
       state: "validate",
       resultedAt: T("10:48"),
       results: [
-        r("urea", 16, null, [14, "2026-08-21"], { instrument: ANALYZER, resultedAt: T("10:48") }),
-        r("creat", 0.6, null, [0.5, "2026-08-21"], { instrument: ANALYZER, resultedAt: T("10:48") }),
+        r("urea", 16, null, [14], { instrument: ANALYZER, resultedAt: T("10:48") }),
+        r("creat", 0.6, null, [0.5], { instrument: ANALYZER, resultedAt: T("10:48") }),
       ],
     },
     {

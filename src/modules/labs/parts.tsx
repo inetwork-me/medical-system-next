@@ -157,3 +157,6 @@ export function useSoon() {
   const t = useTranslations("labs.soon")
   return () => toast.info(t("title"), { description: t("text") })
 }
+
+/** A Latin run inside a translated string ("6.8 mmol/L", "2.1%"): Unicode left-to-right isolate, so it never reorders in Arabic. */
+export const ltrRun = (s: string) => `\u2066${s}\u2069`

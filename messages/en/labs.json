@@ -204,5 +204,174 @@
       "title": "Tube guide",
       "text": "Draw in this order"
     }
+  },
+  "order": {
+    "title": "{no} · {name}",
+    "mobileTitle": "Order",
+    "more": "More",
+    "back": "Back",
+    "notFound": "Order not found",
+    "notFoundText": "It may be from another day or branch.",
+    "backToList": "Back to worklist",
+    "tabs": {
+      "label": "Order",
+      "results": "Results",
+      "sample": "Sample",
+      "report": "Report"
+    },
+    "reject": "Reject sample",
+    "validate": "Validate & release",
+    "header": {
+      "sub": "{age} · {sex} · {mrn}",
+      "subPayer": "{age} · {sex} · {mrn} · {payer}",
+      "line": "{no} · ordered by {doctor} · {clinic} · {time}",
+      "critical": "{n} critical",
+      "stepOf": "Step {n} of 6 · {text}",
+      "now": {
+        "ordered": "waiting to be collected",
+        "collected": "samples on the way to the lab",
+        "received": "samples in the lab",
+        "resulted": "results being entered",
+        "validated": "results are waiting for validation",
+        "released": "results are being released",
+        "done": "results released"
+      }
+    },
+    "sex": {
+      "male": "male",
+      "female": "female"
+    },
+    "banner": {
+      "title": "Critical: {analyte} {value}",
+      "text": "Call {doctor} by {time} and log the read-back.",
+      "overdue": "Call {doctor} now ({time} has passed) and log the read-back.",
+      "hemolysis": "The sample may be hemolyzed — consider a new one.",
+      "log": "Log critical call"
+    },
+    "panel": {
+      "resulted": "Resulted",
+      "released": "Released",
+      "meta": "Resulted {time} · {instrument}",
+      "metaNoInst": "Resulted {time}",
+      "col": {
+        "test": "Test",
+        "result": "Result",
+        "flag": "Flag",
+        "unit": "Unit",
+        "ref": "Reference",
+        "prev": "Previous"
+      },
+      "refLine": "Ref {ref} · before {prev}",
+      "refOnly": "Ref {ref}",
+      "noResults": "Results for this test aren't in the sample data yet."
+    },
+    "pending": {
+      "analyzer": "On analyzer",
+      "waiting": "In queue",
+      "draft": "Draft saved",
+      "collect": "Waiting for the sample",
+      "due": "{state} · Due {time}",
+      "enter": "Enter results"
+    },
+    "side": {
+      "clinical": "Clinical details",
+      "clinicalText": "From the doctor's order",
+      "diagnosis": "Diagnosis",
+      "fasting": "Fasting",
+      "fastingYes": "Yes · {h} h",
+      "fastingYesNoH": "Yes",
+      "fastingNo": "No",
+      "medicines": "Medicines",
+      "allergies": "Allergies",
+      "payer": "Payer",
+      "payerApproved": "{payer} · approved",
+      "history": "Previous orders",
+      "historyText": "Last 12 months",
+      "all": "All",
+      "noHistory": "No earlier lab orders."
+    },
+    "soon": "Comes with step {n} of the Labs build."
+  },
+  "call": {
+    "title": "Log critical call",
+    "text": "{analyte} {value} · normal {ref}",
+    "patient": "Patient",
+    "doctor": "Ordered by",
+    "doctorExt": "{doctor} · ext. {ext}",
+    "resulted": "Resulted",
+    "callBy": "Call by",
+    "left": "{time} · {n} min left",
+    "overdue": "{time} · {n} min overdue",
+    "spokeTo": "Spoke to",
+    "how": "How",
+    "howOpt": {
+      "phone": "Phone call",
+      "inPerson": "In person",
+      "secureMessage": "Secure message"
+    },
+    "time": "Time of call",
+    "readBack": "The doctor read the value back",
+    "instruction": "Doctor's instruction",
+    "cancel": "Cancel",
+    "confirm": "Save call log",
+    "toast": "Critical call logged",
+    "toastText": "{doctor} · {time} · {n} min after result"
+  },
+  "release": {
+    "title": "Validate and release?",
+    "text": "{no} · {ready} of {total} tests ready",
+    "info": "{flags}. The critical call is logged at {time}.",
+    "infoNoCall": "{flags}.",
+    "flags": "{c, plural, =0 {} one {1 critical} other {# critical}}{both, select, true { and } other {}}{h, plural, =0 {} one {1 high value} other {# high values}}",
+    "noFlags": "All values are in range.",
+    "blocked": "{n, plural, one {1 critical value isn't called in yet} other {# critical values aren't called in yet}}. Log the call before you release.",
+    "logCall": "Log call",
+    "later": "Release later",
+    "normal": "Normal",
+    "critical": "{n} critical",
+    "high": "{n} high",
+    "low": "{n} low",
+    "app": "Show in the patient app now",
+    "appGuardian": "The guardian gets a notification",
+    "appPatient": "The patient gets a notification",
+    "comment": "Comment on the report (optional)",
+    "cancel": "Cancel",
+    "confirm": "Validate & release",
+    "toast": "Results released",
+    "toastApp": "{doctor} and the patient app",
+    "toastDoctor": "{doctor}",
+    "nothing": "No results are waiting for validation."
+  },
+  "results": {
+    "pageTitle": "Results to validate",
+    "export": "Export",
+    "exported": "Validation list exported",
+    "alert": "{n, plural, one {1 critical value isn't called in yet} other {# critical values aren't called in yet}}",
+    "alertLine": "{analyte} {value} · {patient} · call {doctor} by {time}",
+    "logCall": "Log call",
+    "title": "Waiting for validation",
+    "text": "{n, plural, one {1 order} other {# orders}} · oldest first · target 30 min",
+    "col": {
+      "order": "Order",
+      "patient": "Patient",
+      "tests": "Tests",
+      "flags": "Flags",
+      "resulted": "Resulted",
+      "waiting": "Waiting"
+    },
+    "review": "Review",
+    "openOrder": "Open order {no}",
+    "mins": "{n} min",
+    "hours": "{h} h {m} min",
+    "hoursOnly": "{h} h",
+    "cardLine": "{no} · waiting {wait}",
+    "flags": {
+      "critical": "{n} critical",
+      "high": "{n} high",
+      "low": "{n} low",
+      "normal": "Normal"
+    },
+    "empty": "Nothing is waiting for validation",
+    "emptyText": "Submitted results show up here."
   }
 }

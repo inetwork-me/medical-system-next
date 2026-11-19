@@ -1,9 +1,9 @@
 import { setLocaleFrom } from "@/i18n/set-locale"
 
-import { LabSoon } from "@/modules/labs/soon"
+import { OrderSoon } from "@/modules/labs/order/page"
 
-/** Built in a later Labs step (CODE_CHAT_LABS.md §5). */
+/** Lab · Order page · entry — built in step 5 of the Labs build. */
 export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
   await setLocaleFrom(params)
-  return <LabSoon />
+  return <OrderSoon step={5} />
 }

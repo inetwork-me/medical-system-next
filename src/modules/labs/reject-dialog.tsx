@@ -10,7 +10,7 @@ import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup } from "@/components/ui/radio-group"
-import { LAB_NOW, TUBES, analyteOf, barcodeOf, type LabOrder, type RejectReason } from "./data"
+import { HEMOLYSIS_SENSITIVE, LAB_NOW, TUBES, analyteOf, barcodeOf, type LabOrder, type RejectReason } from "./data"
 import { reject, valueText } from "./machine"
 import { Latin } from "./parts"
 import { labCan } from "./roles"
@@ -18,8 +18,6 @@ import { applyStep, nextTicket, useLabOrder, useLabRole } from "./store"
 import { useLabText } from "./text"
 
 const REASONS: RejectReason[] = ["hemolyzed", "clotted", "qns", "wrongTube", "label"]
-/** Analytes hemolysis pushes up falsely (shown as a warning when one of the tube's results is raised). */
-const HEMOLYSIS_SENSITIVE = ["k"]
 
 /** The tube to reject by default: the one carrying a raised hemolysis-sensitive result, else the first one in the lab. */
 export function defaultRejectTube(o: LabOrder) {

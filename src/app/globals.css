@@ -341,3 +341,29 @@ html[lang="ar"] {
     box-shadow: none !important;
   }
 }
+
+/* Lab report (Order page · Report): printing the page prints only the A4 paper, edge to edge. */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  html:has([data-lab-report]) body * {
+    visibility: hidden !important;
+  }
+  html:has([data-lab-report]) [data-lab-report],
+  html:has([data-lab-report]) [data-lab-report] * {
+    visibility: visible !important;
+  }
+  html:has([data-lab-report]) [data-lab-report] {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+}

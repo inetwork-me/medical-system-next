@@ -408,5 +408,99 @@
     "nothing": "No test on this order is waiting for results.",
     "noAnalytes": "The fields for this test aren't designed yet.",
     "back": "Back to results"
+  },
+  "sample": {
+    "printLabels": "Print labels",
+    "tubes": "Tubes",
+    "tubesText": "{n, plural, one {1 sample} other {# samples}} · collected {time} by {by}",
+    "tubesTextNone": "{n, plural, one {1 sample} other {# samples}} · not collected yet",
+    "volume": "{ml} mL · {tests}",
+    "state": {
+      "pending": "To collect",
+      "collected": "In transit",
+      "received": "In queue",
+      "analyzer": "On analyzer · {analyzer}",
+      "resulted": "Resulted",
+      "resultedRack": "Resulted · stored rack {rack}",
+      "rejected": "Rejected · {reason}"
+    },
+    "custody": "Chain of custody",
+    "custodyText": "Every hand-off is scanned",
+    "event": {
+      "ordered": "Ordered",
+      "collected": "Collected",
+      "received": "Received in lab",
+      "analyzer": "Loaded on analyzer",
+      "resulted": "Resulted",
+      "submitted": "Submitted for validation",
+      "critical": "Critical call logged",
+      "validated": "Validated",
+      "released": "Released",
+      "rejected": "Sample rejected",
+      "sent": "Results sent"
+    },
+    "barcodeLabel": "Barcode {code}",
+    "labels": "{n, plural, one {1 label} other {# labels}} · printer {printer}"
+  },
+  "report": {
+    "download": "Download PDF",
+    "send": "Send results",
+    "print": "Print",
+    "lab": "Al Noor Medical Center · Laboratory",
+    "labLine": "CBAHI accredited · Riyadh · {phone}",
+    "qr": "Scan to check this report",
+    "patient": "Patient",
+    "mrn": "MRN",
+    "ageSex": "Age · sex",
+    "orderedBy": "Ordered by",
+    "collected": "Collected",
+    "report": "Report",
+    "preliminary": "{no} · preliminary",
+    "final": "{no} · final",
+    "comment": "Comment",
+    "callLine": "{analyte} {value} phoned to {doctor} at {time} and read back.",
+    "validatedBy": "Validated by",
+    "notValidated": "Waiting for validation",
+    "verify": "Check this report at {url} · code {code}",
+    "nothing": "No results to report yet",
+    "nothingPatient": "Results show here once the lab releases them.",
+    "pdf": "PDF downloaded",
+    "col": {
+      "test": "Test",
+      "result": "Result",
+      "unit": "Unit",
+      "range": "Range"
+    },
+    "pdfFailed": "Couldn't make the PDF",
+    "pdfFailedText": "Try again in a moment."
+  },
+  "send": {
+    "title": "Send results",
+    "text": "{no} · {name}",
+    "app": "Patient app",
+    "appGuardian": "{name}'s file · guardian account",
+    "appPatient": "{name}'s file",
+    "sms": "SMS with a secure link",
+    "smsTo": "{phone} · {rel}",
+    "noMobile": "No mobile on file",
+    "email": "Email the PDF",
+    "noEmail": "No email on file",
+    "doctor": "Ordering doctor's inbox",
+    "language": "Report language",
+    "lang": {
+      "both": "Arabic + English",
+      "ar": "Arabic",
+      "en": "English"
+    },
+    "notReleased": "Release the results first — only released results can be sent.",
+    "cancel": "Cancel",
+    "confirm": "Send",
+    "toast": "Results sent",
+    "via": {
+      "app": "app",
+      "sms": "SMS",
+      "doctor": "the doctor's inbox",
+      "and": "and"
+    }
   }
 }

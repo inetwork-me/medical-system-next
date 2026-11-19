@@ -240,6 +240,9 @@ export const HEMOLYSIS_SENSITIVE = ["k"]
 /** Where the design's analyzer results come from. */
 export const ANALYZER = "Cobas c311"
 
+/** The lab on the report letterhead and its verify link (Order page · Report). */
+export const LAB_FACILITY = { phone: "+966 11 400 2200", verifyUrl: "alnoor.sa/verify" } as const
+
 /* ------------------------------------------------------------------ orders */
 
 export type Priority = "routine" | "stat"
@@ -262,6 +265,9 @@ export type LabPatient = {
   /** Clinical side card ("From the doctor's order"). */
   medicines?: Bi
   allergies?: Bi
+  /** Who gets the SMS link (Send results): the guardian for a child. */
+  contact?: { phone: string; relation: Bi }
+  email?: string
 }
 
 export type TubeState = "pending" | "collected" | "received" | "analyzer" | "resulted" | "rejected"
@@ -394,6 +400,7 @@ const ABDULLAH = P({
   payer: bi("Bupa", "بوبا"),
   medicines: bi("Insulin glargine, aspart", "إنسولين جلارجين وأسبارت"),
   allergies: bi("None known", "ما فيه"),
+  contact: { phone: "+966 55 218 4410", relation: bi("father", "الأب") },
 })
 
 const r = (analyte: string, value: number | null, flag: Flag | null, previous?: [number, string?], extra: Partial<Result> = {}): Result => {
@@ -481,8 +488,8 @@ const LAB_0142: LabOrder = {
   calls: [],
   events: [
     { at: T("10:05"), kind: "ordered", by: "zaki" },
-    { at: T("10:14"), kind: "collected", by: "hanan", note: bi("Collection room 2 · ID checked", "غرفة السحب 2 · تأكدت من الهوية") },
-    { at: T("10:21"), kind: "received", by: "ali", note: bi("Scanned at reception", "انمسح عند الاستقبال") },
+    { at: T("10:14"), kind: "collected", by: "hanan", note: bi("collection room 2 · ID checked", "غرفة السحب 2 · تأكدت من الهوية") },
+    { at: T("10:21"), kind: "received", by: "ali", note: bi("scanned at reception", "انمسح عند الاستقبال") },
     { at: T("10:24"), kind: "analyzer", note: bi("Cobas c311 · rack 12", "Cobas c311 · الرف 12") },
     { at: T("10:52"), kind: "resulted", note: bi("Auto-verified 6 · held 2 for review", "6 انعتمدت تلقائياً · 2 تنتظر مراجعة") },
   ],

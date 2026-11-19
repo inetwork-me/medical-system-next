@@ -1,9 +1,9 @@
 import { setLocaleFrom } from "@/i18n/set-locale"
 
-import { OrderSoon } from "@/modules/labs/order/page"
+import { OrderSample } from "@/modules/labs/order/sample"
 
-/** Lab · Order page · sample — built in step 6 of the Labs build. */
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+/** Lab · Order page · Sample: tubes with labels, chain of custody. */
+export default async function SamplePage({ params }: { params: Promise<{ locale: string }> }) {
   await setLocaleFrom(params)
-  return <OrderSoon step={6} />
+  return <OrderSample />
 }

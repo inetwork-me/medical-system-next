@@ -408,5 +408,99 @@
     "nothing": "ما فيه تحليل في هالطلب ينتظر نتائج.",
     "noAnalytes": "حقول هالتحليل لسه ما تصممت.",
     "back": "ارجع للنتائج"
+  },
+  "sample": {
+    "printLabels": "اطبع الملصقات",
+    "tubes": "الأنابيب",
+    "tubesText": "{n, plural, one {عينة} two {عينتين} few {# عينات} other {# عينة}} · سحبتها {by} {time}",
+    "tubesTextNone": "{n, plural, one {عينة} two {عينتين} few {# عينات} other {# عينة}} · ما انسحبت للحين",
+    "volume": "{ml} مل · {tests}",
+    "state": {
+      "pending": "بانتظار السحب",
+      "collected": "في الطريق",
+      "received": "في الطابور",
+      "analyzer": "على الجهاز · {analyzer}",
+      "resulted": "طلعت",
+      "resultedRack": "طلعت · محفوظة في الرف {rack}",
+      "rejected": "مرفوضة · {reason}"
+    },
+    "custody": "تتبع العينة",
+    "custodyText": "كل تسليم ينمسح",
+    "event": {
+      "ordered": "انطلب",
+      "collected": "انسحب",
+      "received": "وصل المختبر",
+      "analyzer": "انحط على الجهاز",
+      "resulted": "طلعت النتيجة",
+      "submitted": "انرسلت للاعتماد",
+      "critical": "انسجّل البلاغ الحرج",
+      "validated": "انعتمد",
+      "released": "انرسل",
+      "rejected": "انرفضت العينة",
+      "sent": "انرسلت النتائج"
+    },
+    "barcodeLabel": "الباركود {code}",
+    "labels": "{n, plural, one {ملصق واحد} two {ملصقين} few {# ملصقات} other {# ملصق}} · طابعة {printer}"
+  },
+  "report": {
+    "download": "حمّل PDF",
+    "send": "أرسل النتائج",
+    "print": "اطبع",
+    "lab": "مجمع النور الطبي · المختبر",
+    "labLine": "معتمد من سباهي · الرياض · {phone}",
+    "qr": "امسح عشان تتأكد من التقرير",
+    "patient": "المريض",
+    "mrn": "رقم الملف",
+    "ageSex": "العمر · الجنس",
+    "orderedBy": "الطبيب",
+    "collected": "السحب",
+    "report": "التقرير",
+    "preliminary": "{no} · مبدئي",
+    "final": "{no} · نهائي",
+    "comment": "ملاحظة",
+    "callLine": "{analyte} {value} انبلّغ لـ {doctor} الساعة {time} وعاده.",
+    "validatedBy": "اعتمدها",
+    "notValidated": "بانتظار الاعتماد",
+    "verify": "تأكد من التقرير على {url} · الكود {code}",
+    "nothing": "ما فيه نتائج للتقرير للحين",
+    "nothingPatient": "النتائج تطلع هنا أول ما يرسلها المختبر.",
+    "pdf": "تحمّل الملف",
+    "col": {
+      "test": "التحليل",
+      "result": "النتيجة",
+      "unit": "الوحدة",
+      "range": "الطبيعي"
+    },
+    "pdfFailed": "ما قدرنا نسوي الملف",
+    "pdfFailedText": "جرّب مرة ثانية بعد شوي."
+  },
+  "send": {
+    "title": "إرسال النتائج",
+    "text": "{no} · {name}",
+    "app": "تطبيق المريض",
+    "appGuardian": "ملف {name} · حساب ولي الأمر",
+    "appPatient": "ملف {name}",
+    "sms": "رسالة فيها رابط آمن",
+    "smsTo": "{phone} · {rel}",
+    "noMobile": "ما فيه جوال مسجل",
+    "email": "إيميل بملف PDF",
+    "noEmail": "ما فيه إيميل مسجل",
+    "doctor": "بريد الطبيب",
+    "language": "لغة التقرير",
+    "lang": {
+      "both": "عربي + إنجليزي",
+      "ar": "عربي",
+      "en": "إنجليزي"
+    },
+    "notReleased": "اعتمد النتائج أول، ما ينرسل إلا اللي انعتمد.",
+    "cancel": "إلغاء",
+    "confirm": "أرسل",
+    "toast": "انرسلت النتائج",
+    "via": {
+      "app": "التطبيق",
+      "sms": "الرسالة",
+      "doctor": "بريد الطبيب",
+      "and": "و"
+    }
   }
 }

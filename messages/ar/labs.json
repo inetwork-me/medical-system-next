@@ -1,0 +1,49 @@
+{
+  "status": {
+    "collect": "بانتظار السحب",
+    "lab": "في المختبر",
+    "validate": "بانتظار الاعتماد",
+    "ready": "جاهزة",
+    "rejected": "تنعاد"
+  },
+  "flag": {
+    "H": "مرتفع",
+    "L": "منخفض",
+    "C": "حرج",
+    "normal": "طبيعي"
+  },
+  "priority": {
+    "routine": "عادي",
+    "stat": "عاجل"
+  },
+  "section": {
+    "hematology": "الدم",
+    "chemistry": "الكيمياء",
+    "hormones": "الهرمونات",
+    "microbiology": "الأحياء الدقيقة",
+    "urine": "البول"
+  },
+  "reject": {
+    "hemolyzed": "متحللة",
+    "clotted": "متجلطة",
+    "qns": "الكمية ما تكفي",
+    "wrongTube": "أنبوب غلط",
+    "label": "الملصق ما يطابق"
+  },
+  "step": {
+    "ordered": "انطلب",
+    "collected": "انسحب",
+    "received": "وصل",
+    "resulted": "طلعت",
+    "validated": "انعتمد",
+    "released": "انرسل"
+  },
+  "role": {
+    "phlebotomy": "السحب",
+    "tech": "فني مختبر",
+    "pathologist": "استشاري علم الأمراض",
+    "doctor": "طبيب",
+    "patient": "مريض",
+    "lead": "مسؤول المختبر (تجريبي)"
+  }
+}

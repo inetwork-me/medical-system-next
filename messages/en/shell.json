@@ -8,8 +8,8 @@
     "clinics": "Clinics",
     "records": "Medical records",
     "recordsShort": "Records",
-    "lab": "Lab results",
-    "labShort": "Lab results",
+    "lab": "Lab",
+    "labShort": "Lab",
     "billing": "Billing",
     "reports": "Reports",
     "messages": "Messages",
@@ -83,5 +83,10 @@
   "placeholder": {
     "title": "{module} is on the way",
     "description": "This module isn't built yet. The design for it is still in progress."
+  },
+  "unavailable": {
+    "title": "{module} isn't available in this branch",
+    "description": "This branch doesn't use this module. Ask your admin if you need it.",
+    "home": "Back to home"
   }
 }

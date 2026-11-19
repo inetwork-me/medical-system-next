@@ -1,0 +1,49 @@
+{
+  "status": {
+    "collect": "To collect",
+    "lab": "In lab",
+    "validate": "To validate",
+    "ready": "Ready",
+    "rejected": "Recollect"
+  },
+  "flag": {
+    "H": "High",
+    "L": "Low",
+    "C": "Critical",
+    "normal": "Normal"
+  },
+  "priority": {
+    "routine": "Routine",
+    "stat": "STAT"
+  },
+  "section": {
+    "hematology": "Hematology",
+    "chemistry": "Chemistry",
+    "hormones": "Hormones",
+    "microbiology": "Microbiology",
+    "urine": "Urine"
+  },
+  "reject": {
+    "hemolyzed": "Hemolyzed",
+    "clotted": "Clotted",
+    "qns": "Not enough blood",
+    "wrongTube": "Wrong tube",
+    "label": "Label doesn't match"
+  },
+  "step": {
+    "ordered": "Ordered",
+    "collected": "Collected",
+    "received": "Received",
+    "resulted": "Resulted",
+    "validated": "Validated",
+    "released": "Released"
+  },
+  "role": {
+    "phlebotomy": "Phlebotomy",
+    "tech": "Lab technician",
+    "pathologist": "Clinical pathologist",
+    "doctor": "Doctor",
+    "patient": "Patient",
+    "lead": "Lab lead (demo)"
+  }
+}

@@ -63,6 +63,8 @@ export type Doctor = {
   ePrescribing?: boolean
   /** Extra clinics (Assign clinic): weekly shifts outside the main clinic, bookable from `start`. */
   assignments?: Assignment[]
+  /** Earlier hours versions (Edit hours · Applies from): each applies up to and including `until`; `week` is the newest. */
+  hoursHistory?: { until: string; week: Record<Weekday, Shift[]> }[]
   /** Set by Deactivate doctor: no slots after the last working day. */
   deactivation?: Deactivation
 }
@@ -105,6 +107,12 @@ export function contactOf(d: Doctor) {
   }
 }
 
+/** The weekly hours that apply on a date: an older version until its end date, else the current week. */
+export function weekOn(d: Doctor, date: string): Record<Weekday, Shift[]> {
+  const old = (d.hoursHistory ?? []).filter((h) => date <= h.until).sort((a, z) => a.until.localeCompare(z.until))[0]
+  return old ? old.week : d.week
+}
+
 /** Extra clinics' shifts on a weekday (Assign clinic). */
 export const assignmentsOn = (d: Doctor, day: Weekday) => (d.assignments ?? []).filter((a) => a.day === day)
 
@@ -123,7 +131,7 @@ export type DoctorBooking = { visitMin: number | null; maxPerDay: number; online
 export type Weekday = "sun" | "mon" | "tue" | "wed" | "thu" | "fri" | "sat"
 export const WEEKDAYS: Weekday[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
 /** "08:00", "16:00"; telehealth shifts are video visits. */
-export type Shift = { from: string; to: string; telehealth?: boolean }
+export type Shift = { from: string; to: string; telehealth?: boolean; /** Room for this shift (Edit hours · Location); default the doctor's room. */ room?: string }
 export type DoctorMonth = {
   visits: number
   rating: string

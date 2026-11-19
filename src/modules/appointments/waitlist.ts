@@ -13,7 +13,7 @@ export type WaitlistEntry = {
   id: string
   /** How many bookings. */
   count: number
-  source: "deactivate" | "leave" | "pause"
+  source: "deactivate" | "leave" | "pause" | "hours"
   /** The doctor (Doctors key) or clinic (Clinics key) the bookings came from. */
   doctor?: string
   clinic?: string

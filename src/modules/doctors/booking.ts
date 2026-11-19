@@ -5,7 +5,7 @@ import type { ClinicLimits } from "@/modules/appointments/data"
 import { shiftRange } from "@/modules/clinics/booking"
 import { useClinicLimits } from "@/modules/clinics/booking"
 import { useClinics } from "@/modules/clinics/store"
-import { APPT_DOCTOR_KEY, WEEKDAYS, employedOn, isBlocked, setupDone, type Doctor, type Leave } from "./data"
+import { APPT_DOCTOR_KEY, WEEKDAYS, employedOn, isBlocked, setupDone, weekOn, type Doctor, type Leave } from "./data"
 import { useDoctors, useLeaves } from "./store"
 
 const mins = (hhmm: string) => shiftRange(`${hhmm}–${hhmm}`)[0]
@@ -29,7 +29,7 @@ export function doctorDayLimits(
   leaves: Leave[]
 ): ClinicLimits {
   if (!d.active || !employedOn(d, date) || !setupDone(d) || isBlocked(d) || leaveOn(leaves, d.key, date) || clinic?.closed) return { closed: true }
-  const shifts = d.week[WEEKDAYS[new Date(`${date}T12:00:00Z`).getUTCDay()]].filter((s) => !s.telehealth || d.booking.telehealth)
+  const shifts = weekOn(d, date)[WEEKDAYS[new Date(`${date}T12:00:00Z`).getUTCDay()]].filter((s) => !s.telehealth || d.booking.telehealth)
   const ranges = shifts
     .map((s): [number, number] => {
       const [a, z] = [mins(s.from), mins(s.to)]

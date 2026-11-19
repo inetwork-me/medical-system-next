@@ -14,7 +14,8 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { CATALOG_TOTALS, PANEL_TESTS, TUBES, type Section, type TestDef } from "./data"
 import { LabFrame } from "./frame"
-import { Latin, TubeDot, TubeLabel, useSoon } from "./parts"
+import { AddTestDialog } from "./add-test"
+import { Latin, TubeDot, TubeLabel } from "./parts"
 import { labCan } from "./roles"
 import { LabCard } from "./samples"
 import { setTestActive, useCatalog, useLabRole } from "./store"
@@ -26,8 +27,8 @@ const FILTERS: Filter[] = ["all", "chemistry", "hematology", "hormones", "microb
 const FILTERS_COMPACT: Filter[] = ["all", "chemistry", "hematology", "hormones"]
 const matchesFilter = (x: TestDef, f: Filter) => f === "all" || (f === "panels" ? PANEL_TESTS.includes(x.key) : x.section === (f as Section))
 
-/** The designed catalog rows: tests with a catalog price (the order-only placeholders aren't priced yet). */
-const listed = (x: TestDef) => x.price > 0
+/** The catalog rows: the designed tests with a catalog price, and the tests added with Add test (the order-only placeholders aren't priced yet). */
+const listed = (x: TestDef) => x.price > 0 || !!x.custom
 
 export function useCatalogText() {
   const t = useTranslations("labs.catalog")
@@ -50,7 +51,7 @@ export function TestCatalog() {
   const { b } = useLabText()
   const fmt = useCatalogText()
   const role = useLabRole()
-  const soon = useSoon()
+  const [adding, setAdding] = React.useState(false)
   const all = useCatalog().filter(listed)
   const [query, setQuery] = React.useState("")
   const [filter, setFilter] = React.useState<Filter>("all")
@@ -72,7 +73,7 @@ export function TestCatalog() {
       text={t("text", CATALOG_TOTALS)}
       action={
         canEdit && (
-          <Button variant="ghost" size="sm" onClick={soon}>
+          <Button variant="ghost" size="sm" onClick={() => setAdding(true)}>
             <Icon name="add" size={24} />
             {t("add")}
           </Button>
@@ -181,6 +182,7 @@ export function TestCatalog() {
           </ul>
         </>
       )}
+      {adding && <AddTestDialog open onOpenChange={setAdding} />}
     </LabCard>
   )
 }

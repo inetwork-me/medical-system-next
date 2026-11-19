@@ -37,6 +37,8 @@ import { ResultEntryWidget } from "@/modules/labs/order/entry"
 import { PatientReport } from "@/modules/labs/order/report"
 import { SendDialog } from "@/modules/labs/order/send-dialog"
 import { TestCatalog } from "@/modules/labs/catalog"
+import { AddTestDialog, blankForm, newRange, sampleForm } from "@/modules/labs/add-test"
+import { useCatalog } from "@/modules/labs/store"
 import { LabReport } from "@/modules/labs/reports"
 import { Summary } from "@/modules/labs/new-order"
 import { tubesFor as tubesForTests } from "@/modules/labs/machine"
@@ -99,6 +101,8 @@ function WidgetStory({ name, wide, compact, render }: { name: string; wide: numb
 export function LabStories() {
   const [collecting, setCollecting] = React.useState<string | null>(null)
   const [rejecting, setRejecting] = React.useState(false)
+  const [addTest, setAddTest] = React.useState<null | "s1" | "s2" | "e1" | "e2">(null)
+  const catalog = useCatalog()
   const [dialog, setDialog] = React.useState<"call" | "release" | "send" | null>(null)
   const live142 = useLabOrder("LAB-0142")
   const b = useB()
@@ -122,6 +126,40 @@ export function LabStories() {
           </div>
         </div>
       </Box>
+      <Box title="Overlay · Add test (switch language for Arabic; mobile = bottom sheet under 768)">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setAddTest("s1")}>
+            Step 1 · Details (sample)
+          </Button>
+          <Button variant="outline" onClick={() => setAddTest("s2")}>
+            Step 2 · Results and limits (sample)
+          </Button>
+          <Button variant="outline" onClick={() => setAddTest("e1")}>
+            Step 1 · validation errors (empty)
+          </Button>
+          <Button variant="outline" onClick={() => setAddTest("e2")}>
+            Step 2 · validation errors (ranges)
+          </Button>
+        </div>
+      </Box>
+      {addTest === "s1" && <AddTestDialog open onOpenChange={() => setAddTest(null)} initial={sampleForm(catalog)} />}
+      {addTest === "s2" && <AddTestDialog open onOpenChange={() => setAddTest(null)} initial={sampleForm(catalog)} initialStep={2} />}
+      {addTest === "e1" && <AddTestDialog open onOpenChange={() => setAddTest(null)} initial={{ ...blankForm(catalog), code: "2090" }} showErrors />}
+      {addTest === "e2" && (
+        <AddTestDialog
+          open
+          onOpenChange={() => setAddTest(null)}
+          initialStep={2}
+          showErrors
+          initial={{
+            ...sampleForm(catalog),
+            unit: "",
+            ranges: [newRange({ group: "adults", low: "2.4", high: "1.7" }), newRange({ group: "all", low: "1.7", high: "2.3" })],
+            critLow: "1.8",
+            critHigh: "2.0",
+          }}
+        />
+      )}
       <WidgetStory name="Widget / Lab Test Catalog" wide={1120} compact={358} render={() => <TestCatalog />} />
       <WidgetStory name="Widget / Lab Report" wide={1120} compact={358} render={() => <LabReport />} />
       <Box title="Widget / New Lab Order Summary · 280">

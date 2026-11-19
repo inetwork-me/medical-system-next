@@ -101,7 +101,24 @@ export type TestDef = {
   volumeMl?: number
   /** Name inside a list ("kidney, electrolytes, lipids"); defaults to the name, lower-cased unless it is an abbreviation. */
   short?: Bi
+  /* Catalog test fields from Add test (CODE_CHAT_LABS.md §4 "Catalog test"); optional on the sample tests. */
+  type?: "single" | "panel"
+  analyzer?: string
+  sampleType?: SampleType
+  fasting?: boolean
+  /** STAT turnaround, hours (tatH is the routine one). */
+  tatStatH?: number
+  /** Insurance (SBS) code. */
+  sbsCode?: string
+  resultType?: ResultType
+  /** Added in the app (Add test) rather than shipped with the sample catalog. */
+  custom?: boolean
 }
+
+export type SampleType = "serum" | "plasma" | "wholeBlood" | "urine"
+export type ResultType = "number" | "text" | "posneg"
+/** Analyzers a test can run on (the design names one; "manual" = typed by the tech). */
+export const ANALYZERS = ["Cobas c311", "manual"] as const
 
 const A = (key: string, en: string, ar: string, unit: string, dp: number, ref: RefBand[], extra: Partial<Analyte> = {}): Analyte => ({
   key,
@@ -203,6 +220,16 @@ export const TESTS: TestDef[] = [
   { key: "ige", code: "6010", name: bi("Total IgE", "Total IgE"), section: "chemistry", tube: "gold", tatH: 24, price: 0, active: true, analytes: [] },
   { key: "coag", code: "1010", name: bi("Coagulation", "التخثر"), section: "hematology", tube: "blue", tatH: 2, price: 0, active: true, analytes: [] },
 ]
+
+/** The shipped catalog (server render / first paint); TESTS also gets the tests added in this session. */
+export const BASE_TESTS: readonly TestDef[] = [...TESTS]
+
+/** Add a test added in the app to the catalog lookups (testOf, analyteOf → flags, critical limits, delta check). */
+export function registerTest(t: TestDef) {
+  const i = TESTS.findIndex((x) => x.key === t.key)
+  if (i === -1) TESTS.push(t)
+  else TESTS[i] = t
+}
 
 export const testOf = (key: string) => TESTS.find((t) => t.key === key)
 export function analyteOf(key: string): Analyte | undefined {

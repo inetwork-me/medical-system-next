@@ -635,5 +635,105 @@
     "topText": "Share of this month",
     "reasons": "Why samples were rejected",
     "reasonsText": "{n} samples this month"
+  },
+  "addTest": {
+    "title": "Add test to the catalog",
+    "step1Text": "Step 1 of 2 · what it is and how it's collected",
+    "step2Text": "Step 2 of 2 · normal ranges and critical limits",
+    "steps": {
+      "label": "Steps",
+      "details": "Details",
+      "results": "Results and limits",
+      "done": "{step}, done"
+    },
+    "basics": "Basics",
+    "nameEn": "Test name (English)",
+    "nameAr": "Test name (Arabic)",
+    "code": "Code",
+    "codeHelp": "Next free code in {section}",
+    "section": "Section",
+    "type": "Type",
+    "typeOpt": {
+      "single": "Single test",
+      "panel": "Panel"
+    },
+    "sample": "Sample",
+    "tube": "Tube",
+    "volume": "Minimum volume",
+    "ml": "mL",
+    "analyzer": "Analyzer",
+    "analyzerOpt": {
+      "manual": "Manual (no analyzer)"
+    },
+    "sampleType": "Sample type",
+    "sampleOpt": {
+      "serum": "Serum",
+      "plasma": "Plasma",
+      "wholeBlood": "Whole blood",
+      "urine": "Urine"
+    },
+    "fasting": "Patient must be fasting",
+    "tatPrice": "Turnaround and price",
+    "tatRoutine": "Routine result in",
+    "tatStat": "STAT result in",
+    "tatHalf": "30 min",
+    "price": "Price before VAT",
+    "sar": "SAR",
+    "sbs": "Insurance code (SBS)",
+    "cancel": "Cancel",
+    "next": "Next",
+    "results": "Results",
+    "unit": "Unit",
+    "resultType": "Result type",
+    "resultOpt": {
+      "number": "Number",
+      "text": "Text",
+      "posneg": "Positive / negative"
+    },
+    "decimals": "Decimals",
+    "ranges": "Reference ranges",
+    "col": {
+      "group": "Group",
+      "sex": "Sex",
+      "low": "Low",
+      "high": "High"
+    },
+    "group": {
+      "all": "All ages",
+      "adults": "Adults · 18 y and over",
+      "children": "Children · 1–17 y",
+      "infants": "Infants · under 1 y"
+    },
+    "sex": {
+      "both": "Both",
+      "male": "Male",
+      "female": "Female"
+    },
+    "removeRange": "Remove this range",
+    "addRange": "Add range (age or sex)",
+    "critLow": "Critical below",
+    "critHigh": "Critical above",
+    "delta": "Delta check (%)",
+    "deltaHelp": "Warn above this change",
+    "critInfo": "Results past the critical limits can't be released until a call to the doctor is logged.",
+    "active": "Doctors can order it now",
+    "activeHelp": "Shows in New lab order and the price list",
+    "back": "Back",
+    "add": "Add test",
+    "err": {
+      "required": "Required",
+      "codeUsed": "Code {code} is already in the catalog",
+      "number": "Enter a number",
+      "negative": "Can't be below 0",
+      "noRange": "Add at least one range",
+      "lowHigh": "Low must be below high",
+      "overlap": "Overlaps another range for the same sex",
+      "critLow": "Must be below every range's low ({low})",
+      "critHigh": "Must be above every range's high ({high})",
+      "fix": "Fix the highlighted fields to continue."
+    },
+    "toast": "{name} added to the catalog",
+    "toastOn": "Code {code} · doctors can order it now",
+    "toastOff": "Code {code} · off until you switch it on"
   }
 }

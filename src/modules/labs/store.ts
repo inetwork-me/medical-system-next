@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { ORDERS, TESTS, type LabOrder, type LabRole, type TestDef } from "./data"
+import { BASE_TESTS, ORDERS, TESTS, registerTest, type LabOrder, type LabRole, type TestDef } from "./data"
 import type { Step } from "./machine"
 
 /**
@@ -10,10 +10,10 @@ import type { Step } from "./machine"
  * logged, released, new orders). Kept in sessionStorage like the other module stores; the status machine
  * (machine.ts) decides every change, the store only applies it.
  */
-type State = { edits: Record<string, LabOrder>; added: LabOrder[]; role: LabRole; active: Record<string, boolean> }
+type State = { edits: Record<string, LabOrder>; added: LabOrder[]; role: LabRole; active: Record<string, boolean>; tests: TestDef[] }
 
 const KEY = "ms.labs.session"
-let state: State = { edits: {}, added: [], role: "lead", active: {} }
+let state: State = { edits: {}, added: [], role: "lead", active: {}, tests: [] }
 let loaded = false
 const listeners = new Set<() => void>()
 let cache: { state: State; list: LabOrder[] } | null = null
@@ -25,6 +25,8 @@ function load() {
     const raw = sessionStorage.getItem(KEY)
     if (raw) state = { ...state, ...(JSON.parse(raw) as Partial<State>) }
   } catch {}
+  // Tests added in this session join the catalog lookups (flags, critical limits, delta check use them).
+  for (const t of state.tests) registerTest(t)
 }
 function commit(next: State) {
   state = next
@@ -117,17 +119,24 @@ let catalogCache: { state: State; list: TestDef[] } | null = null
 function catalog(): TestDef[] {
   load()
   if (catalogCache?.state === state) return catalogCache.list
-  const list = TESTS.map((t) => (t.key in state.active ? { ...t, active: state.active[t.key] } : t))
+  const list = [...TESTS].map((t) => (t.key in state.active ? { ...t, active: state.active[t.key] } : t))
   catalogCache = { state, list }
   return list
 }
 
 /** The test catalog with this session's Active switches (inactive tests can't be ordered). */
 export function useCatalog(): TestDef[] {
-  return React.useSyncExternalStore(subscribe, catalog, () => TESTS)
+  return React.useSyncExternalStore(subscribe, catalog, () => BASE_TESTS as TestDef[])
 }
 
 export function setTestActive(key: string, active: boolean) {
   load()
   commit({ ...state, active: { ...state.active, [key]: active } })
+}
+
+/** Add test (catalog): the new test joins the catalog (and New lab order when active). */
+export function addCatalogTest(t: TestDef) {
+  load()
+  registerTest(t)
+  commit({ ...state, tests: [...state.tests.filter((x) => x.key !== t.key), t] })
 }

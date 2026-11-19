@@ -48,7 +48,7 @@ export function Rail() {
       </nav>
       <div className="flex flex-col gap-1">
         <RailLink href="/settings" icon="setting-2" label={t("nav.settings")} />
-        <RailLink href="/logout" icon="logout" label={t("nav.logout")} />
+        <RailLink href="/logout" icon="logout" label={t("nav.logout")} destructive />
       </div>
       <Avatar>
         <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>
@@ -69,12 +69,12 @@ function useEndSide() {
   return useLocale() === "ar" ? ("left" as const) : ("right" as const)
 }
 
-function RailLink({ href, icon, label, active, dot }: { href: string; icon: IconName; label: string; active?: boolean; dot?: boolean }) {
+function RailLink({ href, icon, label, active, dot, destructive }: { href: string; icon: IconName; label: string; active?: boolean; dot?: boolean; destructive?: boolean }) {
   const side = useEndSide()
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Link href={href} prefetch={href === "/logout" ? false : undefined} aria-label={label} aria-current={active ? "page" : undefined} data-active={active || undefined} className={railItem}>
+        <Link href={href} prefetch={href === "/logout" ? false : undefined} aria-label={label} aria-current={active ? "page" : undefined} data-active={active || undefined} className={cn(railItem, destructive && "text-destructive hover:bg-destructive-soft hover:text-destructive")}>
           <Icon name={icon} size={20} variant={active ? "bold" : "linear"} />
           <Dot show={dot} />
         </Link>

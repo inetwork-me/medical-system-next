@@ -42,7 +42,7 @@ export function SidebarPanel({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
       <div className="flex flex-col gap-0.5">
         <NavRow href="/settings" icon="setting-2" label={t("nav.settings")} onNavigate={onNavigate} />
-        <NavRow href="/logout" icon="logout" label={t("nav.logout")} onNavigate={onNavigate} />
+        <NavRow href="/logout" icon="logout" label={t("nav.logout")} onNavigate={onNavigate} destructive />
       </div>
       <UserCard />
     </div>
@@ -89,6 +89,7 @@ function NavRow({
   active,
   count,
   onNavigate,
+  destructive,
 }: {
   href: string
   icon: IconName
@@ -96,6 +97,8 @@ function NavRow({
   active?: boolean
   count?: number
   onNavigate?: () => void
+  /** Log out: destructive text, destructive-soft hover. */
+  destructive?: boolean
 }) {
   return (
     <Link
@@ -103,7 +106,7 @@ function NavRow({
       prefetch={href === "/logout" ? false : undefined}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={cn(rowBase, active && "bg-sidebar-accent text-sidebar-accent-foreground")}
+      className={cn(rowBase, active && "bg-sidebar-accent text-sidebar-accent-foreground", destructive && "text-destructive hover:bg-destructive-soft hover:text-destructive")}
     >
       <Icon name={icon} size={20} variant={active ? "bold" : "linear"} />
       <span className="min-w-0 flex-1 truncate">{label}</span>

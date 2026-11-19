@@ -373,5 +373,40 @@
     },
     "empty": "Nothing is waiting for validation",
     "emptyText": "Submitted results show up here."
+  },
+  "entry": {
+    "title": "Enter results · {panel}",
+    "text": "{tube} {barcode} · fasting {h} h",
+    "textNoFast": "{tube} {barcode}",
+    "import": "Import from analyzer",
+    "imported": "{n} of {total} values imported from {analyzer} at {time}. Type the missing one.",
+    "importedMany": "{n} of {total} values imported from {analyzer} at {time}. Type the missing ones.",
+    "importedAll": "All {total} values imported from {analyzer} at {time}. Check them before you submit.",
+    "notImported": "Nothing imported yet. Import from the analyzer or type the values.",
+    "col": {
+      "test": "Test",
+      "result": "Result",
+      "unit": "Unit",
+      "ref": "Reference",
+      "flag": "Flag"
+    },
+    "placeholder": "Type value",
+    "ref": "Ref {ref}",
+    "delta": "Delta check: {analyte} is {dir, select, up {up} other {down}} {pct}% since {date}. Check the sample before you submit.",
+    "deltaNoDate": "Delta check: {analyte} is {dir, select, up {up} other {down}} {pct}% from the last result. Check the sample before you submit.",
+    "critical": "{analyte} {value} is a critical value. After you submit, call the doctor and log the read-back.",
+    "missing": "{n, plural, one {Type the missing value to submit.} other {Type the # missing values to submit.}}",
+    "comment": "Comment for the doctor (optional)",
+    "saveDraft": "Save draft",
+    "submit": "Submit for validation",
+    "drafted": "Draft saved",
+    "draftedText": "The doctor can't see it yet",
+    "submitted": "{panel} submitted",
+    "submittedText": "Waiting for validation",
+    "importedToast": "Values imported",
+    "importedToastText": "{analyzer} · {n} of {total}",
+    "nothing": "No test on this order is waiting for results.",
+    "noAnalytes": "The fields for this test aren't designed yet.",
+    "back": "Back to results"
   }
 }

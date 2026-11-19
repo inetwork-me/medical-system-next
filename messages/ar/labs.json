@@ -373,5 +373,40 @@
     },
     "empty": "ما فيه شي بانتظار الاعتماد",
     "emptyText": "النتائج المرسلة تطلع هنا."
+  },
+  "entry": {
+    "title": "إدخال النتائج · {panel}",
+    "text": "{tube} {barcode} · صايم {h, plural, one {ساعة} two {ساعتين} few {# ساعات} other {# ساعة}}",
+    "textNoFast": "{tube} {barcode}",
+    "import": "اسحب من الجهاز",
+    "imported": "انسحبت {n} من {total} قيم من {analyzer} الساعة {time}. اكتب الباقية.",
+    "importedMany": "انسحبت {n} من {total} قيم من {analyzer} الساعة {time}. اكتب الباقي.",
+    "importedAll": "انسحبت كل القيم ({total}) من {analyzer} الساعة {time}. راجعها قبل ما ترسل.",
+    "notImported": "ما انسحب شي للحين. اسحب من الجهاز أو اكتب القيم.",
+    "col": {
+      "test": "التحليل",
+      "result": "النتيجة",
+      "unit": "الوحدة",
+      "ref": "الطبيعي",
+      "flag": "التقييم"
+    },
+    "placeholder": "اكتب القيمة",
+    "ref": "الطبيعي {ref}",
+    "delta": "فحص الفرق: {analyte} {dir, select, up {زاد} other {نقص}} {pct}% من {date}. تأكد من العينة قبل ما ترسل.",
+    "deltaNoDate": "فحص الفرق: {analyte} {dir, select, up {زاد} other {نقص}} {pct}% عن النتيجة السابقة. تأكد من العينة قبل ما ترسل.",
+    "critical": "{analyte} {value} قيمة حرجة. بعد ما ترسل، بلّغ الطبيب وسجّل إنه عاد القيمة.",
+    "missing": "{n, plural, one {اكتب القيمة الناقصة عشان ترسل.} two {اكتب القيمتين الناقصة عشان ترسل.} other {اكتب القيم الناقصة (#) عشان ترسل.}}",
+    "comment": "ملاحظة للطبيب (اختياري)",
+    "saveDraft": "احفظ مسودة",
+    "submit": "أرسل للاعتماد",
+    "drafted": "انحفظت المسودة",
+    "draftedText": "الطبيب ما يشوفها لين الحين",
+    "submitted": "انرسلت {panel} للاعتماد",
+    "submittedText": "بانتظار الاعتماد",
+    "importedToast": "انسحبت القيم",
+    "importedToastText": "{analyzer} · {n} من {total}",
+    "nothing": "ما فيه تحليل في هالطلب ينتظر نتائج.",
+    "noAnalytes": "حقول هالتحليل لسه ما تصممت.",
+    "back": "ارجع للنتائج"
   }
 }

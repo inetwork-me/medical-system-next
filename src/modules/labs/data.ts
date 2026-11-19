@@ -314,6 +314,8 @@ export type Panel = {
   results: Result[]
   /** Expected result time while in the lab. */
   dueAt?: string
+  /** When the analyzer values came in (Enter results: "3 of 4 values imported … at 11:58"). */
+  importedAt?: string
   resultedAt?: string
   submittedBy?: string
   comment?: string
@@ -457,6 +459,7 @@ const LAB_0142: LabOrder = {
       test: "lipid",
       state: "analyzer",
       dueAt: T("12:30"),
+      importedAt: T("11:58"),
       // Enter results: 3 of 4 values imported; triglycerides missing (Focus state). LDL up 32% → delta check.
       results: [
         r("chol", 182, "H", [165, "2026-08-21"], { instrument: ANALYZER }),

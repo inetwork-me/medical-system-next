@@ -430,5 +430,58 @@
     "toastText": "سارية لين {date}",
     "added": "انضافت {name}",
     "addedText": "سارية لين {date}"
+  },
+  "leaveBoard": {
+    "waiting": "بانتظار الاعتماد",
+    "waitingText": "{n, plural, =0 {ما فيه طلبات} one {طلب واحد} two {طلبين} few {# طلبات} other {# طلب}} · الحجوزات تنتقل للبديل بعد الاعتماد",
+    "none": "ما فيه شي بانتظار الاعتماد",
+    "line": "{type} · {days, plural, one {يوم واحد} two {يومين} few {# أيام} other {# يوم}} · {dates}",
+    "cover": "البديل: {name}",
+    "noCover": "بدون بديل · الحجوزات تنلغي",
+    "toMove": "{n, plural, =0 {ما فيه حجوزات تنتقل} other {# حجز لازم ينتقل}}",
+    "decline": "ارفض",
+    "review": "راجع",
+    "declined": "انرفضت الإجازة",
+    "declinedText": "يوصل {name} إشعار",
+    "undo": "تراجع",
+    "away": "مين غايب هالأسبوع",
+    "addLeave": "أضف إجازة",
+    "legend": {
+      "leave": "إجازة",
+      "off": "راحة",
+      "training": "تدريب"
+    },
+    "noneAway": "الكل موجود هالأسبوع",
+    "today": "اليوم",
+    "toCancel": "{n, plural, =0 {ما فيه حجوزات تنلغي} other {# حجز بينلغي}}"
+  },
+  "review": {
+    "title": "تعتمد الإجازة؟",
+    "text": "الحجوزات تنتقل للطبيب البديل",
+    "doctor": "الطبيب",
+    "leave": "الإجازة",
+    "balance": "الرصيد بعدها",
+    "cover": "البديل",
+    "doctorValue": "{name} · {clinic}",
+    "leaveValue": "{type} · {days, plural, one {يوم واحد} two {يومين} few {# أيام} other {# يوم}} · {dates}",
+    "notCounted": "ما تنحسب من الرصيد",
+    "free": "{name} · فاضي كل الأيام",
+    "busy": "{name} · غايب {n, plural, one {يوم واحد} two {يومين} few {# أيام} other {# يوم}} منها",
+    "noCover": "بدون بديل",
+    "info": "{n, plural, =0 {ما فيه حجوزات في هالأيام.} other {# حجز بينتقل إلى {cover}، ويوصل المرضى رسالة.}}",
+    "infoCancel": "{n, plural, =0 {ما فيه حجوزات في هالأيام.} other {# حجز بينلغي، ويوصل المرضى رسالة.}}",
+    "note": "ملاحظة للطبيب (اختياري)",
+    "notePh": "أي شي لازم يسلّمه قبل الإجازة",
+    "cancel": "إلغاء",
+    "approve": "اعتمد",
+    "approved": "انعتمدت الإجازة",
+    "approvedText": "{n, plural, =0 {ما فيه حجوزات تنتقل} other {انتقلت # حجز إلى {cover}}}",
+    "type": {
+      "annual": "سنوية",
+      "sick": "مرضية",
+      "conference": "مؤتمر",
+      "training": "تدريب",
+      "dayOff": "راحة"
+    }
   }
 }

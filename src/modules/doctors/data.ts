@@ -389,7 +389,7 @@ function profile(b: Base, i: number): Doctor {
     booking: { visitMin: zaki ? 15 : null, maxPerDay: zaki ? 24 : 20, online: true, acceptsNew: b.status !== "leave", telehealth: zaki },
     week,
     booked,
-    leaveUsed: zaki ? 9 : 4 + (i % 8),
+    leaveUsed: zaki ? 9 : b.key === "qahtani" ? 8 : 4 + (i % 8),
   }
 }
 
@@ -513,14 +513,32 @@ export type Leave = {
   bookings: number
   place?: Bi
   note?: Bi
+  /** Requested with "Cancel bookings" instead of moving them to the cover. */
+  cancelBookings?: boolean
 }
 export const LEAVES: Leave[] = [
   { id: "lv-zaki-annual", doctor: "zaki", type: "annual", from: "2026-12-22", to: "2026-12-26", cover: "saud", status: "approved", bookings: 0 },
-  { id: "lv-zaki-conf", doctor: "zaki", type: "conference", from: "2027-02-10", to: "2027-02-10", status: "pending", bookings: 6, place: bi("Riyadh", "الرياض") },
+  { id: "lv-zaki-conf", doctor: "zaki", type: "conference", from: "2027-02-10", to: "2027-02-10", cover: "saud", status: "pending", bookings: 6, place: bi("Riyadh", "الرياض") },
   { id: "lv-qahtani", doctor: "qahtani", type: "annual", from: "2026-12-07", to: "2026-12-11", cover: "harbi", status: "pending", bookings: 19 },
   { id: "lv-shehri", doctor: "shehri", type: "conference", from: "2027-01-14", to: "2027-01-16", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "pending", bookings: 11 },
   { id: "lv-hamdan", doctor: "hamdan", type: "annual", from: "2026-11-08", to: "2026-11-19", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "approved", bookings: 12 },
+  { id: "lv-whassan", doctor: "whassan", type: "annual", from: "2026-11-16", to: "2026-11-24", cover: "mutairi", status: "approved", bookings: 9 },
+  // Days off and training this week (Leave & cover · "Who's away this week")
+  { id: "lv-fares-off", doctor: "fares", type: "dayOff", from: "2026-11-18", to: "2026-11-18", cover: "harbi", status: "approved", bookings: 4 },
+  { id: "lv-fares-trn", doctor: "fares", type: "training", from: "2026-11-19", to: "2026-11-19", status: "approved", bookings: 0, place: bi("Riyadh", "الرياض") },
+  { id: "lv-kamal-off", doctor: "kamal", type: "dayOff", from: "2026-11-15", to: "2026-11-15", status: "approved", bookings: 0 },
+  { id: "lv-saud-off", doctor: "saud", type: "dayOff", from: "2026-11-19", to: "2026-11-19", cover: "kamal", status: "approved", bookings: 0 },
+  { id: "lv-bqahtani-off", doctor: "bqahtani", type: "dayOff", from: "2026-11-18", to: "2026-11-18", cover: "otaibi", status: "approved", bookings: 0 },
+  { id: "lv-nharthi-off", doctor: "nharthi", type: "dayOff", from: "2026-11-18", to: "2026-11-18", cover: "ghamdi", status: "approved", bookings: 0 },
 ]
+/** Calendar days in a leave. */
+export const leaveDays = (l: { from: string; to: string }) => Math.round((Date.parse(`${l.to}T12:00:00Z`) - Date.parse(`${l.from}T12:00:00Z`)) / 86_400_000) + 1
+/** Annual and sick leave come out of the 21-day balance; the rest doesn't. */
+export const countsAgainstBalance = (t: LeaveType) => t === "annual"
+/** "Who's away" cell kind for a leave type. */
+export const awayKind = (t: LeaveType) => (t === "dayOff" ? "off" : t === "training" || t === "conference" ? "training" : "leave")
+/** This week on the Leave & cover board: Sun 15 – Thu 19 Nov. */
+export const AWAY_WEEK = ["2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19"]
 
 /* ---------------------------------------------------------------- patients (Patients tab) */
 /** next: ISO date, null (none booked) or "overdue". */

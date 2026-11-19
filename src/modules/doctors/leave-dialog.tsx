@@ -62,7 +62,7 @@ export function RequestLeaveDialog({ doctorKey, onOpenChange }: { doctorKey?: st
   const send = () => {
     setTried(true)
     if (!ready || a < DOCTORS_TODAY || (move === "move" && !coverDoc)) return
-    addLeave({ id: `lv-${d.key}-${a}-${z}-${type}`, doctor: d.key, type, from: a, to: z, cover: coverDoc?.key, status: "pending", bookings: n })
+    addLeave({ id: `lv-${d.key}-${a}-${z}-${type}`, doctor: d.key, type, from: a, to: z, cover: coverDoc?.key, status: "pending", bookings: n, ...(move === "cancel" ? { cancelBookings: true } : {}) })
     onOpenChange(false)
     const range = a === z ? dates.dayMonth(a) : dates.dayRange(a, z).replace(" – ", "–").replace(/ \d{4}$/, "")
     notify.success(t("sent"), { description: ltr(t("sentText", { dates: range })) })

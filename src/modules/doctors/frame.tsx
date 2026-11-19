@@ -4,7 +4,7 @@ import * as React from "react"
 
 import { ModuleTabsNav, PageContainer, PageHeader } from "@/components/shell/page"
 import { dueCredentials } from "./data"
-import { useDoctors } from "./store"
+import { useDoctors, useLeaves } from "./store"
 
 /**
  * Doctors module frame (every module tab): tabs Doctors · n, Credentials · n, Leave & cover · n, Reports, with the tab's
@@ -13,9 +13,10 @@ import { useDoctors } from "./store"
 export function DoctorsFrame({ actions, children }: { actions?: React.ReactNode; children?: React.ReactNode }) {
   const doctors = useDoctors().filter((d) => d.active)
   const due = doctors.reduce((s, d) => s + dueCredentials(d).length, 0)
+  const pending = useLeaves().filter((l) => l.status === "pending").length
   return (
     <PageContainer>
-      <PageHeader mobileTabsFirst tabs={<ModuleTabsNav module="doctors" counts={{ list: doctors.length, credentials: due, leave: 2 }} />} actions={actions} />
+      <PageHeader mobileTabsFirst tabs={<ModuleTabsNav module="doctors" counts={{ list: doctors.length, credentials: due, leave: pending }} />} actions={actions} />
       {children}
     </PageContainer>
   )

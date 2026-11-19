@@ -430,5 +430,58 @@
     "toastText": "Valid until {date}",
     "added": "{name} added",
     "addedText": "Valid until {date}"
+  },
+  "leaveBoard": {
+    "waiting": "Waiting for approval",
+    "waitingText": "{n, plural, =0 {No requests} one {# request} other {# requests}} · bookings move to the cover doctor once approved",
+    "none": "Nothing waiting for approval",
+    "line": "{type} · {dates} · {days, plural, one {# day} other {# days}}",
+    "cover": "Cover: {name}",
+    "noCover": "No cover · bookings are cancelled",
+    "toMove": "{n, plural, =0 {No bookings to move} one {# booking to move} other {# bookings to move}}",
+    "decline": "Decline",
+    "review": "Review",
+    "declined": "Leave declined",
+    "declinedText": "{name} gets a notification",
+    "undo": "Undo",
+    "away": "Who's away this week",
+    "addLeave": "Add leave",
+    "legend": {
+      "leave": "Leave",
+      "off": "Day off",
+      "training": "Training"
+    },
+    "noneAway": "Everyone's in this week",
+    "today": "Today",
+    "toCancel": "{n, plural, =0 {No bookings to cancel} one {# booking to cancel} other {# bookings to cancel}}"
+  },
+  "review": {
+    "title": "Approve leave?",
+    "text": "Bookings move to the cover doctor",
+    "doctor": "Doctor",
+    "leave": "Leave",
+    "balance": "Balance after",
+    "cover": "Cover",
+    "doctorValue": "{name} · {clinic}",
+    "leaveValue": "{type} · {dates} · {days, plural, one {# day} other {# days}}",
+    "notCounted": "Not taken from the balance",
+    "free": "{name} · free on all {n, plural, one {# day} other {# days}}",
+    "busy": "{name} · away on {n, plural, one {# day} other {# days}} of these",
+    "noCover": "No cover",
+    "info": "{n, plural, =0 {No bookings fall in these dates.} one {# booking will move to {cover}. Patients get an SMS.} other {# bookings will move to {cover}. Patients get an SMS.}}",
+    "infoCancel": "{n, plural, =0 {No bookings fall in these dates.} one {# booking will be cancelled. Patients get an SMS.} other {# bookings will be cancelled. Patients get an SMS.}}",
+    "note": "Note to the doctor (optional)",
+    "notePh": "Anything they should hand over before leaving",
+    "cancel": "Cancel",
+    "approve": "Approve",
+    "approved": "Leave approved",
+    "approvedText": "{n, plural, =0 {No bookings to move} one {# booking moved to {cover}} other {# bookings moved to {cover}}}",
+    "type": {
+      "annual": "Annual",
+      "sick": "Sick",
+      "conference": "Conference",
+      "training": "Training",
+      "dayOff": "Day off"
+    }
   }
 }

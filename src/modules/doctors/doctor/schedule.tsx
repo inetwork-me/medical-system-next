@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { SwitchCard } from "@/modules/clinics/parts"
 import { useClinics } from "@/modules/clinics/store"
-import { WEEKDAYS, type Doctor, type DoctorBooking, type Shift, type Weekday } from "../data"
+import { WEEKDAYS, assignmentsOn, type Doctor, type DoctorBooking, type Shift, type Weekday } from "../data"
 import { updateDoctor } from "../store"
 import { ltr, useDoctorText } from "../text"
 import { DoctorPage, useCurrentDoctor } from "./frame"
@@ -93,6 +93,15 @@ function WeekHours({ doctor: d, className }: { doctor: Doctor; className?: strin
     setDraft(null)
     toast.success(t("saved"), { description: t("savedText") })
   }
+  // Shifts in other clinics (Assign clinic): read-only chips with the clinic's name; edited from Works in, not here.
+  const extraChips = (day: Weekday) =>
+    assignmentsOn(d, day).map((a) => (
+      <span key={`${a.clinic}-${a.from}`} className="inline-flex h-7 items-center gap-1.5 rounded-lg border border-dashed bg-card px-2.5 text-xs font-medium tabular-nums">
+        <Icon name="hospital" size={14} className="text-muted-foreground" />
+        <bdi dir="ltr">{`${a.from}–${a.to}`}</bdi>
+        <span className="text-muted-foreground">· {clinicName(a.clinic)}</span>
+      </span>
+    ))
 
   return (
     <Widget
@@ -162,12 +171,15 @@ function WeekHours({ doctor: d, className }: { doctor: Doctor; className?: strin
                         )
                       })}
                       {editing && <AddShift shifts={shifts} onAdd={(s) => setDay(day, [...shifts, s])} />}
+                      {extraChips(day)}
                     </div>
                     <span className="text-xs text-muted-foreground">
                       {ltr(t("where", { clinic: clinicName(d.clinic), room: d.room }))}
                       {tele && t("plusTele")}
                     </span>
                   </>
+                ) : assignmentsOn(d, day).length ? (
+                  <div className="flex flex-wrap items-center gap-1.5">{extraChips(day)}</div>
                 ) : (
                   <span className="text-sm text-muted-foreground">{t("off")}</span>
                 )}

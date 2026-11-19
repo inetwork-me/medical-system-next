@@ -51,6 +51,70 @@ export type Doctor = {
   booked: Record<Weekday, number>
   /** Annual leave days used this year (balance 21). */
   leaveUsed: number
+  /* Settings (Widget / Doctor Profile Form). Optional: defaults come from contactOf / the main clinic. */
+  /** Specialty; defaults to the main clinic's specialty. */
+  specialty?: Bi
+  /** Nationality code (Patients' nationality list), default "sa". */
+  nationality?: string
+  mobile?: string
+  email?: string
+  role?: SystemRole
+  /** Sends prescriptions to Wasfaty; default on. */
+  ePrescribing?: boolean
+  /** Extra clinics (Assign clinic): weekly shifts outside the main clinic, bookable from `start`. */
+  assignments?: Assignment[]
+  /** Set by Deactivate doctor: no slots after the last working day. */
+  deactivation?: Deactivation
+}
+
+export type SystemRole = "doctor" | "head" | "director"
+export const SYSTEM_ROLES: SystemRole[] = ["doctor", "head", "director"]
+export type AssignRole = "visiting" | "member" | "cover"
+export const ASSIGN_ROLES: AssignRole[] = ["visiting", "member", "cover"]
+export type Assignment = { clinic: string; role: AssignRole; room: string; day: Weekday; from: string; to: string; start: string }
+export type DeactivateReason = "contract" | "resigned" | "transfer" | "retired" | "other"
+export const DEACTIVATE_REASONS: DeactivateReason[] = ["contract", "resigned", "transfer", "retired", "other"]
+export type Deactivation = { lastDay: string; reason: DeactivateReason; cover?: string; cancelBookings?: boolean; keepAccess: boolean; bookings: number }
+
+/** Languages a doctor can list (Settings · Languages); stored on the doctor as "Arabic · English". */
+export const LANGUAGES: { key: string; name: Bi }[] = [
+  { key: "ar", name: { en: "Arabic", ar: "عربي" } },
+  { key: "en", name: { en: "English", ar: "إنجليزي" } },
+  { key: "fr", name: { en: "French", ar: "فرنسي" } },
+  { key: "ur", name: { en: "Urdu", ar: "أوردو" } },
+  { key: "hi", name: { en: "Hindi", ar: "هندي" } },
+  { key: "tl", name: { en: "Tagalog", ar: "تاغالوغ" } },
+]
+export const languageKeys = (l: Bi) => LANGUAGES.filter((x) => l.en.split(/\s*[·,]\s*/).includes(x.name.en)).map((x) => x.key)
+export const languagesOf = (keys: string[]): Bi => {
+  const list = LANGUAGES.filter((x) => keys.includes(x.key))
+  return { en: list.map((x) => x.name.en).join(" · "), ar: list.map((x) => x.name.ar).join(" · ") }
+}
+
+/** Contact & system access with defaults: mobile from the extension, work email from the name ("a.zaki@alnoor.sa"). */
+export function contactOf(d: Doctor) {
+  const parts = d.name.en.replace(/^Dr\.\s*/, "").trim().split(/\s+/)
+  const last = (parts.at(-1) ?? "").toLowerCase().replace(/^al-/, "").replace(/[^a-z]/g, "")
+  const ext = d.ext.padEnd(4, "0")
+  return {
+    nationality: d.nationality ?? "sa",
+    mobile: d.mobile ?? (d.ext ? `+966 55 ${ext.slice(0, 3)} ${ext}` : ""),
+    email: d.email ?? (last ? `${parts[0][0].toLowerCase()}.${last}@alnoor.sa` : ""),
+    role: d.role ?? ("doctor" as const),
+    ePrescribing: d.ePrescribing ?? true,
+  }
+}
+
+/** Extra clinics' shifts on a weekday (Assign clinic). */
+export const assignmentsOn = (d: Doctor, day: Weekday) => (d.assignments ?? []).filter((a) => a.day === day)
+
+/** Still working that day (on or before the last working day, when deactivated)? */
+export const employedOn = (d: Doctor, date: string) => !d.deactivation || date <= d.deactivation.lastDay
+
+/** Deactivate dialog: open items someone else must pick up (design: 4 open referrals · 2 unsigned notes, Dr. Ahmed Zaki). */
+export function openItems(d: Doctor) {
+  const n = [...d.key].reduce((s, c) => s + c.charCodeAt(0), 0)
+  return d.key === "zaki" ? { referrals: 4, notes: 2 } : { referrals: n % 5, notes: n % 3 }
 }
 
 /** Booking settings that override the clinic rules; visitMin null = the clinic's visit length. */
@@ -113,6 +177,7 @@ const DESIGN: Base[] = [
     title: bi("Consultant pediatrician", "استشاري طب أطفال"),
     grade: "consultant",
     female: false,
+    mobile: "+966 55 412 0981",
     clinic: "peds",
     room: "101",
     headOf: "peds",
@@ -394,6 +459,41 @@ function profile(b: Base, i: number): Doctor {
 }
 
 export const DOCTORS: Doctor[] = [...DESIGN, ...OTHER].map(profile)
+
+/**
+ * A doctor made with New doctor: no weekly hours yet (the checklist asks for them, so they can't be booked), only the
+ * SCFHS licence on file (issued today, 3 years), today and this month at 0.
+ */
+export function blankDoctor(key: string, f: Partial<Doctor> & { scfhs: string }): Doctor {
+  const { scfhs, ...rest } = f
+  const none: Record<Weekday, number> = { sun: 0, mon: 0, tue: 0, wed: 0, thu: 0, fri: 0, sat: 0 }
+  const expires = `${Number(DOCTORS_TODAY.slice(0, 4)) + 3}${DOCTORS_TODAY.slice(4)}`
+  return {
+    key,
+    initials: "",
+    name: { en: "", ar: "" },
+    title: { en: "", ar: "" },
+    grade: "specialist",
+    female: false,
+    clinic: "",
+    room: "",
+    status: "off",
+    statusLabel: bi("Not bookable yet", "ما ينحجز للحين"),
+    today: { seen: 0, booked: 0, nextFree: "" },
+    month: { visits: 0, rating: "–", reviews: 0, consult: 0, noShow: 0, utilisation: 0, revenue: 0, delta: 0, wait: 0, returnRate: 0 },
+    credentials: [{ type: "scfhs", number: scfhs, issuer: SCFHS, issued: DOCTORS_TODAY, expires, required: true }],
+    active: true,
+    ext: "",
+    yearsExp: 0,
+    languages: bi("Arabic", "عربي"),
+    ages: null,
+    booking: { visitMin: null, maxPerDay: 20, online: true, acceptsNew: true, telehealth: false },
+    week: { sun: [], mon: [], tue: [], wed: [], thu: [], fri: [], sat: [] },
+    booked: none,
+    leaveUsed: 0,
+    ...rest,
+  }
+}
 export const doctorByKey = (key: string) => DOCTORS.find((d) => d.key === key)
 /** Head of a clinic (Clinics key). */
 export const headOf = (clinic: string) => DOCTORS.find((d) => d.headOf === clinic)
@@ -425,6 +525,26 @@ export const dueCredentials = (d: Doctor) =>
 export const cardAlert = (d: Doctor) => dueCredentials(d).find((c) => credStatus(c) !== "soon")
 /** An expired required credential blocks booking. */
 export const isBlocked = (d: Doctor) => d.credentials.some((c) => c.required && credStatus(c) === "expired")
+
+/* ---------------------------------------------------------------- New doctor checklist */
+export const SETUP_STEPS = ["personal", "licence", "clinic", "hours", "account"] as const
+export type SetupStep = (typeof SETUP_STEPS)[number]
+/** SCFHS registration number, e.g. RM-10-0045821 (placeholder XX-00-0000000). */
+export const SCFHS_PATTERN = /^[A-Z]{2}-\d{2}-\d{7}$/
+/** "Before they can be booked": personal details · SCFHS licence checked · main clinic & room · weekly hours · system account. */
+export function setupOf(d: Doctor): Record<SetupStep, boolean> {
+  const scfhs = d.credentials.find((c) => c.type === "scfhs")
+  const c = contactOf(d)
+  return {
+    personal: !!d.name.en.trim() && !!d.name.ar.trim(),
+    licence: !!scfhs && SCFHS_PATTERN.test(scfhs.number),
+    clinic: !!d.clinic && !!d.room,
+    hours: WEEKDAYS.some((w) => d.week[w].length > 0),
+    account: !!c.email && /@/.test(c.email),
+  }
+}
+/** A doctor can't be booked until every step is done. */
+export const setupDone = (d: Doctor) => Object.values(setupOf(d)).every(Boolean)
 
 /* ---------------------------------------------------------------- list KPIs */
 export const isAway = (d: Doctor) => d.status === "off" || d.status === "leave"

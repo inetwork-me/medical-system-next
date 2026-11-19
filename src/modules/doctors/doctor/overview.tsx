@@ -26,6 +26,8 @@ import {
   WEEKDAYS,
   credStatus,
   daysUntil,
+  setupDone,
+  setupOf,
   todayOf,
   type Credential,
   type CredentialType,
@@ -35,7 +37,9 @@ import {
   type Weekday,
 } from "../data"
 import { doctorHref } from "../href"
+import { AssignClinicDialog } from "../assign-dialog"
 import { RequestLeaveDialog } from "../leave-dialog"
+import { SetupChecklist } from "../setup-checklist"
 import { useDoctors, useLeaves } from "../store"
 import { STATUS_TONE, ltr, useDoctorText } from "../text"
 import { DoctorPage, OverviewActions, useCurrentDoctor } from "./frame"
@@ -50,7 +54,9 @@ const minutes = (hhmm: string) => {
   return h * 60 + m
 }
 export const shiftHours = (s: Shift) => (minutes(s.to) - minutes(s.from)) / 60
-export const weekHours = (d: Doctor) => WEEKDAYS.reduce((n, w) => n + d.week[w].reduce((m, s) => m + shiftHours(s), 0), 0)
+/** Weekly hours in every clinic: own shifts + the clinics assigned with Assign clinic. */
+export const weekHours = (d: Doctor) =>
+  WEEKDAYS.reduce((n, w) => n + d.week[w].reduce((m, s) => m + shiftHours(s), 0), 0) + (d.assignments ?? []).reduce((m, a) => m + shiftHours(a), 0)
 
 /** "Sun–Thu" for a run of days, else "Mon, Wed" / "الاثنين والأربعاء". */
 export function useDaysLabel() {
@@ -78,6 +84,8 @@ export function DoctorOverview() {
   return (
     <DoctorPage actions={<OverviewActions />}>
       <DoctorHeader doctor={d} />
+      {/* A new doctor: the New doctor checklist stays on top until they can be booked (open steps link to their tab). */}
+      {!setupDone(d) && <SetupChecklist done={setupOf(d)} doctorKey={d.key} />}
       <div className="@container/ov">
         <div className="grid grid-cols-1 gap-4 @xl/ov:grid-cols-2 @5xl/ov:grid-cols-[minmax(0,1fr)_22.5rem] @5xl/ov:items-start @5xl/ov:gap-6">
           <div className="contents @5xl/ov:flex @5xl/ov:flex-col @5xl/ov:gap-6">
@@ -126,7 +134,7 @@ export function DoctorHeader({ doctor: d }: { doctor: Doctor }) {
             </p>
             {scfhs && (
               <p className="text-xs text-muted-foreground tabular-nums">
-                {t("ids", { no: scfhs.number, ext: d.ext })}
+                {t("ids", { no: scfhs.number, ext: d.ext || "none" })}
               </p>
             )}
           </div>
@@ -289,7 +297,7 @@ function Month({ doctor: d, className }: { doctor: Doctor; className?: string })
 /** Widget / Doctor Works In: the main clinic (head / member · days · room → clinic page) and telehealth evenings. */
 function WorksIn({ doctor: d, className }: { doctor: Doctor; className?: string }) {
   const t = useTranslations("doctors.works")
-  const { clinicName } = useDoctorText()
+  const { clinicName, dates } = useDoctorText()
   const clinic = useClinics().find((c) => c.key === d.clinic)
   const daysLabel = useDaysLabel()
   const f = d.female ? "F" : ""
@@ -298,18 +306,33 @@ function WorksIn({ doctor: d, className }: { doctor: Doctor; className?: string 
   const tele = teleDays.length ? d.week[teleDays[0]].find((s) => s.telehealth)! : null
   const clinicsOn = isModuleEnabled("clinics")
   const name = clinicName(d.clinic)
+  const tx = useTranslations("doctors.worksExtra")
+  const tr = useTranslations("doctors.assign.roles")
+  const tp = useTranslations("doctors.profile")
+  const clinics = useClinics()
+  const [assigning, setAssigning] = React.useState(false)
+  const assigned = d.assignments ?? []
+  const count = 1 + (tele ? 1 : 0) + new Set(assigned.map((a) => a.clinic)).size
   return (
     <Widget
       title={t(`title${f}`)}
-      description={t("text", { clinics: tele ? 2 : 1, h: weekHours(d) })}
+      description={t("text", { clinics: count, h: weekHours(d) })}
       className={cn("gap-2 p-5", className)}
+      action={
+        clinicsOn && (
+          <Button variant="ghost" size="sm" className="-me-2 shrink-0" onClick={() => setAssigning(true)}>
+            <Icon name="add" size={16} />
+            {tx("assign")}
+          </Button>
+        )
+      }
     >
       <ul className="flex flex-col divide-y">
         <li className="flex items-center gap-2.5 py-2.5">
           {clinic && <ClinicTile icon={clinic.icon} tone={clinic.tone} className="size-9" />}
           <div className="flex min-w-0 flex-1 flex-col">
             <span className="truncate text-sm font-medium">{d.headOf === d.clinic ? t(`head${f}`, { clinic: name }) : t("member", { clinic: name })}</span>
-            <span className="truncate text-xs text-muted-foreground tabular-nums">{ltr(t("where", { days: daysLabel(clinicDays), room: d.room }))}</span>
+            <span className="truncate text-xs text-muted-foreground tabular-nums">{ltr(clinicDays.length ? t("where", { days: daysLabel(clinicDays), room: d.room }) : tp("roomValue", { n: d.room }))}</span>
           </div>
           {clinicsOn && clinic && (
             <Button variant="ghost" size="icon-sm" asChild>
@@ -332,7 +355,30 @@ function WorksIn({ doctor: d, className }: { doctor: Doctor; className?: string 
             </div>
           </li>
         )}
+        {assigned.map((a) => {
+          const c = clinics.find((x) => x.key === a.clinic)
+          const started = a.start <= DOCTORS_TODAY
+          return (
+            <li key={`${a.clinic}-${a.day}-${a.from}`} className="flex items-center gap-2.5 py-2.5">
+              {c ? <ClinicTile icon={c.icon} tone={c.tone} className="size-9" /> : <span className="size-9 shrink-0" />}
+              <div className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm font-medium">{tx("assigned", { clinic: clinicName(a.clinic), role: tr(a.role, { grade: d.grade }) })}</span>
+                <span className="truncate text-xs text-muted-foreground tabular-nums">
+                  {ltr(tx("assignedWhere", { day: a.day, hours: `${a.from}–${a.to}`, room: a.room }) + (started ? "" : tx("startsOn", { date: dates.dayMonth(a.start) })))}
+                </span>
+              </div>
+              {clinicsOn && c && (
+                <Button variant="ghost" size="icon-sm" asChild>
+                  <Link href={clinicHref(c.key)} aria-label={t("openClinic", { clinic: clinicName(a.clinic) })}>
+                    <Icon name="arrow-right-1" size={16} />
+                  </Link>
+                </Button>
+              )}
+            </li>
+          )
+        })}
       </ul>
+      {assigning && <AssignClinicDialog doctorKey={d.key} onOpenChange={(o) => !o && setAssigning(false)} />}
     </Widget>
   )
 }

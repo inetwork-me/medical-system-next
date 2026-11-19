@@ -13,7 +13,7 @@ import { EmptyState } from "@/components/ds/states"
 import { PageContainer, PageHeader } from "@/components/shell/page"
 import { PageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
-import { isBlocked, type Doctor } from "../data"
+import { DOCTORS_TODAY, employedOn, isBlocked, setupDone, type Doctor } from "../data"
 import { DOCTOR_TABS, bookHref, doctorHref, type DoctorTab } from "../href"
 import { useDoctor } from "../store"
 import { useDoctorText } from "../text"
@@ -111,7 +111,7 @@ export function OverviewActions() {
         </Link>
       </Button>
       <IfModule id="appointments">
-        <Button asChild className={cn(isBlocked(d) && "hidden")}>
+        <Button asChild className={cn((isBlocked(d) || !setupDone(d) || !employedOn(d, DOCTORS_TODAY)) && "hidden")}>
           <Link href={bookHref(d.key)}>
             <Icon name="calendar-add" size={24} />
             {t("book")}

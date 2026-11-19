@@ -27,7 +27,8 @@ export function useDoctorText() {
     /** "Pediatrics · Room 101" */
     place: (d: Doctor) => t("place", { clinic: clinicName(d.clinic), room: d.room }),
     /** Next free slot: a time, or the day they're back ("Sun 22 Nov"). */
-    nextFree: (d: Doctor) => (d.today.nextFree.includes(":") ? d.today.nextFree : `${dates.weekdayShort(d.today.nextFree)} ${dates.dayMonth(d.today.nextFree)}`),
+    nextFree: (d: Doctor) =>
+      !d.today.nextFree ? "–" : d.today.nextFree.includes(":") ? d.today.nextFree : `${dates.weekdayShort(d.today.nextFree)} ${dates.dayMonth(d.today.nextFree)}`,
     /** "PALS expires in 38 days" / "BLS expired 6 days ago" */
     credAlert: (c: Credential) => {
       const n = daysUntil(c.expires)

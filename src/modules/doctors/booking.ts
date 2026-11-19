@@ -5,7 +5,7 @@ import type { ClinicLimits } from "@/modules/appointments/data"
 import { shiftRange } from "@/modules/clinics/booking"
 import { useClinicLimits } from "@/modules/clinics/booking"
 import { useClinics } from "@/modules/clinics/store"
-import { APPT_DOCTOR_KEY, WEEKDAYS, isBlocked, type Doctor, type Leave } from "./data"
+import { APPT_DOCTOR_KEY, WEEKDAYS, employedOn, isBlocked, setupDone, type Doctor, type Leave } from "./data"
 import { useDoctors, useLeaves } from "./store"
 
 const mins = (hhmm: string) => shiftRange(`${hhmm}–${hhmm}`)[0]
@@ -15,7 +15,8 @@ export const leaveOn = (leaves: Leave[], doctor: string, date: string) =>
   leaves.find((l) => l.doctor === doctor && l.status === "approved" && l.from <= date && l.to >= date)
 
 /**
- * A doctor's booking limits for a day, from the Doctors module: closed when deactivated, a required credential has
+ * A doctor's booking limits for a day, from the Doctors module: closed when deactivated (or after the last working
+ * day), the New doctor checklist isn't finished, a required credential has
  * expired, on approved leave, the clinic is closed, or it's their day off; otherwise slots inside their own shifts
  * (in-clinic shifts clipped to the clinic's hours; telehealth shifts only while telehealth visits are on), every
  * visit length + clinic gap, at most "Max per day".
@@ -27,7 +28,7 @@ export function doctorDayLimits(
   rules: { slotMin: number; gapMin: number } | null,
   leaves: Leave[]
 ): ClinicLimits {
-  if (!d.active || isBlocked(d) || leaveOn(leaves, d.key, date) || clinic?.closed) return { closed: true }
+  if (!d.active || !employedOn(d, date) || !setupDone(d) || isBlocked(d) || leaveOn(leaves, d.key, date) || clinic?.closed) return { closed: true }
   const shifts = d.week[WEEKDAYS[new Date(`${date}T12:00:00Z`).getUTCDay()]].filter((s) => !s.telehealth || d.booking.telehealth)
   const ranges = shifts
     .map((s): [number, number] => {

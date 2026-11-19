@@ -64,7 +64,7 @@ export function OrderHeader({ order: o }: { order: LabOrder }) {
 
       <ol className="flex">
         {steps.map((s, i) => (
-          <li key={s.key} className="flex min-w-0 flex-1 flex-col gap-1.5" aria-current={s.state === "now" ? "step" : undefined}>
+          <li key={s.key} className={cn("flex min-w-0 flex-col gap-1.5", i < steps.length - 1 ? "flex-1" : "shrink-0 items-end text-end")} aria-current={s.state === "now" ? "step" : undefined}>
             <div className="flex items-center gap-1.5">
               <span
                 className={cn(

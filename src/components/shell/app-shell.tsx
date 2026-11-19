@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils"
 import { Icon } from "@/components/ds/icon"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { HeaderSearch } from "./header-search"
 import { BottomNav, MobileAppBar } from "./mobile-nav"
 import { NotificationsButton } from "./notifications"
@@ -109,17 +108,6 @@ function Header({ onToggle, className }: { onToggle: () => void; className?: str
         <Icon name="language-square" size={24} />
         <span lang={other}>{tc("other")}</span>
       </Button>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          {/* Dark mode is postponed (brief §5.9): the toggle is shown but not active yet. */}
-          <span tabIndex={0} className="rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
-            <Button variant="ghost" size="icon" disabled aria-label={t("darkMode")} tabIndex={-1}>
-              <Icon name="moon" size={24} />
-            </Button>
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">{t("darkMode")}</TooltipContent>
-      </Tooltip>
       <NotificationsButton />
       <UserMenuButton />
     </header>

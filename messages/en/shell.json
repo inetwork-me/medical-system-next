@@ -61,7 +61,6 @@
     "toggleSidebar": "Toggle sidebar",
     "searchPlaceholder": "Search patients, MRN…",
     "searchShort": "Search…",
-    "darkMode": "Dark mode",
     "notifications": "Notifications",
     "accountMenu": "Account menu",
     "mainNav": "Main navigation",
@@ -84,8 +83,7 @@
   },
   "more": {
     "title": "More",
-    "language": "Language",
-    "darkMode": "Dark mode"
+    "language": "Language"
   },
   "placeholder": {
     "title": "{module} is on the way",

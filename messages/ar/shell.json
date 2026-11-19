@@ -61,7 +61,6 @@
     "toggleSidebar": "اعرض أو اخفِ القائمة",
     "searchPlaceholder": "دوّر على مريض أو رقم ملف…",
     "searchShort": "دوّر…",
-    "darkMode": "الوضع الليلي",
     "notifications": "الإشعارات",
     "accountMenu": "قائمة الحساب",
     "mainNav": "التنقل الرئيسي",
@@ -84,8 +83,7 @@
   },
   "more": {
     "title": "المزيد",
-    "language": "اللغة",
-    "darkMode": "الوضع الليلي"
+    "language": "اللغة"
   },
   "placeholder": {
     "title": "{module} جاي قريب",

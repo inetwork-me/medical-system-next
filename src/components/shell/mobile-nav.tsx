@@ -12,7 +12,6 @@ import { Icon } from "@/components/ds/icon"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerBody } from "@/components/ui/drawer"
-import { Switch } from "@/components/ui/switch"
 import { MobileSearch } from "./header-search"
 import { MobileNotifications } from "./notifications"
 import { MobileUserMenu } from "./user-menu"
@@ -185,12 +184,6 @@ function MoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
               <span lang={other} className="font-normal text-muted-foreground">{tc("other")}</span>
               <Icon name="arrow-right-1" size={16} className="text-muted-foreground" />
             </button>
-            <label className={row}>
-              <Icon name="moon" size={20} />
-              <span className="flex-1">{t("more.darkMode")}</span>
-              {/* Dark mode is postponed (brief §5.9): the control is shown as in the design but disabled. */}
-              <Switch disabled checked={false} />
-            </label>
             <Link href="/settings" onClick={close} className={row}>
               <Icon name="setting-2" size={20} />
               <span className="flex-1">{t("nav.settings")}</span>

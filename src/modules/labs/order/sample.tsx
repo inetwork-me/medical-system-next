@@ -4,6 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
+import { Barcode } from "@/components/ds/barcode"
 import { Icon } from "@/components/ds/icon"
 import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
 import { toast } from "@/components/ds/toast"
@@ -21,36 +22,6 @@ import { OrderHeader } from "./header"
 import { OrderSide } from "./side"
 
 const PRINTER = "Lab-2"
-
-/**
- * Barcode artwork for the printed label: bars derived from the code (deterministic, so the same code always draws
- * the same label). Illustrative only — the label printer encodes the real symbology.
- */
-export function Barcode({ code, className }: { code: string; className?: string }) {
-  const bars: { x: number; w: number }[] = []
-  let x = 0
-  const unit = 1.5
-  const push = (w: number, gap: number) => {
-    bars.push({ x, w: w * unit })
-    x += (w + gap) * unit
-  }
-  push(2, 1) // start guard
-  push(1, 1)
-  for (const ch of code) {
-    const c = ch.charCodeAt(0)
-    push(1 + (c % 3), 1 + ((c >> 2) % 2))
-    push(1 + ((c >> 1) % 2), 1 + ((c >> 3) % 2))
-  }
-  push(1, 1) // end guard
-  push(2, 0)
-  return (
-    <svg viewBox={`0 0 ${x} 32`} preserveAspectRatio="none" className={cn("h-8 w-[150px] text-foreground", className)} aria-hidden>
-      {bars.map((b, i) => (
-        <rect key={i} x={b.x} y={0} width={b.w} height={32} fill="currentColor" />
-      ))}
-    </svg>
-  )
-}
 
 const TONE: Record<Tube["state"], StatusTone> = {
   pending: "neutral",
@@ -117,7 +88,7 @@ export function SampleDetail({ order: o, onPrint }: { order: LabOrder; onPrint?:
                   <span className="text-sm font-medium text-foreground">{b(TUBES[x.type].full)}</span>
                 </div>
                 <div className="flex flex-col items-center gap-1 rounded-lg bg-muted p-2.5" role="img" aria-label={t("barcodeLabel", { code })}>
-                  <Barcode code={code} />
+                  <Barcode value={code} />
                   <Latin className="text-xs font-medium text-foreground">{code}</Latin>
                 </div>
                 <span className="text-xs text-muted-foreground">

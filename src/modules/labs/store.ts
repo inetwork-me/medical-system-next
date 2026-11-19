@@ -140,3 +140,8 @@ export function addCatalogTest(t: TestDef) {
   registerTest(t)
   commit({ ...state, tests: [...state.tests.filter((x) => x.key !== t.key), t] })
 }
+
+/** The current order, read straight from the store (event handlers that run right after a step). */
+export function getLabOrder(no: string): LabOrder | undefined {
+  return list().find((o) => o.no === no)
+}

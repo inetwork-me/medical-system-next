@@ -56,7 +56,8 @@
     "pathologist": "Clinical pathologist",
     "doctor": "Doctor",
     "patient": "Patient",
-    "lead": "Lab lead (demo)"
+    "lead": "Lab lead (demo)",
+    "reception": "Lab reception"
   },
   "soon": {
     "title": "Coming soon",
@@ -472,7 +473,8 @@
       "range": "Range"
     },
     "pdfFailed": "Couldn't make the PDF",
-    "pdfFailedText": "Try again in a moment."
+    "pdfFailedText": "Try again in a moment.",
+    "receivedNote": "Received outside the stability limit: {note}"
   },
   "send": {
     "title": "Send results",
@@ -735,5 +737,54 @@
     "toast": "{name} added to the catalog",
     "toastOn": "Code {code} · doctors can order it now",
     "toastOff": "Code {code} · off until you switch it on"
+  },
+  "receive": {
+    "title": "Receive samples",
+    "text": "Lab reception · scan each tube as it arrives",
+    "ready": "Scanner ready · scan a tube label",
+    "readyText": "Each tube is received the moment it's scanned",
+    "paused": "Scanning paused · check the sample below first",
+    "camera": "Point the camera at the tube label",
+    "scannerLabel": "Barcode scanner input",
+    "typed": "Type a barcode",
+    "add": "Add",
+    "badFormat": "Use the label format S2611190142-01",
+    "scanned": "Scanned now",
+    "count": "{n, plural, one {1 tube} other {# tubes}}",
+    "line": "{code} · {test}",
+    "received": "Received {time}",
+    "already": "Already in lab · {time}",
+    "unknown": "Not in today's orders · check the label",
+    "unknownTitle": "Unknown barcode",
+    "noted": "Received with a note · {time}",
+    "rejected": "Rejected · new sample requested",
+    "rejectedNoRecollect": "Rejected",
+    "check": "Check this sample before receiving it",
+    "checkLine": "{code} · {patient} · {test}",
+    "tube": "Tube",
+    "collected": "Collected",
+    "collectedLine": "{time} · {place} · {ago}",
+    "ago": "{h, plural, =0 {} one {1 h} other {# h}}{both, select, true { } other {}}{m, plural, =0 {} other {# min}} ago",
+    "place": {
+      "room": "collection room",
+      "clinic": "clinic",
+      "home": "home visit"
+    },
+    "why": "Why",
+    "stability": "{analyte} is reliable for {h} h before spinning",
+    "missingInfo": "The collection time or the collector isn't recorded",
+    "missingTime": "not recorded",
+    "receiveAnyway": "Receive anyway, with a note",
+    "reject": "Reject sample",
+    "note": "Note for the report",
+    "notePlaceholder": "Why it's safe to run this sample",
+    "noteRequired": "Write a note first",
+    "receiveWithNote": "Receive with this note",
+    "cancelNote": "Cancel",
+    "close": "Close",
+    "done": "Done · {n} received",
+    "toast": "Samples received in lab",
+    "toastStat": "{name}'s STAT sample goes to the analyzer first",
+    "toastText": "{n, plural, one {1 tube is} other {# tubes are}} ready for the analyzers"
   }
 }

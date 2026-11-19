@@ -56,7 +56,8 @@
     "pathologist": "استشاري علم الأمراض",
     "doctor": "طبيب",
     "patient": "مريض",
-    "lead": "مسؤول المختبر (تجريبي)"
+    "lead": "مسؤول المختبر (تجريبي)",
+    "reception": "استقبال المختبر"
   },
   "soon": {
     "title": "قريب",
@@ -472,7 +473,8 @@
       "range": "الطبيعي"
     },
     "pdfFailed": "ما قدرنا نسوي الملف",
-    "pdfFailedText": "جرّب مرة ثانية بعد شوي."
+    "pdfFailedText": "جرّب مرة ثانية بعد شوي.",
+    "receivedNote": "انستلمت بعد حد الثبات: {note}"
   },
   "send": {
     "title": "إرسال النتائج",
@@ -735,5 +737,54 @@
     "toast": "انضاف {name} للدليل",
     "toastOn": "الكود {code} · يقدر الأطباء يطلبونه الحين",
     "toastOff": "الكود {code} · موقف لين تفعّله"
+  },
+  "receive": {
+    "title": "استلام العينات",
+    "text": "استقبال المختبر · امسح كل أنبوب أول ما يوصل",
+    "ready": "الماسح جاهز · امسح ملصق الأنبوب",
+    "readyText": "كل أنبوب ينستلم أول ما ينمسح",
+    "paused": "المسح موقف · راجع العينة اللي تحت أول",
+    "camera": "وجّه الكاميرا على ملصق الأنبوب",
+    "scannerLabel": "إدخال ماسح الباركود",
+    "typed": "اكتب الباركود",
+    "add": "أضف",
+    "badFormat": "اكتبه بصيغة الملصق S2611190142-01",
+    "scanned": "انمسحت الحين",
+    "count": "{n, plural, one {أنبوب واحد} two {أنبوبين} few {# أنابيب} other {# أنبوب}}",
+    "line": "{test} · {code}",
+    "received": "استلمت {time}",
+    "already": "موجودة من {time}",
+    "unknown": "مو في طلبات اليوم · راجع الملصق",
+    "unknownTitle": "باركود مو معروف",
+    "noted": "استلمت مع ملاحظة · {time}",
+    "rejected": "انرفضت · انطلبت عينة جديدة",
+    "rejectedNoRecollect": "انرفضت",
+    "check": "راجع العينة قبل ما تستلمها",
+    "checkLine": "{patient} · {test} · {code}",
+    "tube": "الأنبوب",
+    "collected": "انسحبت",
+    "collectedLine": "{time} · {place} · {ago}",
+    "ago": "قبل {h, plural, =0 {} one {ساعة} two {ساعتين} few {# ساعات} other {# ساعة}}{both, select, true { و} other {}}{m, plural, =0 {} one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+    "place": {
+      "room": "غرفة السحب",
+      "clinic": "العيادة",
+      "home": "زيارة منزلية"
+    },
+    "why": "السبب",
+    "stability": "{analyte} يضبط {h, plural, one {ساعة} two {ساعتين} few {# ساعات} other {# ساعة}} بس قبل الفصل",
+    "missingInfo": "وقت السحب أو اللي سحبها مو مسجل",
+    "missingTime": "مو مسجل",
+    "receiveAnyway": "استلمها مع ملاحظة",
+    "reject": "ارفض العينة",
+    "note": "ملاحظة للتقرير",
+    "notePlaceholder": "ليش العينة تنفع للتحليل",
+    "noteRequired": "اكتب ملاحظة أول",
+    "receiveWithNote": "استلمها بهالملاحظة",
+    "cancelNote": "إلغاء",
+    "close": "إغلاق",
+    "done": "تم · استلمت {n}",
+    "toast": "انستلمت العينات في المختبر",
+    "toastStat": "عينة {name} العاجلة تدخل الجهاز أول",
+    "toastText": "{n, plural, one {أنبوب واحد جاهز} two {أنبوبين جاهزين} few {# أنابيب جاهزة} other {# أنبوب جاهز}} للأجهزة"
   }
 }

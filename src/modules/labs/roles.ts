@@ -2,7 +2,8 @@ import type { LabRole } from "./data"
 
 /**
  * Lab permissions (brief §4):
- * - phlebotomy collects (and can reject at the chair);
+ * - lab reception scans tubes in (receive);
+ * - phlebotomy collects and can receive; rejecting a sample needs a lab tech or higher;
  * - lab techs receive, enter and submit results, reject samples, print labels;
  * - the clinical pathologist / lab specialist validates and releases (and sends the report);
  * - doctors view and order;
@@ -27,7 +28,8 @@ export type LabAction =
 const STAFF_VIEW: LabAction[] = ["view"]
 
 const MATRIX: Record<Exclude<LabRole, "lead">, LabAction[]> = {
-  phlebotomy: [...STAFF_VIEW, "collect", "reject", "print"],
+  reception: [...STAFF_VIEW, "receive", "print"],
+  phlebotomy: [...STAFF_VIEW, "collect", "receive", "print"],
   tech: [...STAFF_VIEW, "receive", "reject", "enter", "submit", "logCall", "print"],
   pathologist: [...STAFF_VIEW, "reject", "logCall", "validate", "release", "send", "print", "catalog"],
   doctor: [...STAFF_VIEW, "order"],

@@ -1,3 +1,4 @@
+import type { Bi } from "@/lib/mock/bi"
 import {
   LAB_NOW,
   ORDER_OF_DRAW,
@@ -196,15 +197,33 @@ export function collect(o: LabOrder, tubeNos: number[], by: string, at: string, 
   })
 }
 
-/** Lab reception scans tubes in. */
-export function receive(o: LabOrder, tubeNos: number[], by: string, at: string): Step {
+/** Lab reception scans tubes in: received time + who, and a custody event (with a typed remark when there is one). */
+export function receive(o: LabOrder, tubeNos: number[], by: string, at: string, opts: { note?: Bi; remark?: string } = {}): Step {
   const picks = o.tubes.filter((t) => tubeNos.includes(t.no) && t.state === "collected")
   if (!picks.length) return no("notCollected")
   return ok({
     ...o,
-    tubes: o.tubes.map((t) => (picks.includes(t) ? { ...t, state: "received" as const, receivedAt: at } : t)),
-    events: log(o, { at, kind: "received", by }),
+    tubes: o.tubes.map((t) => (picks.includes(t) ? { ...t, state: "received" as const, receivedAt: at, receivedBy: by } : t)),
+    events: log(o, { at, kind: "received", by, note: opts.note, remark: opts.remark }),
   })
+}
+
+export type ReceiveProblem =
+  | { reason: "stability"; analyte: string; hours: number; ageMin: number }
+  | { reason: "info" }
+
+/**
+ * Receiving rules (CODE_CHAT_LABS.md §4): the collection must be recorded (time + who), and the sample must still be
+ * within the stability limit of every test it carries (e.g. potassium 4 h before spinning). Returns the problem, or
+ * null when the tube can be received.
+ */
+export function receiveProblem(o: LabOrder, tubeNo: number, now: string = LAB_NOW): ReceiveProblem | null {
+  const t = o.tubes.find((x) => x.no === tubeNo)
+  if (!t || !t.collectedAt || !t.collectedBy) return { reason: "info" }
+  const age = minsBetween(t.collectedAt, now)
+  const limits = t.tests.map((k) => testOf(k)?.stability).filter((x): x is NonNullable<typeof x> => !!x)
+  const broken = limits.filter((l) => age > l.hours * 60).sort((a, z) => a.hours - z.hours)[0]
+  return broken ? { reason: "stability", analyte: broken.analyte, hours: broken.hours, ageMin: age } : null
 }
 
 /**

@@ -23,9 +23,10 @@ import {
   type TubeState,
 } from "./data"
 import { CollectDialog } from "./collect-dialog"
+import { ReceiveDialog } from "./receive-dialog"
 import { LabFrame } from "./frame"
 import { tubesToCollect } from "./machine"
-import { Latin, PriorityChip, TubeDot, TubeLabel, useSoon } from "./parts"
+import { Latin, PriorityChip, TubeDot, TubeLabel } from "./parts"
 import { labCan } from "./roles"
 import { useLabOrders, useLabRole } from "./store"
 import { useLabText } from "./text"
@@ -207,7 +208,8 @@ export function sampleCounts(orders: LabOrder[]) {
 export function SampleTracker() {
   const t = useTranslations("labs.samples.tracker")
   const { b, ar } = useLabText()
-  const soon = useSoon()
+  const role = useLabRole()
+  const [scanning, setScanning] = React.useState(false)
   const orders = useLabOrders()
   const rows = trackedTubes(orders)
   const c = sampleCounts(orders)
@@ -219,10 +221,12 @@ export function SampleTracker() {
       title={t("title")}
       text={t("text", c)}
       action={
-        <Button variant="ghost" size="sm" onClick={soon}>
-          <Icon name="scan-barcode" size={24} />
-          {t("scan")}
-        </Button>
+        labCan(role, "receive") && (
+          <Button variant="ghost" size="sm" onClick={() => setScanning(true)}>
+            <Icon name="scan-barcode" size={24} />
+            {t("scan")}
+          </Button>
+        )
       }
       className="@container/tr"
     >
@@ -292,6 +296,7 @@ export function SampleTracker() {
           )
         })}
       </ul>
+      {scanning && <ReceiveDialog open onOpenChange={setScanning} />}
     </LabCard>
   )
 }

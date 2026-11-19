@@ -39,6 +39,9 @@ import { SendDialog } from "@/modules/labs/order/send-dialog"
 import { TestCatalog } from "@/modules/labs/catalog"
 import { AddTestDialog, blankForm, newRange, sampleForm } from "@/modules/labs/add-test"
 import { useCatalog } from "@/modules/labs/store"
+import { ReceiveDialog, scanRow, type CheckState } from "@/modules/labs/receive-dialog"
+import { receiveProblem } from "@/modules/labs/machine"
+import { LAB_TODAY } from "@/modules/labs/data"
 import { LabReport } from "@/modules/labs/reports"
 import { Summary } from "@/modules/labs/new-order"
 import { tubesFor as tubesForTests } from "@/modules/labs/machine"
@@ -102,6 +105,7 @@ export function LabStories() {
   const [collecting, setCollecting] = React.useState<string | null>(null)
   const [rejecting, setRejecting] = React.useState(false)
   const [addTest, setAddTest] = React.useState<null | "s1" | "s2" | "e1" | "e2">(null)
+  const [recv, setRecv] = React.useState<null | "r1" | "r2" | "unknown" | "camera">(null)
   const catalog = useCatalog()
   const [dialog, setDialog] = React.useState<"call" | "release" | "send" | null>(null)
   const live142 = useLabOrder("LAB-0142")
@@ -126,6 +130,23 @@ export function LabStories() {
           </div>
         </div>
       </Box>
+      <Box title="Overlay · Receive samples (Scan sample) · switch language for Arabic; under 768 = sheet">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setRecv("r1")}>
+            State 1 · ready (2 scanned)
+          </Button>
+          <Button variant="outline" onClick={() => setRecv("r2")}>
+            State 2 · check sample (LAB-0134)
+          </Button>
+          <Button variant="outline" onClick={() => setRecv("unknown")}>
+            Unknown barcode row
+          </Button>
+          <Button variant="outline" onClick={() => setRecv("camera")}>
+            Mobile viewfinder (no camera)
+          </Button>
+        </div>
+      </Box>
+      {recv && <ReceiveStory kind={recv} onClose={() => setRecv(null)} />}
       <Box title="Overlay · Add test (switch language for Arabic; mobile = bottom sheet under 768)">
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => setAddTest("s1")}>
@@ -386,4 +407,17 @@ export function LabStories() {
       </Box>
     </div>
   )
+}
+
+/** Receive samples stories: the design's rows (Reem received 10:41, Lina already in lab 10:09) and LAB-0134's check card. */
+function ReceiveStory({ kind, onClose }: { kind: "r1" | "r2" | "unknown" | "camera"; onClose: () => void }) {
+  const o134 = useLabOrder("LAB-0134")
+  const rows = [
+    scanRow({ kind: "received", code: "S2611190137-01", orderNo: "LAB-0137", tubeNo: 1, at: `${LAB_TODAY}T10:41` }),
+    scanRow({ kind: "already", code: "S2611190141-01", orderNo: "LAB-0141", tubeNo: 1, at: `${LAB_TODAY}T10:09` }),
+  ]
+  const problem = o134 ? receiveProblem(o134, 1) : null
+  const check: CheckState | undefined = kind === "r2" && problem ? { orderNo: "LAB-0134", tubeNo: 1, problem } : undefined
+  const initialRows = kind === "unknown" ? [scanRow({ kind: "unknown", code: "S2611190199-01" }), ...rows] : rows
+  return <ReceiveDialog open onOpenChange={(v) => !v && onClose()} initialRows={initialRows} initialCheck={check} cameraPreview={kind === "camera" || undefined} />
 }

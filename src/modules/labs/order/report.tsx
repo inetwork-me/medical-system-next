@@ -48,6 +48,8 @@ export function useReportModel(o: LabOrder, audience: "staff" | "patient") {
       })
     })
   const notes = [...new Set(panels.map((p) => p.comment).filter(Boolean) as string[])]
+  // Notes typed when a sample was received outside its limits ("Receive anyway, with a note").
+  const remarks = o.events.filter((e) => e.kind === "received" && e.remark).map((e) => t("receivedNote", { note: e.remark! }))
   const info: [string, string][] = [
     [t("patient"), b(o.patient.name)],
     [t("mrn"), o.patient.mrn],
@@ -62,7 +64,7 @@ export function useReportModel(o: LabOrder, audience: "staff" | "patient") {
     panels,
     title: (p: Panel) => title(p),
     info,
-    comment: [...calls, ...notes].join(" "),
+    comment: [...calls, ...remarks, ...notes].join(" "),
     validatedBy: v ? `${b(v.name)} · ${b(v.title).toLowerCase()}` : null,
     verify: t("verify", { url: LAB_FACILITY.verifyUrl, code: o.verifyCode ?? o.no.replace(/\D/g, "") }),
   }

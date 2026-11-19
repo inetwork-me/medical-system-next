@@ -113,6 +113,8 @@ export type TestDef = {
   resultType?: ResultType
   /** Added in the app (Add test) rather than shipped with the sample catalog. */
   custom?: boolean
+  /** Receiving: how long the sample is reliable before spinning, and for which analyte (potassium 4 h). */
+  stability?: { hours: number; analyte: string }
 }
 
 export type SampleType = "serum" | "plasma" | "wholeBlood" | "urine"
@@ -185,6 +187,7 @@ export const TESTS: TestDef[] = [
     price: 80,
     active: true,
     volumeMl: 5,
+    stability: { hours: 4, analyte: "k" },
     analytes: [
       A("na", "Sodium", "الصوديوم", "mmol/L", 0, [{ low: 135, high: 145 }]),
       A("k", "Potassium", "البوتاسيوم", "mmol/L", 1, [{ low: 3.5, high: 5.1 }], { critLow: 2.8, critHigh: 6.2 }),
@@ -250,7 +253,7 @@ export const READY_PANELS: { key: string; name: Bi; tests: string[] }[] = [
 /* ------------------------------------------------------------------ staff */
 
 /** Lab roles (brief §4 permissions). "lead" is the demo login: every lab permission (no user model in the design yet). */
-export type LabRole = "phlebotomy" | "tech" | "pathologist" | "doctor" | "patient" | "lead"
+export type LabRole = "reception" | "phlebotomy" | "tech" | "pathologist" | "doctor" | "patient" | "lead"
 
 export type LabStaff = { key: string; name: Bi; role: Exclude<LabRole, "doctor" | "patient" | "lead">; title: Bi }
 
@@ -365,6 +368,8 @@ export type Tube = {
   collectedAt?: string
   collectedBy?: string
   receivedAt?: string
+  /** Staff key (lab reception / tech) who scanned it in. */
+  receivedBy?: string
   /** Rack / storage note once resulted ("stored rack B4"). */
   rack?: string
   /** Why this sample was rejected (state "rejected"; its times stay for the tracker). */
@@ -427,7 +432,14 @@ export type CriticalCall = {
 
 export type LabEventKind = "ordered" | "collected" | "received" | "analyzer" | "resulted" | "submitted" | "critical" | "validated" | "released" | "rejected" | "sent"
 
-export type LabEvent = { at: string; kind: LabEventKind; by?: string; note?: Bi }
+export type LabEvent = {
+  at: string
+  kind: LabEventKind
+  by?: string
+  note?: Bi
+  /** Free text typed by staff (e.g. "Receive anyway" note); printed on the report comment. */
+  remark?: string
+}
 
 export type LabOrder = {
   /** "LAB-0142" */
@@ -596,6 +608,7 @@ type Lite = {
   releasedAt?: string
   mockFlags?: Panel["mockFlags"]
   rejection?: Rejection
+  place?: CollectionPlace
 }
 
 /** Builds the lighter sample orders (worklist rows, queue, tracker, validation queue) in a consistent state. */
@@ -645,7 +658,7 @@ function lite(o: Lite): LabOrder {
     tubes,
     panels,
     fasting: false,
-    place: "room",
+    place: o.place ?? "room",
     createdAt: o.createdAt,
     ticket: o.ticket,
     queuedAt: o.queuedAt,
@@ -786,6 +799,20 @@ export const ORDERS: LabOrder[] = [
     status: "ready",
     releasedAt: T("09:15"),
   }),
+  // Receiving (Scan sample): a home-visit sample on its way since 06:05 — past potassium's 4 h stability.
+  lite({
+    no: "LAB-0134",
+    patient: pt("HD", "Hessa Al-Dossary", "حصة الدوسري", "MRN-19960", "female", 61 * 12),
+    doctorId: "mansour",
+    clinicId: "cardio",
+    tests: ["kidney", "lytes"],
+    tubes: [["gold", ["kidney", "lytes"]]],
+    createdAt: T("05:50"),
+    collectedAt: T("06:05"),
+    receivedAt: null,
+    status: "lab",
+    place: "home",
+  }),
   // Waiting for validation (Results tab), behind the first worklist page.
   lite({
     no: "LAB-0133",
@@ -859,13 +886,13 @@ export const PREVIOUS_ORDERS: Record<string, { date: string; no: string; summary
  * counts and tab counts add these to the live sample orders, so they match the design and still move when a sample
  * order is collected, rejected or released.
  */
-export const OTHER_TODAY = { collect: 8, collectStat: 2, lab: 16, validate: 4, ready: 23 } as const
+export const OTHER_TODAY = { collect: 8, collectStat: 2, lab: 15, validate: 4, ready: 23 } as const
 
 /** Worklist KPI context the mock can't compute (no history yet). */
 export const WORKLIST_TRENDS = { vsLastWeekPct: 8, avgInLabMin: 46 } as const
 
 /** Samples collected / received today outside the sample orders (Samples today: "142 collected · 138 received"). */
-export const OTHER_SAMPLES = { collected: 129, received: 126 } as const
+export const OTHER_SAMPLES = { collected: 128, received: 126 } as const
 
 /** Collection rooms in use (Collection queue subtitle; Call next sends the patient to the first). */
 export const COLLECTION_ROOMS = [1, 2] as const
@@ -875,3 +902,11 @@ export const OTHER_REJECTIONS: { name: Bi; reason: RejectReason; tube?: TubeKey;
   { name: bi("Badr Al-Otaibi", "بدر العتيبي"), reason: "clotted", tube: "lav", at: `${LAB_TODAY}T09:31`, outcome: "done", doneAt: `${LAB_TODAY}T09:50` },
   { name: bi("Hind Al-Zahrani", "هند الزهراني"), reason: "qns", at: `${LAB_TODAY}T09:12`, outcome: "sms" },
 ]
+
+/** Custody note for a tube scanned in at lab reception (Receive samples). */
+export const RECEIVE_NOTE = {
+  normal: { en: "scanned at reception", ar: "انمسح عند الاستقبال" },
+  stat: { en: "scanned at reception · STAT, first on the analyzer", ar: "انمسح عند الاستقبال · عاجل، أول على الجهاز" },
+} as const
+/** Who scans tubes in at reception in the sample data (Ali Hassan, lab technician). */
+export const RECEPTION_STAFF = "ali"

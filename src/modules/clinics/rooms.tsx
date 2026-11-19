@@ -11,7 +11,7 @@ import { Field } from "@/components/ds/field"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -198,7 +198,7 @@ function AddRoomDialog({ clinic: c, onOpenChange }: { clinic: Clinic; onOpenChan
     const room: Room = { number: n, type: TYPES[type], status: "free", equipment: items }
     updateClinic(c.key, (x) => ({ rooms: [...x.rooms, room], roomCount: x.rooms.length + 1 }))
     onOpenChange(false)
-    notify.success(t("toast", { n }), { description: t("toastText") })
+    toast.success(t("toast", { n }), { description: t("toastText") })
   }
   return (
     <ResponsiveDialog

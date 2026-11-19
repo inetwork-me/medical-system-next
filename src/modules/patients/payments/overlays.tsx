@@ -11,7 +11,7 @@ import { saveBlob } from "@/lib/export/files"
 import { Field } from "@/components/ds/field"
 import { Icon } from "@/components/ds/icon"
 import { RadioOption } from "@/components/ds/radio-option"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -43,9 +43,9 @@ function usePdfDownload() {
     setBusy(true)
     try {
       saveBlob(await pdfDocument(blocks, { dir: rtl ? "rtl" : "ltr", title: name }), name)
-      notify.success(t("ready"), { description: t("readyText", { name }) })
+      toast.success(t("ready"), { description: t("readyText", { name }) })
     } catch {
-      notify.error(t("failed"), { description: t("failedText") })
+      toast.error(t("failed"), { description: t("failedText"), retry: () => void run(name, blocks) })
     } finally {
       setBusy(false)
     }

@@ -3,7 +3,7 @@
 import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 
 import { isModuleEnabled } from "@/lib/modules"
 import { bi } from "@/lib/mock/bi"
@@ -58,7 +58,7 @@ export function RowActions({ patient, trigger }: { patient: Patient; trigger?: R
               label: isVip ? t("rowMenu.unvip") : t("rowMenu.vip"),
               onSelect: () => {
                 setTags(patient.id, toggleTag(patient.tags, "vip", !isVip))
-                notify.success(isVip ? t("vipToast.off") : t("vipToast.on"), { description: t("vipToast.text", { name }) })
+                toast.success(isVip ? t("vipToast.off") : t("vipToast.on"), { description: t("vipToast.text", { name }) })
               },
             },
             {
@@ -94,7 +94,7 @@ export function BanDialog({ patient, open, onOpenChange }: { patient: Patient; o
   const confirm = () => {
     setTags(patient.id, toggleTag(patient.tags, "banned", true))
     onOpenChange(false)
-    notify.success(t("done", { name }), { description: t("doneText") })
+    toast.success(t("done", { name }), { description: t("doneText") })
   }
 
   return (
@@ -168,7 +168,7 @@ export function ArchiveDialog({
     archive(patient.id)
     onOpenChange(false)
     onArchived?.()
-    notify.success(t("done"), { description: t("doneText", { name }) })
+    toast.success(t("done"), { description: t("doneText", { name }) })
   }
 
   return (

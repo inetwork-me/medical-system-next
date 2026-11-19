@@ -71,10 +71,10 @@
     "video": "فيديو",
     "pdfBrand": "النظام الطبي · الفرع الرئيسي",
     "pdfTitle": "المواعيد",
-    "downloaded": "الملف جاهز",
+    "downloaded": "نزل الملف",
     "downloadedText": "{count, plural, one {انحفظ موعد واحد} two {انحفظ موعدين} few {انحفظت # مواعيد} many {انحفظ # موعد} other {انحفظ # موعد}} كملف {format}.",
     "failed": "ما قدرنا نصدّر",
-    "failedText": "صار خطأ وإحنا نجهز الملف. جرّب مرة ثانية."
+    "failedText": "ما نزل أي ملف."
   },
   "list": {
     "kpi": {

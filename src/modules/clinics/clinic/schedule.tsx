@@ -10,7 +10,7 @@ import { DatePicker } from "@/components/ds/pickers"
 import { RadioOption } from "@/components/ds/radio-option"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -63,7 +63,7 @@ function Hours({ clinic: c, className }: { clinic: Clinic; className?: string })
     const next = { ...c.hours }
     for (const d of WEEKDAYS) if (next[d].length) next[d] = [...c.hours[source]]
     updateClinic(c.key, { hours: next })
-    notify.success(t("copied"), { description: t("copiedText", { day: t(`days.${source}`) }) })
+    toast.success(t("copied"), { description: t("copiedText", { day: t(`days.${source}`) }) })
   }
   return (
     <Widget
@@ -292,7 +292,7 @@ function AddClosureDialog({ clinic: c, onOpenChange }: { clinic: Clinic; onOpenC
     const text = reason.trim() || (kind === "halfDay" ? t("halfDay") : t("holiday"))
     updateClinic(c.key, (x) => ({ closures: [...x.closures, { date: iso, reason: { en: text, ar: text }, kind }] }))
     onOpenChange(false)
-    notify.success(t("toast"), { description: t("toastText", { date: dates.short(iso) }) })
+    toast.success(t("toast"), { description: t("toastText", { date: dates.short(iso) }) })
   }
   return (
     <ResponsiveDialog

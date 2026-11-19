@@ -8,7 +8,7 @@ import { Field } from "@/components/ds/field"
 import { Icon } from "@/components/ds/icon"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { EmptyState } from "@/components/ds/states"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -59,7 +59,7 @@ export function LeaveBoard() {
   const decline = (l: Leave) => {
     updateLeave(l.id, { status: "declined" })
     const d = doc(l.doctor)
-    notify.info(t("declined"), {
+    toast.info(t("declined"), {
       description: t("declinedText", { name: d ? shortName(b(d.name)) : "" }),
       action: { label: t("undo"), onClick: () => updateLeave(l.id, { status: "pending" }) },
     })
@@ -263,7 +263,7 @@ function ReviewLeaveDialog({ leaveId, onOpenChange }: { leaveId: string; onOpenC
     updateLeave(l.id, { status: "approved", ...(note.trim() ? { note: { en: note.trim(), ar: note.trim() } } : {}) })
     if (countsAgainstBalance(l.type)) updateDoctor(d.key, (x) => ({ leaveUsed: x.leaveUsed + days }))
     onOpenChange(false)
-    notify.success(t("approved"), { description: t("approvedText", { n: moving ? l.bookings : 0, cover: coverShort }) })
+    toast.success(t("approved"), { description: t("approvedText", { n: moving ? l.bookings : 0, cover: coverShort }) })
   }
 
   return (

@@ -11,7 +11,7 @@ import { Field } from "@/components/ds/field"
 import { Icon } from "@/components/ds/icon"
 import { Segmented } from "@/components/ds/segmented"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { PageContainer } from "@/components/shell/page"
 import { PageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
@@ -107,7 +107,7 @@ export function NewAppointment({ initial }: { initial: NewAppointmentInitial }) 
       telehealth: visit === "telehealth",
     })
     guard.allow()
-    notify.success(t("booked"), {
+    toast.success(t("booked"), {
       description: t("bookedText", {
         name: bi(patient.name, locale).split(" ")[0],
         date: `${dates.weekdayShort(date)} ${dates.dayMonth(date)}`,

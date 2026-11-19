@@ -71,10 +71,10 @@
     "video": "Video",
     "pdfBrand": "Medical System · Main branch",
     "pdfTitle": "Appointments",
-    "downloaded": "Export ready",
+    "downloaded": "Export downloaded",
     "downloadedText": "{count, plural, one {1 appointment} other {# appointments}} saved as {format}.",
     "failed": "Couldn't export",
-    "failedText": "Something went wrong while building the file. Try again."
+    "failedText": "Nothing was downloaded."
   },
   "list": {
     "kpi": {

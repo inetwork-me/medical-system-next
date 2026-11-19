@@ -3,7 +3,7 @@
 import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import { Link, useRouter } from "@/i18n/navigation"
@@ -125,7 +125,7 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
       return
     }
     if (!dirty) {
-      notify.info(t("noChanges"), { description: t("noChangesText") })
+      toast.info(t("noChanges"), { description: t("noChangesText") })
       return
     }
     const region = CITY_REGION[form.city] ?? "other"
@@ -153,7 +153,7 @@ function EditForm_({ patient: p, record }: { patient: Patient; record: Data["rec
       form
     )
     guard.allow()
-    notify.success(t("saved"), { description: t("savedText", { name: b({ en: nameEn, ar: form.nameAr.trim() }) }) })
+    toast.success(t("saved"), { description: t("savedText", { name: b({ en: nameEn, ar: form.nameAr.trim() }) }) })
     router.push(back)
   }
 

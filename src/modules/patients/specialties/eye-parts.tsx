@@ -13,7 +13,7 @@ import { useIsMobile } from "@/hooks/use-media-query"
 import { Field } from "@/components/ds/field"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -672,7 +672,7 @@ function FinishDialog({ id, exam, open, onOpenChange }: { id: string; exam: EyeE
           onClick={() => {
             signExam(id)
             onOpenChange(false)
-            notify.success(t("savedTitle"), { description: t("savedText") })
+            toast.success(t("savedTitle"), { description: t("savedText") })
           }}
         >
           <Icon name="tick-circle" size={20} />

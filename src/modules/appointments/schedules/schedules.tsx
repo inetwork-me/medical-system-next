@@ -12,7 +12,7 @@ import { Icon } from "@/components/ds/icon"
 import { DateRangePicker } from "@/components/ds/pickers"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ExportDialog } from "../calendar/export"
@@ -159,7 +159,7 @@ function TimeOffDialog({ open, onOpenChange, initialDoctor }: { open: boolean; o
     const id = `to-${doctor}-${Date.now()}`
     addTimeOff({ id, doctor, from, to, reason })
     onOpenChange(false)
-    notify.success(t("saved"), {
+    toast.success(t("saved"), {
       description: t("savedText", { doctor: name, range: dates.dayRange(from, to), count: booked }),
       action: { label: t("undo"), onClick: () => removeTimeOff(id) },
     })

@@ -9,7 +9,7 @@ import { Icon } from "@/components/ds/icon"
 import { FilterChip } from "@/components/ds/module-controls"
 import { StatCard } from "@/components/ds/stat-card"
 import { EmptyState } from "@/components/ds/states"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -65,7 +65,7 @@ export function ClinicsList() {
       String(c.today.avgWait),
     ])
     saveBlob(xlsxBlob(head, body, { sheet: tn("clinics"), rtl: locale === "ar" }), file)
-    notify.success(t("exported"), { description: t("exportedText", { file }) })
+    toast.success(t("exported"), { description: t("exportedText", { file }) })
   }
 
   return (

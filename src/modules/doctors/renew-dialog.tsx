@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl"
 import { Field } from "@/components/ds/field"
 import { DatePicker } from "@/components/ds/pickers"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { DropZone, UploadItem, toMb } from "@/components/ds/upload"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -72,7 +72,7 @@ export function RenewDialog({ doctorKey, type, onOpenChange }: { doctorKey: stri
     }
     updateDoctor(d.key, (x) => ({ credentials: x.credentials.some((c) => c.type === kind) ? x.credentials.map((c) => (c.type === kind ? next : c)) : [...x.credentials, next] }))
     onOpenChange(false)
-    notify.success(cur ? t("toast", { name }) : t("added", { name }), { description: t(cur ? "toastText" : "addedText", { date: dates.short(iso) }) })
+    toast.success(cur ? t("toast", { name }) : t("added", { name }), { description: t(cur ? "toastText" : "addedText", { date: dates.short(iso) }) })
   }
 
   return (

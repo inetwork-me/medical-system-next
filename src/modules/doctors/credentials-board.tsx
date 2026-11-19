@@ -8,7 +8,7 @@ import { saveBlob, stamp, xlsxBlob } from "@/lib/export/files"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -55,14 +55,14 @@ export function CredentialsBoard() {
   const caption = (k: CredBucket) =>
     k === "expired" ? t("cap.expired", { n: new Set(all.filter((r) => credBucket(r.c) === "expired").map((r) => r.d.key)).size }) : k === "valid" ? t("cap.valid", { n: doctors.length }) : t(`cap.${k}`)
 
-  const remind = () => notify.success(t("reminded"), { description: t("remindedText") })
-  const remindAll = () => notify.success(t("remindedAll"), { description: t("remindedAllText", { n: new Set(due.map((r) => r.d.key)).size }) })
+  const remind = () => toast.success(t("reminded"), { description: t("remindedText") })
+  const remindAll = () => toast.success(t("remindedAll"), { description: t("remindedAllText", { n: new Set(due.map((r) => r.d.key)).size }) })
   const exportList = () => {
     const file = `credentials-${stamp()}.xlsx`
     const head = [t("col.doctor"), t("col.credential"), t("col.expires"), t("col.status")]
     const body = rows.map((r) => [b(r.d.name), tn(r.c.type), dates.short(r.c.expires), status(r.c)])
     saveBlob(xlsxBlob(head, body, { sheet: t("sheet"), rtl: locale === "ar" }), file)
-    notify.success(t("exported"), { description: t("exportedText", { file }) })
+    toast.success(t("exported"), { description: t("exportedText", { file }) })
   }
   const who = (d: Doctor) => (
     <div className="flex min-w-0 items-center gap-2.5">

@@ -171,7 +171,7 @@
     "colLastVisit": "آخر زيارة",
     "colTags": "التصنيفات",
     "confirm": "صدّر",
-    "downloaded": "الملف جاهز",
+    "downloaded": "نزل الملف",
     "downloadedText": "انحفظت {count} صف كملف {format}.",
     "mobile": "الجوال",
     "region": "المنطقة",
@@ -179,7 +179,7 @@
     "pdfTitle": "قائمة المرضى",
     "pdfMeta": "{count} مريض · تم التصدير {date}",
     "failed": "ما قدرنا نصدّر",
-    "failedText": "صار خطأ وإحنا نجهّز الملف. جرّب مرة ثانية.",
+    "failedText": "ما نزل أي ملف.",
     "patient": "المريض"
   },
   "sheet": {
@@ -520,7 +520,7 @@
       "ready": "نزل الملف",
       "readyText": "{name} موجود في التنزيلات.",
       "failed": "ما قدرنا نسوي الملف",
-      "failedText": "صار خطأ وإحنا نجهّز الملف. جرّب مرة ثانية.",
+      "failedText": "ما نزل أي ملف.",
       "level": {
         "severe": "شديدة",
         "moderate": "متوسطة"
@@ -1223,7 +1223,7 @@
       "ready": "نزل الـ PDF",
       "readyText": "{name} موجود في التنزيلات.",
       "failed": "ما قدرنا نسوي الـ PDF",
-      "failedText": "صار خطأ وإحنا نجهّز الملف. جرّب مرة ثانية."
+      "failedText": "ما نزل أي ملف."
     }
   },
   "ov": {

@@ -9,7 +9,7 @@ import { Field } from "@/components/ds/field"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -39,7 +39,7 @@ function DoctorsCard({ clinic: c }: { clinic: Clinic }) {
   const remove = (d: ClinicDoctor) => {
     const before = c.doctors
     updateClinic(c.key, { doctors: before.filter((x) => x !== d), doctorCount: before.length - 1 })
-    notify.success(t("removed"), {
+    toast.success(t("removed"), {
       description: t("removedText", { name: b(d.name), clinic: b(c.name) }),
       action: { label: t("undo"), onClick: () => updateClinic(c.key, { doctors: before, doctorCount: before.length }) },
     })
@@ -213,7 +213,7 @@ function AddDoctorDialog({ clinic: c, open, onOpenChange }: { clinic: Clinic; op
     }
     updateClinic(c.key, (x) => ({ doctors: [...x.doctors, d], doctorCount: x.doctors.length + 1 }))
     onOpenChange(false)
-    notify.success(t("toast"), { description: t("toastText", { name: b(pick.name) }) })
+    toast.success(t("toast"), { description: t("toastText", { name: b(pick.name) }) })
   }
   const name = b(c.name)
   return (

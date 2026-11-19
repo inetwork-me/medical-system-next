@@ -11,7 +11,7 @@ import { useDates } from "@/i18n/dates"
 import { Donut, HBars, Kpis, ReportCard, ReportFilters, ReportTable, VBars, type Column, type Kpi } from "@/components/reports/parts"
 import { Icon } from "@/components/ds/icon"
 import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { ModuleTabsNav, PageContainer, PageHeader } from "@/components/shell/page"
 import { PageTitle } from "@/components/shell/page-title"
 import { Badge } from "@/components/ui/badge"
@@ -121,7 +121,7 @@ function ReportShell({ report, csv, children }: { report: ReportKey; csv: (c: Ct
   const exportCsv = () => {
     const { name, head, rows } = csv(ctx)
     saveBlob(csvBlob(head, rows.map((r) => r.map(String))), `${name}-${stamp()}.csv`)
-    notify.success(t("exported"), { description: t("exportedText", { count: rows.length }) })
+    toast.success(t("exported"), { description: t("exportedText", { count: rows.length }) })
   }
 
   return (
@@ -374,7 +374,7 @@ function NoShowsBody() {
     { icon: "timer-1", tile: "warning", label: t("noShows.kLate"), value: n(scale(48)), delta: t("noShows.kLateDelta"), tone: "warning", caption: t("noShows.kLateCap") },
     { icon: "money-remove", tile: "destructive", label: t("noShows.kLost"), value: t("sar", { n: n(scale(41300)) }), delta: n(scale(244)), tone: "destructive", caption: t("noShows.kLostCap") },
   ]
-  const warn = (name: string) => notify.success(t("noShows.warned"), { description: t("noShows.warnedText", { name }) })
+  const warn = (name: string) => toast.success(t("noShows.warned"), { description: t("noShows.warnedText", { name }) })
   const status = (c: number) => (
     <StatusBadge tone={c >= 3 ? "destructive" : "warning"}>{c >= 3 ? t("noShows.blocked") : t("noShows.oneMore")}</StatusBadge>
   )

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { saveBlob, stamp, xlsxBlob } from "@/lib/export/files"
 import { VBars } from "@/components/reports/parts"
 import { Icon } from "@/components/ds/icon"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -34,7 +34,7 @@ function useExportReport(rows: Clinic[]) {
       t("revenue", { n: c.month.revenue }),
     ])
     saveBlob(xlsxBlob(head, body, { sheet: t("sheet"), rtl: locale === "ar" }), file)
-    notify.success(t("exported"), { description: t("exportedText", { file }) })
+    toast.success(t("exported"), { description: t("exportedText", { file }) })
   }
 }
 

@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl"
 import { useDates } from "@/i18n/dates"
 import { useIsMobile } from "@/hooks/use-media-query"
 import { Icon } from "@/components/ds/icon"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { usePatient, useText } from "../profile/use-patient"
 import { printArea } from "../payments/overlays"
@@ -43,7 +43,7 @@ export function DentalActions() {
   if (mobile) return null
   const save = () => {
     markChartSaved(id)
-    notify.success(t("saved"), { description: data ? `${b(data.patient.name)} · ${dates.short(new Date())}` : undefined })
+    toast.success(t("saved"), { description: data ? `${b(data.patient.name)} · ${dates.short(new Date())}` : undefined })
   }
   return (
     <>

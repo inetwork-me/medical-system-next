@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import type { Bi } from "@/lib/mock/bi"
@@ -224,7 +224,7 @@ function AddNote({ patient, record, onClose }: { patient: Patient; record: Patie
       activity: [act({ en: `Note: ${titleBi[type].en}`, ar: `ملاحظة: ${titleBi[type].ar}` }), ...c.activity],
     }))
     onClose()
-    notify.success(t("saved"), { description: t("savedText", { name: b(patient.name) }) })
+    toast.success(t("saved"), { description: t("savedText", { name: b(patient.name) }) })
   }
   return (
     <ResponsiveDialog
@@ -452,7 +452,7 @@ function Reschedule({ patient, record, date, onClose }: { patient: Patient; reco
       }
     })
     onClose()
-    notify.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(d), time }) }) })
+    toast.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(d), time }) }) })
   }
   return (
     <ResponsiveDialog
@@ -504,7 +504,7 @@ function CancelAppt({ patient, record, date, onClose }: { patient: Patient; reco
       }
     })
     onClose()
-    notify.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(a.date), time: a.time ?? "" }) }) })
+    toast.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(a.date), time: a.time ?? "" }) }) })
   }
   return (
     <ResponsiveDialog
@@ -585,7 +585,7 @@ function BookVisit({ patient, record, onClose }: { patient: Patient; record: Pat
       activity: [act({ en: `Visit booked: ${c.name.en} · ${d} ${time}`, ar: `حجز موعد: ${c.name.ar} · ${d} ${time}` }), ...ch.activity],
     }))
     onClose()
-    notify.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(d), time }), doctor: b(doc) }) })
+    toast.success(t("done"), { description: t("doneText", { when: ta("when", { day: day(d), time }), doctor: b(doc) }) })
   }
   return (
     <ResponsiveDialog
@@ -742,7 +742,7 @@ function Prescribe({ patient, record, onClose }: { patient: Patient; record: Pat
       activity: [act({ en: `Prescription: ${m.name.en}`, ar: `وصفة: ${m.name.ar}` }), ...c.activity],
     }))
     onClose()
-    notify.success(t("done"), { description: t("doneText", { med: b(m.name), dose: `${dose.trim()} · ${t(`freq.${freq}`)}` }) })
+    toast.success(t("done"), { description: t("doneText", { med: b(m.name), dose: `${dose.trim()} · ${t(`freq.${freq}`)}` }) })
   }
   return (
     <ResponsiveDialog
@@ -899,7 +899,7 @@ function Upload({ patient, initial, onClose }: { patient: Patient; initial?: Fil
       activity: [act({ en: `Files uploaded: ${files.length}`, ar: `رفع ملفات: ${files.length}` }), ...c.activity],
     }))
     onClose()
-    notify.success(t("done", { count: files.length }), { description: t("doneText", { name: b(patient.name) }) })
+    toast.success(t("done", { count: files.length }), { description: t("doneText", { name: b(patient.name) }) })
   }
   return (
     <ResponsiveDialog
@@ -1096,7 +1096,7 @@ function Sms({ patient, record, onClose }: { patient: Patient; record: PatientRe
   const send = () => {
     if (!phone || !text.trim()) return
     onClose()
-    notify.success(t("sent"), { description: t("sentText", { phone }) })
+    toast.success(t("sent"), { description: t("sentText", { phone }) })
   }
   const parts = Math.max(1, Math.ceil(text.length / 160))
   return (

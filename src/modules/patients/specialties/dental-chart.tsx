@@ -11,7 +11,7 @@ import { useIsMobile } from "@/hooks/use-media-query"
 import { Icon } from "@/components/ds/icon"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetBody, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { PCard } from "../profile/side"
@@ -48,7 +48,7 @@ export function DentalChartWorkspace() {
 
   const addTreatment = () => {
     if (selected == null) {
-      notify.info(t("pickTooth"), { description: t("pickToothText") })
+      toast.info(t("pickTooth"), { description: t("pickToothText") })
       return
     }
     const el = document.getElementById(`treatment-${selected}`)

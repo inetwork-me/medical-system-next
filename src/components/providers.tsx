@@ -2,7 +2,7 @@
 
 import { Direction } from "radix-ui";
 import type { ReactNode } from "react";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ds/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 /**

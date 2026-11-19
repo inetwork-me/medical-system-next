@@ -11,7 +11,7 @@ import { Icon } from "@/components/ds/icon"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -181,7 +181,7 @@ function PreApprovalDialog({ id, rec, open, onOpenChange }: { id: string; rec: D
   const send = () => {
     sendPreApproval(id, notifyGuardian)
     onOpenChange(false)
-    notify.success(t("sentTitle", { payer }), { description: t("sentText") })
+    toast.success(t("sentTitle", { payer }), { description: t("sentText") })
   }
   return (
     <ResponsiveDialog
@@ -264,7 +264,7 @@ export function ConsentCard({ id, rec, readOnly, className }: { id: string; rec:
             variant="outline"
             onClick={() => {
               setConsent(id, "sent")
-              notify.success(t("sentTitle"), { description: t("sentText", { name: g ? b(g.name) : b(data.patient.name) }) })
+              toast.success(t("sentTitle"), { description: t("sentText", { name: g ? b(g.name) : b(data.patient.name) }) })
             }}
           >
             <Icon name="message" size={20} />
@@ -282,7 +282,7 @@ export function ConsentCard({ id, rec, readOnly, className }: { id: string; rec:
         signer={g ? b(g.name) : b(data.patient.name)}
         onSigned={() => {
           setConsent(id, "signed")
-          notify.success(t("signedTitle"), { description: t("signedText") })
+          toast.success(t("signedTitle"), { description: t("signedText") })
         }}
       />
     </PCard>

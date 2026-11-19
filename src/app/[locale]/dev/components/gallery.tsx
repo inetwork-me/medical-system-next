@@ -3,8 +3,7 @@
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
-import { notify } from "@/components/ds/toast"
-
+import { toast } from "@/components/ds/toast"
 import { Icon } from "@/components/ds/icon"
 import { Field } from "@/components/ds/field"
 import { StatusBadge } from "@/components/ds/status-badge"
@@ -334,7 +333,7 @@ export function Gallery() {
 
       <Section title="Upload & drag-and-drop · Empty states">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <DropZone onFiles={(f) => notify.success(`${f.length} file(s)`)} />
+          <DropZone onFiles={(f) => toast.success(`${f.length} file(s)`)} />
           <div className="space-y-2">
             <UploadItem name="lab-report-004812.pdf" state="uploading" progress={64} doneMb="2.4" totalMb="3.8" />
             <UploadItem name="lab-report-004812.pdf" state="complete" totalMb="3.8" />
@@ -401,11 +400,9 @@ export function Gallery() {
               <PopoverDescription>{L("Short content tied to the trigger; closes on outside click.", "محتوى قصير مرتبط بالزر، يتسكّر لما تضغط برّا.")}</PopoverDescription>
             </PopoverContent>
           </Popover>
-          {(["success", "info", "warning", "error"] as const).map((k) => (
-            <Button key={k} variant="ghost" onClick={() => notify[k](L("Saved", "انحفظ"), { description: L("Your changes were saved.", "تعديلاتك انحفظت.") })}>
-              Toast · {k}
-            </Button>
-          ))}
+          <Button variant="ghost" asChild>
+            <a href={`/${ar ? "ar" : "en"}/dev/toasts`}>Toasts (sheet 12) →</a>
+          </Button>
         </div>
       </Section>
     </div>

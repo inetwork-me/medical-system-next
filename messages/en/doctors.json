@@ -219,9 +219,9 @@
     "savedText": "Patients can book inside the new shifts.",
     "copied": "Copied to all working days",
     "copiedText": "{day}'s shifts now apply to every working day.",
-    "dayOn": "{day} is on",
+    "dayOn": "{day} set as a working day",
     "dayOnText": "Patients can book {day} again.",
-    "dayOff": "{day} is off",
+    "dayOff": "{day} set as a day off",
     "dayOffText": "No new bookings on {day}."
   },
   "bookingSettings": {

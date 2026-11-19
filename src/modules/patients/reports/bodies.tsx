@@ -3,7 +3,7 @@
 import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useFormatter, useTranslations } from "next-intl"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
@@ -587,7 +587,7 @@ function DuplicatesReport() {
     setDismissed((s) => new Set(s).add(g.id))
     const before = g.keep.tags
     if (before.includes("duplicate")) setTags(g.keep.id, toggleTag(before, "duplicate", false))
-    notify.info(t("duplicates.dismissed"), {
+    toast.info(t("duplicates.dismissed"), {
       description: t("duplicates.dismissedText"),
       action: {
         label: t("duplicates.undo"),

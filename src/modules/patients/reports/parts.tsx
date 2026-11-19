@@ -3,7 +3,7 @@
 import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
@@ -54,7 +54,7 @@ export function ReportShell({
     a.download = `${name}-${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(a.href)
-    notify.success(t("exported"), { description: t("exportedText", { count: rows.length }) })
+    toast.success(t("exported"), { description: t("exportedText", { count: rows.length }) })
   }
   return (
     <PageContainer>

@@ -17,6 +17,10 @@
     "clearFilters": "Clear filters",
     "tryAgain": "Try again"
   },
+  "toast": {
+    "region": "Notifications",
+    "close": "Close"
+  },
   "a11y": {
     "showPassword": "Show password",
     "hidePassword": "Hide password",

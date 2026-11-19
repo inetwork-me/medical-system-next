@@ -13,7 +13,7 @@ import { FilterChip, Pagination } from "@/components/ds/module-controls"
 import { StatCard } from "@/components/ds/stat-card"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { STATUS_TONE } from "../calendar/agenda"
 import { ExportDialog } from "../calendar/export"
@@ -299,13 +299,13 @@ function RowMenu({ a, trigger }: { a: LiveAppointment; trigger: React.ReactEleme
     const from = a.status
     const since = a.since
     setStatus(a.id, to)
-    notify[tone](title, {
+    toast[tone](title, {
       description,
       action: {
         label: t("toast.undo"),
         onClick: () => {
           setStatus(a.id, from, since)
-          notify.info(t("toast.undone"), { description: t("toast.undoneText", { name: x.name, status: ts(from) }) })
+          toast.info(t("toast.undone"), { description: t("toast.undoneText", { name: x.name, status: ts(from) }) })
         },
       },
     })

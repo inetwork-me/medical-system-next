@@ -12,10 +12,11 @@ import { Field } from "@/components/ds/field"
 import { DatePicker } from "@/components/ds/pickers"
 import { RadioOption } from "@/components/ds/radio-option"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { MobileActionBar, PageContainer, PageHeader } from "@/components/shell/page"
 import { PageTitle } from "@/components/shell/page-title"
+import { Alert, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -177,6 +178,12 @@ function ClinicForm({
   )
   return (
     <div className="flex min-w-0 flex-col gap-4 md:gap-6">
+      {Object.keys(errors).length > 0 && (
+        <Alert variant="destructive">
+          <Icon name="danger" />
+          <AlertTitle>{t("fixErrors")}</AlertTitle>
+        </Alert>
+      )}
       {section(
         t("basics"),
         t("basicsText"),
@@ -213,6 +220,9 @@ function ClinicForm({
   )
 }
 
+/** Form validation never toasts (DS sheet 12): the fields show their errors, an Alert tops the form, focus goes to the first one. */
+const focusInvalid = () => requestAnimationFrame(() => document.querySelector<HTMLElement>("[aria-invalid=true]")?.focus())
+
 function useForm(initial: () => Form) {
   const [form, setForm] = React.useState<Form>(initial)
   const [tried, setTried] = React.useState(false)
@@ -240,17 +250,14 @@ export function ClinicSettingsPage() {
   }
   const save = () => {
     setTried(true)
-    if (Object.keys(validate(form, t)).length) {
-      notify.error(t("fixErrors"))
-      return
-    }
+    if (Object.keys(validate(form, t)).length) return focusInvalid()
     updateClinic(c.key, fieldsOf(form, clinics, c))
-    notify.success(t("saved"), { description: t("savedText") })
+    toast.success(t("saved"), { description: t("savedText") })
   }
   const paused = c.status === "paused" || (!!c.pausedFrom && !!c.pausedUntil && c.pausedUntil > CLINICS_TODAY)
   const resume = () => {
     updateClinic(c.key, { status: "open", pausedFrom: undefined, pausedUntil: undefined, pauseNote: undefined })
-    notify.success(t("resumed"), { description: t("resumedText", { clinic: b(c.name) }) })
+    toast.success(t("resumed"), { description: t("resumedText", { clinic: b(c.name) }) })
   }
   const actions = (
     <>
@@ -369,7 +376,7 @@ function PauseDialog({ clinic: c, onOpenChange }: { clinic: Clinic; onOpenChange
       },
     })
     onOpenChange(false)
-    notify.success(t("toast", { clinic: name, range }), {
+    toast.success(t("toast", { clinic: name, range }), {
       description: t(plan === "move" ? "toastMoved" : "toastCancelled", { n, notified: sms ? t("notified") : t("notNotified") }),
     })
   }
@@ -442,7 +449,7 @@ function ArchiveDialog({ clinic: c, onOpenChange }: { clinic: Clinic; onOpenChan
     updateClinic(c.key, { archived: true })
     onOpenChange(false)
     router.replace("/clinics")
-    notify.success(t("toast", { clinic: name }), {
+    toast.success(t("toast", { clinic: name }), {
       description: t("toastText"),
       action: { label: t("undo"), onClick: () => updateClinic(c.key, { archived: false }) },
     })
@@ -534,10 +541,7 @@ export function NewClinicPage() {
 
   const create = () => {
     setTried(true)
-    if (Object.keys(validate(form, ts)).length) {
-      notify.error(ts("fixErrors"))
-      return
-    }
+    if (Object.keys(validate(form, ts)).length) return focusInvalid()
     let key = slug(form.nameEn)
     while (clinics.some((c) => c.key === key)) key += "-2"
     const doctors = headDoc
@@ -551,7 +555,7 @@ export function NewClinicPage() {
         ]
       : []
     addClinic(blankClinic(key, { ...fieldsOf(form, clinics, empty), doctors, doctorCount: doctors.length }))
-    notify.success(t("toast"), { description: t("toastText") })
+    toast.success(t("toast"), { description: t("toastText") })
     router.push(clinicHref(key))
   }
 

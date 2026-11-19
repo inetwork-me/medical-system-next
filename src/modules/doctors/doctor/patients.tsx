@@ -12,7 +12,7 @@ import { Icon } from "@/components/ds/icon"
 import { Segmented } from "@/components/ds/segmented"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -63,7 +63,7 @@ function PatientsCard({ doctor: d }: { doctor: Doctor }) {
     const head = (["patient", "mrn", "age", "last", "next", "condition", "payer"] as const).map((k) => t(`col.${k}`))
     const body = rows.map((p) => [b(p.name), p.mrn, b(p.age), dates.short(p.last), next(p), b(p.condition), b(p.payer)])
     saveBlob(xlsxBlob(head, body, { sheet: t("sheet"), rtl: locale === "ar" }), file)
-    notify.success(t("exported"), { description: t("exportedText", { file }) })
+    toast.success(t("exported"), { description: t("exportedText", { file }) })
   }
 
   const menu = (p: DoctorPatient) => {

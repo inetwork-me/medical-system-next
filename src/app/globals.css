@@ -314,6 +314,17 @@ html[lang="ar"] {
   unicode-bidi: isolate;
 }
 
+/* Toast timer (DS sheet 12): the bar sits at the inline-start edge, so shrinking its inline size drains it toward the
+   start in both directions. Paused through animation-play-state. */
+@keyframes toast-timer {
+  from {
+    inline-size: 100%;
+  }
+  to {
+    inline-size: 0%;
+  }
+}
+
 /* Printing a receipt / statement: only the marked area prints (printArea() in modules/patients/payments). */
 @media print {
   html[data-printing] body * {

@@ -4,7 +4,7 @@ import { patientHref } from "@/modules/patients/href"
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 
 import { cn } from "@/lib/utils"
 import { Link, useRouter } from "@/i18n/navigation"
@@ -186,7 +186,7 @@ function MoreActions({ patient, variant = "outline" }: { patient: Patient; varia
               label: isVip ? t("rowMenu.unvip") : t("rowMenu.vip"),
               onSelect: () => {
                 setTags(patient.id, toggleTag(patient.tags, "vip", !isVip))
-                notify.success(isVip ? t("vipToast.off") : t("vipToast.on"), { description: t("vipToast.text", { name }) })
+                toast.success(isVip ? t("vipToast.off") : t("vipToast.on"), { description: t("vipToast.text", { name }) })
               },
             },
             {

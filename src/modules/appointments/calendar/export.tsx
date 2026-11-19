@@ -10,7 +10,7 @@ import { useDates } from "@/i18n/dates"
 import { Icon } from "@/components/ds/icon"
 import { RadioOption } from "@/components/ds/radio-option"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { RadioGroup } from "@/components/ui/radio-group"
 import { doctorById, hhmm, type DoctorId } from "../data"
@@ -80,9 +80,9 @@ export function ExportDialog({
         saveBlob(blob, `${name}.pdf`)
       }
       onOpenChange(false)
-      notify.success(tx("downloaded"), { description: tx("downloadedText", { count: list.length, format: { excel: "Excel", pdf: "PDF", csv: "CSV" }[fmt] }) })
+      toast.success(tx("downloaded"), { description: tx("downloadedText", { count: list.length, format: { excel: "Excel", pdf: "PDF", csv: "CSV" }[fmt] }) })
     } catch {
-      notify.error(tx("failed"), { description: tx("failedText") })
+      toast.error(tx("failed"), { description: tx("failedText"), retry: () => void run() })
     } finally {
       setBusy(false)
     }

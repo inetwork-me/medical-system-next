@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { Field } from "@/components/ds/field"
 import { Icon } from "@/components/ds/icon"
 import { EmptyState } from "@/components/ds/states"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
@@ -65,14 +65,17 @@ function PanelBody({ id, rec, fdi, onClose, readOnly, className }: { id: string;
   const fileRef = React.useRef<HTMLInputElement>(null)
   const label = toothName(fdi)
 
+  // Validation shows on the field, never as a toast (DS sheet 12).
+  const [tried, setTried] = React.useState(false)
+  const missing = d.status !== "existing" && !d.treatment
   const update = () => {
-    if (d.status !== "existing" && !d.treatment) {
-      notify.error(t("needTreatment"), { description: t("needTreatmentText") })
+    setTried(true)
+    if (missing) {
       document.getElementById(`treatment-${fdi}`)?.focus()
       return
     }
     applyDraft(id, rec, fdi, d)
-    notify.success(t("updated", { n: fdi }), { description: proc ? `${b(proc.name)} · ${t(`status.${d.status}`)}` : t(`status.${d.status}`) })
+    toast.success(t("updated", { n: fdi }), { description: proc ? `${b(proc.name)} · ${t(`status.${d.status}`)}` : t(`status.${d.status}`) })
   }
 
   return (
@@ -120,7 +123,7 @@ function PanelBody({ id, rec, fdi, onClose, readOnly, className }: { id: string;
       </div>
 
       <div className="flex flex-col gap-3">
-        <Field label={t("treatment")} required>
+        <Field label={t("treatment")} required error={tried && missing ? t("needTreatmentText") : undefined}>
           {(control) => (
             <Select value={d.treatment ?? ""} onValueChange={(v) => set({ treatment: v, status: d.status === "existing" ? "planned" : d.status })} disabled={readOnly}>
               <SelectTrigger {...control} id={`treatment-${fdi}`} className="w-full">
@@ -196,7 +199,7 @@ function PanelBody({ id, rec, fdi, onClose, readOnly, className }: { id: string;
                 onChange={(e) => {
                   if (e.target.files?.length) {
                     uploads.add(e.target.files)
-                    notify.success(t("uploaded"), { description: t("uploadedText", { count: e.target.files.length, n: fdi }) })
+                    toast.success(t("uploaded"), { description: t("uploadedText", { count: e.target.files.length, n: fdi }) })
                   }
                   e.target.value = ""
                 }}

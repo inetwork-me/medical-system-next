@@ -14,7 +14,7 @@ import { Icon, type IconName } from "@/components/ds/icon"
 import { RadioOption } from "@/components/ds/radio-option"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
@@ -174,7 +174,7 @@ function DetailsSheet({ a, open: isOpen, onOpenChange, onAction }: { a: LiveAppo
     const since = a.since
     setStatus(a.id, to)
     onOpenChange(false)
-    notify.success(to === "withDoctor" ? tl("toast.calledIn") : tl("toast.finished"), {
+    toast.success(to === "withDoctor" ? tl("toast.calledIn") : tl("toast.finished"), {
       description: to === "withDoctor" ? tl("toast.calledInText", { name: f.name, doctor: f.doctor }) : tl("toast.finishedText", { name: f.name, time: f.time, doctor: f.doctor }),
       action: { label: tl("toast.undo"), onClick: () => setStatus(a.id, from, since) },
     })
@@ -339,7 +339,7 @@ function CheckInDialog({ a, onOpenChange }: { a: LiveAppointment; onOpenChange: 
     const since = a.since
     setStatus(a.id, "arrived")
     onOpenChange(false)
-    notify.success(tl("toast.checkedIn"), {
+    toast.success(tl("toast.checkedIn"), {
       description: t("checkIn.toastText", { name: f.first, room }),
       action: { label: tl("toast.undo"), onClick: () => setStatus(a.id, from, since) },
     })
@@ -412,7 +412,7 @@ function NoShowDialog({ a, onOpenChange }: { a: LiveAppointment; onOpenChange: (
     const since = a.since
     setStatus(a.id, "noShow")
     onOpenChange(false)
-    notify.info(tl("toast.noShow"), {
+    toast.info(tl("toast.noShow"), {
       description: t("noShow.toastText", { name: f.name, time: f.time, doctor: f.doctor, sms: sms ? "yes" : "no" }),
       action: { label: tl("toast.undo"), onClick: () => setStatus(a.id, from, since) },
     })
@@ -463,7 +463,7 @@ function CancelDialog({ a, onOpenChange }: { a: LiveAppointment; onOpenChange: (
     const since = a.since
     setStatus(a.id, "cancelled")
     onOpenChange(false)
-    notify.info(tl("toast.cancelled"), {
+    toast.info(tl("toast.cancelled"), {
       description: t("cancelAppt.toastText", { name: f.name, when: `${f.when} · ${f.time}`, doctor: f.doctor }),
       action: { label: tl("toast.undo"), onClick: () => setStatus(a.id, from, since) },
     })
@@ -538,7 +538,7 @@ function RescheduleDialog({ a, onOpenChange }: { a: LiveAppointment; onOpenChang
     if (time === null) return
     const undo = reschedule(a, date, time)
     onOpenChange(false)
-    notify.success(t("reschedule.toast"), {
+    toast.success(t("reschedule.toast"), {
       description: t("reschedule.toastText", { name: f.name, from: `${f.when} · ${f.time}`, to: `${dates.weekdayShort(date)} ${dates.dayMonth(date)} · ${hhmm(time)}`, sms: sms ? "yes" : "no" }),
       action: { label: tl("toast.undo"), onClick: undo },
     })
@@ -624,7 +624,7 @@ function SmsDialog({ a, onOpenChange }: { a: LiveAppointment; onOpenChange: (o: 
     if (!text.trim()) return
     remind(a.id)
     onOpenChange(false)
-    notify.success(t("toast"), { description: t("toastText", { to: to[recipient].split(" · ").slice(0, 2).join(" · "), template: t(`templates.${template}`) }) })
+    toast.success(t("toast"), { description: t("toastText", { to: to[recipient].split(" · ").slice(0, 2).join(" · "), template: t(`templates.${template}`) }) })
   }
   return (
     <ResponsiveDialog

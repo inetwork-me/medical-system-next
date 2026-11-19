@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useFormatter, useLocale, useTranslations } from "next-intl"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import type { DateRange } from "react-day-picker"
 
 import { bi } from "@/lib/mock/bi"
@@ -73,9 +73,9 @@ export function ExportDialog({ open, onOpenChange, rows }: { open: boolean; onOp
           `${base}.pdf`,
         )
       onOpenChange(false)
-      notify.success(t("downloaded"), { description: t("downloadedText", { count: format.number(rows.length, "integer"), format: label }) })
+      toast.success(t("downloaded"), { description: t("downloadedText", { count: format.number(rows.length, "integer"), format: label }) })
     } catch {
-      notify.error(t("failed"), { description: t("failedText") })
+      toast.error(t("failed"), { description: t("failedText"), retry: () => void run() })
     } finally {
       setBusy(false)
     }

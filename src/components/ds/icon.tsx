@@ -11,7 +11,23 @@ import { cn } from "@/lib/utils";
  *   menu → HamburgerMenu · menu-1 (2×2 circle grid) → Menu · note-2 → Notepad2
  * Add icons to ICONS as screens need them.
  */
+
+/**
+ * close: a plain ✕ (Design System · Icon/Linear/close, added with sheet 12 · Toasts). Iconsax has no bare ✕, so it is
+ * drawn in the Iconsax style: 24 grid, stroke 1.5, round caps.
+ */
+function Close({ size = 24, color = "currentColor", variant, ...rest }: Omit<ComponentProps<"svg">, "ref"> & { size?: number | string; color?: string; variant?: string }) {
+  void variant
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" {...rest}>
+      <path d="M7 7l10 10M17 7L7 17" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 const ICONS = {
+  // Toasts (Design System · 12 · Toasts)
+  close: Close,
   // Eyes & Dental (Design System · "Added icons · Eyes & Dental")
   "3d-rotate": Iconsax.I3DRotate,
   "3dcube": Iconsax.I3Dcube,

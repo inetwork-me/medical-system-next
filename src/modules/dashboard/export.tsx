@@ -11,7 +11,7 @@ import { useDates } from "@/i18n/dates"
 import { Icon } from "@/components/ds/icon"
 import { RadioOption } from "@/components/ds/radio-option"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup } from "@/components/ui/radio-group"
@@ -116,9 +116,9 @@ function DashboardExportDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         saveBlob(await pdfDocument(blocks, { dir: locale === "ar" ? "rtl" : "ltr", title: base }), `${base}.pdf`)
       }
       onOpenChange(false)
-      notify.success(tp("downloaded"), { description: tx("downloadedText", { count: chosen.length, format: label }) })
+      toast.success(tp("downloaded"), { description: tx("downloadedText", { count: chosen.length, format: label }) })
     } catch {
-      notify.error(tp("failed"), { description: tp("failedText") })
+      toast.error(tp("failed"), { description: tp("failedText"), retry: () => void run() })
     } finally {
       setBusy(false)
     }

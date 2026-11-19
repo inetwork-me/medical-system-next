@@ -8,7 +8,7 @@ import { Icon } from "@/components/ds/icon"
 import { DatePicker } from "@/components/ds/pickers"
 import { RadioOption } from "@/components/ds/radio-option"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup } from "@/components/ui/radio-group"
@@ -65,7 +65,7 @@ export function RequestLeaveDialog({ doctorKey, onOpenChange }: { doctorKey?: st
     addLeave({ id: `lv-${d.key}-${a}-${z}-${type}`, doctor: d.key, type, from: a, to: z, cover: coverDoc?.key, status: "pending", bookings: n, ...(move === "cancel" ? { cancelBookings: true } : {}) })
     onOpenChange(false)
     const range = a === z ? dates.dayMonth(a) : dates.dayRange(a, z).replace(" – ", "–").replace(/ \d{4}$/, "")
-    notify.success(t("sent"), { description: ltr(t("sentText", { dates: range })) })
+    toast.success(t("sent"), { description: ltr(t("sentText", { dates: range })) })
   }
 
   const pick = (label: string, value: string, set: (v: string) => void, items: { value: string; label: string }[], error?: string) => (

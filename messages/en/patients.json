@@ -171,7 +171,7 @@
     "colLastVisit": "Last visit",
     "colTags": "Tags",
     "confirm": "Export",
-    "downloaded": "Export ready",
+    "downloaded": "Export downloaded",
     "downloadedText": "{count} rows saved as {format}.",
     "mobile": "Mobile",
     "region": "Region",
@@ -179,7 +179,7 @@
     "pdfTitle": "Patients list",
     "pdfMeta": "{count} patients · exported {date}",
     "failed": "Couldn't export",
-    "failedText": "Something went wrong while building the file. Try again.",
+    "failedText": "Nothing was downloaded.",
     "patient": "Patient"
   },
   "sheet": {
@@ -520,7 +520,7 @@
       "ready": "File downloaded",
       "readyText": "{name} is in your downloads.",
       "failed": "Couldn't create the file",
-      "failedText": "Something went wrong while building the file. Try again.",
+      "failedText": "Nothing was downloaded.",
       "level": {
         "severe": "Severe",
         "moderate": "Moderate"
@@ -1223,7 +1223,7 @@
       "ready": "PDF downloaded",
       "readyText": "{name} is in your downloads.",
       "failed": "Couldn't create the PDF",
-      "failedText": "Something went wrong while building the file. Try again."
+      "failedText": "Nothing was downloaded."
     }
   },
   "ov": {

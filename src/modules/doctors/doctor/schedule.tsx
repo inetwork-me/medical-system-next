@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Field } from "@/components/ds/field"
 import { Icon } from "@/components/ds/icon"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -75,7 +75,7 @@ function WeekHours({ doctor: d, className }: { doctor: Doctor; className?: strin
     setDay(day, on ? (last.current[day]?.length ? last.current[day]! : DEFAULT_DAY) : [])
     if (!editing) {
       const name = t(`days.${day}`)
-      notify.success(on ? t("dayOn", { day: name }) : t("dayOff", { day: name }), { description: on ? t("dayOnText", { day: name }) : t("dayOffText", { day: name }) })
+      toast.success(on ? t("dayOn", { day: name }) : t("dayOff", { day: name }), { description: on ? t("dayOnText", { day: name }) : t("dayOffText", { day: name }) })
     }
   }
   const copyAll = () => {
@@ -85,13 +85,13 @@ function WeekHours({ doctor: d, className }: { doctor: Doctor; className?: strin
     const next = { ...draft }
     for (const w of WEEKDAYS) if (next[w].length) next[w] = [...draft[source]]
     setDraft(next)
-    notify.success(t("copied"), { description: t("copiedText", { day: t(`days.${source}`) }) })
+    toast.success(t("copied"), { description: t("copiedText", { day: t(`days.${source}`) }) })
   }
   const save = () => {
     if (!draft) return
     updateDoctor(d.key, { week: draft })
     setDraft(null)
-    notify.success(t("saved"), { description: t("savedText") })
+    toast.success(t("saved"), { description: t("savedText") })
   }
 
   return (

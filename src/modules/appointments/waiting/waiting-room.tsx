@@ -9,7 +9,7 @@ import { useDates } from "@/i18n/dates"
 import { Icon } from "@/components/ds/icon"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { ExportDialog } from "../calendar/export"
 import { DOCTORS, doctorById, hhmm, NOW_MIN, TODAY, type ApptStatus } from "../data"
@@ -129,7 +129,7 @@ function Card({ col, a }: { col: Col; a: LiveAppointment }) {
     const from = a.status
     const since = a.since
     setStatus(a.id, to)
-    notify.success(title, {
+    toast.success(title, {
       description,
       action: { label: t("list.toast.undo"), onClick: () => setStatus(a.id, from, since) },
     })
@@ -182,7 +182,7 @@ function Card({ col, a }: { col: Col; a: LiveAppointment }) {
             variant="outline"
             onClick={() => {
               collect(a.id)
-              notify.success(tw("collected"), {
+              toast.success(tw("collected"), {
                 description: tw("collectedText", vars),
                 action: { label: t("list.toast.undo"), onClick: () => collect(a.id, false) },
               })

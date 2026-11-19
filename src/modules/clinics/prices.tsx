@@ -12,7 +12,7 @@ import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { Segmented } from "@/components/ds/segmented"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -60,8 +60,8 @@ export function PriceList({ clinic }: { clinic?: Clinic }) {
   const toggle = (r: Row, v: boolean) => {
     patchService(r.clinic.key, r.s.id, (s) => ({ ...s, active: v }))
     const name = b(r.s.name)
-    if (v) notify.success(t("activated"), { description: t("activeText", { name, clinic: b(r.clinic.name) }) })
-    else notify.info(t("deactivated"), { description: t("deactivatedText", { name, clinic: b(r.clinic.name) }) })
+    if (v) toast.success(t("activated"), { description: t("activeText", { name, clinic: b(r.clinic.name) }) })
+    else toast.info(t("deactivated"), { description: t("deactivatedText", { name, clinic: b(r.clinic.name) }) })
   }
 
   const clinicSelect = all && (
@@ -230,7 +230,7 @@ export function useExportPrices() {
       c.services.map((s) => [b(s.name), b(c.name), s.code, min(s.minutes), ...PAYERS.map((p) => String(pricesNow(s)[p])), s.active ? "✓" : "—"])
     )
     saveBlob(xlsxBlob(head, body, { sheet: t("title"), rtl: locale === "ar" }), file)
-    notify.success(t("exported"), { description: t("exportedText", { file }) })
+    toast.success(t("exported"), { description: t("exportedText", { file }) })
   }
 }
 
@@ -262,7 +262,7 @@ function EditPricesDialog({ row, onOpenChange }: { row: Row; onOpenChange: (o: b
     const now = iso <= CLINICS_TODAY
     patchService(row.clinic.key, row.s.id, (s) => (now ? { ...s, prices, pending: undefined } : { ...s, pending: { prices, from: iso } }))
     onOpenChange(false)
-    notify.success(t("toast"), { description: now ? t("toastNow") : t("toastText", { date: dates.short(iso) }) })
+    toast.success(t("toast"), { description: now ? t("toastNow") : t("toastText", { date: dates.short(iso) }) })
   }
   return (
     <ResponsiveDialog
@@ -328,7 +328,7 @@ function AddServiceDialog({ clinic, defaultKey, onOpenChange }: { clinic?: Clini
     const s: Service = { id: `${where}-${Date.now()}`, name: { en: text, ar: text }, code: code.trim().toUpperCase() || "—", minutes: length, prices, active: true }
     updateClinic(where, (x) => ({ services: [...x.services, s] }))
     onOpenChange(false)
-    notify.success(t("toast"), { description: t("toastText") })
+    toast.success(t("toast"), { description: t("toastText") })
   }
   return (
     <ResponsiveDialog

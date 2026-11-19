@@ -17,6 +17,10 @@
     "clearFilters": "امسح الفلاتر",
     "tryAgain": "جرّب مرة ثانية"
   },
+  "toast": {
+    "region": "الإشعارات",
+    "close": "إغلاق"
+  },
   "a11y": {
     "showPassword": "اعرض كلمة المرور",
     "hidePassword": "اخفِ كلمة المرور",

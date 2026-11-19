@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl"
 
 import { csvBlob, saveBlob, stamp } from "@/lib/export/files"
 import { pdfDocument, type PdfBlock } from "@/lib/export/pdf"
-import { notify } from "@/components/ds/toast"
+import { toast } from "@/components/ds/toast"
 import { useDates } from "@/i18n/dates"
 import { REGIONS, type Patient } from "../data"
 import type { ActivityItem, PatientRecord } from "./record"
@@ -28,9 +28,9 @@ export function usePatientExports() {
     setBusy(true)
     try {
       saveBlob(await make(), name)
-      notify.success(t("ready"), { description: t("readyText", { name }) })
+      toast.success(t("ready"), { description: t("readyText", { name }) })
     } catch {
-      notify.error(t("failed"), { description: t("failedText") })
+      toast.error(t("failed"), { description: t("failedText"), retry: () => void guard(name, make) })
     } finally {
       setBusy(false)
     }

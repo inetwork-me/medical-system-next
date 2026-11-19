@@ -35,18 +35,18 @@ export const minsBetween = (a: string, b: string = LAB_NOW) => minsOf(b) - minsO
 
 /**
  * Tube cap colours are physical standards and the only hard-coded colours in the module (brief §4).
- * Always shown as a dot paired with its name. `name` = short colour name, `full` = colour · additive.
+ * Always shown as a dot paired with its name. `name` = short colour name, `full` = colour · additive, `the` = in a sentence.
  */
 export const TUBES = {
-  gold: { hex: "#EAB308", name: bi("Gold", "ذهبي"), full: bi("Gold · SST", "ذهبي · SST") },
-  lav: { hex: "#A78BFA", name: bi("Lavender", "بنفسجي"), full: bi("Lavender · EDTA", "بنفسجي · EDTA") },
-  blue: { hex: "#7DD3FC", name: bi("Light blue", "أزرق فاتح"), full: bi("Light blue · Citrate", "أزرق فاتح · سترات") },
-  grey: { hex: "#9CA3AF", name: bi("Grey", "رمادي"), full: bi("Grey · Fluoride", "رمادي · فلورايد") },
-  green: { hex: "#22C55E", name: bi("Green", "أخضر"), full: bi("Green · Heparin", "أخضر · هيبارين") },
-  red: { hex: "#EF4444", name: bi("Red", "أحمر"), full: bi("Red · Plain", "أحمر · سادة") },
-  urine: { hex: "#FDE68A", name: bi("Urine cup", "علبة بول"), full: bi("Urine cup", "علبة بول") },
-  bottle: { hex: "#64748B", name: bi("Culture bottles", "قناني المزرعة"), full: bi("Culture bottles", "قناني المزرعة") },
-} as const satisfies Record<string, { hex: string; name: Bi; full: Bi }>
+  gold: { hex: "#EAB308", name: bi("Gold", "ذهبي"), full: bi("Gold · SST", "ذهبي · SST"), the: bi("gold tube", "الأنبوب الذهبي") },
+  lav: { hex: "#A78BFA", name: bi("Lavender", "بنفسجي"), full: bi("Lavender · EDTA", "بنفسجي · EDTA"), the: bi("lavender tube", "الأنبوب البنفسجي") },
+  blue: { hex: "#7DD3FC", name: bi("Light blue", "أزرق فاتح"), full: bi("Light blue · Citrate", "أزرق فاتح · سترات"), the: bi("light blue tube", "الأنبوب الأزرق الفاتح") },
+  grey: { hex: "#9CA3AF", name: bi("Grey", "رمادي"), full: bi("Grey · Fluoride", "رمادي · فلورايد"), the: bi("grey tube", "الأنبوب الرمادي") },
+  green: { hex: "#22C55E", name: bi("Green", "أخضر"), full: bi("Green · Heparin", "أخضر · هيبارين"), the: bi("green tube", "الأنبوب الأخضر") },
+  red: { hex: "#EF4444", name: bi("Red", "أحمر"), full: bi("Red · Plain", "أحمر · سادة"), the: bi("red tube", "الأنبوب الأحمر") },
+  urine: { hex: "#FDE68A", name: bi("Urine cup", "علبة بول"), full: bi("Urine cup", "علبة بول"), the: bi("urine cup", "علبة البول") },
+  bottle: { hex: "#64748B", name: bi("Culture bottles", "قناني المزرعة"), full: bi("Culture bottles", "قناني المزرعة"), the: bi("culture bottles", "قناني المزرعة") },
+} as const satisfies Record<string, { hex: string; name: Bi; full: Bi; the: Bi }>
 
 export type TubeKey = keyof typeof TUBES
 
@@ -99,6 +99,8 @@ export type TestDef = {
   analytes: Analyte[]
   /** Volume drawn, mL (tube cards and the order summary). */
   volumeMl?: number
+  /** Name inside a list ("kidney, electrolytes, lipids"); defaults to the name, lower-cased unless it is an abbreviation. */
+  short?: Bi
 }
 
 const A = (key: string, en: string, ar: string, unit: string, dp: number, ref: RefBand[], extra: Partial<Analyte> = {}): Analyte => ({
@@ -129,6 +131,7 @@ export const TESTS: TestDef[] = [
     key: "lipid",
     code: "2020",
     name: bi("Lipid panel", "الدهون"),
+    short: bi("lipids", "الدهون"),
     section: "chemistry",
     tube: "gold",
     tatH: 4,
@@ -146,6 +149,7 @@ export const TESTS: TestDef[] = [
     key: "kidney",
     code: "2031",
     name: bi("Kidney function", "وظائف الكلى"),
+    short: bi("kidney", "الكلى"),
     section: "chemistry",
     tube: "gold",
     tatH: 3,
@@ -345,6 +349,8 @@ export type LabOrder = {
   panels: Panel[]
   fasting: boolean
   fastingHours?: number
+  /** When fasting started ("12 am"), from the order. */
+  fastingSince?: Bi
   diagnosisIcd10?: string
   diagnosis?: Bi
   note?: Bi
@@ -457,6 +463,7 @@ const LAB_0142: LabOrder = {
   ],
   fasting: true,
   fastingHours: 10,
+  fastingSince: bi("12 am", "12 بالليل"),
   diagnosisIcd10: "E10.9",
   diagnosis: bi("Type 1 diabetes", "سكري نوع 1"),
   note: bi("Poor control since August. Please add urine ketones if glucose is over 250.", "السكر مو منضبط من أغسطس. أضيفوا كيتونات البول لو السكر فوق 250."),
@@ -746,3 +753,15 @@ export const PREVIOUS_ORDERS: Record<string, { date: string; no: string; summary
     { date: "2026-02-12", no: "LAB-0017", summary: bi("HbA1c 7.6% · kidney normal", "HbA1c 7.6% · الكلى طبيعية") },
   ],
 }
+
+/* ------------------------------------------------------------------ the rest of the day */
+
+/**
+ * Today's orders that aren't in the sample list above (the worklist shows the first page of 64). The KPIs, filter
+ * counts and tab counts add these to the live sample orders, so they match the design and still move when a sample
+ * order is collected, rejected or released.
+ */
+export const OTHER_TODAY = { collect: 8, collectStat: 2, lab: 16, validate: 4, ready: 23 } as const
+
+/** Worklist KPI context the mock can't compute (no history yet). */
+export const WORKLIST_TRENDS = { vsLastWeekPct: 8, avgInLabMin: 46 } as const

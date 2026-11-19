@@ -45,5 +45,100 @@
     "doctor": "طبيب",
     "patient": "مريض",
     "lead": "مسؤول المختبر (تجريبي)"
+  },
+  "soon": {
+    "title": "قريب",
+    "text": "هالجزء لسه ما تصمم."
+  },
+  "age": {
+    "years": "{n, plural, one {سنة} two {سنتين} few {# سنوات} other {# سنة}}",
+    "months": "{n, plural, one {شهر} two {شهرين} few {# شهور} other {# شهر}}"
+  },
+  "worklist": {
+    "export": "تصدير",
+    "newOrder": "طلب جديد",
+    "exported": "تصدّرت قائمة العمل",
+    "exportedText": "{file}",
+    "kpi": {
+      "orders": "طلبات اليوم",
+      "vsLast": "عن {day} اللي فات",
+      "collect": "بانتظار السحب",
+      "stat": "{n} عاجل",
+      "longest": "أطولهم {n, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+      "inLab": "في المختبر",
+      "avg": "{n} د",
+      "avgCaption": "المتوسط لين الحين",
+      "critical": "قيم حرجة",
+      "notCalled": "ما انبلّغ",
+      "callBy": "بلّغ قبل {time}",
+      "allCalled": "كلها انبلّغت"
+    },
+    "title": "طلبات اليوم",
+    "subtitle": "{date} · العاجل أول، بعدين الأقدم",
+    "printLabels": "اطبع الملصقات",
+    "search": "دوّر على مريض أو رقم ملف أو طلب…",
+    "filter": {
+      "label": "الحالة",
+      "all": "الكل · {n}",
+      "collect": "للسحب · {n}",
+      "lab": "في المختبر · {n}",
+      "validate": "للاعتماد · {n}",
+      "ready": "جاهزة · {n}"
+    },
+    "col": {
+      "order": "الطلب",
+      "patient": "المريض",
+      "tests": "التحاليل",
+      "doctor": "الطبيب",
+      "priority": "الأولوية",
+      "status": "الحالة",
+      "action": "الإجراء"
+    },
+    "line": {
+      "validate": "طلعت {time}",
+      "lab": "متوقعة {time}",
+      "collect": "{sex, select, female {تنتظر} other {ينتظر}} {n, plural, one {دقيقة} two {دقيقتين} few {# دقايق} other {# دقيقة}}",
+      "ready": "انرسلت {time}",
+      "rejected": "{reason} · {time}"
+    },
+    "action": {
+      "collect": "اسحب",
+      "lab": "أدخل النتائج",
+      "validate": "راجع",
+      "ready": "اعرض",
+      "rejected": "أعد السحب"
+    },
+    "critical": "قيمة حرجة ما انبلّغ عنها",
+    "openOrder": "افتح الطلب {no}",
+    "showing": "يعرض {shown} من {total} طلب",
+    "showMore": "اعرض أكثر",
+    "showMoreMobile": "اعرض {n} طلب زيادة",
+    "empty": "ما فيه طلبات مطابقة",
+    "emptyText": "جرّب اسم أو رقم ملف أو رقم طلب ثاني.",
+    "clear": "امسح البحث"
+  },
+  "collect": {
+    "title": "سحب العينة · {name}",
+    "text": "{no} · {n, plural, one {تحليل واحد} two {تحليلين} few {# تحاليل} other {# تحليل}} · {priority}",
+    "idCheck": "تأكدت من هوية المريض بمعرّفين (الاسم + رقم الملف)",
+    "tubes": "الأنابيب المطلوبة",
+    "tube": "{tube} {ml} مل · {tests}",
+    "tubeNoMl": "{tube} · {tests}",
+    "by": "سحبها",
+    "time": "الوقت",
+    "fasting": "تأكدت إنه صايم",
+    "fastingText": "{h, plural, one {ساعة} two {ساعتين} few {# ساعات} other {# ساعة}} · من {since}",
+    "oneLeft": "{tube} ما انعلّم عليها، بتبقى في القائمة بانتظار السحب.",
+    "manyLeft": "{n, plural, two {أنبوبين} few {# أنابيب} other {# أنبوب}} ما انعلّم عليها، بتبقى في القائمة بانتظار السحب.",
+    "cancel": "إلغاء",
+    "confirm": "اسحب واطبع الملصقات",
+    "toast": "{n, plural, one {انسحبت عينة} two {انسحبت عينتين} few {انسحبت # عينات} other {انسحبت # عينة}}",
+    "toastAll": "انطبعت الملصقات",
+    "toastOne": "انطبعت الملصقات · باقي {tube}",
+    "toastMany": "انطبعت الملصقات · باقي {n, plural, two {أنبوبين} few {# أنابيب} other {# أنبوب}}"
+  },
+  "labels": {
+    "toast": "انطبعت الملصقات",
+    "toastText": "{n, plural, one {ملصق واحد} two {ملصقين} few {# ملصقات} other {# ملصق}} · طابعة {printer}"
   }
 }

@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { bi, type Bi } from "@/lib/mock/bi"
 import { Icon } from "@/components/ds/icon"
+import { toast } from "@/components/ds/toast"
 import { StatusBadge, type StatusTone } from "@/components/ds/status-badge"
 import { TUBES, type Flag, type OrderStatus, type Priority, type TubeKey } from "./data"
 
@@ -149,4 +150,10 @@ export function LabStatusBadge({ status, className }: { status: OrderStatus; cla
 /** Trend icon next to the previous value (16, coloured by flag). */
 export function TrendIcon({ dir, flag }: { dir: "up" | "down"; flag: Flag | null }) {
   return <Icon name={dir === "up" ? "trend-up" : "trend-down"} size={16} className={flag ? FLAG_TEXT[flag] : "text-muted-foreground"} />
+}
+
+/** Known design gaps (Add test, Scan sample, Call next, Show more): the button shows a "coming soon" toast. */
+export function useSoon() {
+  const t = useTranslations("labs.soon")
+  return () => toast.info(t("title"), { description: t("text") })
 }

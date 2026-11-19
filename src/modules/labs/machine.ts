@@ -3,6 +3,7 @@ import {
   addMins,
   analyteOf,
   minsBetween,
+  minsOf,
   testOf,
   type Analyte,
   type CriticalCall,
@@ -173,9 +174,16 @@ export function collect(o: LabOrder, tubeNos: number[], by: string, at: string, 
   if (!picks.length) return no("notPending")
   const tubes = o.tubes.map((t) => (picks.includes(t) ? { ...t, state: "collected" as const, collectedAt: at, collectedBy: by } : t))
   const done = tubes.every((t) => t.state !== "pending")
+  // A test's results are due collection time + its turnaround (same-day TATs; longer ones show no due time).
+  const ready = (test: string) => tubes.filter((t) => t.tests.includes(test)).every((t) => t.state !== "pending")
+  const panels = o.panels.map((p) => {
+    const tat = testOf(p.test)?.tatH ?? 0
+    return p.state === "waiting" && !p.dueAt && ready(p.test) && tat && minsOf(at) + tat * 60 < 24 * 60 ? { ...p, dueAt: addMins(at, tat * 60) } : p
+  })
   return ok({
     ...o,
     tubes,
+    panels,
     fasting: opts.fastingConfirmed ?? o.fasting,
     ticket: done ? undefined : o.ticket,
     queuedAt: done ? undefined : o.queuedAt,
@@ -214,7 +222,7 @@ export function reject(
     tubes: o.tubes.map((t) =>
       t.no === tubeNo ? { ...t, state: opts.recollect ? ("pending" as const) : ("rejected" as const), collectedAt: undefined, receivedAt: undefined, rejections: [...(t.rejections ?? []), rej] } : t
     ),
-    panels: o.panels.map((p) => (tube.tests.includes(p.test) && p.state !== "released" ? { ...p, state: "waiting" as const, results: p.results.map((r) => ({ ...r, value: null, flag: null })) } : p)),
+    panels: o.panels.map((p) => (tube.tests.includes(p.test) && p.state !== "released" ? { ...p, state: "waiting" as const, dueAt: undefined, results: p.results.map((r) => ({ ...r, value: null, flag: null })) } : p)),
     ticket: opts.recollect ? (opts.ticket ?? o.ticket) : o.ticket,
     queuedAt: opts.recollect ? at : o.queuedAt,
     events: log(o, { at, kind: "rejected", by }),

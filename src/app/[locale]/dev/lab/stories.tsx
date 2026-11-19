@@ -22,6 +22,8 @@ import {
   uncalledCriticals,
   type Step,
 } from "@/modules/labs/machine"
+import { CollectDialog } from "@/modules/labs/collect-dialog"
+import { TodaysOrders } from "@/modules/labs/worklist"
 import { FlagChip, LabStatusBadge, Latin, PriorityChip, StatChip, TubeDot, TubeLabel, useB } from "@/modules/labs/parts"
 
 const FLAGS: (Flag | null)[] = ["H", "L", "C", null]
@@ -64,7 +66,20 @@ function machineRun(): { label: string; step: Step; status?: OrderStatus }[] {
   return out
 }
 
+/** Widget / Lab … stories: each widget at its Wide and Compact widths (switch language for Dir=RTL). */
+function WidgetStory({ name, wide, compact, render }: { name: string; wide: number; compact: number; render: () => React.ReactNode }) {
+  return (
+    <Box title={`${name} · Wide ${wide} / Compact ${compact}`}>
+      <div className="flex flex-wrap items-start gap-6">
+        <div style={{ width: wide }}>{render()}</div>
+        <div style={{ width: compact }}>{render()}</div>
+      </div>
+    </Box>
+  )
+}
+
 export function LabStories() {
+  const [collecting, setCollecting] = React.useState<string | null>(null)
   const b = useB()
   const t = useTranslations("labs")
   const run = React.useMemo(() => machineRun(), [])
@@ -73,6 +88,9 @@ export function LabStories() {
 
   return (
     <div className="flex flex-col gap-6">
+      <WidgetStory name="Widget / Lab Worklist" wide={1120} compact={358} render={() => <TodaysOrders onCollect={setCollecting} />} />
+      {collecting && <CollectDialog orderNo={collecting} onOpenChange={(o) => !o && setCollecting(null)} />}
+
       <Box title="Tube dot + name · 12 / 14 / 16 · short and full">
         <div className="flex flex-wrap gap-x-6 gap-y-3">
           {(Object.keys(TUBES) as TubeKey[]).map((k) => (

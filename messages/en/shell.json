@@ -48,6 +48,13 @@
       "credentials": "Credentials",
       "leave": "Leave & cover",
       "reports": "Reports"
+    },
+    "lab": {
+      "worklist": "Worklist",
+      "samples": "Samples",
+      "results": "Results",
+      "catalog": "Test catalog",
+      "reports": "Reports"
     }
   },
   "header": {

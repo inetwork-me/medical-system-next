@@ -45,5 +45,100 @@
     "doctor": "Doctor",
     "patient": "Patient",
     "lead": "Lab lead (demo)"
+  },
+  "soon": {
+    "title": "Coming soon",
+    "text": "This part isn't designed yet."
+  },
+  "age": {
+    "years": "{n} y",
+    "months": "{n} m"
+  },
+  "worklist": {
+    "export": "Export",
+    "newOrder": "New order",
+    "exported": "Worklist exported",
+    "exportedText": "{file}",
+    "kpi": {
+      "orders": "Orders today",
+      "vsLast": "vs last {day}",
+      "collect": "To collect",
+      "stat": "{n} STAT",
+      "longest": "longest {n} min",
+      "inLab": "In lab",
+      "avg": "{n} min",
+      "avgCaption": "average so far",
+      "critical": "Critical values",
+      "notCalled": "Not called",
+      "callBy": "call by {time}",
+      "allCalled": "All called"
+    },
+    "title": "Today's orders",
+    "subtitle": "{date} · STAT first, then oldest",
+    "printLabels": "Print labels",
+    "search": "Search patient, MRN or order no…",
+    "filter": {
+      "label": "Status",
+      "all": "All · {n}",
+      "collect": "To collect · {n}",
+      "lab": "In lab · {n}",
+      "validate": "To validate · {n}",
+      "ready": "Ready · {n}"
+    },
+    "col": {
+      "order": "Order",
+      "patient": "Patient",
+      "tests": "Tests",
+      "doctor": "Ordered by",
+      "priority": "Priority",
+      "status": "Status",
+      "action": "Action"
+    },
+    "line": {
+      "validate": "Resulted {time}",
+      "lab": "Due {time}",
+      "collect": "Waiting {n} min",
+      "ready": "Released {time}",
+      "rejected": "{reason} · {time}"
+    },
+    "action": {
+      "collect": "Collect",
+      "lab": "Enter results",
+      "validate": "Review",
+      "ready": "View",
+      "rejected": "Recollect"
+    },
+    "critical": "Critical value not called",
+    "openOrder": "Open order {no}",
+    "showing": "Showing {shown} of {total} orders",
+    "showMore": "Show more",
+    "showMoreMobile": "Show {n} more orders",
+    "empty": "No orders match",
+    "emptyText": "Try another name, MRN or order number.",
+    "clear": "Clear search"
+  },
+  "collect": {
+    "title": "Collect sample · {name}",
+    "text": "{no} · {n, plural, one {# test} other {# tests}} · {priority}",
+    "idCheck": "Patient ID checked with 2 identifiers (name + MRN)",
+    "tubes": "Tubes to collect",
+    "tube": "{tube} {ml} mL · {tests}",
+    "tubeNoMl": "{tube} · {tests}",
+    "by": "Collected by",
+    "time": "Time",
+    "fasting": "Fasting confirmed",
+    "fastingText": "{h} h · since {since}",
+    "oneLeft": "{plural, select, true {The {tube} aren't ticked. They stay} other {The {tube} isn't ticked. It stays}} on the worklist as 'to collect'.",
+    "manyLeft": "{n} tubes aren't ticked. They stay on the worklist as 'to collect'.",
+    "cancel": "Cancel",
+    "confirm": "Collect & print labels",
+    "toast": "{n, plural, one {# sample collected} other {# samples collected}}",
+    "toastAll": "Labels printed",
+    "toastOne": "Labels printed · {tube} still to collect",
+    "toastMany": "Labels printed · {n} tubes still to collect"
+  },
+  "labels": {
+    "toast": "Labels printed",
+    "toastText": "{n, plural, one {# label} other {# labels}} · printer {printer}"
   }
 }

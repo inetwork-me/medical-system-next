@@ -67,6 +67,8 @@ const ICONS = {
   "calendar-add": Iconsax.CalendarAdd,
   "calendar-tick": Iconsax.CalendarTick,
   call: Iconsax.Call,
+  "call-calling": Iconsax.CallCalling,
+  "scan-barcode": Iconsax.ScanBarcode,
   category: Iconsax.Category,
   "chart-2": Iconsax.Chart2,
   "clipboard-text": Iconsax.ClipboardText,
@@ -84,7 +86,8 @@ const ICONS = {
   "eye-slash": Iconsax.EyeSlash,
   filter: Iconsax.Filter,
   gallery: Iconsax.Gallery,
-  glass: Iconsax.Glass,
+  // The design's Iconsax "glass" is the lab flask; this package calls it ChemicalGlass (its Glass is spectacles).
+  glass: Iconsax.ChemicalGlass,
   global: Iconsax.Global,
   health: Iconsax.Health,
   heart: Iconsax.Heart,

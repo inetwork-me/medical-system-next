@@ -116,8 +116,24 @@ export const MODULES: ModuleDef[] = [
     ],
   },
   { id: "records", icon: "clipboard-text", href: "/records", group: "clinical", labelKey: "records", shortLabelKey: "recordsShort", mobile: "more", built: false },
-  // Lab (design v4.9): renamed from "Lab results"; opens the Worklist. Tabs are added as their screens are built.
-  { id: "lab", icon: "glass", href: "/lab", group: "clinical", labelKey: "lab", shortLabelKey: "labShort", mobile: "more", built: true },
+  // Lab (design v4.9): renamed from "Lab results"; opens the Worklist.
+  {
+    id: "lab",
+    icon: "glass",
+    href: "/lab",
+    group: "clinical",
+    labelKey: "lab",
+    shortLabelKey: "labShort",
+    mobile: "more",
+    built: true,
+    tabs: [
+      { key: "worklist", href: "/lab" },
+      { key: "samples", href: "/lab/samples", ownTitle: true },
+      { key: "results", href: "/lab/results", ownTitle: true },
+      { key: "catalog", href: "/lab/catalog", ownTitle: true },
+      { key: "reports", href: "/lab/reports", ownTitle: true },
+    ],
+  },
   { id: "billing", icon: "receipt-2", href: "/billing", group: "admin", labelKey: "billing", mobile: "more", built: false },
   { id: "reports", icon: "chart-2", href: "/reports", group: "admin", labelKey: "reports", mobile: "more", built: false },
   { id: "messages", icon: "message", href: "/messages", group: "admin", labelKey: "messages", mobile: "bottom", built: false },

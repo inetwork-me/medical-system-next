@@ -10,7 +10,7 @@ import type { Bi } from "@/lib/mock/bi"
 import { Icon } from "@/components/ds/icon"
 import { Field } from "@/components/ds/field"
 import { DatePicker } from "@/components/ds/pickers"
-import { RadioOption } from "@/components/ds/radio-option"
+import { ReassignBookings, type ReassignChoice } from "@/components/ds/reassign-bookings"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { toast } from "@/components/ds/toast"
 import { Widget } from "@/components/ds/widget"
@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
-import { RadioGroup } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ClinicPage, useCurrentClinic } from "./clinic/frame"
 import {
@@ -36,7 +35,10 @@ import {
   type ChecklistKey,
   type Clinic,
 } from "./data"
+import { addToWaitlist } from "@/modules/appointments/waitlist"
+import { ltr } from "@/modules/doctors/text"
 import { clinicHref, type ClinicTab } from "./href"
+import { nextOpenDays, siteCandidates, type SiteCover } from "./reassign"
 import { SwitchCard } from "./parts"
 import { addClinic, updateClinic, useClinics } from "./store"
 import { useClinicText } from "./text"
@@ -349,18 +351,42 @@ const REASON_TEXT: Record<(typeof REASONS)[number], Bi> = {
  */
 function PauseDialog({ clinic: c, onOpenChange }: { clinic: Clinic; onOpenChange: (o: boolean) => void }) {
   const t = useTranslations("clinics.pause")
-  const { b, dates } = useClinicText()
+  const tr = useTranslations("common.reassign")
+  const { b, dates, locale } = useClinicText()
   const [from, setFrom] = React.useState<Date | undefined>(() => fromIso("2026-11-20"))
   const [until, setUntil] = React.useState<Date | undefined>(() => fromIso("2026-11-24"))
   const [reason, setReason] = React.useState<(typeof REASONS)[number]>("leave")
-  const cover = c.doctors.find((d) => d.name.en !== c.head.en)
-  const [plan, setPlan] = React.useState<"move" | "cancel">(cover ? "move" : "cancel")
+  const [choice, setChoice] = React.useState<ReassignChoice>("date")
+  const [picked, setPicked] = React.useState<string>()
   const [sms, setSms] = React.useState(true)
   const f = from ? isoOf(from) : ""
   const u = until ? isoOf(until) : ""
   const bad = !f || !u || u < f
   const n = bad ? 0 : bookedIn(c, f, u)
   const name = b(c.name)
+  const next = bad ? null : nextOpenDays(c, u, n, CLINICS_TODAY)
+  const sites = bad ? [] : siteCandidates(c, f, u, n)
+  const open = sites.filter((s) => s.state !== "unavailable")
+  const pick = picked && open.some((s) => s.site.key === picked) ? picked : open[0]?.site.key
+  const ar = locale === "ar"
+  const dayLabel = (d: string) => (ar ? dates.weekday(d) : `${dates.weekdayShort(d)} ${dates.dayMonth(d)}`)
+  // "25–26 Nov" / "ليوم 25 و26 نوفمبر" (design toast); longer runs as a range.
+  const daysText = (days: string[]) => {
+    if (!days.length) return ""
+    const a = days[0]
+    const z = days[days.length - 1]
+    if (a === z) return ar ? `ليوم ${dates.dayMonth(a)}` : dates.dayMonth(a)
+    if (a.slice(0, 7) !== z.slice(0, 7)) return ar ? `من ${dates.dayMonth(a)} لين ${dates.dayMonth(z)}` : `${dates.dayMonth(a)}–${dates.dayMonth(z)}`
+    if (ar) return days.length === 2 ? `ليوم ${Number(a.slice(8))} و${dates.dayMonth(z)}` : `من ${Number(a.slice(8))} لين ${dates.dayMonth(z)}`
+    return `${Number(a.slice(8))}–${dates.dayMonth(z)}`
+  }
+  const siteSub = (s: SiteCover) =>
+    s.state === "unavailable" && s.paused
+      ? t("sitePaused", { range: `${Number(s.paused[0].slice(8))}–${dates.dayMonth(s.paused[1])}` })
+      : s.site.floor !== undefined
+        ? t("siteHere", { n: s.site.floor })
+        : t("siteAway", { n: s.site.minutesAway ?? 0 })
+
   const confirm = () => {
     if (bad) return
     // Design: "Pediatrics paused 20–24 Nov" (one month) / "28 Nov–02 Dec".
@@ -375,10 +401,20 @@ function PauseDialog({ clinic: c, onOpenChange }: { clinic: Clinic; onOpenChange
         ar: `موقفة ${enRange} · ${REASON_TEXT[reason].ar}`,
       },
     })
+    let description: string
+    if (choice === "cancel") description = t("toastCancelled", { n, notified: sms ? t("notified") : t("notNotified") })
+    else {
+      const site = sites.find((s) => s.site.key === pick)
+      const moved = choice === "date" ? (next?.moved ?? 0) : site && site.state !== "unavailable" ? site.covered : 0
+      const waiting = n - moved
+      addToWaitlist({ count: waiting, source: "pause", clinic: c.key, from: f, to: u })
+      const after = waiting ? tr("waitingAfter", { n: waiting }) : ""
+      description = !moved
+        ? t("toastNone") + after
+        : (choice === "date" ? t("toastNextDays", { n: moved, days: daysText(next!.days.map((d) => d.date)) }) : t("toastSite", { n: moved, clinic: b(site!.site.name) })) + after
+    }
     onOpenChange(false)
-    toast.success(t("toast", { clinic: name, range }), {
-      description: t(plan === "move" ? "toastMoved" : "toastCancelled", { n, notified: sms ? t("notified") : t("notNotified") }),
-    })
+    toast.success(t("toast", { clinic: name, range }), { description: ltr(description) })
   }
   return (
     <ResponsiveDialog
@@ -426,10 +462,24 @@ function PauseDialog({ clinic: c, onOpenChange }: { clinic: Clinic; onOpenChange
           </Select>
         )}
       </Field>
-      <RadioGroup value={plan} onValueChange={(v) => setPlan(v as typeof plan)} className="gap-2">
-        {cover && <RadioOption value="move" title={t("move", { doctor: b(cover.name) })} />}
-        <RadioOption value="cancel" title={t("cancelBookings")} />
-      </RadioGroup>
+      {!bad && (
+        <ReassignBookings
+          target="clinic"
+          count={n}
+          department={{ name, short: b(c.short) }}
+          value={choice}
+          onValueChange={setChoice}
+          picked={pick}
+          onPick={setPicked}
+          candidates={sites.map((s) => ({
+            key: s.site.key,
+            name: b(s.site.name),
+            sub: siteSub(s),
+            coverage: s.state === "unavailable" ? { state: "unavailable" } : { state: s.state, covered: s.covered, total: s.total },
+          }))}
+          preview={next ? { days: next.days.map((d) => ({ key: d.date, label: dayLabel(d.date), n: d.n })), waiting: next.waiting } : undefined}
+        />
+      )}
       <label className="flex cursor-pointer items-center gap-2 text-sm">
         <Checkbox checked={sms} onCheckedChange={(v) => setSms(v === true)} />
         {t("notify")}

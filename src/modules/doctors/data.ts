@@ -74,7 +74,7 @@ export const ASSIGN_ROLES: AssignRole[] = ["visiting", "member", "cover"]
 export type Assignment = { clinic: string; role: AssignRole; room: string; day: Weekday; from: string; to: string; start: string }
 export type DeactivateReason = "contract" | "resigned" | "transfer" | "retired" | "other"
 export const DEACTIVATE_REASONS: DeactivateReason[] = ["contract", "resigned", "transfer", "retired", "other"]
-export type Deactivation = { lastDay: string; reason: DeactivateReason; cover?: string; cancelBookings?: boolean; keepAccess: boolean; bookings: number }
+export type Deactivation = { lastDay: string; reason: DeactivateReason; cover?: string; spread?: boolean; cancelBookings?: boolean; keepAccess: boolean; bookings: number }
 
 /** Languages a doctor can list (Settings · Languages); stored on the doctor as "Arabic · English". */
 export const LANGUAGES: { key: string; name: Bi }[] = [
@@ -351,7 +351,16 @@ const EXTRA: Extra[] = [
   ["sulami", bi("Dr. Abeer Al-Sulami", "د. عبير السلمي"), true, "obgyn", "221", "specialist", "later", 0, 20, "15:00", 287, "4.7"],
   ["nharthi", bi("Dr. Nouf Al-Harthi", "د. نوف الحارثي"), true, "obgyn", "222", "specialist", "off", 0, 0, "2026-11-19", 243, "4.9"],
   ["kamal", bi("Dr. Yasser Kamal", "د. ياسر كمال"), false, "peds", "103", "specialist", "in", 12, 16, "11:15", 280, "4.6"],
+  // Pediatrics team in the Move bookings block (design v4.6): Omar works Sun–Wed, Rana every day but Monday, Hessa
+  // is on leave until 5 Jan. (Not the Cardiology "Dr. Hessa Al-Dossary" above — a different doctor.)
+  ["oghamdi", bi("Dr. Omar Al-Ghamdi", "د. عمر الغامدي"), false, "peds", "104", "consultant", "in", 10, 14, "12:40", 238, "4.7"],
+  ["mutlaq", bi("Dr. Rana Al-Mutlaq", "د. رنا المطلق"), true, "peds", "105", "specialist", "in", 9, 12, "11:30", 196, "4.8"],
+  ["hdossari", bi("Dr. Hessa Al-Dossari", "د. حصة الدوسري"), true, "peds", "106", "specialist", "leave", 0, 0, "2027-01-06", 120, "4.6"],
 ]
+/** Status line overrides for the extra doctors (default leave text says "back 25 Nov"). */
+const EXTRA_STATUS: Record<string, Bi> = { hdossari: { en: "On leave · back 6 Jan", ar: "في إجازة · ترجع 6 يناير" } }
+/** Weekly hours that aren't the standard Sun–Thu day shift. */
+const WEEK_DAYS: Record<string, Weekday[]> = { oghamdi: ["sun", "mon", "tue", "wed"], mutlaq: ["sun", "tue", "wed", "thu"] }
 
 /** Title by clinic: specialty, "-ist" noun, Arabic specialty — "Consultant cardiologist", "Dermatology specialist". */
 const TITLES: Record<string, [string, string, string]> = {
@@ -392,14 +401,14 @@ const OTHER: Base[] = EXTRA.map(([key, name, female, clinic, room, grade, status
   room,
   ...(key === "ghamdi" ? { headOf: "obgyn" } : {}),
   status,
-  statusLabel:
-    status === "in"
+  statusLabel: EXTRA_STATUS[key] ??
+    (status === "in"
       ? IN
       : status === "later"
         ? bi(`Starts ${next === "14:00" ? "2 PM" : "3 PM"}`, `${female ? "تبدأ" : "يبدأ"} ${next === "14:00" ? "2" : "3"} الظهر`)
         : status === "off"
           ? bi("Off today", "إجازة اليوم")
-          : bi("On leave · back 25 Nov", "في إجازة · يرجع 25 نوفمبر"),
+          : bi("On leave · back 25 Nov", "في إجازة · يرجع 25 نوفمبر")),
   ...(status === "off" || status === "leave"
     ? { awayNote: status === "off" ? bi("Back tomorrow. Today's patients were moved.", "يرجع بكرة، وانتقل مرضى اليوم.") : bi("Annual leave. Patients were moved to the clinic's other doctors.", "إجازة سنوية، وانتقل المرضى لباقي أطباء العيادة.") }
     : {}),
@@ -438,7 +447,9 @@ function profile(b: Base, i: number): Doctor {
   const shift = later ? LATE_SHIFT : DAY_SHIFT
   const week: Record<Weekday, Shift[]> = zaki
     ? { sun: DAY_SHIFT, mon: [...DAY_SHIFT, TELE], tue: DAY_SHIFT, wed: [...DAY_SHIFT, TELE], thu: [{ from: "08:00", to: "13:00" }], ...OFF }
-    : { sun: shift, mon: shift, tue: shift, wed: shift, thu: shift, ...OFF }
+    : WEEK_DAYS[b.key]
+      ? { sun: [], mon: [], tue: [], wed: [], thu: [], ...OFF, ...Object.fromEntries(WEEK_DAYS[b.key].map((w) => [w, shift])) }
+      : { sun: shift, mon: shift, tue: shift, wed: shift, thu: shift, ...OFF }
   const perDay = b.today.booked || Math.round(b.month.visits / 13)
   const booked: Record<Weekday, number> = zaki
     ? { sun: 18, mon: 22, tue: 17, wed: 18, thu: 11, fri: 0, sat: 0 }
@@ -643,6 +654,7 @@ export const LEAVES: Leave[] = [
   { id: "lv-shehri", doctor: "shehri", type: "conference", from: "2027-01-14", to: "2027-01-16", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "pending", bookings: 11 },
   { id: "lv-hamdan", doctor: "hamdan", type: "annual", from: "2026-11-08", to: "2026-11-19", coverName: bi("Dr. Waleed Saeed", "د. وليد سعيد"), status: "approved", bookings: 12 },
   { id: "lv-whassan", doctor: "whassan", type: "annual", from: "2026-11-16", to: "2026-11-24", cover: "mutairi", status: "approved", bookings: 9 },
+  { id: "lv-hdossari", doctor: "hdossari", type: "annual", from: "2026-11-09", to: "2027-01-05", cover: "saud", status: "approved", bookings: 0 },
   // Days off and training this week (Leave & cover · "Who's away this week")
   { id: "lv-fares-off", doctor: "fares", type: "dayOff", from: "2026-11-18", to: "2026-11-18", cover: "harbi", status: "approved", bookings: 4 },
   { id: "lv-fares-trn", doctor: "fares", type: "training", from: "2026-11-19", to: "2026-11-19", status: "approved", bookings: 0, place: bi("Riyadh", "الرياض") },
@@ -735,12 +747,12 @@ const addDay = (iso: string, n: number) => {
   d.setUTCDate(d.getUTCDate() + n)
   return d.toISOString().slice(0, 10)
 }
-const daysIn = (from: string, to: string) => {
+export const daysIn = (from: string, to: string) => {
   const out: string[] = []
   for (let x = from; x <= to && out.length < 400; x = addDay(x, 1)) out.push(x)
   return out
 }
-const weekdayOf = (iso: string) => WEEKDAYS[new Date(`${iso}T12:00:00Z`).getUTCDay()]
+export const weekdayOf = (iso: string) => WEEKDAYS[new Date(`${iso}T12:00:00Z`).getUTCDay()]
 /** Days in a range the doctor normally works in clinic. */
 export const workingDays = (d: Doctor, from: string, to: string) => daysIn(from, to).filter((x) => d.week[weekdayOf(x)].some((s) => !s.telehealth)).length
 /**

@@ -589,7 +589,10 @@
     "confirm": "أوقف الطبيب",
     "toast": "انوقف {name}",
     "toastMoved": "من {date} · {n, plural, =0 {ما فيه حجوزات تنتقل} other {انتقلت # حجز}}",
-    "toastCancelled": "من {date} · {n, plural, =0 {ما فيه حجوزات تنلغي} other {انلغت # حجز}}"
+    "toastCancelled": "من {date} · {n, plural, =0 {ما فيه حجوزات تنلغي} other {انلغت # حجز}}",
+    "toastMovedTo": "انتقلت {n} حجز {female, select, true {للدكتورة} other {للدكتور}} {name}",
+    "toastSpread": "انتوزعت {n} حجز على {k, plural, =1 {طبيب واحد} =2 {طبيبين} few {# أطباء} other {# طبيب}}",
+    "toastCancelledAll": "{n, plural, =0 {ما فيه حجوزات تنلغي} other {انلغت # حجز}} · ووصل المرضى إشعار"
   },
   "newDoctor": {
     "title": "طبيب جديد",

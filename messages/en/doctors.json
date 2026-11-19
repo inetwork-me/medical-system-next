@@ -589,7 +589,10 @@
     "confirm": "Deactivate",
     "toast": "{name} deactivated",
     "toastMoved": "From {date} · {n, plural, =0 {no bookings to move} one {# booking moved} other {# bookings moved}}",
-    "toastCancelled": "From {date} · {n, plural, =0 {no bookings to cancel} one {# booking cancelled} other {# bookings cancelled}}"
+    "toastCancelled": "From {date} · {n, plural, =0 {no bookings to cancel} one {# booking cancelled} other {# bookings cancelled}}",
+    "toastMovedTo": "{n, plural, one {# booking} other {# bookings}} moved to {name}",
+    "toastSpread": "{n, plural, one {# booking} other {# bookings}} spread across {k, plural, one {# doctor} other {# doctors}}",
+    "toastCancelledAll": "{n, plural, =0 {No bookings to cancel} one {# booking cancelled} other {# bookings cancelled}} · patients notified"
   },
   "newDoctor": {
     "title": "New doctor",

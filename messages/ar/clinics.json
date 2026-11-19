@@ -446,7 +446,13 @@
     "notified": "ووصل المرضى إشعار",
     "notNotified": "وما انرسل للمرضى",
     "untilError": "اختر تاريخ نهاية بعد البداية",
-    "note": "موقفة {range} · {reason}"
+    "note": "موقفة {range} · {reason}",
+    "siteAway": "نفس الزيارات · يبعد {n} دقيقة",
+    "siteHere": "نفس الفرع · الدور {n}",
+    "sitePaused": "موقفة بعد {range}",
+    "toastNextDays": "انتقلت {n} حجز {days}",
+    "toastSite": "انتقلت {n} حجز لعيادة {clinic}",
+    "toastNone": "ما فيه حجوزات تنتقل"
   },
   "archive": {
     "title": "تأرشف عيادة {clinic}؟",

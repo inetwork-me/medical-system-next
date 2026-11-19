@@ -446,7 +446,13 @@
     "notified": "patients notified",
     "notNotified": "patients not texted",
     "untilError": "Pick an end date after the start",
-    "note": "Paused {range} · {reason}"
+    "note": "Paused {range} · {reason}",
+    "siteAway": "Same visits · {n} min away",
+    "siteHere": "This branch · Floor {n}",
+    "sitePaused": "Paused too {range}",
+    "toastNextDays": "{n} moved to {days}",
+    "toastSite": "{n} moved to {clinic}",
+    "toastNone": "No bookings to move"
   },
   "archive": {
     "title": "Archive {clinic}?",

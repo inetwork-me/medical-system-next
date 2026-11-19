@@ -6,14 +6,14 @@ import { useTranslations } from "next-intl"
 import { Field } from "@/components/ds/field"
 import { Icon } from "@/components/ds/icon"
 import { DatePicker } from "@/components/ds/pickers"
-import { RadioOption } from "@/components/ds/radio-option"
 import { ResponsiveDialog } from "@/components/ds/responsive-dialog"
 import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { RadioGroup } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { addToWaitlist } from "@/modules/appointments/waitlist"
 import { DEACTIVATE_REASONS, DOCTORS_TODAY, bookingsBetween, openItems, type DeactivateReason, type Doctor } from "./data"
+import { useDoctorMoveBookings } from "./move-bookings"
 import { updateDoctor, useDoctors } from "./store"
 import { ltr, useDoctorText } from "./text"
 
@@ -35,27 +35,25 @@ const stripDr = (s: string) => s.replace(/^(Dr\.|د\.)\s*/, "")
 
 /**
  * Overlay · Deactivate doctor (destructive; desktop dialog, mobile sheet): future bookings · open referrals · unsigned
- * notes; Last working day + Reason; move the bookings to a colleague in the same clinic or cancel them (patients get an
- * SMS); keep read-only access for 30 days. Deactivate sets the last day (no slots after it) and swaps to the
- * "doctor-deactivated" toast.
+ * notes; Last working day + Reason; the Move bookings block (another Pediatrics doctor, spread across the department,
+ * or cancel); keep read-only access for 30 days. Deactivate sets the last day (no slots after it), moves the bookings
+ * (what nobody can fit goes to the Appointments waiting list) and swaps to the "doctor-deactivated" toast.
  */
 export function DeactivateDialog({ doctorKey, onOpenChange }: { doctorKey: string; onOpenChange: (o: boolean) => void }) {
   const t = useTranslations("doctors.deactivate")
-  const { b, dates } = useDoctorText()
-  const all = useDoctors()
-  const d = all.find((x) => x.key === doctorKey)
+  const tr = useTranslations("common.reassign")
+  const { b } = useDoctorText()
+  const d = useDoctors().find((x) => x.key === doctorKey)
   const [lastDay, setLastDay] = React.useState<Date | undefined>(() => fromIso(endOfNextMonth(DOCTORS_TODAY)))
   const [reason, setReason] = React.useState<DeactivateReason>("contract")
-  const [move, setMove] = React.useState<"move" | "cancel">("move")
   const [keep, setKeep] = React.useState(true)
   const [tried, setTried] = React.useState(false)
+  const iso = lastDay ? isoOf(lastDay) : ""
+  // The bookings already made for the 4 weeks after the last working day.
+  const move = useDoctorMoveBookings(d, iso ? addDays(iso, 1) : "", iso ? addDays(iso, 28) : "")
   if (!d) return null
 
-  const cover = all
-    .filter((x) => x.active && x.key !== d.key && !x.deactivation)
-    .sort((a, z) => Number(z.clinic === d.clinic) - Number(a.clinic === d.clinic) || Number(!!a.headOf) - Number(!!z.headOf))[0]
-  const iso = lastDay ? isoOf(lastDay) : ""
-  const n = iso ? bookingsAfter(d, iso) : 0
+  const n = move.count
   const open = openItems(d)
   const error = tried && !iso ? t("required") : iso && iso < DOCTORS_TODAY ? t("past") : undefined
   const name = b(d.name)
@@ -63,13 +61,20 @@ export function DeactivateDialog({ doctorKey, onOpenChange }: { doctorKey: strin
   const confirm = () => {
     setTried(true)
     if (!iso || iso < DOCTORS_TODAY) return
-    const cancel = move === "cancel" || !cover
-    updateDoctor(d.key, {
-      deactivation: { lastDay: iso, reason, keepAccess: keep, bookings: n, ...(cancel ? { cancelBookings: true } : { cover: cover.key }) },
-    })
+    const o = move.outcome()
+    const plan = o.kind === "doctor" && o.cover ? { cover: o.cover.key } : o.kind === "spread" ? { spread: true } : { cancelBookings: true }
+    updateDoctor(d.key, { deactivation: { lastDay: iso, reason, keepAccess: keep, bookings: n, ...plan } })
+    const waiting = o.kind === "cancel" ? 0 : o.waiting
+    addToWaitlist({ count: waiting, source: "deactivate", doctor: d.key, from: addDays(iso, 1), to: addDays(iso, 28) })
     onOpenChange(false)
-    const date = dates.dayMonth(iso)
-    toast.success(t("toast", { name }), { description: ltr(cancel ? t("toastCancelled", { date, n }) : t("toastMoved", { date, n })) })
+    const after = waiting ? tr("waitingAfter", { n: waiting }) : ""
+    const description =
+      o.kind === "cancel" || (o.kind === "doctor" && !o.cover)
+        ? t("toastCancelledAll", { n })
+        : o.kind === "spread"
+          ? t("toastSpread", { n: o.covered, k: o.doctors }) + after
+          : t("toastMovedTo", { n: o.covered, name: b({ en: o.cover!.name.en, ar: stripDr(o.cover!.name.ar) }), female: String(o.cover!.female) }) + after
+    toast.success(t("toast", { name }), { description: ltr(description) })
   }
 
   return (
@@ -117,14 +122,7 @@ export function DeactivateDialog({ doctorKey, onOpenChange }: { doctorKey: strin
           )}
         </Field>
       </div>
-      <RadioGroup value={cover ? move : "cancel"} onValueChange={(v) => setMove(v as "move" | "cancel")} className="gap-2" aria-label={t("lastDay")}>
-        <RadioOption
-          value="move"
-          disabled={!cover}
-          title={cover ? t("move", { name: b({ en: cover.name.en, ar: stripDr(cover.name.ar) }), female: String(cover.female) }) : t("moveNone")}
-        />
-        <RadioOption value="cancel" title={t("cancelBookings")} />
-      </RadioGroup>
+      {move.element}
       <label className="flex cursor-pointer items-center gap-2 text-sm">
         <Checkbox checked={keep} onCheckedChange={(v) => setKeep(v === true)} />
         {t("keep", { female: String(d.female) })}

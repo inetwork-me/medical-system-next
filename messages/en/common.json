@@ -69,5 +69,46 @@
     "noRows": "No rows match these filters",
     "noRowsText": "Try another filter or period.",
     "loadMore": "Load more"
+  },
+  "reassign": {
+    "labelDoctor": "Future bookings · {n}",
+    "labelClinic": "Bookings in these dates · {n}",
+    "doctor": {
+      "title": "Move to another doctor",
+      "titleLeave": "Move to a cover doctor",
+      "hint": "Pick any doctor in {dept}",
+      "search": "Search doctors in {dept}…",
+      "foot": "Bookings the doctor can't fit go to the waiting list."
+    },
+    "spread": {
+      "title": "Spread across available doctors",
+      "hint": "Each booking goes to a free {dept} doctor at the same time"
+    },
+    "cancel": {
+      "title": "Cancel bookings and text patients",
+      "hint": "Patients get an SMS with a link to rebook"
+    },
+    "date": {
+      "title": "Move to the next open days",
+      "hint": "Same doctor and visit type, first free slots after the pause",
+      "bookings": "{n, plural, one {# booking} other {# bookings}}",
+      "waiting": "Waiting list",
+      "waitingValue": "{n} · no free slot",
+      "waitingNone": "None",
+      "foot": "Patients on the waiting list get the first slot that opens."
+    },
+    "clinic": {
+      "title": "Move to another clinic or branch",
+      "hint": "Pick any clinic that sees the same visits",
+      "search": "Search clinics and branches…",
+      "foot": "Bookings the clinic can't fit go to the waiting list."
+    },
+    "covers": "Covers {n} of {total}",
+    "onLeave": "On leave until {date}",
+    "unavailableDoctor": "Unavailable",
+    "unavailableClinic": "Unavailable",
+    "cantPick": "can't be picked",
+    "noMatch": "No matches",
+    "waitingAfter": " · {n} on the waiting list"
   }
 }

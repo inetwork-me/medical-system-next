@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { hasLocale } from "next-intl"
 import { setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
@@ -14,7 +15,9 @@ export default async function BillingDevPage({ params }: { params: Promise<{ loc
     <main className="mx-auto w-full max-w-screen-2xl p-4 md:p-6 lg:p-8">
       <h1 className="mb-2 text-3xl font-semibold tracking-tight">Billing · data model and helpers</h1>
       <p className="mb-8 text-sm text-muted-foreground">Billing & contracts (design v5.0). Switch language for Arabic; switch the role to check permissions. </p>
-      <BillingStories />
+      <Suspense>
+        <BillingStories />
+      </Suspense>
     </main>
   )
 }

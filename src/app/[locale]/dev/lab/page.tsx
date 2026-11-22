@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { hasLocale } from "next-intl"
 import { setRequestLocale } from "next-intl/server"
 import { notFound } from "next/navigation"
@@ -14,7 +15,9 @@ export default async function LabDevPage({ params }: { params: Promise<{ locale:
     <main className="mx-auto w-full max-w-screen-2xl p-4 md:p-6 lg:p-8">
       <h1 className="mb-2 text-3xl font-semibold tracking-tight">Labs · data model and helpers</h1>
       <p className="mb-8 text-sm text-muted-foreground">Step 1 of the Labs build. Switch language for Arabic.</p>
-      <LabStories />
+      <Suspense>
+        <LabStories />
+      </Suspense>
     </main>
   )
 }

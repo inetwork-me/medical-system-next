@@ -14,7 +14,7 @@ import { toast } from "@/components/ds/toast"
 import { PageContainer, PageHeader } from "@/components/shell/page"
 import { PageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
-import { CENTER, STAFF, type BillDocument, type Contract, type ContractEvent, type Signer } from "./data"
+import { CENTER, STAFF, userById, type BillDocument, type Contract, type ContractEvent, type Signer } from "./data"
 import { CONTRACTS_HREF } from "./href"
 import { FactRow } from "./insurers"
 import { formatMoney } from "./money"
@@ -25,16 +25,21 @@ import { SignDialog } from "./sign-dialog"
 import { clausesOf } from "./templates"
 import { visibleContracts } from "./contracts"
 import { useBillRole, useContract } from "./store"
+import { useBillUser } from "./session"
 import { useBillText } from "./text"
 
 const timeOf = (iso: string) => iso.slice(11, 16)
 
-/** The signed-in user signs for the center when the next signer is the center's signatory and the role may sign. */
+/**
+ * The signed-in user signs now when the next signer in order is them (a center signature assigned to their user id),
+ * they're an authorized signatory and their role may sign.
+ */
 export function useMyTurn(c: Contract | undefined) {
   const role = useBillRole()
-  if (!c) return false
+  const me = useBillUser()
+  if (!c || !me) return false
   const next = nextSigner(c)
-  return !!next && next.side === "center" && c.sent && !c.locked && billCan(role, "sign")
+  return !!next && next.side === "center" && next.userId === me.id && me.signatory && c.sent && !c.locked && billCan(role, "sign")
 }
 
 /* ------------------------------------------------------------------ paper */
@@ -91,7 +96,8 @@ export function ContractPaper({ c, className }: { c: Contract; className?: strin
   const p = c.party
   const center = c.signers.find((s) => s.side === "center")
   const party = c.signers.find((s) => s.side === "party")
-  const rep = STAFF.faisal
+  // The center is represented by the user who signs for it on this contract.
+  const rep = userById(center?.userId) ?? STAFF[CENTER.signatory]
   const idText = p.nationalId
     ? p.licence
       ? t("employeeIds", { id: ltrRun(maskId(p.nationalId)), tail: ltrRun(idTail(p.nationalId)), licence: ltrRun(p.licence.no) })
@@ -208,6 +214,7 @@ export function ContractSide({ c, onSign }: { c: Contract; onSign?: () => void }
   const { b, date, locale } = useBillText()
   const dates = useDates()
   const myTurn = useMyTurn(c)
+  const me = useBillUser()
   const eventText = useEventText()
   const signed = signedCount(c)
   const total = c.signers.length
@@ -236,7 +243,7 @@ export function ContractSide({ c, onSign }: { c: Contract; onSign?: () => void }
                   <span className="text-xs text-muted-foreground">
                     {s.status === "signed" && s.signedAt
                       ? t("signerSigned", { role: b(s.role), date: dates.dayMonth(s.signedAt), time: timeOf(s.signedAt) })
-                      : s.side === "center" && myTurn
+                      : s.side === "center" && s.userId === me?.id
                         ? t("you", { role: b(s.role) })
                         : b(s.role)}
                   </span>

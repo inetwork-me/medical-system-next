@@ -8,7 +8,8 @@ import type { ContractKind } from "./data"
  * - HR drafts staff contracts;
  * - only the authorized signatory (CEO / medical director) signs for the center;
  * - doctors see nothing here except their own contract.
- * "lead" is the demo login: every permission, and it signs as the center's signatory (Faisal Al-Qahtani).
+ * "lead" is the demo role: every permission. Signing also needs the signed-in user to be an authorized signatory and
+ * the next signer (session.ts) — the role alone never signs for someone else.
  */
 export type BillRole = "reception" | "billing" | "finance" | "hr" | "signatory" | "doctor" | "lead"
 

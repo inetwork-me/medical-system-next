@@ -21,6 +21,7 @@ import { canSignNow, maskId, monthlyPay, nextSigner, pdfHashOf, signContract } f
 import { clausesOf } from "./templates"
 import { getContract, saveContract, useBillRole, useContract } from "./store"
 import { useBillText } from "./text"
+import { currentUser } from "./session"
 
 type Phase = { step: 1 } | { step: 2; req: NafathStart; left: number } | { step: "expired" | "rejected" }
 
@@ -109,7 +110,9 @@ export function SignDialog({ contractNo, onOpenChange, initialStep }: { contract
 
   if (!c || !me) return null
   const refusal = canSignNow(c, me)
-  const allowed = !refusal && me.side === "center" && billCan(role, "sign")
+  // Only the signed-in user signs, and only as an authorized signatory whose turn it is (signers sign in order).
+  const user = currentUser()
+  const allowed = !refusal && me.side === "center" && me.userId === user?.id && !!user?.signatory && billCan(role, "sign")
   const other = c.signers.find((s) => s.side === "party")
   const clauses = clausesOf(c).length
 

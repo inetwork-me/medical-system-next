@@ -1,4 +1,4 @@
-import type { Invoice, ZatcaRecord } from "./data"
+import { CENTER, type Invoice, type ZatcaRecord } from "./data"
 import { totals } from "./rules"
 
 /*
@@ -70,3 +70,60 @@ export function applyZatca(inv: Invoice, res: ZatcaResponse, at: string): Invoic
 }
 
 export const zatca: ZatcaClient = zatcaStub()
+
+/* ------------------------------------------------------------------ QR (TLV) */
+
+const te = new TextEncoder()
+
+/** One TLV field: tag (1 byte), length (1 byte, UTF-8 byte length), value. */
+function tlv(tag: number, value: string): number[] {
+  const v = Array.from(te.encode(value))
+  if (v.length > 255) throw new Error(`ZATCA TLV tag ${tag} is longer than 255 bytes`)
+  return [tag, v.length, ...v]
+}
+
+const toBase64 = (bytes: number[]) => {
+  let s = ""
+  for (const b of bytes) s += String.fromCharCode(b)
+  return typeof btoa === "function" ? btoa(s) : Buffer.from(bytes).toString("base64")
+}
+
+/** Riyadh wall-clock "2026-11-19T10:58" → UTC "2026-11-19T07:58:00Z" (KSA is UTC+3, no DST). */
+export function zatcaTimestamp(local: string) {
+  const d = new Date(`${local.length === 16 ? `${local}:00` : local}+03:00`)
+  return d.toISOString().replace(/\.\d{3}Z$/, "Z")
+}
+
+/**
+ * The invoice's QR payload (ZATCA e-invoicing): base64 of the TLV fields
+ *   1 seller name · 2 VAT registration no. · 3 time stamp · 4 total with VAT · 5 VAT total · 6 invoice hash.
+ * Phase 2 adds 7 ECDSA signature · 8 public key · 9 the stamp's signature (simplified invoices) — those come from the
+ * signing SDK with the CSID; a cleared standard invoice carries the QR ZATCA returns, which replaces this one.
+ */
+export function zatcaQrPayload(inv: Invoice, sellerName = CENTER.name.ar, vatNo = CENTER.vatNo) {
+  const t = totals(inv)
+  const bytes = [
+    ...tlv(1, sellerName),
+    ...tlv(2, vatNo),
+    ...tlv(3, zatcaTimestamp(inv.issuedAt)),
+    ...tlv(4, t.total.toFixed(2)),
+    ...tlv(5, t.vat.toFixed(2)),
+    ...tlv(6, inv.zatca.hash),
+  ]
+  return toBase64(bytes)
+}
+
+/** Decode a TLV payload back to its fields (dev stories / tests). */
+export function readZatcaQr(b64: string): Record<number, string> {
+  const raw = typeof atob === "function" ? atob(b64) : Buffer.from(b64, "base64").toString("binary")
+  const bytes = Uint8Array.from(raw, (c) => c.charCodeAt(0))
+  const out: Record<number, string> = {}
+  const td = new TextDecoder()
+  for (let i = 0; i + 1 < bytes.length; ) {
+    const tag = bytes[i]
+    const len = bytes[i + 1]
+    out[tag] = td.decode(bytes.slice(i + 2, i + 2 + len))
+    i += 2 + len
+  }
+  return out
+}

@@ -21,6 +21,7 @@ import {
   type ContractEvent,
 } from "./data"
 import { round2 } from "./money"
+import { currentUserId } from "./session"
 
 /*
  * Billing rules (brief §4), pure functions over the data model. Screens never compute money or statuses themselves.
@@ -42,17 +43,20 @@ export type InvoiceTotals = {
   balance: number
   /** The VAT rate printed in the header ("VAT 15%"); null when lines mix rates. */
   vatRate: number | null
+  /** The co-pay hit its per-visit cap (the insurer pays the rest). */
+  capped: boolean
 }
 
 export function totals(inv: Invoice): InvoiceTotals {
   const subtotal = round2(inv.lines.reduce((s, l) => s + lineNet(l), 0))
   const vat = round2(inv.lines.reduce((s, l) => s + lineVat(l), 0))
   const total = round2(subtotal + vat)
-  const insurerShare = inv.payer === "cash" ? 0 : round2((total * inv.insurerPct) / 100)
-  const patientShare = round2(total - insurerShare)
+  // Co-pay as issued: a percentage of the total, capped per visit when the class has a cap; the insurer pays the rest.
+  const patientShare = inv.payer === "cash" ? total : round2(Math.min((total * inv.copay.pct) / 100, inv.copay.cap ?? Infinity))
+  const insurerShare = round2(total - patientShare)
   const paid = round2(inv.payments.reduce((s, p) => s + p.amount, 0))
   const rates = [...new Set(inv.lines.map((l) => l.vatRate))]
-  return { subtotal, vat, total, insurerShare, patientShare, paid, balance: round2(Math.max(0, patientShare - paid)), vatRate: rates.length === 1 ? rates[0] : null }
+  return { subtotal, vat, total, insurerShare, patientShare, paid, balance: round2(Math.max(0, patientShare - paid)), vatRate: rates.length === 1 ? rates[0] : null, capped: inv.payer !== "cash" && inv.copay.cap != null && patientShare === inv.copay.cap }
 }
 
 /** Status from the money: a refund (credit note) wins, then the patient balance. */
@@ -74,12 +78,16 @@ export const zatcaConfirmed = (inv: Invoice) => inv.zatca.status === "reported" 
 
 /**
  * Co-pay from the insurer agreement (brief §4): a percentage of the total, capped per visit for the classes the cap
- * covers. Used when an invoice is created from a visit; an issued invoice keeps the shares it was issued with.
+ * covers. Used when an invoice is created from a visit; the invoice stores the rule it was issued with (`copay`).
  */
-export function copayFor(ins: Pick<Insurer, "copay">, cls: InsurerClass | undefined, total: number) {
-  const share = round2((total * ins.copay.pct) / 100)
+export function copayRuleFor(ins: Pick<Insurer, "copay">, cls: InsurerClass | undefined): { pct: number; cap?: number } {
   const capped = ins.copay.capPerVisit != null && cls != null && ins.copay.classes.includes(cls)
-  return capped ? Math.min(share, ins.copay.capPerVisit!) : share
+  return capped ? { pct: ins.copay.pct, cap: ins.copay.capPerVisit } : { pct: ins.copay.pct }
+}
+
+export function copayFor(ins: Pick<Insurer, "copay">, cls: InsurerClass | undefined, total: number) {
+  const r = copayRuleFor(ins, cls)
+  return round2(Math.min((total * r.pct) / 100, r.cap ?? Infinity))
 }
 
 /* ------------------------------------------------------------------ claims */
@@ -124,13 +132,14 @@ export const nextSigner = (c: Pick<Contract, "signers">): Signer | undefined => 
 export const signedCount = (c: Pick<Contract, "signers">) => c.signers.filter((s) => s.status === "signed").length
 
 /**
- * Draft until sent; then waiting for the next signer in order (the center's signatory → "Waiting for you",
- * the other side → "Waiting for them"); once all signed: Signed → Ends in N days (60) → Ended.
+ * Draft until sent; then waiting for the next signer in order (the signed-in user → "Waiting for you", anyone else
+ * → "Waiting for them"); once all signed: Signed → Ends in N days (60) → Ended.
  */
-export function contractStatus(c: Pick<Contract, "sent" | "signers" | "end">, today = BILL_TODAY): ContractStatus {
+export function contractStatus(c: Pick<Contract, "sent" | "signers" | "end">, today = BILL_TODAY, me: string | undefined = currentUserId()): ContractStatus {
   if (!c.sent) return "draft"
   const next = nextSigner(c)
-  if (next) return next.side === "center" ? "awaitingYou" : "awaitingThem"
+  // "Waiting for you" only when the next signer is the signed-in user; anyone else's turn is "Waiting for them".
+  if (next) return next.side === "center" && next.userId != null && next.userId === me ? "awaitingYou" : "awaitingThem"
   const left = daysBetween(today, c.end)
   if (left < 0) return "ended"
   return left <= ENDING_DAYS ? "ending" : "signed"
@@ -202,10 +211,12 @@ export const askPreauth = (c: Claim, at: string): Claim => ({ ...c, preauthReque
 export type SignRefusal = "notSent" | "locked" | "notYourTurn"
 
 /** Only the next signer in order may sign; a draft or a locked document can't be signed. */
-export function canSignNow(c: Pick<Contract, "sent" | "locked" | "signers">, signer: Pick<Signer, "order">): SignRefusal | null {
+export function canSignNow(c: Pick<Contract, "sent" | "locked" | "signers">, signer: Pick<Signer, "order" | "userId" | "side">, me: string | undefined = currentUserId()): SignRefusal | null {
   if (!c.sent) return "notSent"
   if (c.locked) return "locked"
-  return nextSigner(c)?.order === signer.order ? null : "notYourTurn"
+  if (nextSigner(c)?.order !== signer.order) return "notYourTurn"
+  // A center signature can only be given by that user, signed in as themselves.
+  return signer.side === "center" && signer.userId !== me ? "notYourTurn" : null
 }
 
 /**

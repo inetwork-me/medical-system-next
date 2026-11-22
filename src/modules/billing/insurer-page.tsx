@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
 import { useDates } from "@/i18n/dates"
 import { isTabEnabled } from "@/lib/modules"
-import { SESSION_USER } from "@/lib/mock/shell"
 import { ActionMenu } from "@/components/ds/action-menu"
 import { Icon } from "@/components/ds/icon"
 import { EmptyState } from "@/components/ds/states"
@@ -25,6 +24,7 @@ import { billCan } from "./roles"
 import { daysLeft, docStatus, insurerStatus } from "./rules"
 import { getInsurer, saveInsurer, useBillRole, useInsurer } from "./store"
 import { useBillText } from "./text"
+import { currentUser } from "./session"
 
 const pct = (n: number) => ltrRun(`${n}%`)
 
@@ -157,7 +157,7 @@ export function useUploadDocument(insurerId: string) {
       file: f.name,
       format: ext === "XLSX" || ext === "XLS" ? "XLSX" : ext === "DOCX" || ext === "DOC" ? "DOCX" : "PDF",
       status: "checking",
-      uploadedBy: SESSION_USER.name.en,
+      uploadedBy: currentUser()?.id ?? "session",
       uploadedAt: BILL_NOW,
       version: 1,
     }

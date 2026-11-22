@@ -20,6 +20,8 @@ import { claimsHref, INVOICES_HREF } from "./href"
 import { useMoney } from "./money"
 import { ClaimStatusBadge, InvoiceStatusBadge, Latin, ltrRun } from "./parts"
 import { RecordPaymentDialog } from "./payment-dialog"
+import { zatcaQrPayload } from "./zatca"
+import { QrCode } from "@/components/ds/qr-code"
 import { billCan } from "./roles"
 import { canCollect, invoiceStatus, lineTotal, lineVat, lineNet, sendInvoice, totals } from "./rules"
 import { getInvoice, saveInvoice, useBillRole, useClaim, useInvoice } from "./store"
@@ -100,19 +102,14 @@ export function InvoicePaper({ inv, className }: { inv: Invoice; className?: str
               </bdi>
             </p>
           </div>
-          {/* ZATCA QR: the API's TLV payload (seller, VAT no., time, total, VAT); drawn as the design's placeholder tile. */}
-          <div className="hidden flex-col items-center gap-0.5 @xl/paper:flex">
-            <span
-              role="img"
-              aria-label={t("qr")}
-              title={z.qr}
-              className="inline-flex size-16 items-center justify-center rounded-md border bg-muted text-foreground"
-            >
-              <Icon name="scan-barcode" size={30} />
-            </span>
-            <span className="text-xs text-muted-foreground">{t("zatca")}</span>
-          </div>
-        </header>
+          {/* ZATCA QR: the TLV payload (seller, VAT no., time, total, VAT, hash), encoded as a real QR code. */}
+        <div className="hidden flex-col items-center gap-0.5 @xl/paper:flex">
+          <span className="inline-flex rounded-md border bg-white p-1">
+            <QrCode value={zatcaQrPayload(inv)} size={88} quiet={2} label={t("qr")} />
+          </span>
+          <span className="text-xs text-muted-foreground">{t("zatca")}</span>
+        </div>
+      </header>
 
         <div aria-hidden className="h-px bg-border" />
 
@@ -187,14 +184,24 @@ export function InvoicePaper({ inv, className }: { inv: Invoice; className?: str
             <SumRow label={t("sum.total")} value={money(tt.total)} />
             {ins && (
               <SumRow
-                label={t("sum.insurerPays", {
-                  insurer: insurerShort(ins.id),
-                  pct: pctRun(inv.insurerPct),
-                })}
+                label={
+                  tt.capped
+                    ? t("sum.insurerPaysCapped", { insurer: insurerShort(ins.id) })
+                    : t("sum.insurerPays", { insurer: insurerShort(ins.id), pct: pctRun(100 - inv.copay.pct) })
+                }
                 value={money(tt.insurerShare)}
               />
             )}
-            <SumRow label={ins ? t("sum.patientPays", { pct: pctRun(100 - inv.insurerPct) }) : t("sum.patientPaysCash")} value={money(tt.patientShare)} />
+            <SumRow
+              label={
+                !ins
+                  ? t("sum.patientPaysCash")
+                  : inv.copay.cap != null
+                    ? t("sum.patientPaysCapped", { pct: pctRun(inv.copay.pct), cap: money(inv.copay.cap, { whole: true }) })
+                    : t("sum.patientPays", { pct: pctRun(inv.copay.pct) })
+              }
+              value={money(tt.patientShare)}
+            />
             {inv.payments.map((pay, i) => (
               <SumRow
                 key={i}
@@ -296,11 +303,9 @@ export function InvoiceSide({ inv, onRecord }: { inv: Invoice; onRecord?: () => 
         description={
           inv.payer === "cash"
             ? t("pay.cash")
-            : t("pay.copay", {
-                pct: pctRun(100 - inv.insurerPct),
-                insurer: insurerShort(inv.payer),
-                cls: ltrRun(inv.class ?? "—"),
-              })
+            : inv.copay.cap != null
+              ? t("pay.copayCapped", { pct: pctRun(inv.copay.pct), cap: money(inv.copay.cap, { whole: true }), insurer: insurerShort(inv.payer), cls: ltrRun(inv.class ?? "—") })
+              : t("pay.copay", { pct: pctRun(inv.copay.pct), insurer: insurerShort(inv.payer), cls: ltrRun(inv.class ?? "—") })
         }
       >
         <div className="flex flex-col">

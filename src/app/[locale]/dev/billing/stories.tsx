@@ -13,7 +13,8 @@ import { setBillRole, useBillRole } from "@/modules/billing/store"
 import { InvoicesList } from "@/modules/billing/invoices"
 import { InvoicePaper, InvoiceSide } from "@/modules/billing/invoice-page"
 import { RecordPaymentDialog } from "@/modules/billing/payment-dialog"
-import { applyZatca, zatcaRequest, zatcaStub } from "@/modules/billing/zatca"
+import { applyZatca, readZatcaQr, zatcaQrPayload, zatcaRequest, zatcaStub } from "@/modules/billing/zatca"
+import { QrCode } from "@/components/ds/qr-code"
 import type { Invoice } from "@/modules/billing/data"
 import { ClaimsList, ClaimsSummary } from "@/modules/billing/claims"
 import { FixClaimDialog, SubmitClaimsDialog } from "@/modules/billing/claim-dialogs"
@@ -56,14 +57,14 @@ function Check({ ok }: { ok: boolean }) {
   return <span className={cn("font-mono text-xs", ok ? "text-success" : "text-destructive")}>{ok ? "✓" : "✗"}</span>
 }
 
-/** The design's printed figures, to check the rules against. */
+/** The design's printed figures (Bupa B rows corrected to the SAR 75 cap), to check the rules against. */
 const DESIGN_INVOICES: Record<string, { total: number; patient: number; status: InvoiceStatus }> = {
-  "INV-2611-0241": { total: 833.75, patient: 166.75, status: "part" },
+  "INV-2611-0241": { total: 833.75, patient: 75, status: "part" },
   "INV-2611-0240": { total: 420, patient: 42, status: "paid" },
   "INV-2611-0239": { total: 310.5, patient: 310.5, status: "unpaid" },
   "INV-2611-0238": { total: 575, patient: 57.5, status: "paid" },
   "INV-2611-0237": { total: 240, patient: 240, status: "refunded" },
-  "INV-2611-0236": { total: 1150, patient: 230, status: "paid" },
+  "INV-2611-0236": { total: 1150, patient: 75, status: "paid" },
   "INV-2611-0235": { total: 690, patient: 69, status: "unpaid" },
   "INV-2611-0234": { total: 160, patient: 160, status: "paid" },
 }
@@ -252,7 +253,8 @@ export function BillingStories() {
           </tbody>
         </table>
         <p className="text-xs text-muted-foreground">
-          Co-pay rule on INV-2611-0241 (Bupa class B, 20% capped SAR 75): {formatMoney(copayFor(INSURERS[0], "B", 833.75), "en")} — the design prints SAR 166.75 (reported gap).
+          Bupa&apos;s official terms (20%, up to SAR 75 a visit for classes B and C): INV-2611-0241 class B →{" "}
+          {formatMoney(copayFor(INSURERS[0], "B", 833.75), "en")} (the design printed SAR 166.75 before the cap was applied).
         </p>
       </Box>
 
@@ -376,6 +378,21 @@ function InvoiceStories() {
       <Box title="Widget / Bill Invoice · Compact (358) — refunded (credit note)">
         <div className="w-[358px] max-w-full">
           <InvoicePaper inv={inv("INV-2611-0237")} />
+        </div>
+      </Box>
+      <Box title="ZATCA QR · INV-2611-0241 (TLV tags 1–6, base64, QR byte mode M — scan it with a phone)" className="lg:col-span-2">
+        <div className="flex flex-wrap items-start gap-6">
+          <QrCode value={zatcaQrPayload(inv("INV-2611-0241"))} size={200} label="ZATCA QR" />
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+            {Object.entries(readZatcaQr(zatcaQrPayload(inv("INV-2611-0241")))).map(([tag, v]) => (
+              <React.Fragment key={tag}>
+                <dt className="font-mono text-xs text-muted-foreground" dir="ltr">
+                  tag {tag}
+                </dt>
+                <dd>{v}</dd>
+              </React.Fragment>
+            ))}
+          </dl>
         </div>
       </Box>
       <Box title="ZATCA stub · report → confirmed / rejected (badge only after the API confirms)" className="lg:col-span-2">

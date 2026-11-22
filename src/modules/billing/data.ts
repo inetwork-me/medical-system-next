@@ -41,6 +41,8 @@ export const CENTER = {
   hrEmail: "hr@alnoor.sa",
   verifyUrl: "alnoor.sa/verify",
   refundDays: 14,
+  /** The authorized signatory new contracts route to (center settings); the signed-in user when they are one. */
+  signatory: "khaled" as const,
 }
 
 /* ------------------------------------------------------------------ VAT */
@@ -308,12 +310,31 @@ export const PATIENTS = {
 
 export type PatientKey = keyof typeof PATIENTS
 
-/** Staff who act in Billing (payments, drafting). */
+/**
+ * The center's users who act in Billing (the users table once the backend exists). `email` links a record to the
+ * signed-in session; `signatory` marks the authorized signatories (CEO / medical director) — the only users who sign
+ * for the center. National IDs are stored in full for Nafath and only ever shown masked.
+ */
+export type BillUser = {
+  id: string
+  email?: string
+  initials: string
+  name: Bi
+  /** Job title, shown as the signer's role ("CEO", "Medical director"). */
+  role: Bi
+  nationalId: string
+  mobile: string
+  signatory: boolean
+}
+
 export const STAFF = {
-  nora: { name: bi("Nora Al-Fahad", "نورة الفهد"), role: bi("HR", "الموارد البشرية") },
-  faisal: { name: bi("Faisal Al-Qahtani", "فيصل القحطاني"), role: bi("CEO", "الرئيس التنفيذي") },
-} as const
+  nora: { id: "u-nora", email: "nora.f@clinic.sa", initials: "NF", name: bi("Nora Al-Fahad", "نورة الفهد"), role: bi("HR", "الموارد البشرية"), nationalId: "1066102338", mobile: "+966 55 410 2338", signatory: false },
+  faisal: { id: "u-faisal", email: "faisal.q@clinic.sa", initials: "FQ", name: bi("Faisal Al-Qahtani", "فيصل القحطاني"), role: bi("CEO", "الرئيس التنفيذي"), nationalId: "1029384482", mobile: "+966 50 100 2482", signatory: true },
+  khaled: { id: "u-khaled", email: "khaled.m@clinic.sa", initials: "KM", name: bi("Dr. Khaled Mansour", "د. خالد منصور"), role: bi("Medical director", "المدير الطبي"), nationalId: "1031457726", mobile: "+966 55 123 4287", signatory: true },
+} satisfies Record<string, BillUser>
 export type StaffKey = keyof typeof STAFF
+
+export const userById = (id: string | undefined): BillUser | undefined => Object.values(STAFF).find((u) => u.id === id)
 
 /* ------------------------------------------------------------------ invoices */
 
@@ -381,8 +402,12 @@ export type Invoice = {
   payer: "cash" | string
   class?: InsurerClass
   lines: InvoiceLine[]
-  /** Insurer share percent applied at issue (from the agreement's co-pay). */
-  insurerPct: number
+  /**
+   * The patient's co-pay as issued, from the insurer agreement (percentage, and the per-visit cap when the member's class
+   * has one — Bupa: 20%, up to SAR 75 a visit for classes B and C). An issued invoice keeps it even if the agreement
+   * changes. Cash invoices: the patient pays everything.
+   */
+  copay: { pct: number; cap?: number }
   payments: Payment[]
   zatca: ZatcaRecord
   claimNo?: string
@@ -446,12 +471,12 @@ export const INVOICES: Invoice[] = [
       line("LAB-LIPID", "Lipid panel", "الدهون", 120, "standard", { kind: "lab", ref: "LAB-0142" }),
       line("LAB-UA", "Urinalysis", "تحليل البول", 40, "standard", { kind: "lab", ref: "LAB-0142" }),
     ],
-    insurerPct: 80,
-    payments: [pay("INV-2611-0241", 100, "cash", "2026-11-19T10:30")],
+    copay: { pct: 20, cap: 75 },
+    payments: [pay("INV-2611-0241", 50, "cash", "2026-11-19T10:30")],
     zatca: { ...zatca("8f3c41d2-7b0e-4c55-9a1e-2f6d0b7ea21e", "2026-11-19T10:58"), status: "reported" },
     claimNo: "CLM-26-01842",
     events: [
-      { at: "2026-11-19T10:30", kind: "paid", text: bi("SAR 100 paid in cash · Nora Al-Fahad", "انتدفع 100 ر.س كاش · نورة الفهد") },
+      { at: "2026-11-19T10:30", kind: "paid", text: bi("SAR 50 paid in cash · Nora Al-Fahad", "انتدفع 50 ر.س كاش · نورة الفهد") },
       { at: "2026-11-19T10:58", kind: "issued", text: bi("Invoice issued and reported to ZATCA", "صدرت الفاتورة وانرفعت للهيئة") },
       { at: "2026-11-19T11:20", kind: "claimSent", text: bi("Claim sent to Bupa", "انرسلت المطالبة لبوبا") },
       { at: "2026-11-19T11:21", kind: "sent", text: bi("Invoice sent to the guardian by SMS", "انرسلت الفاتورة لولي الأمر برسالة") },
@@ -468,7 +493,7 @@ export const INVOICES: Invoice[] = [
     payer: "tawuniya",
     class: "A",
     lines: [line("CONS-GP", "Consultation · General practice", "كشفية · الطب العام", 250, "citizen", { kind: "consult" }), line("LAB-CBC", "Complete blood count", "صورة الدم الكاملة", 90, "citizen", { kind: "lab" }), line("LAB-TSH", "TSH", "TSH", 80, "citizen", { kind: "lab" })],
-    insurerPct: 90,
+    copay: { pct: 10 },
     payments: [pay("INV-2611-0240", 42, "mada", "2026-11-19T10:14", { terminal: "POS-2", approvalCode: "551203" })],
     zatca: zatca("1b7e9c20-3d41-4f8a-8c2b-6e0f1a9d4c40", "2026-11-19T10:12"),
     claimNo: "CLM-26-01841",
@@ -484,7 +509,7 @@ export const INVOICES: Invoice[] = [
     doctor: "zaki",
     payer: "cash",
     lines: [line("CONS-PED", "Consultation · Pediatrics", "كشفية · الأطفال", 200, "standard", { kind: "consult" }), line("LAB-CBC", "Complete blood count", "صورة الدم الكاملة", 70, "standard", { kind: "lab" })],
-    insurerPct: 0,
+    copay: { pct: 100 },
     payments: [],
     zatca: zatca("c4a0d1e8-92f3-4b6d-a7c1-5e2b8f3d0239", "2026-11-19T09:47", "simplified"),
     events: [],
@@ -500,7 +525,7 @@ export const INVOICES: Invoice[] = [
     payer: "medgulf",
     class: "B",
     lines: [line("CONS-DERM", "Consultation · Dermatology", "كشفية · الجلدية", 300, "standard", { kind: "consult" }), line("PROC-CRYO", "Cryotherapy", "علاج بالتبريد", 200, "standard", { kind: "procedure" })],
-    insurerPct: 90,
+    copay: { pct: 10 },
     payments: [pay("INV-2611-0238", 57.5, "card", "2026-11-18T16:22", { terminal: "POS-1", approvalCode: "309114" })],
     zatca: zatca("e7f21c09-6a4d-4e3b-91c8-0d5a2b6f0238", "2026-11-18T16:20"),
     claimNo: "CLM-26-01839",
@@ -516,7 +541,7 @@ export const INVOICES: Invoice[] = [
     doctor: "mansour",
     payer: "cash",
     lines: [line("CONS-IM", "Consultation · Internal medicine", "كشفية · الباطنة", 240, "citizen", { kind: "consult" })],
-    insurerPct: 0,
+    copay: { pct: 100 },
     payments: [pay("INV-2611-0237", 240, "cash", "2026-11-18T12:06")],
     zatca: zatca("5d9b3e7a-0c18-4f62-b4a9-7e1d2c3f0237", "2026-11-18T12:05", "simplified"),
     refunded: true,
@@ -534,8 +559,8 @@ export const INVOICES: Invoice[] = [
     payer: "bupa",
     class: "B",
     lines: [line("LAB-IGE", "Allergy panel (IgE)", "تحليل الحساسية (IgE)", 1000, "standard", { kind: "lab" })],
-    insurerPct: 80,
-    payments: [pay("INV-2611-0236", 230, "mada", "2026-11-18T10:42", { terminal: "POS-2", approvalCode: "118270" })],
+    copay: { pct: 20, cap: 75 },
+    payments: [pay("INV-2611-0236", 75, "mada", "2026-11-18T10:42", { terminal: "POS-2", approvalCode: "118270" })],
     zatca: zatca("a3c5e1f0-7d2b-4c98-8e61-9b0f4d2a0236", "2026-11-18T10:40"),
     claimNo: "CLM-26-01836",
     events: [],
@@ -551,7 +576,7 @@ export const INVOICES: Invoice[] = [
     payer: "alrajhi",
     class: "A",
     lines: [line("CONS-PED", "Consultation · Pediatrics", "كشفية · الأطفال", 300, "standard", { kind: "consult" }), line("PROC-NEB", "Nebulizer session", "جلسة بخار", 300, "standard", { kind: "procedure" })],
-    insurerPct: 90,
+    copay: { pct: 10 },
     payments: [],
     zatca: zatca("f0b8d2c6-4e1a-4a7f-b3d5-2c9e6a1f0235", "2026-11-17T13:15"),
     claimNo: "CLM-26-01835",
@@ -567,7 +592,7 @@ export const INVOICES: Invoice[] = [
     doctor: "odeh",
     payer: "cash",
     lines: [line("CONS-GP", "Consultation · General practice", "كشفية · الطب العام", 160, "citizen", { kind: "consult" })],
-    insurerPct: 0,
+    copay: { pct: 100 },
     payments: [pay("INV-2611-0234", 160, "applepay", "2026-11-17T11:03", { terminal: "POS-1", approvalCode: "772415" })],
     zatca: zatca("2e6f9a1b-8c3d-4b70-a5e2-1d4c7b9e0234", "2026-11-17T11:02", "simplified"),
     events: [],
@@ -630,7 +655,7 @@ export const CLAIMS: Claim[] = [
     invoiceNo: "INV-2611-0236",
     patient: "dosari",
     insurer: "bupa",
-    amount: 920,
+    amount: 1075,
     status: "rejected",
     service: bi("Allergy panel (IgE)", "تحليل الحساسية (IgE)"),
     visitAt: "2026-11-18T09:10",
@@ -648,7 +673,7 @@ export const CLAIMS: Claim[] = [
     invoiceNo: "INV-2611-0241",
     patient: "shammari",
     insurer: "bupa",
-    amount: 667,
+    amount: 758.75,
     status: "review",
     service: bi("Consultation and lab tests", "كشفية وتحاليل"),
     visitAt: "2026-11-19T09:40",
@@ -732,7 +757,7 @@ export const OTHER_CLAIMS = {
     { insurer: "tawuniya", count: 3, amount: 4860 },
     { insurer: "alrajhi", count: 1, amount: 1989 },
   ],
-  review: { count: 30, amount: 46233 },
+  review: { count: 30, amount: 46141.25 },
   rejected: 6,
   needsPreauth: 0,
   approved: 120,
@@ -766,8 +791,8 @@ export type Signer = {
   female?: boolean
   /** "center" = signs for Al Noor (only the authorized signatory); "party" = the other side. */
   side: "center" | "party"
-  /** The signatory key when side is "center" (signing permission). */
-  signatory?: StaffKey
+  /** The user who signs for the center (side "center"): matched against the signed-in user for "you" / "Your turn". */
+  userId?: string
   mobile: string
   /** Stored in full, shown masked to its last 3 digits. */
   nationalId: string
@@ -850,19 +875,23 @@ export type Contract = {
 }
 
 const signer = (order: number, s: Omit<Signer, "order" | "method">): Signer => ({ order, method: "nafath", ...s })
-const faisal = (order: number, status: SignerStatus, signedAt?: string): Signer =>
-  signer(order, {
-    initials: "FQ",
-    name: STAFF.faisal.name,
-    role: STAFF.faisal.role,
+/** A center signature by one of the center's users (an authorized signatory). */
+export const centerSigner = (key: StaffKey, order: number, status: SignerStatus = "waiting", signedAt?: string): Signer => {
+  const u = STAFF[key]
+  return signer(order, {
+    initials: u.initials,
+    name: u.name,
+    role: u.role,
     side: "center",
-    signatory: "faisal",
-    mobile: "+966 50 100 2482",
-    nationalId: "1029384482",
+    userId: u.id,
+    mobile: u.mobile,
+    nationalId: u.nationalId,
     status,
     signedAt,
     ...(signedAt ? { nafathTxn: `NFD-${signedAt.replace(/\D/g, "").slice(2, 12)}`, pdfHash: `sha256:${signedAt.replace(/\D/g, "")}f0` } : {}),
   })
+}
+const faisal = (order: number, status: SignerStatus, signedAt?: string) => centerSigner("faisal", order, status, signedAt)
 
 const signedBy = (s: Omit<Signer, "order" | "method" | "status">, order: number, at: string) =>
   signer(order, { ...s, status: "signed", signedAt: at, nafathTxn: `NFD-${at.replace(/\D/g, "").slice(2, 12)}`, pdfHash: `sha256:${at.replace(/\D/g, "")}a1` })
@@ -948,7 +977,7 @@ export const CONTRACTS: Contract[] = [
         1,
         "2026-11-20T09:14"
       ),
-      faisal(2, "waiting"),
+      centerSigner(CENTER.signatory, 2),
     ],
     sent: true,
     locked: false,
@@ -1021,7 +1050,7 @@ export const CONTRACTS: Contract[] = [
     ],
     signers: [
       signer(1, { initials: "MG", name: bi("Majed Al-Ghamdi", "ماجد الغامدي"), role: bi("Al Borg · CEO", "البرج · الرئيس التنفيذي"), side: "party", mobile: "+966 55 310 2290", nationalId: "1033829105", status: "waiting" }),
-      faisal(2, "waiting"),
+      centerSigner(CENTER.signatory, 2),
     ],
     sent: false,
     locked: false,
@@ -1177,19 +1206,26 @@ export const OTHER_CONTRACTS = {
 
 /* ------------------------------------------------------------------ overview */
 
-/** Money in · the last 2 working weeks (Sun–Thu), SAR thousands: the design's bars for the 9 working days before
- * today; today's bar is the live "Collected today". */
-export const MONEY_IN_DAYS: { day: string; value: number }[] = [
-  { day: "2026-11-09", value: 38.1 },
-  { day: "2026-11-10", value: 41.1 },
-  { day: "2026-11-11", value: 36.1 },
-  { day: "2026-11-12", value: 43.9 },
-  { day: "2026-11-15", value: 31.1 },
-  { day: "2026-11-16", value: 40 },
-  { day: "2026-11-17", value: 46.1 },
-  { day: "2026-11-18", value: 38.9 },
-  { day: "2026-11-19", value: 43.1 },
-]
+/**
+ * Money in · the last 2 working weeks (Sun–Thu) ending today, SAR thousands. The design's bars fill the 9 working days
+ * before today (derived from BILL_TODAY, so the chart always ends on the demo clock's day); today's bar is the live
+ * "Collected today".
+ */
+const MONEY_IN_VALUES = [38.1, 41.1, 36.1, 43.9, 31.1, 40, 46.1, 38.9, 43.1]
+
+/** The `n` working days (Sun–Thu; Fri–Sat weekend) before `iso`, oldest first. */
+export function workingDaysBefore(iso: string, n: number) {
+  const out: string[] = []
+  const d = new Date(`${iso}T12:00:00Z`)
+  while (out.length < n) {
+    d.setUTCDate(d.getUTCDate() - 1)
+    const wd = d.getUTCDay()
+    if (wd !== 5 && wd !== 6) out.unshift(d.toISOString().slice(0, 10))
+  }
+  return out
+}
+
+export const MONEY_IN_DAYS: { day: string; value: number }[] = workingDaysBefore(BILL_TODAY, MONEY_IN_VALUES.length).map((day, i) => ({ day, value: MONEY_IN_VALUES[i] }))
 /** "Who paid this month": patients (cash and cards) share, percent; insurers carry their own paidShare. */
 export const PATIENTS_PAID_SHARE = 38
 

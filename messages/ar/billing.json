@@ -169,7 +169,9 @@
       "patientPays": "المريض يدفع · {pct}",
       "patientPaysCash": "المريض يدفع",
       "paid": "انتدفع · {method} {date}",
-      "balance": "المتبقي"
+      "balance": "المتبقي",
+      "insurerPaysCapped": "{insurer} تدفع",
+      "patientPaysCapped": "المريض يدفع · {pct} بحد {cap}"
     },
     "footer": {
       "reported": "مرفوعة لهيئة الزكاة · {date} {time} · UUID {uuid}",
@@ -185,7 +187,8 @@
       "cash": "كاش · بدون تأمين",
       "patientPays": "على المريض",
       "paid": "انتدفع",
-      "balance": "المتبقي"
+      "balance": "المتبقي",
+      "copayCapped": "نسبة التحمل {pct}، بحد أقصى {cap} للزيارة · {insurer} فئة {cls}"
     },
     "claim": {
       "title": "مطالبة التأمين",

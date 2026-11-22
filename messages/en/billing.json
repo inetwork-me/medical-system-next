@@ -169,7 +169,9 @@
       "patientPays": "Patient pays · {pct}",
       "patientPaysCash": "Patient pays",
       "paid": "Paid · {method} {date}",
-      "balance": "Balance"
+      "balance": "Balance",
+      "insurerPaysCapped": "{insurer} pays",
+      "patientPaysCapped": "Patient pays · {pct}, up to {cap}"
     },
     "footer": {
       "reported": "Reported to ZATCA · {date} {time} · UUID {uuid}",
@@ -185,7 +187,8 @@
       "cash": "Cash · no insurance",
       "patientPays": "Patient pays",
       "paid": "Paid",
-      "balance": "Balance"
+      "balance": "Balance",
+      "copayCapped": "Co-pay {pct}, up to {cap} a visit · {insurer} class {cls}"
     },
     "claim": {
       "title": "Insurance claim",

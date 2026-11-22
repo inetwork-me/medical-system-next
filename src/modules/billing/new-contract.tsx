@@ -23,6 +23,7 @@ import {
   BILL_TODAY,
   CENTER,
   CLAUSES,
+  centerSigner,
   PARTY_CANDIDATES,
   PRICING_OPTIONS,
   STAFF,
@@ -40,6 +41,7 @@ import { InitialsAvatar, InitialsTile, ltrRun, useSoon } from "./parts"
 import { canDraft, type BillRole } from "./roles"
 import { MAX_WEEK_HOURS, monthlyPay } from "./rules"
 import { addContract, getContracts, useBillRole } from "./store"
+import { currentUser, signatoryFor, useBillUser } from "./session"
 import { Strip } from "./claim-dialogs"
 import { useBillText } from "./text"
 
@@ -206,19 +208,6 @@ export function nextContractNo(list: Contract[]) {
   return `CTR-${yy}-${String(max + 1).padStart(3, "0")}`
 }
 
-const faisalSigner = (order: number): Signer => ({
-  order,
-  initials: "FQ",
-  name: STAFF.faisal.name,
-  role: STAFF.faisal.role,
-  side: "center",
-  signatory: "faisal",
-  mobile: "+966 50 100 2482",
-  nationalId: "1029384482",
-  status: "waiting",
-  method: "nafath",
-})
-
 /** The form as a Contract (draft or sent). */
 export function buildContract(f: ContractForm, no: string, sent: boolean): Contract {
   const p = candidateOf(f)!
@@ -239,7 +228,8 @@ export function buildContract(f: ContractForm, no: string, sent: boolean): Contr
     status: "waiting",
     method: "nafath",
   }
-  const signers = f.signers.map((s, i) => (s === "party" ? { ...partySigner, order: i + 1 } : faisalSigner(i + 1)))
+  // The center signs through the signed-in user when they're an authorized signatory, else the center's signatory.
+  const signers = f.signers.map((s, i) => (s === "party" ? { ...partySigner, order: i + 1 } : centerSigner(signatoryFor(), i + 1)))
   const clauses: Clause[] = f.clauses.filter((c) => c.on && c.title.en.trim()).map((c) => ({ key: c.key, title: c.title, text: c.custom ? c.title : { en: "", ar: "" } }))
   return {
     no,
@@ -249,7 +239,7 @@ export function buildContract(f: ContractForm, no: string, sent: boolean): Contr
     template: f.template,
     version: 1,
     draftedAt: BILL_TODAY,
-    draftedBy: "nora",
+    draftedBy: currentUser()?.key ?? "nora",
     department: f.department ? { en: f.department, ar: f.department } : undefined,
     start: f.start,
     end: f.end,
@@ -298,7 +288,7 @@ export function buildContract(f: ContractForm, no: string, sent: boolean): Contr
     locked: false,
     pages: 4,
     verifyCode: `CTR-${no.slice(-3)}X`,
-    events: [{ at: BILL_TODAY, kind: "drafted", who: STAFF.nora.name }, ...(sent ? [{ at: BILL_TODAY, kind: "sent" as const, who: signers[0]?.name }] : [])],
+    events: [{ at: BILL_TODAY, kind: "drafted", who: (currentUser() ?? STAFF.nora).name }, ...(sent ? [{ at: BILL_TODAY, kind: "sent" as const, who: signers[0]?.name }] : [])],
   }
 }
 
@@ -722,6 +712,8 @@ function SignersSection({ f, patch, errors }: { f: ContractForm; patch: (p: Part
   const { b } = useBillText()
   const soon = useSoon()
   const p = candidateOf(f)
+  const me = useBillUser()
+  const signer = STAFF[signatoryFor()]
   const addSigner = () => {
     // Re-add a removed default signer (the other side, then the center); anyone else needs the signer picker (gap).
     if (p && !f.signers.includes("party")) patch({ signers: ["party", ...f.signers] })
@@ -744,8 +736,8 @@ function SignersSection({ f, patch, errors }: { f: ContractForm; patch: (p: Part
           const isParty = s === "party"
           if (isParty && !p) return null
           const contact = contactText(f, b)
-          const name = isParty ? (p!.kind === "employee" ? b(p!.name) : contact.split(" · ")[0] || b(p!.name)) : b(STAFF.faisal.name)
-          const initials = isParty ? (p!.kind === "employee" ? p!.initials : initialsOf(isParty && p!.contact && !f.contactName.trim() ? p!.contact.name.en : name)) : "FQ"
+          const name = isParty ? (p!.kind === "employee" ? b(p!.name) : contact.split(" · ")[0] || b(p!.name)) : b(signer.name)
+          const initials = isParty ? (p!.kind === "employee" ? p!.initials : initialsOf(isParty && p!.contact && !f.contactName.trim() ? p!.contact.name.en : name)) : signer.initials
           return (
             <li key={s} className="flex items-center gap-2.5 rounded-[10px] border p-3">
               <span aria-hidden className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">
@@ -762,7 +754,9 @@ function SignersSection({ f, patch, errors }: { f: ContractForm; patch: (p: Part
                           role: p!.kind === "employee" ? t("party.staff") : (contact.split(" · ")[1] ?? b(p!.contact?.role ?? p!.role)),
                           mobile: ltrRun(f.mobile || "—"),
                         })
-                      : t("signerYou", { org: b(CENTER.short), role: b(STAFF.faisal.role) })}
+                      : signer.id === me?.id
+                        ? t("signerYou", { org: b(CENTER.short), role: b(signer.role) })
+                        : t("signerLine", { org: b(CENTER.short), role: b(signer.role), mobile: ltrRun(signer.mobile) })}
                   </bdi>
                 </span>
               </div>
@@ -824,7 +818,11 @@ export function ContractSummary({ f, className }: { f: ContractForm; className?:
         <p className="flex items-start gap-2 rounded-lg bg-info-soft p-3 text-xs text-info-soft-foreground">
           <Icon name="info-circle" size={18} className="shrink-0" />
           <span>
-            {first === "party" ? t("first", { name: firstName, g: firstFemale ? "female" : "male" }) : t("firstYou", { name: b(p.kind === "employee" ? (p.short ?? p.name) : (p.contact?.name ?? p.name)) })}
+            {first === "party"
+              ? t("first", { name: firstName, g: firstFemale ? "female" : "male" })
+              : STAFF[signatoryFor()].id === currentUser()?.id
+                ? t("firstYou", { name: b(p.kind === "employee" ? (p.short ?? p.name) : (p.contact?.name ?? p.name)) })
+                : t("first", { name: b(STAFF[signatoryFor()].name).split(" ").slice(0, 2).join(" "), g: "male" })}
           </span>
         </p>
       )}

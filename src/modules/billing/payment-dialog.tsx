@@ -21,6 +21,7 @@ import { billCan } from "./roles"
 import { paymentError, recordPayment, totals, usesTerminal, type PaymentError } from "./rules"
 import { getInvoice, saveInvoice, useBillRole, useInvoice } from "./store"
 import { useBillText } from "./text"
+import { currentUser } from "./session"
 
 const METHODS: PayMethod[] = ["cash", "mada", "card", "applepay", "transfer"]
 // Mobile sheet: 4 methods (Transfer is a desk task).
@@ -88,8 +89,9 @@ export function RecordPaymentDialog({ invoiceNo, onOpenChange }: { invoiceNo: st
       method,
       terminal: card ? terminal : undefined,
       approvalCode: card && approval.trim() ? approval.trim() : undefined,
-      by: "me",
-      byName: SESSION_USER.name,
+      // Recorded by the signed-in user (the session's user record; the shell's profile name as a fallback).
+      by: currentUser()?.id ?? "session",
+      byName: currentUser()?.name ?? SESSION_USER.name,
       at: BILL_NOW,
       smsReceipt: sms && !!p.mobile,
     })

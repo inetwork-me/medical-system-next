@@ -15,6 +15,9 @@ import { InvoicePaper, InvoiceSide } from "@/modules/billing/invoice-page"
 import { RecordPaymentDialog } from "@/modules/billing/payment-dialog"
 import { applyZatca, zatcaRequest, zatcaStub } from "@/modules/billing/zatca"
 import type { Invoice } from "@/modules/billing/data"
+import { ClaimsList, ClaimsSummary } from "@/modules/billing/claims"
+import { FixClaimDialog, SubmitClaimsDialog } from "@/modules/billing/claim-dialogs"
+import { toBundle } from "@/modules/billing/nphies"
 import {
   ClaimStatusBadge,
   ContractStatusBadge,
@@ -265,6 +268,7 @@ export function BillingStories() {
       </Box>
 
       <InvoiceStories />
+      <ClaimStories />
 
       <Box title="Derived statuses · insurers, papers, contracts" className="lg:col-span-2">
         <div className="grid gap-4 md:grid-cols-3">
@@ -378,6 +382,60 @@ function InvoiceStories() {
         </div>
       </Box>
       {paying && <RecordPaymentDialog invoiceNo={paying} onOpenChange={(o) => !o && setPaying(null)} />}
+    </>
+  )
+}
+
+/** Step 3 · Claims: summary + list (wide / compact), Submit claims, Fix claim (empty / as drawn), the NPHIES request. */
+function ClaimStories() {
+  const [submit, setSubmit] = React.useState(false)
+  const [fix, setFix] = React.useState<null | "empty" | "drawn">(null)
+  const bundle = toBundle(CLAIMS[0], "claim-request", "2026-11-22T11:40")
+  return (
+    <>
+      <Box title="Widget / Bill Claims · Wide" className="lg:col-span-2">
+        <ClaimsSummary />
+        <ClaimsList onFix={() => setFix("empty")} />
+      </Box>
+      <Box title="Widget / Bill Claims · Compact (358)">
+        <div className="flex w-[358px] max-w-full flex-col gap-4">
+          <ClaimsSummary />
+          <ClaimsList onFix={() => setFix("empty")} />
+        </div>
+      </Box>
+      <Box title="Overlays · Submit claims · Fix claim">
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={() => setSubmit(true)}>
+            Submit claims
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setFix("empty")}>
+            Fix claim · empty (error on resend)
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setFix("drawn")}>
+            Fix claim · as drawn
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">NPHIES claim-request bundle for CLM-26-01836 (stub client, FHIR R4 shape):</p>
+        <pre className="max-h-64 overflow-auto rounded-lg bg-muted p-3 font-mono text-[11px] leading-4" dir="ltr">
+          {JSON.stringify(bundle, null, 2)}
+        </pre>
+      </Box>
+      {submit && <SubmitClaimsDialog onOpenChange={setSubmit} />}
+      {fix && (
+        <FixClaimDialog
+          claimNo="CLM-26-01836"
+          onOpenChange={(o) => !o && setFix(null)}
+          initial={
+            fix === "drawn"
+              ? {
+                  preauthNo: "PA-882104",
+                  attachments: [{ name: "Bupa-approval-PA-882104.pdf", format: "PDF", size: "180 KB" }],
+                  note: "Approved by phone on 18 Nov at 09:40. The approval letter is attached.",
+                }
+              : undefined
+          }
+        />
+      )}
     </>
   )
 }

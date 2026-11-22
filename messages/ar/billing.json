@@ -67,7 +67,7 @@
     "export": "تصدير",
     "newContract": "عقد جديد",
     "newAgreement": "اتفاقية جديدة",
-    "sendClaims": "{n, plural, one {أرسل مطالبة} two {أرسل مطالبتين} few {أرسل # مطالبات} other {أرسل # مطالبة}}"
+    "sendClaims": "{n, plural, =0 {أرسل المطالبات} one {أرسل مطالبة} two {أرسل مطالبتين} few {أرسل # مطالبات} other {أرسل # مطالبة}}"
   },
   "method": {
     "cash": "كاش",
@@ -230,5 +230,93 @@
     "toastFullNoSms": "الفاتورة انسددت كاملة",
     "toastPart": "باقي {balance} · وانرسل الإيصال برسالة",
     "toastPartNoSms": "باقي {balance}"
+  },
+  "claims": {
+    "summary": "المطالبات عبر نفيس",
+    "summaryText": "{month} · آخر تحديث {time}",
+    "tile": {
+      "ready": "جاهزة للإرسال",
+      "review": "تحت المراجعة",
+      "reviewText": "{amount} · متوسط {days} يوم",
+      "rejected": "مرفوضة",
+      "rejectedText": "{pct} من المطالبات",
+      "paid": "انصرفت",
+      "paidText": "من {n} شركات"
+    },
+    "title": "المطالبات",
+    "subtitle": "المرفوضة والموقوفة أول",
+    "search": "دوّر مريض أو رقم مطالبة…",
+    "filter": {
+      "label": "حالة المطالبة",
+      "all": "الكل",
+      "toFix": "تبي تصليح · {n}",
+      "ready": "جاهزة · {n}",
+      "review": "تحت المراجعة · {n}",
+      "paid": "انصرفت"
+    },
+    "col": {
+      "claim": "المطالبة",
+      "patient": "المريض",
+      "insurer": "شركة التأمين",
+      "amount": "المبلغ",
+      "status": "الحالة",
+      "action": "الإجراء"
+    },
+    "sub": "{no} · {insurer} · {amount}",
+    "line": {
+      "review": "انرسلت {date}",
+      "approved": "انقبلت {date}",
+      "paid": "انصرفت {date}",
+      "part": "انقبل {amount}",
+      "needsPreauth": "موقوفة · اطلب من {insurer} أول",
+      "asked": "انطلبت من {insurer} {time} · بالانتظار"
+    },
+    "fix": "صلّح وأعد الإرسال",
+    "ask": "اطلب موافقة",
+    "view": "اعرض",
+    "open": "افتح {no}",
+    "empty": "ما فيه مطالبات تطابق",
+    "emptyText": "جرّب اسم أو رقم مطالبة ثاني، أو امسح الفلتر.",
+    "clear": "امسح البحث والفلتر",
+    "preauthToast": "انطلبت الموافقة المسبقة",
+    "preauthToastText": "{insurer} عادة ترد خلال ساعة"
+  },
+  "submit": {
+    "title": "إرسال {n, plural, one {مطالبة} two {مطالبتين} few {# مطالبات} other {# مطالبة}} لنفيس",
+    "text": "{amount} · {n, plural, one {شركة} two {شركتين} few {# شركات} other {# شركة}}",
+    "info": "كل مطالبة تروح مع فاتورتها وأكواد التشخيص والنتائج.",
+    "row": "{insurer} · {n, plural, one {مطالبة} two {مطالبتين} few {# مطالبات} other {# مطالبة}}",
+    "total": "الإجمالي · {n, plural, one {مطالبة} two {مطالبتين} few {# مطالبات} other {# مطالبة}}",
+    "heldOne": "فيه مطالبة موقوفة: {name} يبي موافقة مسبقة من {insurer} أول.",
+    "heldMany": "فيه {n} مطالبات موقوفة: تبي موافقة مسبقة أول.",
+    "attach": "أرفق نتائج التحاليل والتقارير تلقائياً",
+    "cancel": "إلغاء",
+    "confirm": "أرسل المطالبات",
+    "sending": "جاري الإرسال…",
+    "none": "ما فيه شي جاهز للإرسال.",
+    "toast": "انرسلت {n, plural, one {مطالبة} two {مطالبتين} few {# مطالبات} other {# مطالبة}} لنفيس",
+    "toastText": "الشركات عادة ترد خلال يومين عمل",
+    "failed": "نفيس ما استقبل الدفعة",
+    "failedText": "ما انرسل شي. جرّب بعد دقيقة."
+  },
+  "fix": {
+    "title": "تصليح المطالبة وإعادة إرسالها",
+    "text": "{no} · {name} · {amount}",
+    "reason": "{insurer}: {reason} · الكود {code}",
+    "service": "الخدمة",
+    "visit": "الزيارة",
+    "visitText": "{date} · {doctor}",
+    "amount": "المبلغ",
+    "preauth": "رقم الموافقة المسبقة",
+    "preauthError": "اكتب رقم الموافقة المسبقة من شركة التأمين",
+    "attachment": "موافقة {insurer} {no}",
+    "removeFile": "احذف {name}",
+    "addFile": "أرفق خطاب الموافقة",
+    "note": "ملاحظة ل{insurer}",
+    "cancel": "إلغاء",
+    "confirm": "أعد الإرسال",
+    "sending": "جاري الإرسال…",
+    "toast": "انرسلت المطالبة ل{insurer} مرة ثانية",
+    "toastText": "مع الموافقة المسبقة {no}"
   }
 }

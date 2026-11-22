@@ -3,6 +3,7 @@ import {
   OTHER_CONTRACTS,
   OTHER_INVOICES,
   OTHER_UNPAID,
+  insurerOf,
   type Claim,
   type ClaimStatus,
   type Contract,
@@ -11,7 +12,7 @@ import {
   type InvoiceStatus,
 } from "./data"
 import { round2 } from "./money"
-import { contractStatus, invoiceStatus, toFix, toSign, totals } from "./rules"
+import { contractStatus, heldBack, invoiceStatus, toFix, toSign, totals } from "./rules"
 
 /*
  * Module counts: the design's rows (with this session's changes) plus the aggregates for the rest of November,
@@ -78,3 +79,21 @@ export function contractCounts(contracts: Contract[]) {
 }
 
 export const inSign = (c: Contract) => toSign(contractStatus(c))
+
+/**
+ * Submit claims: the batch per insurer (this month's other ready claims + the ready rows not held back) and the
+ * held-back claims (needs pre-auth, or a ready claim the insurer's rule says needs one).
+ */
+export function readyBatch(claims: Claim[], batchSent: boolean) {
+  const by = new Map<string, { insurer: string; count: number; amount: number }>()
+  const add = (insurer: string, count: number, amount: number) => {
+    const cur = by.get(insurer) ?? { insurer, count: 0, amount: 0 }
+    by.set(insurer, { insurer, count: cur.count + count, amount: round2(cur.amount + amount) })
+  }
+  if (!batchSent) for (const r of OTHER_CLAIMS.ready) add(r.insurer, r.count, r.amount)
+  const held = claims.filter((c) => heldBack(c, insurerOf(c.insurer)))
+  const rows = claims.filter((c) => c.status === "ready" && !held.includes(c))
+  for (const c of rows) add(c.insurer, 1, c.amount)
+  const groups = [...by.values()].filter((g) => g.count > 0)
+  return { groups, rows, held, count: groups.reduce((s, g) => s + g.count, 0), amount: round2(groups.reduce((s, g) => s + g.amount, 0)) }
+}

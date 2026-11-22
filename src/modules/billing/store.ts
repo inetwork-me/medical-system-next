@@ -91,6 +91,7 @@ export const useContract = (no: string) => useContracts().find((x) => x.no === n
 /** Read straight from the store (event handlers right after a change; stub callbacks). */
 export const getInvoice = (no: string) => invoicesOf(read()).find((x) => x.no === no)
 export const getClaim = (no: string) => claimsOf(read()).find((x) => x.no === no)
+export const getClaims = () => claimsOf(read())
 export const getInsurer = (id: string) => insurersOf(read()).find((x) => x.id === id)
 export const getContract = (no: string) => contractsOf(read()).find((x) => x.no === no)
 export const getContracts = () => contractsOf(read())

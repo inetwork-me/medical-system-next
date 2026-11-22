@@ -6,7 +6,9 @@ import { useTranslations } from "next-intl"
 import { Icon } from "@/components/ds/icon"
 import { usePageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
-import { claimCounts } from "./counts"
+import { readyBatch } from "./counts"
+import { ClaimsList, ClaimsSummary } from "./claims"
+import { FixClaimDialog, SubmitClaimsDialog } from "./claim-dialogs"
 import { BillingFrame } from "./frame"
 import { InvoicesList } from "./invoices"
 import { RecordPaymentDialog } from "./payment-dialog"
@@ -74,13 +76,14 @@ export function InvoicesTab() {
   )
 }
 
-/** Claims: header "Billing / Insurance claims"; Export · Send 12 claims. */
+/** Claims: header "Billing / Insurance claims"; Export · Send 12 claims; summary tiles + the claims list. */
 export function ClaimsTab() {
   const t = useTranslations("billing")
   const tn = useTranslations("shell.nav")
   const role = useBillRole()
-  const ready = claimCounts(useClaims(), useBatchSent()).ready
-  const soon = useSoon()
+  const batch = readyBatch(useClaims(), useBatchSent())
+  const [submitting, setSubmitting] = React.useState(false)
+  const [fixing, setFixing] = React.useState<string | null>(null)
   usePageTitle({ title: t("claimsTitle"), mobileTitle: true, crumbs: [{ label: tn("billing"), href: "/billing" }] })
   return (
     <BillingFrame
@@ -89,14 +92,19 @@ export function ClaimsTab() {
         <>
           <ExportButton />
           {billCan(role, "claims") && (
-            <Button onClick={soon} disabled={ready === 0}>
+            <Button onClick={() => setSubmitting(true)} disabled={batch.count === 0}>
               <Icon name="send-2" size={18} />
-              {t("actions.sendClaims", { n: ready })}
+              {t("actions.sendClaims", { n: batch.count })}
             </Button>
           )}
         </>
       }
-    />
+    >
+      <ClaimsSummary />
+      <ClaimsList onFix={setFixing} />
+      {submitting && <SubmitClaimsDialog onOpenChange={setSubmitting} />}
+      {fixing && <FixClaimDialog claimNo={fixing} onOpenChange={(o) => !o && setFixing(null)} />}
+    </BillingFrame>
   )
 }
 

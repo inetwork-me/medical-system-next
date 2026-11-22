@@ -533,7 +533,7 @@ export const INVOICES: Invoice[] = [
     doctor: "zaki",
     payer: "bupa",
     class: "B",
-    lines: [line("LAB-IGE", "Allergy panel (IgE)", "لوحة الحساسية (IgE)", 1000, "standard", { kind: "lab" })],
+    lines: [line("LAB-IGE", "Allergy panel (IgE)", "تحليل الحساسية (IgE)", 1000, "standard", { kind: "lab" })],
     insurerPct: 80,
     payments: [pay("INV-2611-0236", 230, "mada", "2026-11-18T10:42", { terminal: "POS-2", approvalCode: "118270" })],
     zatca: zatca("a3c5e1f0-7d2b-4c98-8e61-9b0f4d2a0236", "2026-11-18T10:40"),
@@ -615,6 +615,10 @@ export type Claim = {
   approvedAmount?: number
   attachments: Attachment[]
   note?: string
+  /** Ask for approval: the pre-auth request went to the insurer (waiting for its answer). */
+  preauthRequestedAt?: string
+  /** Fix & resend: when the corrected claim went back. */
+  resentAt?: string
   /** NPHIES bundle / request id (stub). */
   nphiesId?: string
 }
@@ -628,7 +632,7 @@ export const CLAIMS: Claim[] = [
     insurer: "bupa",
     amount: 920,
     status: "rejected",
-    service: bi("Allergy panel (IgE)", "لوحة الحساسية (IgE)"),
+    service: bi("Allergy panel (IgE)", "تحليل الحساسية (IgE)"),
     visitAt: "2026-11-18T09:10",
     doctor: "zaki",
     reasonCode: "BE-1-4",
@@ -735,13 +739,15 @@ export const OTHER_CLAIMS = {
   part: 4,
   /** Paid this month, SAR, from 5 insurers. */
   paidAmount: 211922,
+  /** Insurers that paid this month (design: "from 5 insurers"). */
+  paidInsurers: 5,
   answerDays: 2.1,
   rejectedPct: 3.2,
 }
 
 /** NPHIES rejection codes the center sees most (Fix claim shows the insurer's code + text). */
 export const REJECTION_CODES: Record<string, Bi> = {
-  "BE-1-4": bi("pre-authorization needed for the allergy panel", "تحتاج موافقة مسبقة للوحة الحساسية"),
+  "BE-1-4": bi("pre-authorization needed for the allergy panel", "لازم موافقة مسبقة لتحليل الحساسية"),
   "CV-2-1": bi("price above the agreement", "السعر فوق الاتفاقية"),
 }
 

@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { setLocaleFrom } from "@/i18n/set-locale"
 
 import { ClaimsTab } from "@/modules/billing/tabs"
@@ -13,7 +14,9 @@ export default async function BillingClaimsPage({ params }: { params: Promise<{ 
   await setLocaleFrom(params)
   return (
     <TabGuard tab="claims">
-      <ClaimsTab />
+      <Suspense>
+        <ClaimsTab />
+      </Suspense>
     </TabGuard>
   )
 }

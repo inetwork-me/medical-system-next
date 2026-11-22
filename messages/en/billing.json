@@ -67,7 +67,7 @@
     "export": "Export",
     "newContract": "New contract",
     "newAgreement": "New agreement",
-    "sendClaims": "{n, plural, one {Send # claim} other {Send # claims}}"
+    "sendClaims": "{n, plural, =0 {Send claims} one {Send # claim} other {Send # claims}}"
   },
   "method": {
     "cash": "Cash",
@@ -230,5 +230,93 @@
     "toastFullNoSms": "{no} is fully paid",
     "toastPart": "{balance} still to pay · receipt sent by SMS",
     "toastPartNoSms": "{balance} still to pay"
+  },
+  "claims": {
+    "summary": "Claims through NPHIES",
+    "summaryText": "{month} · updated {time}",
+    "tile": {
+      "ready": "Ready to send",
+      "review": "In review",
+      "reviewText": "{amount} · {days} days avg",
+      "rejected": "Rejected",
+      "rejectedText": "{pct} of claims",
+      "paid": "Paid",
+      "paidText": "from {n} insurers"
+    },
+    "title": "Claims",
+    "subtitle": "Rejected and held back first",
+    "search": "Search patient or claim no…",
+    "filter": {
+      "label": "Claim status",
+      "all": "All",
+      "toFix": "To fix · {n}",
+      "ready": "Ready · {n}",
+      "review": "In review · {n}",
+      "paid": "Paid"
+    },
+    "col": {
+      "claim": "Claim",
+      "patient": "Patient",
+      "insurer": "Insurer",
+      "amount": "Amount",
+      "status": "Status",
+      "action": "Action"
+    },
+    "sub": "{no} · {insurer} · {amount}",
+    "line": {
+      "review": "Sent {date}",
+      "approved": "Approved {date}",
+      "paid": "Paid {date}",
+      "part": "{amount} approved",
+      "needsPreauth": "Held back · ask {insurer} first",
+      "asked": "Asked {insurer} {time} · waiting"
+    },
+    "fix": "Fix & resend",
+    "ask": "Ask for approval",
+    "view": "View",
+    "open": "Open {no}",
+    "empty": "No claims match",
+    "emptyText": "Try another name or claim no., or clear the filter.",
+    "clear": "Clear search and filter",
+    "preauthToast": "Pre-authorization requested",
+    "preauthToastText": "{insurer} usually answers within 1 hour"
+  },
+  "submit": {
+    "title": "Send {n, plural, one {# claim} other {# claims}} to NPHIES",
+    "text": "{amount} · {n, plural, one {# insurer} other {# insurers}}",
+    "info": "Each claim goes with its invoice, diagnosis codes and results.",
+    "row": "{insurer} · {n, plural, one {# claim} other {# claims}}",
+    "total": "Total · {n, plural, one {# claim} other {# claims}}",
+    "heldOne": "1 claim is held back: {name} needs {insurer}'s pre-authorization first.",
+    "heldMany": "{n} claims are held back: they need a pre-authorization first.",
+    "attach": "Attach lab results and reports automatically",
+    "cancel": "Cancel",
+    "confirm": "Send claims",
+    "sending": "Sending…",
+    "none": "Nothing is ready to send.",
+    "toast": "{n, plural, one {# claim} other {# claims}} sent to NPHIES",
+    "toastText": "Insurers usually answer within 2 working days",
+    "failed": "NPHIES didn't take the batch",
+    "failedText": "Nothing was sent. Try again in a minute."
+  },
+  "fix": {
+    "title": "Fix and resend the claim",
+    "text": "{no} · {name} · {amount}",
+    "reason": "{insurer}: {reason} · code {code}",
+    "service": "Service",
+    "visit": "Visit",
+    "visitText": "{date} · {doctor}",
+    "amount": "Amount",
+    "preauth": "Pre-authorization no.",
+    "preauthError": "Enter the insurer's pre-authorization no.",
+    "attachment": "{insurer} approval {no}",
+    "removeFile": "Remove {name}",
+    "addFile": "Attach the approval letter",
+    "note": "Note to {insurer}",
+    "cancel": "Cancel",
+    "confirm": "Resend claim",
+    "sending": "Sending…",
+    "toast": "Claim resent to {insurer}",
+    "toastText": "With pre-authorization {no}"
   }
 }

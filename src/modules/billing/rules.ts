@@ -176,3 +176,22 @@ export function recordPayment(inv: Invoice, p: Payment): Invoice {
 export function sendInvoice(inv: Invoice, to: "guardian" | "patient", at: string): Invoice {
   return { ...inv, events: [...inv.events, { at, kind: "sent", sent: { to } }] }
 }
+
+/* ------------------------------------------------------------------ claims flow */
+
+/** Ready claims that still need a pre-auth under their insurer's rule are held back from the batch too. */
+export function heldBack(c: Claim, ins: Pick<Insurer, "preauthRule"> | undefined) {
+  if (c.status === "needsPreauth") return true
+  return c.status === "ready" && !!ins && !c.preauthNo && needsPreauth(ins, c.amount)
+}
+
+/** Send a batch: each ready claim goes to NPHIES and waits for the insurer (In review). */
+export const submitClaim = (c: Claim, at: string): Claim => ({ ...c, status: "review", submittedAt: at })
+
+/** Fix & resend: the pre-auth no., the approval letter and a note go back with the claim; it's In review again. */
+export function resendClaim(c: Claim, fix: { preauthNo: string; attachments: Claim["attachments"]; note?: string }, at: string): Claim {
+  return { ...c, status: "review", preauthNo: fix.preauthNo.trim(), attachments: fix.attachments, note: fix.note?.trim() || undefined, resentAt: at, submittedAt: at }
+}
+
+/** Ask for approval: a pre-auth request goes to the insurer; the claim stays held back until it answers. */
+export const askPreauth = (c: Claim, at: string): Claim => ({ ...c, preauthRequestedAt: at })

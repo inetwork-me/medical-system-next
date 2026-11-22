@@ -5,7 +5,10 @@ import { useTranslations } from "next-intl"
 
 import { Icon } from "@/components/ds/icon"
 import { usePageTitle } from "@/components/shell/page-title"
+import { Link } from "@/i18n/navigation"
+import { isTabEnabled } from "@/lib/modules"
 import { Button } from "@/components/ui/button"
+import { newContractHref } from "./href"
 import { readyBatch } from "./counts"
 import { ClaimsList, ClaimsSummary } from "./claims"
 import { FixClaimDialog, SubmitClaimsDialog } from "./claim-dialogs"
@@ -39,13 +42,16 @@ function ExportButton() {
 
 function NewContractButton({ label = "newContract" }: { label?: "newContract" | "newAgreement" }) {
   const t = useTranslations("billing.actions")
-  const soon = useSoon()
   const role = useBillRole()
-  if (!(billCan(role, "draftStaff") || billCan(role, "draftPartner") || billCan(role, "draftInsurer"))) return null
+  const kind = label === "newAgreement" ? "insurer" : undefined
+  if (!(kind ? billCan(role, "draftInsurer") : billCan(role, "draftStaff") || billCan(role, "draftPartner") || billCan(role, "draftInsurer"))) return null
+  if (!isTabEnabled("billing", "contracts")) return null
   return (
-    <Button onClick={soon}>
-      <Icon name="add" size={18} />
-      {t(label)}
+    <Button asChild>
+      <Link href={newContractHref(kind)}>
+        <Icon name="add" size={18} />
+        {t(label)}
+      </Link>
     </Button>
   )
 }

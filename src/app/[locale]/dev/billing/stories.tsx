@@ -23,6 +23,7 @@ import { InsurerHeader, InsurerSide, InsurerTerms } from "@/modules/billing/insu
 import { ContractsList } from "@/modules/billing/contracts"
 import { ContractPaper, ContractSide } from "@/modules/billing/contract-page"
 import { SignDialog } from "@/modules/billing/sign-dialog"
+import { ContractFormCards, ContractSummary, useContractForm, type ContractForm } from "@/modules/billing/new-contract"
 import {
   ClaimStatusBadge,
   ContractStatusBadge,
@@ -276,6 +277,7 @@ export function BillingStories() {
       <ClaimStories />
       <InsurerStories />
       <ContractStories />
+      <NewContractStories />
 
       <Box title="Derived statuses · insurers, papers, contracts" className="lg:col-span-2">
         <div className="grid gap-4 md:grid-cols-3">
@@ -527,6 +529,41 @@ function ContractStories() {
         </div>
       </Box>
       {sign && <SignDialog contractNo="CTR-26-031" initialStep={sign === 2 ? 2 : undefined} onOpenChange={(o) => !o && setSign(null)} />}
+    </>
+  )
+}
+
+/** The drawn Partner state: Al Borg, Majed signs first, two papers. */
+const DRAWN: Partial<ContractForm> = {
+  partyId: "co-alborg",
+  mobile: "+966 55 310 2290",
+  signers: ["party", "center"],
+  papers: [
+    { id: "p1", kind: "priceList", title: { en: "Al Borg price list 2026", ar: "قائمة أسعار البرج 2026" }, file: "x.xlsx", format: "XLSX", detail: { en: "1.2 MB", ar: "1.2 MB" }, status: "valid", version: 1 },
+    { id: "p2", kind: "accreditation", title: { en: "CAP accreditation", ar: "اعتماد CAP" }, file: "x.pdf", format: "PDF", detail: { en: "840 KB", ar: "840 KB" }, validTo: "2027-08-31", status: "valid", version: 1 },
+  ],
+}
+
+function FormStory({ kind, initial, title }: { kind: "staff" | "partner" | "insurer"; initial?: Partial<ContractForm>; title: string }) {
+  const role = useBillRole()
+  const { f, patch, setKind } = useContractForm(kind, initial)
+  return (
+    <Box title={title} className="lg:col-span-2">
+      <div className="grid gap-6 xl:grid-cols-[816px_280px]">
+        <ContractFormCards f={f} patch={patch} setKind={setKind} errors={{}} role={role} />
+        <ContractSummary f={f} className="xl:sticky xl:top-4 xl:self-start" />
+      </div>
+    </Box>
+  )
+}
+
+/** Step 6 · New contract: Partner as drawn; Staff and Insurer (same layout, not drawn — gaps to review). */
+function NewContractStories() {
+  return (
+    <>
+      <FormStory kind="partner" initial={DRAWN} title="Widget / New Contract Form · Two + Summary — Partner (as drawn)" />
+      <FormStory kind="staff" initial={{ partyId: "emp-haddad", mobile: "+966 50 611 2218", jobTitle: "Consultant cardiologist", department: "Cardiology · Riyadh", basic: "32000", housing: "8000", transport: "3000", signers: ["party", "center"] }} title="New Contract Form — Staff (not drawn: same layout)" />
+      <FormStory kind="insurer" initial={{ partyId: "ins-gig", mobile: "+966 11 418 2200", signers: ["party", "center"] }} title="New Contract Form — Insurer (not drawn: same layout)" />
     </>
   )
 }

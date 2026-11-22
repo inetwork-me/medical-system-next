@@ -105,7 +105,7 @@ function AddInsurerTile() {
 }
 
 /** Set once the New contract page exists. */
-export const NEW_CONTRACT_READY = false
+export const NEW_CONTRACT_READY = true
 
 /**
  * Widget / Bill Insurers: "Insurance partners" · "5 provider agreements · SAR 162,150 owed to us"; a card per

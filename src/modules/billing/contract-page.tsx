@@ -184,6 +184,10 @@ function useEventText() {
         return t("event.copies", { to: t(`copiesTo.${c.kind}`, { party: e.who ? b(e.who) : "" }) })
       case "filed":
         return t("event.filed", { place: t(`filedIn.${c.kind}`) })
+      case "drafted":
+        return t("event.drafted", { name: e.who ? b(e.who) : "" })
+      case "sent":
+        return t("event.sent", { name: e.who ? b(e.who) : "" })
       default:
         return ""
     }

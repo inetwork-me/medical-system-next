@@ -800,7 +800,7 @@ export type Party = {
   /** SCFHS licence (staff). */
   licence?: { no: string; validTo: string }
   city?: Bi
-  contact?: { name: Bi; role: Bi; mobile: string }
+  contact?: { name: Bi; role: Bi; mobile: string; female?: boolean }
   /** Insurer partner id or Doctors key, where the party exists elsewhere. */
   ref?: string
 }
@@ -881,7 +881,13 @@ export const CLAUSES: Record<ContractKind, Clause[]> = {
     { key: "liability", title: bi("Liability insurance", "تأمين المسؤولية"), text: bi("", "") },
     { key: "nonCompete", title: bi("No working with competitors", "عدم العمل مع المنافسين"), text: bi("", "") },
   ],
-  insurer: [],
+  insurer: [
+    { key: "nphies", title: bi("Claims through NPHIES", "المطالبات عبر نفيس"), text: bi("", "") },
+    { key: "priceAnnex", title: bi("Price list annex", "ملحق قائمة الأسعار"), text: bi("", "") },
+    { key: "pdpl", title: bi("Patient data protection (PDPL)", "حماية بيانات المرضى (نظام حماية البيانات)"), text: bi("", "") },
+    { key: "confidentiality", title: bi("Confidentiality", "السرية"), text: bi("", "") },
+    { key: "audit", title: bi("Claim audits on site", "تدقيق المطالبات في الموقع"), text: bi("", "") },
+  ],
 }
 
 export const CONTRACTS: Contract[] = [
@@ -1181,3 +1187,141 @@ export const MONEY_IN_DAYS: { day: string; value: number }[] = [
 ]
 /** "Who paid this month": patients (cash and cards) share, percent; insurers carry their own paidShare. */
 export const PATIENTS_PAID_SHARE = 38
+
+/* ------------------------------------------------------------------ new contract */
+
+/** Templates per contract kind (the Templates library itself is a known gap). */
+export const TEMPLATES: Record<ContractKind, { key: string; label: Bi }[]> = {
+  staff: [
+    { key: "staff-employment", label: bi("Employment · v4", "عقد عمل · النسخة 4") },
+    { key: "staff-locum", label: bi("Locum · v2", "تعاقد مؤقت · النسخة 2") },
+  ],
+  partner: [
+    { key: "partner-reference-lab", label: bi("Reference lab services · v3", "خدمات المختبر المرجعي · النسخة 3") },
+    { key: "partner-dental-lab", label: bi("Dental lab · v2", "مختبر أسنان · النسخة 2") },
+    { key: "partner-services", label: bi("Facility services · v1", "خدمات المنشأة · النسخة 1") },
+  ],
+  insurer: [{ key: "insurer-provider", label: bi("Provider agreement · v5", "اتفاقية مقدم خدمة · النسخة 5") }],
+}
+
+export const PRICING_OPTIONS: { key: string; label: Bi }[] = [
+  { key: "less10", label: bi("Their price list less 10%", "قائمة أسعارهم ناقص 10%") },
+  { key: "less15", label: bi("Their price list less 15%", "قائمة أسعارهم ناقص 15%") },
+  { key: "fixed", label: bi("Fixed price list", "قائمة أسعار ثابتة") },
+  { key: "monthly", label: bi("Monthly fee", "رسوم شهرية") },
+]
+
+/** People and companies the party picker searches (HR records and supplier / insurer registers, mocked). */
+export type PartyCandidate = Party & { id: string; mobile: string; contactNationalId: string }
+
+export const PARTY_CANDIDATES: Record<ContractKind, PartyCandidate[]> = {
+  staff: [
+    {
+      id: "emp-haddad",
+      kind: "employee",
+      initials: "OH",
+      name: bi("Dr. Omar Haddad", "د. عمر حداد"),
+      short: bi("Dr. Omar", "د. عمر"),
+      role: bi("Consultant cardiologist", "استشاري قلب"),
+      nationalId: "1056230118",
+      licence: { no: "21RC1102", validTo: "2028-03-31" },
+      mobile: "+966 50 611 2218",
+      contactNationalId: "1056230118",
+    },
+    {
+      id: "emp-harbi",
+      kind: "employee",
+      initials: "RH",
+      name: bi("Reem Al-Harbi", "ريم الحربي"),
+      short: bi("Reem", "ريم"),
+      female: true,
+      role: bi("Staff nurse", "ممرضة"),
+      nationalId: "1077410392",
+      licence: { no: "24RN3391", validTo: "2027-09-30" },
+      mobile: "+966 55 902 1176",
+      contactNationalId: "1077410392",
+    },
+    {
+      id: "emp-mutlaq",
+      kind: "employee",
+      initials: "SM",
+      name: bi("Dr. Sara Al-Mutlaq", "د. سارة المطلق"),
+      short: bi("Dr. Sara", "د. سارة"),
+      female: true,
+      role: bi("Specialist dermatologist", "أخصائية جلدية"),
+      nationalId: "1049920571",
+      licence: { no: "22RS0915", validTo: "2027-12-31" },
+      mobile: "+966 53 440 8812",
+      contactNationalId: "1049920571",
+    },
+  ],
+  partner: [
+    {
+      id: "co-alborg",
+      kind: "company",
+      initials: "AB",
+      name: bi("Al Borg Diagnostics", "البرج للمختبرات"),
+      short: bi("Al Borg", "البرج"),
+      role: bi("Reference lab", "مختبر مرجعي"),
+      cr: "1010234567",
+      city: bi("Riyadh", "الرياض"),
+      contact: { name: bi("Majed Al-Ghamdi", "ماجد الغامدي"), role: bi("CEO", "الرئيس التنفيذي"), mobile: "+966 55 310 2290" },
+      mobile: "+966 55 310 2290",
+      contactNationalId: "1033829105",
+    },
+    {
+      id: "co-delta",
+      kind: "company",
+      initials: "DM",
+      name: bi("Delta Medical Supplies", "دلتا للمستلزمات الطبية"),
+      short: bi("Delta", "دلتا"),
+      role: bi("Medical supplies", "مستلزمات طبية"),
+      cr: "1010455120",
+      city: bi("Riyadh", "الرياض"),
+      contact: { name: bi("Sami Al-Otaibi", "سامي العتيبي"), role: bi("Sales manager", "مدير المبيعات"), mobile: "+966 50 220 4410" },
+      mobile: "+966 50 220 4410",
+      contactNationalId: "1061183027",
+    },
+    {
+      id: "co-radiology",
+      kind: "company",
+      initials: "RR",
+      name: bi("Riyadh Radiology Center", "مركز الرياض للأشعة"),
+      short: bi("Riyadh Radiology", "مركز الرياض للأشعة"),
+      role: bi("Imaging", "الأشعة"),
+      cr: "1010598841",
+      city: bi("Riyadh", "الرياض"),
+      contact: { name: bi("Dr. Huda Al-Shehri", "د. هدى الشهري"), role: bi("Medical director", "المديرة الطبية"), mobile: "+966 55 781 0043", female: true },
+      mobile: "+966 55 781 0043",
+      contactNationalId: "1052219874",
+    },
+  ],
+  insurer: [
+    {
+      id: "ins-gig",
+      kind: "company",
+      initials: "GS",
+      name: bi("GIG Saudi", "جي آي جي السعودية"),
+      short: bi("GIG", "جي آي جي"),
+      role: bi("Provider agreement", "اتفاقية مقدم خدمة"),
+      cr: "1010223310",
+      city: bi("Riyadh", "الرياض"),
+      contact: { name: bi("Khalid Al-Zahrani", "خالد الزهراني"), role: bi("Provider relations", "علاقات مقدمي الخدمة"), mobile: "+966 11 418 2200" },
+      mobile: "+966 11 418 2200",
+      contactNationalId: "1044210935",
+    },
+    {
+      id: "ins-walaa",
+      kind: "company",
+      initials: "WA",
+      name: bi("Walaa Cooperative", "ولاء للتأمين التعاوني"),
+      short: bi("Walaa", "ولاء"),
+      role: bi("Provider agreement", "اتفاقية مقدم خدمة"),
+      cr: "2050031105",
+      city: bi("Al Khobar", "الخبر"),
+      contact: { name: bi("Faten Al-Dossary", "فاتن الدوسري"), role: bi("Network manager", "مديرة الشبكة"), mobile: "+966 13 847 1100", female: true },
+      mobile: "+966 13 847 1100",
+      contactNationalId: "1058812406",
+    },
+  ],
+}

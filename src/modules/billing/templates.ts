@@ -48,8 +48,8 @@ function staffClauses(c: Contract): Clause[] {
       key: "pay",
       title: bi("Pay", "الراتب"),
       text: bi(
-        `${sar(pay).en} a month: basic ${num(s.basic)}, housing ${num(s.housing)}, transport ${num(s.transport)}${extra.map((x) => x.en).join("")}. Paid on the ${s.payDay}th.`,
-        `${sar(pay).ar} بالشهر: أساسي ${num(s.basic)} وسكن ${num(s.housing)} ونقل ${num(s.transport)}${extra.map((x) => x.ar).join("")}. ينصرف يوم ${s.payDay}.`
+        `${sar(pay).en} a month: basic ${num(s.basic)}${s.housing ? `, housing ${num(s.housing)}` : ""}${s.transport ? `, transport ${num(s.transport)}` : ""}${extra.map((x) => x.en).join("")}. Paid on the ${s.payDay}th.`,
+        `${sar(pay).ar} بالشهر: أساسي ${num(s.basic)}${s.housing ? ` وسكن ${num(s.housing)}` : ""}${s.transport ? ` ونقل ${num(s.transport)}` : ""}${extra.map((x) => x.ar).join("")}. ينصرف يوم ${s.payDay}.`
       ),
     },
     {
@@ -118,7 +118,13 @@ function insurerClauses(c: Contract): Clause[] {
 /** The clauses the paper prints: as written when the contract carries full text, else from its template. */
 export function clausesOf(c: Contract): Clause[] {
   if (c.clauses.length && c.clauses.every((x) => x.text.en)) return c.clauses
-  if (c.kind === "staff" && c.terms.staff) return staffClauses(c)
+  if (c.kind === "staff" && c.terms.staff) {
+    // A contract drafted here keeps only the ticked clauses (and its own added ones) in the template's order.
+    const all = staffClauses(c)
+    if (!c.clauses.length) return all
+    const keys = new Set(c.clauses.map((x) => x.key))
+    return [...all.filter((x) => keys.has(x.key)), ...c.clauses.filter((x) => x.key.startsWith("custom-"))]
+  }
   if (c.kind === "partner" && c.terms.partner) return partnerClauses(c)
   if (c.kind === "insurer" && c.terms.insurer) return insurerClauses(c)
   return c.clauses

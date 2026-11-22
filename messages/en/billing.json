@@ -1,0 +1,72 @@
+{
+  "title": "Billing and contracts",
+  "status": {
+    "invoice": {
+      "unpaid": "Unpaid",
+      "part": "Partly paid",
+      "paid": "Paid",
+      "refunded": "Refunded"
+    },
+    "zatca": {
+      "reported": "ZATCA reported",
+      "cleared": "ZATCA reported",
+      "pending": "Reporting to ZATCA…",
+      "failed": "ZATCA didn't accept it"
+    },
+    "claim": {
+      "ready": "Ready to send",
+      "review": "In review",
+      "approved": "Approved",
+      "part": "Partly approved",
+      "rejected": "Rejected",
+      "needsPreauth": "Needs pre-auth"
+    },
+    "insurer": {
+      "active": "Active",
+      "ending": "Ends in {n} days",
+      "awaitingSignature": "Waiting for their signature",
+      "ended": "Ended"
+    },
+    "contract": {
+      "awaitingYou": "Waiting for you",
+      "awaitingThem": "Waiting for them",
+      "draft": "Draft",
+      "signed": "Signed",
+      "ending": "Ends in {n} days",
+      "ended": "Ended"
+    },
+    "doc": {
+      "valid": "Valid",
+      "renew": "Renew by {month}",
+      "expired": "Expired",
+      "checking": "Being checked"
+    },
+    "signer": {
+      "signed": "Signed",
+      "yourTurn": "Your turn",
+      "waiting": "Waiting"
+    }
+  },
+  "kind": {
+    "staff": "Staff",
+    "partner": "Partner",
+    "insurer": "Insurer"
+  },
+  "signedOf": "{n} of {total}",
+  "signedOfLabel": "{n} of {total} signed",
+  "soon": {
+    "title": "Coming soon",
+    "text": "This part isn't designed yet."
+  },
+  "frame": {
+    "noAccess": "Not open to your role",
+    "noAccessText": "Ask the finance manager if you need this."
+  },
+  "claimsTitle": "Insurance claims",
+  "actions": {
+    "export": "Export",
+    "newContract": "New contract",
+    "newAgreement": "New agreement",
+    "sendClaims": "{n, plural, one {Send # claim} other {Send # claims}}"
+  }
+}

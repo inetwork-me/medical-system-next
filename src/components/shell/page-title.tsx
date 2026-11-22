@@ -12,7 +12,13 @@ import { useNav } from "./use-shell"
 
 export type Crumb = { label: string; href: string }
 /** What the app header shows for the current page: optional back link, breadcrumb trail and the page title. */
-export type PageTitleValue = { title: string; crumbs?: Crumb[]; back?: string }
+export type PageTitleValue = {
+  title: string
+  crumbs?: Crumb[]
+  back?: string
+  /** Also show this title in the mobile app bar (default: the module / tab name there). */
+  mobileTitle?: boolean
+}
 
 const Ctx = React.createContext<{ value: PageTitleValue | null; set: (v: PageTitleValue | null) => void } | null>(null)
 
@@ -34,6 +40,11 @@ export function usePageTitle(value: PageTitleValue | null) {
     set(key === "null" ? null : (JSON.parse(key) as PageTitleValue))
     return () => set(null)
   }, [key, set])
+}
+
+/** The title the current page set (null = the route default). */
+export function usePageTitleValue(): PageTitleValue | null {
+  return React.useContext(Ctx)?.value ?? null
 }
 
 /** Component form of usePageTitle, for server pages. */

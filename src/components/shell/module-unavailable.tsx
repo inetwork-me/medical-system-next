@@ -7,13 +7,13 @@ import { EmptyState } from "@/components/ds/states"
 import { PageContainer } from "@/components/shell/page"
 
 /**
- * DS sheet 08 (module pages): when a module is hidden for the branch, its deep links show a calm
- * "not available in this branch" state instead of a 404.
+ * DS sheet 08 (module pages): when a module — or one of its tabs — is hidden for the branch, its deep links show a
+ * calm "not available in this branch" state instead of a 404. A hidden tab links back to the module's home.
  */
-export async function ModuleUnavailable({ id }: { id: ModuleId }) {
+export async function ModuleUnavailable({ id, tab }: { id: ModuleId; tab?: string }) {
   const t = await getTranslations("shell")
   const m = moduleById(id)
-  const name = t(`nav.${m.labelKey}` as "nav.lab")
+  const name = tab ? t(`tabs.${id}.${tab}` as "tabs.lab.samples") : t(`nav.${m.labelKey}` as "nav.lab")
   return (
     <PageContainer>
       <div className="rounded-xl border bg-card">
@@ -24,7 +24,7 @@ export async function ModuleUnavailable({ id }: { id: ModuleId }) {
           className="py-16"
           actions={
             <Button asChild variant="outline">
-              <Link href="/dashboard">{t("unavailable.home")}</Link>
+              <Link href={tab ? m.href : "/dashboard"}>{tab ? t("unavailable.module", { module: t(`nav.${m.labelKey}` as "nav.lab") }) : t("unavailable.home")}</Link>
             </Button>
           }
         />

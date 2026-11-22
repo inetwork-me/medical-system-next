@@ -57,16 +57,39 @@ export function PageHeader({
  * 18px icon (Bold when active), optional count. Tabs come from the module registry, so a tab hidden for the
  * branch disappears here, in the sidebar tree and in the rail flyout at the same time.
  */
-export function ModuleTabsNav({ module, counts, className }: { module: ModuleId; counts?: Record<string, React.ReactNode>; className?: string }) {
+export function ModuleTabsNav({
+  module,
+  counts,
+  only,
+  className,
+}: {
+  module: ModuleId
+  counts?: Record<string, React.ReactNode>
+  /** Tabs the signed-in role may open (e.g. a doctor sees only Billing › Contracts); branch-hidden tabs stay hidden. */
+  only?: string[]
+  className?: string
+}) {
   const { pathname, tabLabel } = useNav()
   const m = moduleById(module)
-  const tabs = moduleTabs(m)
+  const tabs = moduleTabs(m).filter((t) => !only || only.includes(t.key))
   const current = activeTab(m, pathname)
+  const navRef = React.useRef<HTMLElement>(null)
+  // Scrolling tab rows (mobile, 4+ tabs): bring the active tab into view (e.g. Billing › Contracts, the last tab).
+  React.useEffect(() => {
+    const el = navRef.current?.querySelector<HTMLElement>("[aria-current=page]")
+    const nav = navRef.current
+    if (!el || !nav || nav.scrollWidth <= nav.clientWidth) return
+    // Scroll the strip only (scrollIntoView would also shift the page sideways in RTL); deltas are physical px.
+    const n = nav.getBoundingClientRect()
+    const r = el.getBoundingClientRect()
+    if (r.left < n.left) nav.scrollLeft -= n.left - r.left + 16
+    else if (r.right > n.right) nav.scrollLeft += r.right - n.right + 16
+  }, [current?.key])
   if (tabs.length < 2) return null
   // Up to 3 tabs share the width on mobile; more than that scroll sideways (Appointments has 5).
   const many = tabs.length > 3
   return (
-    <nav className={cn(many ? "-mx-4 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:px-0" : "md:overflow-x-auto md:[scrollbar-width:none]", className)}>
+    <nav ref={navRef} className={cn(many ? "-mx-4 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:px-0" : "md:overflow-x-auto md:[scrollbar-width:none]", className)}>
       <div className={cn("items-center gap-1 rounded-lg bg-muted p-1", many ? "inline-flex" : "flex md:inline-flex")}>
         {tabs.map((tab) => {
           const on = current?.key === tab.key

@@ -1,0 +1,72 @@
+{
+  "title": "الفواتير والعقود",
+  "status": {
+    "invoice": {
+      "unpaid": "غير مدفوعة",
+      "part": "مدفوعة جزئياً",
+      "paid": "مدفوعة",
+      "refunded": "مسترجعة"
+    },
+    "zatca": {
+      "reported": "مرفوعة للهيئة",
+      "cleared": "مرفوعة للهيئة",
+      "pending": "جاري الرفع للهيئة…",
+      "failed": "الهيئة ما قبلتها"
+    },
+    "claim": {
+      "ready": "جاهزة للإرسال",
+      "review": "تحت المراجعة",
+      "approved": "مقبولة",
+      "part": "مقبولة جزئياً",
+      "rejected": "مرفوضة",
+      "needsPreauth": "تبي موافقة مسبقة"
+    },
+    "insurer": {
+      "active": "سارية",
+      "ending": "تخلص بعد {n} يوم",
+      "awaitingSignature": "بانتظار توقيعهم",
+      "ended": "انتهت"
+    },
+    "contract": {
+      "awaitingYou": "بانتظار توقيعك",
+      "awaitingThem": "بانتظار الطرف الثاني",
+      "draft": "مسودة",
+      "signed": "موقّع",
+      "ending": "يخلص بعد {n} يوم",
+      "ended": "منتهي"
+    },
+    "doc": {
+      "valid": "{g, select, f {سارية} other {ساري}}",
+      "renew": "جدّدها قبل {month}",
+      "expired": "{g, select, f {منتهية} other {منتهي}}",
+      "checking": "تحت المراجعة"
+    },
+    "signer": {
+      "signed": "{g, select, female {وقّعت} other {وقّع}}",
+      "yourTurn": "دورك",
+      "waiting": "ينتظر"
+    }
+  },
+  "kind": {
+    "staff": "موظف",
+    "partner": "شريك",
+    "insurer": "تأمين"
+  },
+  "signedOf": "{n} من {total}",
+  "signedOfLabel": "{n} من {total} وقّعوا",
+  "soon": {
+    "title": "قريب",
+    "text": "هالجزء لسه ما تصمم."
+  },
+  "frame": {
+    "noAccess": "هالصفحة مو متاحة لدورك",
+    "noAccessText": "كلّم المدير المالي إذا تحتاجها."
+  },
+  "claimsTitle": "مطالبات التأمين",
+  "actions": {
+    "export": "تصدير",
+    "newContract": "عقد جديد",
+    "newAgreement": "اتفاقية جديدة",
+    "sendClaims": "{n, plural, one {أرسل مطالبة} two {أرسل مطالبتين} few {أرسل # مطالبات} other {أرسل # مطالبة}}"
+  }
+}

@@ -14,6 +14,8 @@ export const BRANCHES: Record<string, BranchConfig> = {
   main: { hiddenModules: [], hiddenTabs: [] },
   // Example: a small clinic without inpatient lab or billing, and without the eye / dental specialties.
   "olaya-clinic": { hiddenModules: ["lab", "billing"], hiddenTabs: ["patients.payments", "patients.eyes", "patients.dental"] },
+  // Example: a cash-only branch — Billing without insurance claims or insurer partners, contracts handled at HQ.
+  "cash-branch": { hiddenModules: [], hiddenTabs: ["billing.claims", "billing.insurers", "billing.contracts"] },
 }
 
 export const ACTIVE_BRANCH = process.env.NEXT_PUBLIC_BRANCH ?? "main"

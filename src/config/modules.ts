@@ -134,7 +134,24 @@ export const MODULES: ModuleDef[] = [
       { key: "reports", href: "/lab/reports", ownTitle: true },
     ],
   },
-  { id: "billing", icon: "receipt-2", href: "/billing", group: "admin", labelKey: "billing", mobile: "more", built: false },
+  // Billing & contracts (design v5.0): opens Overview. Each tab can be hidden per branch ("billing.claims" at a
+  // cash-only branch, "billing.contracts", …); hiding one removes its tab, counts and every link into it.
+  {
+    id: "billing",
+    icon: "receipt-2",
+    href: "/billing",
+    group: "admin",
+    labelKey: "billing",
+    mobile: "more",
+    built: true,
+    tabs: [
+      { key: "overview", href: "/billing" },
+      { key: "invoices", href: "/billing/invoices", ownTitle: true },
+      { key: "claims", href: "/billing/claims", ownTitle: true },
+      { key: "insurers", href: "/billing/insurers", ownTitle: true },
+      { key: "contracts", href: "/billing/contracts", ownTitle: true },
+    ],
+  },
   { id: "reports", icon: "chart-2", href: "/reports", group: "admin", labelKey: "reports", mobile: "more", built: false },
   { id: "messages", icon: "message", href: "/messages", group: "admin", labelKey: "messages", mobile: "bottom", built: false },
 ]

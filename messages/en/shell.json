@@ -55,6 +55,13 @@
       "results": "Results",
       "catalog": "Test catalog",
       "reports": "Reports"
+    },
+    "billing": {
+      "overview": "Overview",
+      "invoices": "Invoices",
+      "claims": "Claims",
+      "insurers": "Insurers",
+      "contracts": "Contracts"
     }
   },
   "header": {
@@ -92,6 +99,7 @@
   "unavailable": {
     "title": "{module} isn't available in this branch",
     "description": "This branch doesn't use this module. Ask your admin if you need it.",
-    "home": "Back to home"
+    "home": "Back to home",
+    "module": "Back to {module}"
   }
 }

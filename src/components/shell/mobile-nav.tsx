@@ -11,6 +11,7 @@ import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
 import { Icon } from "@/components/ds/icon"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { usePageTitleValue } from "./page-title"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerBody } from "@/components/ui/drawer"
 import { MobileSearch } from "./header-search"
 import { MobileNotifications } from "./notifications"
@@ -25,7 +26,8 @@ export function MobileAppBar({ className }: { className?: string }) {
   const { current, label, tabLabel, pathname, t } = useNav()
   const tab = current ? activeTab(current, pathname) : undefined
   // Tabs with their own title (Header v2: "Doctors › Credentials") show that title here too.
-  const title = current ? (tab?.ownTitle ? tabLabel(current, tab.key) : label(current)) : ""
+  const own = usePageTitleValue()
+  const title = own?.mobileTitle ? own.title : current ? (tab?.ownTitle ? tabLabel(current, tab.key) : label(current)) : ""
   const tc = useTranslations("common")
   const { other, switchLocale } = useLocaleSwitch()
   const [sheet, setSheet] = React.useState<null | "user" | "search" | "notifications">(null)

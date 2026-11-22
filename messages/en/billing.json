@@ -171,7 +171,9 @@
       "paid": "Paid · {method} {date}",
       "balance": "Balance",
       "insurerPaysCapped": "{insurer} pays",
-      "patientPaysCapped": "Patient pays · {pct}, up to {cap}"
+      "patientPaysCapped": "Patient pays · {pct}, up to {cap}",
+      "credited": "Credit note {cn}",
+      "refunded": "Refunded"
     },
     "footer": {
       "reported": "Reported to ZATCA · {date} {time} · UUID {uuid}",
@@ -179,7 +181,8 @@
       "pending": "Waiting for ZATCA to confirm · UUID {uuid}",
       "failed": "ZATCA didn't accept it · UUID {uuid}",
       "refund": "Refunds within {days} days with this invoice. Questions: {email}",
-      "refunded": "Refunded with credit note {cn}"
+      "refunded": "Refunded with credit note {cn}",
+      "credited": "Credit note {cn} issued against it. The invoice itself is unchanged."
     },
     "pay": {
       "title": "Patient payment",
@@ -188,7 +191,8 @@
       "patientPays": "Patient pays",
       "paid": "Paid",
       "balance": "Balance",
-      "copayCapped": "Co-pay {pct}, up to {cap} a visit · {insurer} class {cls}"
+      "copayCapped": "Co-pay {pct}, up to {cap} a visit · {insurer} class {cls}",
+      "refunded": "Refunded"
     },
     "claim": {
       "title": "Insurance claim",
@@ -200,7 +204,8 @@
     "history": {
       "title": "History",
       "paid": "{amount} paid {method} · {name}",
-      "sent": "Invoice sent to the {who} by SMS"
+      "sent": "Invoice sent to the {who} by SMS",
+      "credited": "Credit note {cn} issued · {amount} · {name}"
     },
     "sentToast": "Invoice sent",
     "sentGuardian": "SMS and email to the guardian",
@@ -208,7 +213,9 @@
     "who": {
       "guardian": "guardian",
       "patient": "patient"
-    }
+    },
+    "creditNote": "Credit note",
+    "openCredit": "Open credit note {cn}"
   },
   "payment": {
     "title": "Record payment",
@@ -615,12 +622,12 @@
     "party": {
       "staff": "Employee",
       "partner": "Partner",
-      "insurer": "Insurer"
+      "insurer": "Insurance company"
     },
     "partySearch": {
-      "staff": "Search by name or national ID",
+      "staff": "Search by name, national ID or SCFHS number",
       "partner": "Search by name or CR number",
-      "insurer": "Search by name or CR number"
+      "insurer": "Search by name or CCHI licence"
     },
     "partyEmpty": "Nobody matches",
     "partyPick": "Choose…",
@@ -644,7 +651,7 @@
     "resultsWithin": "Results within",
     "jobTitle": "Job title",
     "department": "Department",
-    "basic": "Basic salary",
+    "basic": "Basic",
     "housing": "Housing",
     "transport": "Transport",
     "allowance": "Other allowances",
@@ -684,7 +691,7 @@
       "kind": {
         "staff": "Employment contract",
         "partner": "Partner contract",
-        "insurer": "Provider agreement"
+        "insurer": "Insurer agreement"
       },
       "party": {
         "staff": "Employee",
@@ -704,7 +711,21 @@
       "signersValue": "{n}{nafath, select, yes { · Nafath} other {}}",
       "first": "{name} signs first. You'll see when {g, select, female {she opens it and signs} other {he opens it and signs}}.",
       "firstYou": "You sign first, then {name} gets the SMS link.",
-      "none": "—"
+      "none": "—",
+      "job": "Job",
+      "jobValue": "{job} · {employment}",
+      "years": "{n, plural, one {# year} other {# years}}",
+      "months": "{n, plural, one {# month} other {# months}}",
+      "termProbation": "{length} · {n}-day probation",
+      "payValue": "{amount} a month",
+      "discountValue": "{pct} off our prices",
+      "copay": "Co-pay",
+      "copayCapped": "{pct} · up to {cap}",
+      "preauth": "Pre-authorization",
+      "payWithin": "They pay within",
+      "days": "{n} days",
+      "firstStaff": "{name} signs first. HR adds {g, select, female {her} other {him}} to payroll once both sign.",
+      "firstInsurer": "{name} signs first. Once both sign, {insurer} shows in Insurers and claims can go to them."
     },
     "error": {
       "party": "Choose who the contract is with",
@@ -717,13 +738,58 @@
       "basic": "Enter the basic salary",
       "hours": "The Labor Law allows at most 48 hours a week",
       "signers": "Add at least the other side and the center's signatory",
-      "summary": "Fill in the highlighted fields before sending"
+      "summary": "Fill in the highlighted fields before sending",
+      "jobTitle": "Choose the job title",
+      "clinic": "Choose the clinic",
+      "priceList": "Choose the price list",
+      "percent": "Enter a percent from 0 to 100",
+      "preauth": "Choose the pre-authorization rule"
     },
     "draftToast": "Draft saved",
     "draftToastText": "Nothing is sent until you press Send",
     "sentToast": "Sent for signature",
     "sentToastText": "{name} gets the SMS link first",
-    "noKind": "You can't draft this kind of contract"
+    "noKind": "You can't draft this kind of contract",
+    "insurerLine": "{role} · CCHI licence {licence} · {city}",
+    "clinic": "Clinic",
+    "employment": "Employment",
+    "employmentType": {
+      "full": "Full time",
+      "part": "Part time",
+      "locum": "Locum"
+    },
+    "employmentLower": {
+      "full": "full time",
+      "part": "part time",
+      "locum": "locum"
+    },
+    "termsBasis": "{basis} · you can edit",
+    "versionShort": "v{v}",
+    "workingHours": "Working hours",
+    "renewsOff": "Off · HR gets a reminder {n} days before the end",
+    "priceList": "Price list",
+    "discountPct": "Discount (%)",
+    "discountHint": "Off our price list",
+    "claimValue": "{n} days of the claim",
+    "payTitle": "Monthly pay",
+    "payText": "Goes to payroll after both sign",
+    "totalMonth": "Total a month",
+    "gosi": "Register with GOSI",
+    "gosiText": "From the start date",
+    "shareTitle": "Patient share and approvals",
+    "shareText": "Used on every invoice for their members",
+    "copayPct": "Co-pay (%)",
+    "capVisit": "Co-pay cap a visit",
+    "classes": "Classes covered",
+    "preauth": "Pre-authorization",
+    "nphies": "Send claims through NPHIES",
+    "nphiesText": "In one batch every evening",
+    "papersStaff": "Licence and certificates · checked by HR",
+    "papersInsurer": "{insurer} asks for these before they sign",
+    "paperEnds": "ends {date}",
+    "employeeSigner": "{role} · {mobile}",
+    "backInsurers": "Back to insurers",
+    "sentInsurerToast": "Sent to {insurer} for signature"
   },
   "overview": {
     "kpi": {
@@ -767,6 +833,270 @@
       "them": "{name} hasn't signed yet",
       "themText": "Sent {sent}{reminded, select, none {} other { · reminded {reminded}}}",
       "open": "Open"
+    }
+  },
+  "templates": {
+    "title": "Templates",
+    "text": "Every new contract starts from one · signed contracts keep their version",
+    "back": "Back to contracts",
+    "search": "Search templates…",
+    "filter": {
+      "label": "Template type",
+      "all": "All · {n}",
+      "staff": "Staff · {n}",
+      "partner": "Partners · {n}",
+      "insurer": "Insurers · {n}"
+    },
+    "col": {
+      "template": "Template",
+      "type": "Type",
+      "clauses": "Clauses",
+      "used": "Used in",
+      "status": "Status"
+    },
+    "nameVersion": "{name} · v{v}",
+    "edited": "Edited {date} · {name}",
+    "today": "Today",
+    "status": {
+      "published": "Published",
+      "draft": "Draft"
+    },
+    "compactLine": "{type} · {clauses, plural, one {# clause} other {# clauses}} · {used, plural, one {# contract} other {# contracts}}",
+    "open": "Show {name}",
+    "empty": "No templates match",
+    "emptyText": "Try another name, or clear the filter.",
+    "clear": "Clear search and filter",
+    "newTemplate": "New template",
+    "preview": {
+      "meta": "{type} · version {v} · published {date}",
+      "metaDraft": "{type} · version {v} · draft",
+      "languages": "Languages",
+      "lang": {
+        "both": "Arabic and English",
+        "ar": "Arabic",
+        "en": "English"
+      },
+      "whoSigns": "Who signs",
+      "first": {
+        "staff": "Employee first",
+        "partner": "Partner first",
+        "insurer": "Insurer first",
+        "center": "We sign first"
+      },
+      "usedIn": "Used in",
+      "usedValue": "{n, plural, one {# contract} other {# contracts}}",
+      "use": "Use template",
+      "newVersion": "New version",
+      "duplicate": "Duplicate {name}",
+      "clauses": "Clauses",
+      "clausesText": "In this order on the paper",
+      "noClauses": "No clauses yet — write them in the editor",
+      "filled": "Filled from the form",
+      "filledText": "These blanks take the values typed in New contract",
+      "versions": "Versions",
+      "current": "Current",
+      "archived": "Archived",
+      "draft": "Draft",
+      "published": "Published {date} · {name}",
+      "signedOn": "{n, plural, one {# signed contract stays on it} other {# signed contracts stay on it}}",
+      "replaced": "Replaced {date}",
+      "started": "Started {date} · {name}"
+    },
+    "versionToast": "Version {v} created",
+    "versionToastText": "It's a draft · publish it from the editor when it's ready",
+    "versionExists": "Version {v} is already a draft",
+    "versionExistsText": "Finish or publish it before starting another",
+    "duplicateToast": "Template duplicated",
+    "duplicateToastText": "{name} starts as a draft",
+    "copy": "(copy)",
+    "createdToast": "Template created",
+    "createdToastText": "{name} starts as a draft",
+    "dialog": {
+      "title": "New template",
+      "text": "Starts as a draft",
+      "name": "Template name",
+      "nameError": "Enter the template's name",
+      "type": "Type",
+      "from": "Start from",
+      "blank": "Blank",
+      "copyOf": "A copy of {name}",
+      "bilingual": "Arabic and English side by side",
+      "note": "It starts as a draft. Only HR or the finance manager can publish it.",
+      "cancel": "Cancel",
+      "create": "Create draft"
+    }
+  },
+  "creditNote": {
+    "title": "{no} · {name}",
+    "mobileTitle": "Credit note",
+    "back": "Back to the invoice",
+    "more": "More actions",
+    "notFound": "We couldn't find this credit note",
+    "notFoundText": "It may be from another month or branch.",
+    "backToList": "Back to invoices",
+    "download": "Download PDF",
+    "openInvoice": "Open invoice",
+    "paper": "Tax credit note",
+    "issued": "{no} · issued {date} · {time}",
+    "status": {
+      "refunded": "Refunded",
+      "issued": "Issued"
+    },
+    "field": {
+      "patient": "Patient",
+      "mrn": "MRN",
+      "against": "Against invoice",
+      "insurer": "Insurer",
+      "reason": "Reason",
+      "claim": "Claim"
+    },
+    "against": "{no} · {date}",
+    "line": {
+      "item": "Item credited",
+      "qty": "Qty",
+      "price": "Price",
+      "vat": "VAT {rate}",
+      "vatMixed": "VAT",
+      "total": "Total"
+    },
+    "sum": {
+      "subtotal": "Subtotal",
+      "vat": "VAT {rate}",
+      "vatMixed": "VAT",
+      "total": "Total credited",
+      "insurer": "Off {insurer}'s claim",
+      "insurerPct": "Off {insurer}'s claim · {pct}",
+      "patient": "Patient's part",
+      "patientPct": "Patient's part · {pct}",
+      "refunded": {
+        "cash": "Refunded in cash",
+        "transfer": "Refunded by transfer",
+        "card": "Refunded to the card",
+        "visitCredit": "Kept as credit"
+      },
+      "owes": "Still to pay"
+    },
+    "footer": {
+      "reported": "Reported to ZATCA · {date} {time} · UUID {uuid}",
+      "cleared": "Cleared by ZATCA · {date} {time} · UUID {uuid}",
+      "pending": "Reporting to ZATCA… · UUID {uuid}",
+      "failed": "ZATCA didn't accept it · UUID {uuid}",
+      "against": "Issued against {no}. The original invoice is unchanged."
+    },
+    "stays": {
+      "consult": "The consultation stays on the invoice.",
+      "items": "{n, plural, one {# item stays} other {# items stay}} on the invoice.",
+      "none": "Nothing is left on the invoice."
+    },
+    "reason": {
+      "testsNotDone": "Lab tests not done · samples rejected",
+      "notGiven": "Service not given",
+      "billedTwice": "Billed twice",
+      "wrongPrice": "Wrong price or code",
+      "other": "Other"
+    },
+    "reasonShort": {
+      "testsNotDone": "Lab tests not done",
+      "notGiven": "Service not given",
+      "billedTwice": "Billed twice",
+      "wrongPrice": "Wrong price or code",
+      "other": "Other"
+    },
+    "reasonNote": {
+      "testsNotDone": "Samples rejected (haemolysed) and the patient declined a redraw.",
+      "notGiven": "The service was billed but not given.",
+      "billedTwice": "The same service was billed twice.",
+      "wrongPrice": "The line was billed with the wrong price or code.",
+      "other": ""
+    },
+    "refund": {
+      "title": "Refund to the patient",
+      "text": "{sex, select, f {Paid more than her new share} other {Paid more than his new share}}",
+      "textNone": "Nothing to refund",
+      "newShare": "New patient share",
+      "paid": "Already paid",
+      "refunded": "Refunded",
+      "owes": "Still to pay",
+      "how": "How",
+      "method": {
+        "cash": "Cash at reception · {name}",
+        "transfer": "Bank transfer · {name}",
+        "card": "Back to the card · {name}",
+        "visitCredit": "Credit for the next visit · {name}"
+      },
+      "receipt": "Download refund receipt"
+    },
+    "after": {
+      "title": "Invoice after this",
+      "consult": "{no} · consultation only",
+      "items": "{no} · {n, plural, one {# item left} other {# items left}}",
+      "none": "{no} · fully credited",
+      "total": "Total",
+      "insurerPays": "{insurer} pays",
+      "patientPays": "Patient pays",
+      "balance": "Balance",
+      "open": "Open invoice"
+    },
+    "claim": {
+      "title": "{insurer} claim",
+      "text": "Adjusted through NPHIES",
+      "open": "Open claims"
+    },
+    "history": {
+      "title": "History",
+      "issued": "Credit note issued and reported to ZATCA · {name}",
+      "issuedPending": "Credit note issued · {name}",
+      "claimAdjusted": "Claim adjustment sent to {insurer}",
+      "refunded": "{amount} refunded {how}",
+      "refundedReceipt": "{amount} refunded {how} · receipt printed for the patient to sign",
+      "how": {
+        "cash": "in cash",
+        "transfer": "by bank transfer",
+        "card": "to the card",
+        "visitCredit": "as credit for the next visit"
+      }
+    },
+    "dialog": {
+      "title1": "Issue a credit note",
+      "sub1": "{no} · step 1 of 2 · what to credit",
+      "info": "An issued invoice can't be changed. A credit note reverses the lines you pick and is reported to ZATCA.",
+      "lines": "Lines to credit",
+      "linesError": "Pick at least one line",
+      "lineCredited": "Credited · {cn}",
+      "reason": "Reason",
+      "reasonPick": "Pick a reason",
+      "reasonError": "Pick a reason",
+      "alert": "Fix the marked fields to go on.",
+      "creditVat": "Credit, with VAT",
+      "cancel": "Cancel",
+      "next": "Next",
+      "title2": "Refund the patient",
+      "sub2": "Step 2 of 2 · {amount} back to {name}",
+      "title2None": "Check and issue",
+      "sub2None": "Step 2 of 2 · nothing to refund",
+      "newShare": "Patient's new share",
+      "paid": "Already paid",
+      "toRefund": "To refund",
+      "owes": "Still to pay",
+      "refundBy": "Refund by",
+      "method": {
+        "cash": "Cash",
+        "transfer": "Bank transfer",
+        "card": "Back to the card",
+        "visitCredit": "Credit for next visit"
+      },
+      "noteCash": "{sex, select, f {She} other {He}} paid {how}, so it can't go back to a card. Refunds over {limit} need the finance manager's approval.",
+      "noteCard": "{sex, select, f {She} other {He}} paid {how}, so it goes back to the same card through the terminal. Refunds over {limit} need the finance manager's approval.",
+      "noteNone": "Nothing goes back: {sex, select, f {she} other {he}} paid less than the new share. The balance drops to {owes}.",
+      "overLimit": "{amount} is over {limit}: the finance manager approves it before it's issued.",
+      "receipt": "Print a refund receipt for the patient to sign",
+      "nphies": "{insurer}'s part ({amount}) comes off claim {claim} through NPHIES.",
+      "nphiesNoClaim": "{insurer}'s part ({amount}) comes off what {insurer} owes for this invoice.",
+      "back": "Back",
+      "issue": "Issue credit note",
+      "approval": "Send for approval",
+      "failed": "Couldn't issue the credit note",
+      "failedText": "Nothing was saved. Try again."
     }
   }
 }

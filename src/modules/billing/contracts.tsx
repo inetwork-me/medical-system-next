@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Contract, ContractKind } from "./data"
 import { contractCounts } from "./counts"
-import { contractHref } from "./href"
+import { contractHref, TEMPLATES_HREF } from "./href"
 import { ContractStatusBadge, InitialsAvatar, KindChip, Latin, SignatureDots, ltrRun, useSoon } from "./parts"
 import { billCan, DEMO_DOCTOR_KEY, type BillRole } from "./roles"
 import { contractStatus, daysLeft, signedCount, toSign } from "./rules"
@@ -93,9 +93,11 @@ export function ContractsList({ onSign }: { onSign: (no: string) => void }) {
           <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
         </div>
         {!own && (
-          <Button variant="ghost" size="sm" onClick={soon}>
-            <Icon name="note-2" size={24} />
-            {t("templates")}
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={TEMPLATES_HREF}>
+              <Icon name="note-2" size={24} />
+              {t("templates")}
+            </Link>
           </Button>
         )}
       </header>

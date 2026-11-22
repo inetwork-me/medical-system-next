@@ -16,14 +16,15 @@ import { PageContainer, PageHeader } from "@/components/shell/page"
 import { PageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
 import { BILL_NOW, CENTER, insurerOf, type Invoice, type InvoiceEvent } from "./data"
-import { claimsHref, INVOICES_HREF } from "./href"
+import { claimsHref, creditNoteHref, INVOICES_HREF } from "./href"
+import { CreditNoteDialog } from "./credit-note"
 import { useMoney } from "./money"
 import { ClaimStatusBadge, InvoiceStatusBadge, Latin, ltrRun } from "./parts"
 import { RecordPaymentDialog } from "./payment-dialog"
 import { zatcaQrPayload } from "./zatca"
 import { QrCode } from "@/components/ds/qr-code"
 import { billCan } from "./roles"
-import { canCollect, invoiceStatus, lineTotal, lineVat, lineNet, sendInvoice, totals } from "./rules"
+import { canCollect, creditedLines, invoiceStatus, lineTotal, lineVat, lineNet, sendInvoice, totals } from "./rules"
 import { getInvoice, saveInvoice, useBillRole, useClaim, useInvoice } from "./store"
 import { useBillText } from "./text"
 
@@ -213,6 +214,10 @@ export function InvoicePaper({ inv, className }: { inv: Invoice; className?: str
                 tone="success"
               />
             ))}
+            {(inv.credits ?? []).map((c) => (
+              <SumRow key={c.cn} label={t("sum.credited", { cn: ltrRun(c.cn) })} value={money(-c.total)} />
+            ))}
+            {tt.refunded > 0 && <SumRow label={t("sum.refunded")} value={money(-tt.refunded)} />}
             <SumRow label={t("sum.balance")} value={money(tt.balance)} tone={tt.balance > 0 ? "destructive" : undefined} last />
           </div>
         </div>
@@ -231,8 +236,8 @@ export function InvoicePaper({ inv, className }: { inv: Invoice; className?: str
           </p>
           <p>
             <bdi>
-              {inv.refunded && inv.creditNote
-                ? t("footer.refunded", { cn: ltrRun(inv.creditNote) })
+              {inv.credits?.length
+                ? t("footer.credited", { cn: ltrRun(inv.credits.map((c) => c.cn).join(", ")) })
                 : t("footer.refund", {
                     days: CENTER.refundDays,
                     email: ltrRun(CENTER.billingEmail),
@@ -275,6 +280,7 @@ function useEventText() {
         name: b(e.paid.byName),
       })
     if (e.sent) return t("sent", { who: tw(e.sent.to) })
+    if (e.credited) return t("credited", { cn: ltrRun(e.credited.cn), amount: money(e.credited.total), name: b(e.credited.byName) })
     return ""
   }
 }
@@ -309,10 +315,19 @@ export function InvoiceSide({ inv, onRecord }: { inv: Invoice; onRecord?: () => 
         }
       >
         <div className="flex flex-col">
-          <SumRow label={t("pay.patientPays")} value={money(tt.patientShare)} />
+          <SumRow label={t("pay.patientPays")} value={money(tt.net.patient)} />
           <SumRow label={t("pay.paid")} value={money(tt.paid)} tone="success" />
+          {tt.refunded > 0 && <SumRow label={t("pay.refunded")} value={money(tt.refunded)} />}
           <SumRow label={t("pay.balance")} value={money(tt.balance)} tone={tt.balance > 0 ? "destructive" : undefined} last />
         </div>
+        {(inv.credits ?? []).map((c) => (
+          <Button key={c.cn} variant="outline" size="sm" className="w-full" asChild>
+            <Link href={creditNoteHref(c.cn)}>
+              <Icon name="receipt-minus" size={18} />
+              <bdi>{t("openCredit", { cn: ltrRun(c.cn) })}</bdi>
+            </Link>
+          </Button>
+        ))}
         {onRecord && canCollect(inv) && billCan(role, "collect") && (
           <Button className="w-full" onClick={onRecord}>
             <Icon name="wallet-money" size={24} />
@@ -382,7 +397,7 @@ function useSendInvoice() {
   }
 }
 
-function MobileBar({ inv }: { inv: Invoice }) {
+function MobileBar({ inv, onCredit }: { inv: Invoice; onCredit?: () => void }) {
   const t = useTranslations("billing.invoice")
   return (
     <div data-mobile-page-bar className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-card px-3 md:hidden">
@@ -401,6 +416,7 @@ function MobileBar({ inv }: { inv: Invoice }) {
         }
         groups={[
           [
+            ...(onCredit ? [{ key: "credit", icon: "receipt-minus" as const, label: t("creditNote"), onSelect: onCredit }] : []),
             {
               key: "print",
               icon: "printer",
@@ -428,6 +444,7 @@ export function InvoicePage() {
   const inv = useInvoice(useSearchParams().get("no") ?? "")
   const send = useSendInvoice()
   const [paying, setPaying] = React.useState(false)
+  const [crediting, setCrediting] = React.useState(false)
 
   if (!inv) {
     return (
@@ -453,6 +470,8 @@ export function InvoicePage() {
   }
 
   const collect = canCollect(inv) && billCan(role, "collect")
+  // Credit note: reception / finance, while some line is still on the invoice (credited lines can't be credited twice).
+  const credit = billCan(role, "creditNote") && creditedLines(inv).size < inv.lines.length
   return (
     <>
       <PageTitle
@@ -463,11 +482,17 @@ export function InvoicePage() {
         ]}
         back={INVOICES_HREF}
       />
-      <MobileBar inv={inv} />
+      <MobileBar inv={inv} onCredit={credit ? () => setCrediting(true) : undefined} />
       <PageContainer className="@container/ip">
         <PageHeader
           actions={
             <>
+              {credit && (
+                <Button variant="outline" onClick={() => setCrediting(true)}>
+                  <Icon name="receipt-minus" size={24} />
+                  {t("creditNote")}
+                </Button>
+              )}
               {billCan(role, "sendInvoice") && (
                 <Button variant="outline" onClick={() => send(inv.no)}>
                   <Icon name="send-2" size={24} />
@@ -483,12 +508,13 @@ export function InvoicePage() {
             </>
           }
         />
-        <div className="grid gap-4 @[70rem]/ip:grid-cols-[minmax(0,1fr)_360px] @[70rem]/ip:items-start @[70rem]/ip:gap-6">
+        <div className="grid gap-4 @[68rem]/ip:grid-cols-[minmax(0,1fr)_360px] @[68rem]/ip:items-start @[68rem]/ip:gap-6">
           <InvoicePaper inv={inv} />
           <InvoiceSide inv={inv} onRecord={() => setPaying(true)} />
         </div>
       </PageContainer>
       {paying && <RecordPaymentDialog invoiceNo={inv.no} onOpenChange={setPaying} />}
+      {crediting && <CreditNoteDialog invoiceNo={inv.no} onOpenChange={setCrediting} />}
     </>
   )
 }

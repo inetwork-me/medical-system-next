@@ -449,7 +449,7 @@ export function InsurerPage() {
           }
         />
         <InsurerHeader ins={ins} />
-        <div className="grid gap-4 @[70rem]/ins:grid-cols-[minmax(0,1fr)_360px] @[70rem]/ins:items-start @[70rem]/ins:gap-6">
+        <div className="grid gap-4 @[68rem]/ins:grid-cols-[minmax(0,1fr)_360px] @[68rem]/ins:items-start @[68rem]/ins:gap-6">
           <InsurerTerms ins={ins} onUpload={canUpload ? upload.open : undefined} />
           <InsurerSide ins={ins} />
         </div>

@@ -11,6 +11,7 @@ import { ActionMenu } from "@/components/ds/action-menu"
 import { Field } from "@/components/ds/field"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { Combobox, DatePicker } from "@/components/ds/pickers"
+import { Segmented } from "@/components/ds/segmented"
 import { toast } from "@/components/ds/toast"
 import { MobileActionBar, PageContainer, PageHeader } from "@/components/shell/page"
 import { PageTitle } from "@/components/shell/page-title"
@@ -19,15 +20,19 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import { useClinics } from "@/modules/clinics/store"
 import {
   BILL_TODAY,
   CENTER,
+  CLASS_OPTIONS,
   CLAUSES,
   centerSigner,
+  JOB_TITLES,
   PARTY_CANDIDATES,
+  PREAUTH_RULES,
+  PRICE_LISTS,
   PRICING_OPTIONS,
   STAFF,
-  TEMPLATES,
   type BillDocument,
   type Clause,
   type Contract,
@@ -35,7 +40,7 @@ import {
   type PartyCandidate,
   type Signer,
 } from "./data"
-import { CONTRACTS_HREF, contractHref } from "./href"
+import { CONTRACTS_HREF, INSURERS_HREF, TEMPLATES_HREF, contractHref } from "./href"
 import { formatMoney } from "./money"
 import { InitialsAvatar, InitialsTile, ltrRun, useSoon } from "./parts"
 import { canDraft, type BillRole } from "./roles"
@@ -43,15 +48,22 @@ import { MAX_WEEK_HOURS, monthlyPay } from "./rules"
 import { addContract, getContracts, useBillRole } from "./store"
 import { currentUser, signatoryFor, useBillUser } from "./session"
 import { Strip } from "./claim-dialogs"
+import { publishedTemplates, templateById, useTemplates } from "./templates-store"
 import { useBillText } from "./text"
 
 /* ------------------------------------------------------------------ form model */
 
 type ClauseRow = { key: string; title: { en: string; ar: string }; on: boolean; custom?: boolean }
+export type Employment = "full" | "part" | "locum"
 
+/**
+ * One form for the three contract types. Fields the types share (dates, Nafath) keep their values when the type
+ * switches; the party, terms, clauses, papers and the type-only fields reset to the new type's template.
+ */
 export type ContractForm = {
   kind: ContractKind
   partyId: string | null
+  /** "" = the party's registered contact, worded in the reader's language. */
   contactName: string
   mobile: string
   template: string
@@ -65,22 +77,24 @@ export type ContractForm = {
   serviceLevel: string
   // staff
   jobTitle: string
-  department: string
+  clinic: string
+  employment: Employment
+  probationDays: number
+  workingHours: string
+  leaveDays: number
   basic: string
   housing: string
   transport: string
-  allowance: string
-  probationDays: number
-  hours: string
-  leaveDays: number
+  gosi: boolean
   // insurer
+  priceList: string
   discount: string
+  insurerPays: number
   copay: string
   cap: string
-  preauthAbove: string
-  imaging: boolean
-  claimDays: number
-  insurerPays: number
+  classes: string
+  preauth: string
+  nphies: boolean
   clauses: ClauseRow[]
   papers: BillDocument[]
   /** Party signer first (by default), the center's signatory after; removable. */
@@ -100,74 +114,91 @@ const dayBefore = (iso: string) => {
 /** Contracts start on the 1st of next month by default (design: 01/12/2026 – 30/11/2027). */
 const NEXT_MONTH = addMonths(BILL_TODAY, 1)
 
-/** "Filled from the template": the terms each template starts with. */
+/** The center's papers an insurer asks for before signing (attached by default to a new insurer agreement). */
+const INSURER_PAPERS: BillDocument[] = [
+  { id: "ctr-pl-2027", kind: "priceList", title: { en: "Our price list 2027", ar: "قائمة أسعارنا 2027" }, file: "AlNoor-price-list-2027.xlsx", format: "XLSX", detail: { en: "960 KB", ar: "960 KB" }, status: "valid", version: 1 },
+  { id: "ctr-cbahi", kind: "accreditation", title: { en: "CBAHI accreditation", ar: "اعتماد سباهي" }, file: "CBAHI-accreditation.pdf", format: "PDF", detail: { en: "1.1 MB", ar: "1.1 MB" }, validTo: "2028-02-29", status: "valid", version: 1 },
+]
+
+/** "Filled from the template": the terms each template starts with (the drawn values). */
 function templateDefaults(kind: ContractKind, template: string, locale = "en"): Partial<ContractForm> {
+  const tpl = templateById(template)
   if (kind === "staff")
     return {
-      start: NEXT_MONTH,
-      end: dayBefore(addMonths(NEXT_MONTH, template === "staff-locum" ? 6 : 24)),
-      autoRenew: template !== "staff-locum",
+      autoRenew: false,
       noticeDays: 60,
-      probationDays: template === "staff-locum" ? 0 : 90,
-      hours: "48",
+      employment: tpl?.locum ? "locum" : "full",
+      probationDays: tpl?.locum ? 0 : 90,
+      workingHours: locale === "ar" ? "48 ساعة بالأسبوع · من الأحد للخميس" : "48 h a week · Sun to Thu",
       leaveDays: 30,
+      gosi: true,
     }
   if (kind === "insurer")
-    return { start: NEXT_MONTH, end: dayBefore(addMonths(NEXT_MONTH, 24)), autoRenew: true, noticeDays: 90, discount: "10", copay: "10", cap: "", preauthAbove: "1000", imaging: true, claimDays: 30, insurerPays: 45 }
+    return { autoRenew: true, noticeDays: 90, priceList: "pl-2027", discount: "12", insurerPays: 45, copay: "20", cap: "100", classes: "all", preauth: "over500-dental", nphies: true }
   return {
-    start: NEXT_MONTH,
-    end: dayBefore(addMonths(NEXT_MONTH, 12)),
     autoRenew: true,
     noticeDays: 60,
-    pricing: template === "partner-services" ? "monthly" : template === "partner-dental-lab" ? "fixed" : "less10",
+    pricing: template === "partner-services" ? "monthly" : template === "partner-supplies" ? "fixed" : "less10",
     payDays: 30,
     serviceLevel: template === "partner-reference-lab" ? (locale === "ar" ? "48 ساعة للتحاليل العادية" : "48 h for routine tests") : "",
   }
 }
 
-const clauseRows = (kind: ContractKind): ClauseRow[] =>
-  CLAUSES[kind].map((c) => ({ key: c.key, title: { ...c.title }, on: !(kind === "partner" && c.key === "nonCompete") }))
+/** Default term length per type: staff and insurer agreements 2 years, partners 1 year. */
+const termMonths = (kind: ContractKind) => (kind === "partner" ? 12 : 24)
 
-export function blankForm(kind: ContractKind, locale = "en"): ContractForm {
-  const template = TEMPLATES[kind][0].key
+const clauseRows = (kind: ContractKind): ClauseRow[] =>
+  CLAUSES[kind].map((c) => ({ key: c.key, title: { ...c.title }, on: !["nonCompete", "pricesPrivate"].includes(c.key) }))
+
+export function blankForm(kind: ContractKind, locale = "en", template?: string): ContractForm {
+  const tpl = template && templateById(template)?.kind === kind ? template : publishedTemplates(kind)[0]?.id ?? ""
   return {
     kind,
     partyId: null,
     contactName: "",
     mobile: "",
-    template,
-    start: "",
-    end: "",
+    template: tpl,
+    start: NEXT_MONTH,
+    end: dayBefore(addMonths(NEXT_MONTH, termMonths(kind))),
     autoRenew: true,
     noticeDays: 60,
     pricing: "",
     payDays: 30,
     serviceLevel: "",
     jobTitle: "",
-    department: "",
+    clinic: "",
+    employment: "full",
+    probationDays: 90,
+    workingHours: "",
+    leaveDays: 30,
     basic: "",
     housing: "",
     transport: "",
-    allowance: "",
-    probationDays: 90,
-    hours: "48",
-    leaveDays: 30,
+    gosi: true,
+    priceList: "",
     discount: "",
+    insurerPays: 45,
     copay: "",
     cap: "",
-    preauthAbove: "",
-    imaging: true,
-    claimDays: 30,
-    insurerPays: 45,
+    classes: "all",
+    preauth: "",
+    nphies: true,
     clauses: clauseRows(kind),
-    papers: [],
+    papers: kind === "insurer" ? INSURER_PAPERS : [],
     signers: ["center"],
     nafath: true,
-    ...templateDefaults(kind, template, locale),
+    ...templateDefaults(kind, tpl, locale),
   }
 }
 
+/** Switch the type in place: the shared fields (dates, Nafath) stay, the rest starts from the new type's template. */
+export function switchKind(f: ContractForm, kind: ContractKind, locale = "en"): ContractForm {
+  if (f.kind === kind) return f
+  return { ...blankForm(kind, locale), start: f.start, end: f.end, nafath: f.nafath }
+}
+
 const candidateOf = (f: Pick<ContractForm, "kind" | "partyId">): PartyCandidate | undefined => PARTY_CANDIDATES[f.kind].find((p) => p.id === f.partyId)
+
 /** "Majed Al-Ghamdi · CEO": what the user typed, else the party's registered contact in the reader's language. */
 export function contactText(f: Pick<ContractForm, "kind" | "partyId" | "contactName">, b: (v: { en: string; ar: string }) => string) {
   if (f.contactName.trim()) return f.contactName
@@ -182,21 +213,52 @@ export const initialsOf = (name: string) => {
 }
 const toNum = (s: string) => Number(s.replace(/,/g, "")) || 0
 const mobileOk = (s: string) => /^\+966\d{8,9}$/.test(s.replace(/\s/g, ""))
+/** "48 h a week · Sun to Thu" → 48 (the first number typed). */
+const weeklyHours = (s: string) => Number(/(\d+(?:\.\d+)?)/.exec(s.replace(/,/g, ""))?.[1] ?? 0)
+const staffPay = (f: Pick<ContractForm, "basic" | "housing" | "transport">) => monthlyPay({ basic: toNum(f.basic), housing: toNum(f.housing), transport: toNum(f.transport), allowances: [] })
 
-type Errors = Partial<Record<"party" | "contact" | "mobile" | "template" | "pricing" | "starts" | "ends" | "basic" | "hours" | "signers", true>>
+type ErrorKey =
+  | "party"
+  | "contact"
+  | "mobile"
+  | "template"
+  | "pricing"
+  | "starts"
+  | "ends"
+  | "jobTitle"
+  | "clinic"
+  | "basic"
+  | "hours"
+  | "priceList"
+  | "discount"
+  | "copay"
+  | "preauth"
+  | "signers"
+type Errors = Partial<Record<ErrorKey, true>>
 
-/** Required fields and the Labor Law cap; Save draft needs only a type (and a party to name it). */
+/** Required fields per type and the Labor Law cap; Save draft needs only a party to name it. */
 export function validate(f: ContractForm): Errors {
   const e: Errors = {}
   if (!f.partyId) e.party = true
   if (f.kind !== "staff" && !f.contactName.trim() && !candidateOf(f)?.contact) e.contact = true
-  if (!mobileOk(f.mobile)) e.mobile = true
+  if (f.kind !== "staff" && !mobileOk(f.mobile)) e.mobile = true
   if (!f.template) e.template = true
-  if (f.kind === "partner" && !f.pricing) e.pricing = true
   if (!f.start) e.starts = true
   if (!f.end || (f.start && f.end <= f.start)) e.ends = true
-  if (f.kind === "staff" && toNum(f.basic) <= 0) e.basic = true
-  if (f.kind === "staff" && (toNum(f.hours) <= 0 || toNum(f.hours) > MAX_WEEK_HOURS)) e.hours = true
+  if (f.kind === "partner" && !f.pricing) e.pricing = true
+  if (f.kind === "staff") {
+    if (!f.jobTitle) e.jobTitle = true
+    if (!f.clinic) e.clinic = true
+    if (toNum(f.basic) <= 0) e.basic = true
+    const h = weeklyHours(f.workingHours)
+    if (h <= 0 || h > MAX_WEEK_HOURS) e.hours = true
+  }
+  if (f.kind === "insurer") {
+    if (!f.priceList) e.priceList = true
+    if (f.discount === "" || toNum(f.discount) > 100) e.discount = true
+    if (f.copay === "" || toNum(f.copay) > 100) e.copay = true
+    if (!f.preauth) e.preauth = true
+  }
   if (!(f.signers.includes("party") && f.signers.includes("center"))) e.signers = true
   return e
 }
@@ -208,39 +270,77 @@ export function nextContractNo(list: Contract[]) {
   return `CTR-${yy}-${String(max + 1).padStart(3, "0")}`
 }
 
-/** The form as a Contract (draft or sent). */
-export function buildContract(f: ContractForm, no: string, sent: boolean): Contract {
-  const p = candidateOf(f)!
-  const kindDetail = {
-    staff: f.template === "staff-locum" ? { en: "locum", ar: "تعاقد مؤقت" } : { en: "employment", ar: "عقد عمل" },
-    partner: p.role,
-    insurer: { en: "provider agreement", ar: "اتفاقية مقدم خدمة" },
-  }[f.kind]
-  const partySigner: Signer = {
-    order: 0,
-    initials: p.kind === "employee" ? p.initials : initialsOf(f.contactName.trim() ? f.contactName.split(" · ")[0] : (p.contact?.name.en ?? p.name.en)),
-    name: p.kind === "employee" ? p.name : f.contactName.trim() ? { en: f.contactName.split(" · ")[0], ar: f.contactName.split(" · ")[0] } : (p.contact?.name ?? p.name),
-    role: p.kind === "employee" ? { en: "Employee", ar: p.female ? "الموظفة" : "الموظف" } : { en: `${p.short?.en ?? p.name.en} · ${p.contact?.role.en ?? ""}`, ar: `${p.short?.ar ?? p.name.ar} · ${p.contact?.role.ar ?? ""}` },
-    female: p.kind === "employee" ? p.female : p.contact?.female,
+/** Who signs for the other side: the employee, the partner's contact, or the insurer's signatory (network director). */
+function partySignerOf(f: ContractForm): Omit<Signer, "order"> | undefined {
+  const p = candidateOf(f)
+  if (!p) return undefined
+  if (p.kind === "employee")
+    return {
+      initials: p.initials,
+      name: p.name,
+      role: { en: "Employee", ar: p.female ? "الموظفة" : "الموظف" },
+      female: p.female,
+      side: "party",
+      mobile: p.mobile,
+      nationalId: p.contactNationalId,
+      status: "waiting",
+      method: "nafath",
+    }
+  if (p.signatory)
+    return {
+      initials: p.signatory.initials,
+      name: p.signatory.name,
+      role: { en: `${p.short?.en ?? p.name.en} · ${p.signatory.role.en}`, ar: `${p.short?.ar ?? p.name.ar} · ${p.signatory.role.ar}` },
+      female: p.signatory.female,
+      side: "party",
+      mobile: p.signatory.mobile,
+      nationalId: p.signatory.nationalId,
+      status: "waiting",
+      method: "nafath",
+    }
+  const typed = f.contactName.trim()
+  const name = typed ? { en: typed.split(" · ")[0], ar: typed.split(" · ")[0] } : (p.contact?.name ?? p.name)
+  return {
+    initials: initialsOf(typed ? typed.split(" · ")[0] : (p.contact?.name.en ?? p.name.en)),
+    name,
+    role: { en: `${p.short?.en ?? p.name.en} · ${p.contact?.role.en ?? ""}`, ar: `${p.short?.ar ?? p.name.ar} · ${p.contact?.role.ar ?? ""}` },
+    female: p.contact?.female,
     side: "party",
     mobile: f.mobile,
     nationalId: p.contactNationalId,
     status: "waiting",
     method: "nafath",
   }
+}
+
+/** The form as a Contract (draft or sent): stores the template id + the published version it was made from. */
+export function buildContract(f: ContractForm, no: string, sent: boolean, clinicName?: { en: string; ar: string }): Contract {
+  const p = candidateOf(f)!
+  const tpl = templateById(f.template)
+  const published = tpl?.versions.find((v) => v.status === "published")?.version ?? 1
+  const job = JOB_TITLES.find((j) => j.en === f.jobTitle) ?? { en: f.jobTitle, ar: f.jobTitle }
+  const kindDetail = {
+    staff:
+      f.employment === "locum" ? { en: "locum", ar: "تعاقد مؤقت" } : f.employment === "part" ? { en: "part-time employment", ar: "دوام جزئي" } : { en: "employment", ar: "عقد عمل" },
+    partner: p.role,
+    insurer: { en: "provider agreement", ar: "اتفاقية مقدم خدمة" },
+  }[f.kind]
+  const ps = partySignerOf(f)!
   // The center signs through the signed-in user when they're an authorized signatory, else the center's signatory.
-  const signers = f.signers.map((s, i) => (s === "party" ? { ...partySigner, order: i + 1 } : centerSigner(signatoryFor(), i + 1)))
+  const signers = f.signers.map((s, i) => (s === "party" ? { ...ps, order: i + 1 } : centerSigner(signatoryFor(), i + 1)))
   const clauses: Clause[] = f.clauses.filter((c) => c.on && c.title.en.trim()).map((c) => ({ key: c.key, title: c.title, text: c.custom ? c.title : { en: "", ar: "" } }))
+  const rule = PREAUTH_RULES.find((r) => r.key === f.preauth)
   return {
     no,
     kind: f.kind,
     kindDetail,
-    party: { ...p, contact: p.contact ? { ...p.contact, mobile: f.mobile } : undefined },
+    party: { ...p, role: f.kind === "staff" ? job : p.role, contact: p.contact ? { ...p.contact, mobile: f.mobile } : undefined },
     template: f.template,
+    templateVersion: published,
     version: 1,
     draftedAt: BILL_TODAY,
     draftedBy: currentUser()?.key ?? "nora",
-    department: f.department ? { en: f.department, ar: f.department } : undefined,
+    department: f.kind === "staff" ? clinicName : undefined,
     start: f.start,
     end: f.end,
     autoRenew: f.autoRenew,
@@ -249,12 +349,18 @@ export function buildContract(f: ContractForm, no: string, sent: boolean): Contr
       staff:
         f.kind === "staff"
           ? {
+              employment: f.employment,
+              jobTitle: job,
+              clinic: f.clinic,
+              workingHours: f.workingHours,
+              gosi: f.gosi,
+              reminderDays: f.autoRenew ? undefined : 90,
               basic: toNum(f.basic),
               housing: toNum(f.housing),
               transport: toNum(f.transport),
-              allowances: toNum(f.allowance) ? [{ label: { en: "allowances", ar: "بدلات" }, amount: toNum(f.allowance) }] : [],
+              allowances: [],
               probationDays: f.probationDays,
-              hoursPerWeek: toNum(f.hours),
+              hoursPerWeek: weeklyHours(f.workingHours),
               leaveDays: f.leaveDays,
               payDay: 27,
             }
@@ -273,10 +379,14 @@ export function buildContract(f: ContractForm, no: string, sent: boolean): Contr
               discountPct: toNum(f.discount),
               copayPct: toNum(f.copay),
               capPerVisit: toNum(f.cap) || undefined,
-              preauthAbove: toNum(f.preauthAbove) || undefined,
-              preauthImaging: f.imaging,
+              classes: CLASS_OPTIONS.find((c) => c.key === f.classes)?.classes,
+              preauthAbove: rule?.above,
+              preauthImaging: rule?.imaging,
+              preauthDental: rule?.dental,
               paymentDays: f.insurerPays,
-              claimDeadlineDays: f.claimDays,
+              claimDeadlineDays: 30,
+              priceList: f.priceList,
+              nphies: f.nphies,
             }
           : undefined,
     },
@@ -292,7 +402,7 @@ export function buildContract(f: ContractForm, no: string, sent: boolean): Contr
   }
 }
 
-/* ------------------------------------------------------------------ sections */
+/* ------------------------------------------------------------------ building blocks */
 
 function Card({ title, description, action, children, className }: { title: string; description?: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
@@ -309,21 +419,98 @@ function Card({ title, description, action, children, className }: { title: stri
   )
 }
 
-const Row = ({ children }: { children: React.ReactNode }) => <div className="grid gap-4 @xl/nc:grid-cols-2 @xl/nc:gap-3">{children}</div>
+const Row = ({ children, three }: { children: React.ReactNode; three?: boolean }) => (
+  <div className={cn("grid gap-4 @xl/nc:gap-3", three ? "@xl/nc:grid-cols-3" : "@xl/nc:grid-cols-2")}>{children}</div>
+)
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+  required,
+  error,
+  helper,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  options: { value: string; label: string }[]
+  required?: boolean
+  error?: string
+  helper?: string
+}) {
+  return (
+    <Field label={label} required={required} error={error} helper={helper}>
+      {(fp) => (
+        <Select value={value} onValueChange={onChange}>
+          <SelectTrigger {...fp} className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((o) => (
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+    </Field>
+  )
+}
+
+/** A number field: bare value (percent fields carry the unit in the label), or with the currency inside ("SAR 24,000"). */
+function NumberInput({ value, onChange, currency }: { value: string; onChange: (v: string) => void; currency?: boolean }) {
+  const { ar } = useBillText()
+  const unit = currency ? <span className="shrink-0 text-sm text-foreground ltr:-me-1 rtl:-ms-1">{ar ? "ر.س" : "SAR"}</span> : undefined
+  return (
+    <Input
+      inputMode="decimal"
+      value={value}
+      onChange={(e) => onChange(e.target.value.replace(/[^\d.,]/g, ""))}
+      startIcon={!ar ? unit : undefined}
+      end={ar ? unit : undefined}
+      className="tabular-nums"
+    />
+  )
+}
+
+function SwitchRow({ label, hint, checked, onCheckedChange }: { label: string; hint: string; checked: boolean; onCheckedChange: (v: boolean) => void }) {
+  const id = React.useId()
+  return (
+    <div className="flex items-center gap-3 rounded-[10px] border p-3">
+      <label htmlFor={id} className="flex min-w-0 flex-1 cursor-pointer flex-col gap-0.5">
+        <span className="text-sm text-foreground">{label}</span>
+        <span className="text-xs text-muted-foreground">{hint}</span>
+      </label>
+      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
+  )
+}
+
+function useDates() {
+  const toDate = (iso: string) => (iso ? new Date(`${iso}T12:00`) : undefined)
+  const fromDate = (d: Date | undefined) => (d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` : "")
+  return { toDate, fromDate }
+}
+
+/* ------------------------------------------------------------------ cards */
 
 const KIND_ICON: Record<ContractKind, IconName> = { staff: "profile-2user", partner: "briefcase", insurer: "shield-tick" }
 
+/** Contract type radio cards; types the signed-in role can't draft are hidden. */
 function TypeCards({ f, set, role }: { f: ContractForm; set: (k: ContractKind) => void; role: BillRole }) {
   const t = useTranslations("billing.newContract")
+  const kinds = (["staff", "partner", "insurer"] as ContractKind[]).filter((k) => canDraft(role, k))
   return (
     <Card title={t("type")} description={t("typeText")}>
-      <RadioGroupPrimitive.Root value={f.kind} onValueChange={(v) => set(v as ContractKind)} className="grid gap-2.5 @xl/nc:grid-cols-3" aria-label={t("type")}>
-        {(["staff", "partner", "insurer"] as ContractKind[]).map((k) => (
+      <RadioGroupPrimitive.Root value={f.kind} onValueChange={(v) => set(v as ContractKind)} className={cn("grid gap-2.5", kinds.length === 3 ? "@xl/nc:grid-cols-3" : "@xl/nc:grid-cols-2")} aria-label={t("type")}>
+        {kinds.map((k) => (
           <RadioGroupPrimitive.Item
             key={k}
             value={k}
-            disabled={!canDraft(role, k)}
-            className="group/radio flex items-center gap-2.5 rounded-[10px] border bg-card p-3 text-start transition-colors outline-none hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-accent"
+            className="group/radio flex items-center gap-2.5 rounded-[10px] border bg-card p-3 text-start transition-colors outline-none hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=checked]:border-primary data-[state=checked]:bg-accent"
           >
             <span className="flex size-4 shrink-0 items-center justify-center rounded-full border border-input bg-card group-data-[state=checked]/radio:border-primary">
               <RadioGroupPrimitive.Indicator className="size-2 rounded-full bg-primary" />
@@ -345,7 +532,8 @@ function TypeCards({ f, set, role }: { f: ContractForm; set: (k: ContractKind) =
 function PartySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partial<ContractForm>) => void; errors: Errors }) {
   const t = useTranslations("billing.newContract")
   const te = useTranslations("billing.newContract.error")
-  const { b, date } = useBillText()
+  const { b } = useBillText()
+  const clinics = useClinics()
   const p = candidateOf(f)
   const pick = (id: string) => {
     const c = PARTY_CANDIDATES[f.kind].find((x) => x.id === id)
@@ -354,10 +542,11 @@ function PartySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partia
       partyId: id,
       contactName: "",
       mobile: c.contact?.mobile ?? c.mobile,
-      jobTitle: c.kind === "employee" ? b(c.role) : f.jobTitle,
+      ...(c.kind === "employee" ? { jobTitle: c.role.en, clinic: c.clinic ?? "", papers: c.papers ?? [] } : {}),
       signers: f.signers.includes("party") ? f.signers : ["party", ...f.signers],
     })
   }
+  const searchKey = (c: PartyCandidate) => [b(c.name), c.cr, c.cchiLicence && `CCHI ${c.cchiLicence}`, c.nationalId, c.licence?.no].filter(Boolean).join(" · ")
   return (
     <Card title={t(`party.${f.kind}`)} description={t(`partySearch.${f.kind}`)}>
       {p ? (
@@ -367,9 +556,11 @@ function PartySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partia
             <span className="truncate text-sm text-foreground">{b(p.name)}</span>
             <span className="text-xs text-muted-foreground">
               <bdi>
-                {p.kind === "company"
-                  ? t("companyLine", { role: b(p.role), cr: ltrRun(p.cr ?? "—"), city: p.city ? b(p.city) : "" })
-                  : t("employeeLine", { role: b(p.role), licence: ltrRun(p.licence?.no ?? "—") })}
+                {p.kind === "employee"
+                  ? t("employeeLine", { role: b(p.role), licence: ltrRun(p.licence?.no ?? "—") })
+                  : p.cchiLicence
+                    ? t("insurerLine", { role: b(p.role), licence: ltrRun(p.cchiLicence), city: p.city ? b(p.city) : "" })
+                    : t("companyLine", { role: b(p.role), cr: ltrRun(p.cr ?? "—"), city: p.city ? b(p.city) : "" })}
               </bdi>
             </span>
           </div>
@@ -377,7 +568,7 @@ function PartySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partia
             variant="ghost"
             size="icon-sm"
             aria-label={t("change", { name: b(p.name) })}
-            onClick={() => patch({ partyId: null, contactName: "", mobile: "", signers: f.signers.filter((s) => s !== "party") })}
+            onClick={() => patch({ partyId: null, contactName: "", mobile: "", ...(f.kind === "staff" ? { papers: [] } : {}), signers: f.signers.filter((s) => s !== "party") })}
           >
             <Icon name="close-circle" size={24} />
           </Button>
@@ -387,7 +578,7 @@ function PartySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partia
           {(fp) => (
             <Combobox
               {...fp}
-              options={PARTY_CANDIDATES[f.kind].map((c) => ({ value: c.id, label: `${b(c.name)} · ${c.cr ?? c.nationalId ?? ""}` }))}
+              options={PARTY_CANDIDATES[f.kind].map((c) => ({ value: c.id, label: searchKey(c) }))}
               value={undefined}
               onChange={pick}
               placeholder={t("partyPick")}
@@ -398,192 +589,221 @@ function PartySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partia
           )}
         </Field>
       )}
-      <Row>
-        {f.kind === "staff" ? (
-          <Field label={t("licence")}>
-            <Input readOnly value={p?.licence ? `${p.licence.no} · ${date(p.licence.validTo)}` : ""} dir="ltr" />
+      {f.kind === "staff" ? (
+        <>
+          <Row>
+            <SelectField
+              label={t("jobTitle")}
+              required
+              value={f.jobTitle}
+              onChange={(v) => patch({ jobTitle: v })}
+              options={JOB_TITLES.map((j) => ({ value: j.en, label: b(j) }))}
+              error={errors.jobTitle ? te("jobTitle") : undefined}
+            />
+            <SelectField
+              label={t("clinic")}
+              required
+              value={f.clinic}
+              onChange={(v) => patch({ clinic: v })}
+              options={clinics.map((c) => ({ value: c.key, label: `${b(c.short)} · ${b(c.branch)}` }))}
+              error={errors.clinic ? te("clinic") : undefined}
+            />
+          </Row>
+          <Field label={t("employment")} required>
+            {(fp) => (
+              <Segmented
+                {...fp}
+                value={f.employment}
+                onValueChange={(v) => patch({ employment: v })}
+                aria-label={t("employment")}
+                className="w-full *:flex-1"
+                options={(["full", "part", "locum"] as Employment[]).map((e) => ({ value: e, label: t(`employmentType.${e}`) }))}
+              />
+            )}
           </Field>
-        ) : (
+        </>
+      ) : (
+        <Row>
           <Field label={t("contact")} required error={errors.contact ? te("contact") : undefined}>
             <Input value={contactText(f, b)} onChange={(e) => patch({ contactName: e.target.value })} />
           </Field>
-        )}
-        <Field label={t("mobile")} required error={errors.mobile ? te("mobile") : undefined}>
-          <Input dir="ltr" inputMode="tel" value={f.mobile} onChange={(e) => patch({ mobile: e.target.value })} startIcon={<Icon name="call" size={20} className="text-muted-foreground" />} />
-        </Field>
-      </Row>
-    </Card>
-  )
-}
-
-function SelectField({ label, value, onChange, options, required, error }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; required?: boolean; error?: string }) {
-  return (
-    <Field label={label} required={required} error={error}>
-      {(fp) => (
-        <Select value={value} onValueChange={onChange}>
-          <SelectTrigger {...fp} className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((o) => (
-              <SelectItem key={o.value} value={o.value}>
-                {o.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Field label={t("mobile")} required error={errors.mobile ? te("mobile") : undefined}>
+            <Input dir="ltr" inputMode="tel" value={f.mobile} onChange={(e) => patch({ mobile: e.target.value })} startIcon={<Icon name="call" size={20} className="text-muted-foreground" />} />
+          </Field>
+        </Row>
       )}
-    </Field>
-  )
-}
-
-function NumberInput({ value, onChange, unit }: { value: string; onChange: (v: string) => void; unit?: string }) {
-  return (
-    <Input
-      inputMode="decimal"
-      value={value}
-      onChange={(e) => onChange(e.target.value.replace(/[^\d.,]/g, ""))}
-      end={unit ? <span className="shrink-0 text-sm text-muted-foreground">{unit}</span> : undefined}
-      className="tabular-nums"
-    />
+    </Card>
   )
 }
 
 function TermsSection({ f, patch, errors }: { f: ContractForm; patch: (p: Partial<ContractForm>) => void; errors: Errors }) {
   const t = useTranslations("billing.newContract")
   const te = useTranslations("billing.newContract.error")
-  const { b, ar, locale } = useBillText()
-  const sar = ar ? "ر.س" : "SAR"
-  const toDate = (iso: string) => (iso ? new Date(`${iso}T12:00`) : undefined)
-  const fromDate = (d: Date | undefined) =>
-    d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` : ""
-  const days = (ns: number[], key: "payWithinValue" | "daysUnit") => ns.map((n) => ({ value: String(n), label: t(key, { n }) }))
-  const pay = f.kind === "staff" ? monthlyPay({ basic: toNum(f.basic), housing: toNum(f.housing), transport: toNum(f.transport), allowances: [{ amount: toNum(f.allowance) }] }) : 0
+  const { b, locale } = useBillText()
+  const { toDate, fromDate } = useDates()
+  useTemplates()
+  const tpl = templateById(f.template)
+  const days = (ns: number[], key: "payWithinValue" | "daysUnit" | "claimValue") => ns.map((n) => ({ value: String(n), label: t(key, { n }) }))
+  const templateOptions = publishedTemplates(f.kind).map((x) => ({ value: x.id, label: `${b(x.name)} · ${t("versionShort", { v: x.versions.find((v) => v.status === "published")?.version ?? 1 })}` }))
+  const description = tpl?.basis ? t("termsBasis", { basis: b(tpl.basis) }) : t("termsText")
+  const dates = (
+    <Row>
+      <Field label={t("starts")} required error={errors.starts ? te("starts") : undefined}>
+        {(fp) => <DatePicker {...fp} value={toDate(f.start)} onChange={(d) => patch({ start: fromDate(d) })} placeholder={t("pickDate")} className="w-full" />}
+      </Field>
+      <Field label={t("ends")} required error={errors.ends ? te("ends") : undefined}>
+        {(fp) => <DatePicker {...fp} value={toDate(f.end)} onChange={(d) => patch({ end: fromDate(d) })} placeholder={t("pickDate")} className="w-full" />}
+      </Field>
+    </Row>
+  )
+  const template = (
+    <SelectField
+      label={t("template")}
+      required
+      value={f.template}
+      onChange={(v) => patch({ template: v, ...templateDefaults(f.kind, v, locale) })}
+      options={templateOptions}
+      error={errors.template ? te("template") : undefined}
+    />
+  )
 
   return (
-    <Card title={t("terms")} description={t("termsText")}>
-      <Row>
-        <SelectField
-          label={t("template")}
-          required
-          value={f.template}
-          onChange={(v) => patch({ template: v, ...templateDefaults(f.kind, v, locale) })}
-          options={TEMPLATES[f.kind].map((x) => ({ value: x.key, label: b(x.label) }))}
-          error={errors.template ? te("template") : undefined}
-        />
-        {f.kind === "partner" && (
-          <SelectField
-            label={t("pricing")}
-            required
-            value={f.pricing}
-            onChange={(v) => patch({ pricing: v })}
-            options={PRICING_OPTIONS.map((x) => ({ value: x.key, label: b(x.label) }))}
-            error={errors.pricing ? te("pricing") : undefined}
-          />
-        )}
-        {f.kind === "staff" && (
-          <Field label={t("jobTitle")}>
-            <Input value={f.jobTitle} onChange={(e) => patch({ jobTitle: e.target.value })} />
-          </Field>
-        )}
-        {f.kind === "insurer" && (
-          <Field label={t("discount")}>
-            <NumberInput value={f.discount} onChange={(v) => patch({ discount: v })} unit="%" />
-          </Field>
-        )}
-      </Row>
-      <Row>
-        <Field label={t("starts")} required error={errors.starts ? te("starts") : undefined}>
-          {(fp) => <DatePicker {...fp} value={toDate(f.start)} onChange={(d) => patch({ start: fromDate(d) })} placeholder={t("pickDate")} className="w-full" />}
-        </Field>
-        <Field label={t("ends")} required error={errors.ends ? te("ends") : undefined}>
-          {(fp) => <DatePicker {...fp} value={toDate(f.end)} onChange={(d) => patch({ end: fromDate(d) })} placeholder={t("pickDate")} className="w-full" />}
-        </Field>
-      </Row>
-
+    <Card title={t("terms")} description={description}>
       {f.kind === "partner" && (
-        <Row>
-          <SelectField label={t("payWithin")} value={String(f.payDays)} onChange={(v) => patch({ payDays: Number(v) })} options={days([30, 45, 60], "payWithinValue")} />
-          <Field label={t("resultsWithin")}>
-            <Input value={f.serviceLevel} onChange={(e) => patch({ serviceLevel: e.target.value })} />
-          </Field>
-        </Row>
+        <>
+          <Row>
+            {template}
+            <SelectField
+              label={t("pricing")}
+              required
+              value={f.pricing}
+              onChange={(v) => patch({ pricing: v })}
+              options={PRICING_OPTIONS.map((x) => ({ value: x.key, label: b(x.label) }))}
+              error={errors.pricing ? te("pricing") : undefined}
+            />
+          </Row>
+          {dates}
+          <Row>
+            <SelectField label={t("payWithin")} value={String(f.payDays)} onChange={(v) => patch({ payDays: Number(v) })} options={days([30, 45, 60], "payWithinValue")} />
+            <Field label={t("resultsWithin")}>
+              <Input value={f.serviceLevel} onChange={(e) => patch({ serviceLevel: e.target.value })} />
+            </Field>
+          </Row>
+          <SwitchRow label={t("renews")} hint={t("renewsText", { n: f.noticeDays })} checked={f.autoRenew} onCheckedChange={(v) => patch({ autoRenew: v })} />
+        </>
       )}
 
       {f.kind === "staff" && (
         <>
           <Row>
-            <Field label={t("department")}>
-              <Input value={f.department} onChange={(e) => patch({ department: e.target.value })} />
-            </Field>
-            <SelectField label={t("probation")} value={String(f.probationDays)} onChange={(v) => patch({ probationDays: Number(v) })} options={days([0, 90, 180], "daysUnit")} />
+            {template}
+            <SelectField label={t("probation")} required value={String(f.probationDays)} onChange={(v) => patch({ probationDays: Number(v) })} options={days([0, 90, 180], "daysUnit")} />
           </Row>
+          {dates}
           <Row>
-            <Field label={t("basic")} required error={errors.basic ? te("basic") : undefined}>
-              <NumberInput value={f.basic} onChange={(v) => patch({ basic: v })} unit={sar} />
-            </Field>
-            <Field label={t("housing")}>
-              <NumberInput value={f.housing} onChange={(v) => patch({ housing: v })} unit={sar} />
-            </Field>
-          </Row>
-          <Row>
-            <Field label={t("transport")}>
-              <NumberInput value={f.transport} onChange={(v) => patch({ transport: v })} unit={sar} />
-            </Field>
-            <Field label={t("allowance")} helper={pay ? t("monthly", { amount: formatMoney(pay, locale, { whole: true }) }) : undefined}>
-              <NumberInput value={f.allowance} onChange={(v) => patch({ allowance: v })} unit={sar} />
-            </Field>
-          </Row>
-          <Row>
-            <Field label={t("hours")} required error={errors.hours ? te("hours") : undefined}>
-              <NumberInput value={f.hours} onChange={(v) => patch({ hours: v })} />
+            <Field label={t("workingHours")} error={errors.hours ? te("hours") : undefined}>
+              <Input value={f.workingHours} onChange={(e) => patch({ workingHours: e.target.value })} />
             </Field>
             <SelectField label={t("leave")} value={String(f.leaveDays)} onChange={(v) => patch({ leaveDays: Number(v) })} options={days([21, 30], "daysUnit")} />
           </Row>
+          <SwitchRow
+            label={t("renews")}
+            hint={f.autoRenew ? t("renewsText", { n: f.noticeDays }) : t("renewsOff", { n: 90 })}
+            checked={f.autoRenew}
+            onCheckedChange={(v) => patch({ autoRenew: v })}
+          />
         </>
       )}
 
       {f.kind === "insurer" && (
         <>
           <Row>
-            <Field label={t("copay")}>
-              <NumberInput value={f.copay} onChange={(v) => patch({ copay: v })} unit="%" />
-            </Field>
-            <Field label={t("cap")}>
-              <NumberInput value={f.cap} onChange={(v) => patch({ cap: v })} unit={sar} />
-            </Field>
+            {template}
+            <SelectField
+              label={t("priceList")}
+              required
+              value={f.priceList}
+              onChange={(v) => patch({ priceList: v })}
+              options={PRICE_LISTS.map((x) => ({ value: x.key, label: b(x.label) }))}
+              error={errors.priceList ? te("priceList") : undefined}
+            />
           </Row>
+          {dates}
           <Row>
-            <Field label={t("preauthAbove")}>
-              <NumberInput value={f.preauthAbove} onChange={(v) => patch({ preauthAbove: v })} unit={sar} />
+            <Field label={t("discountPct")} required helper={t("discountHint")} error={errors.discount ? te("percent") : undefined}>
+              <NumberInput value={f.discount} onChange={(v) => patch({ discount: v })} />
             </Field>
-            <SelectField label={t("claimDays")} value={String(f.claimDays)} onChange={(v) => patch({ claimDays: Number(v) })} options={days([15, 30, 60], "daysUnit")} />
+            <SelectField label={t("insurerPays")} required value={String(f.insurerPays)} onChange={(v) => patch({ insurerPays: Number(v) })} options={days([30, 45, 60], "claimValue")} />
           </Row>
-          <Row>
-            <SelectField label={t("insurerPays")} value={String(f.insurerPays)} onChange={(v) => patch({ insurerPays: Number(v) })} options={days([30, 45, 60], "daysUnit")} />
-            <label className="flex items-center gap-2 self-end pb-2 text-sm">
-              <Checkbox checked={f.imaging} onCheckedChange={(v) => patch({ imaging: v === true })} />
-              {t("imaging")}
-            </label>
-          </Row>
+          <SwitchRow label={t("renews")} hint={t("renewsText", { n: f.noticeDays })} checked={f.autoRenew} onCheckedChange={(v) => patch({ autoRenew: v })} />
         </>
       )}
-
-      <SwitchRow label={t("renews")} hint={t("renewsText", { n: f.noticeDays })} checked={f.autoRenew} onCheckedChange={(v) => patch({ autoRenew: v })} />
     </Card>
   )
 }
 
-function SwitchRow({ label, hint, checked, onCheckedChange }: { label: string; hint: string; checked: boolean; onCheckedChange: (v: boolean) => void }) {
-  const id = React.useId()
+/** Staff · Monthly pay: basic, housing, transport → Total a month (live), Register with GOSI. */
+function PaySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partial<ContractForm>) => void; errors: Errors }) {
+  const t = useTranslations("billing.newContract")
+  const te = useTranslations("billing.newContract.error")
+  const { locale } = useBillText()
   return (
-    <div className="flex items-center gap-3 rounded-[10px] border p-3">
-      <label htmlFor={id} className="flex min-w-0 flex-1 cursor-pointer flex-col gap-0.5">
-        <span className="text-sm text-foreground">{label}</span>
-        <span className="text-xs text-muted-foreground">{hint}</span>
-      </label>
-      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
-    </div>
+    <Card title={t("payTitle")} description={t("payText")}>
+      <Row three>
+        <Field label={t("basic")} required error={errors.basic ? te("basic") : undefined}>
+          <NumberInput value={f.basic} onChange={(v) => patch({ basic: v })} currency />
+        </Field>
+        <Field label={t("housing")}>
+          <NumberInput value={f.housing} onChange={(v) => patch({ housing: v })} currency />
+        </Field>
+        <Field label={t("transport")}>
+          <NumberInput value={f.transport} onChange={(v) => patch({ transport: v })} currency />
+        </Field>
+      </Row>
+      <div className="flex items-center gap-3 rounded-[10px] bg-muted px-3 py-3" aria-live="polite">
+        <span className="min-w-0 flex-1 text-sm text-foreground">{t("totalMonth")}</span>
+        <span className="text-lg font-semibold text-foreground tabular-nums">{formatMoney(staffPay(f), locale, { whole: true })}</span>
+      </div>
+      <SwitchRow label={t("gosi")} hint={t("gosiText")} checked={f.gosi} onCheckedChange={(v) => patch({ gosi: v })} />
+    </Card>
+  )
+}
+
+/** Insurer · Patient share and approvals: co-pay (%), cap a visit, classes covered, pre-authorization, NPHIES. */
+function ShareSection({ f, patch, errors }: { f: ContractForm; patch: (p: Partial<ContractForm>) => void; errors: Errors }) {
+  const t = useTranslations("billing.newContract")
+  const te = useTranslations("billing.newContract.error")
+  const { b } = useBillText()
+  const cls = CLASS_OPTIONS.find((c) => c.key === f.classes)
+  return (
+    <Card title={t("shareTitle")} description={t("shareText")}>
+      <Row>
+        <Field label={t("copayPct")} required error={errors.copay ? te("percent") : undefined}>
+          <NumberInput value={f.copay} onChange={(v) => patch({ copay: v })} />
+        </Field>
+        <Field label={t("capVisit")}>
+          <NumberInput value={f.cap} onChange={(v) => patch({ cap: v })} currency />
+        </Field>
+      </Row>
+      <Row>
+        <SelectField
+          label={t("classes")}
+          value={f.classes}
+          onChange={(v) => patch({ classes: v })}
+          options={CLASS_OPTIONS.map((c) => ({ value: c.key, label: b(c.label) }))}
+          helper={cls ? cls.classes.join(", ") : undefined}
+        />
+        <SelectField
+          label={t("preauth")}
+          required
+          value={f.preauth}
+          onChange={(v) => patch({ preauth: v })}
+          options={PREAUTH_RULES.map((r) => ({ value: r.key, label: b(r.label) }))}
+          error={errors.preauth ? te("preauth") : undefined}
+        />
+      </Row>
+      <SwitchRow label={t("nphies")} hint={t("nphiesText")} checked={f.nphies} onCheckedChange={(v) => patch({ nphies: v })} />
+    </Card>
   )
 }
 
@@ -609,13 +829,7 @@ function ClausesSection({ f, patch }: { f: ContractForm; patch: (p: Partial<Cont
             <Checkbox checked={c.on} onCheckedChange={(v) => set(i, { on: v === true })} aria-label={c.custom ? t("newClause") : b(c.title)} id={`clause-${c.key}`} />
             {c.custom ? (
               <>
-                <Input
-                  autoFocus
-                  value={c.title.en}
-                  placeholder={t("newClause")}
-                  onChange={(e) => set(i, { title: { en: e.target.value, ar: e.target.value } })}
-                  className="h-8 flex-1"
-                />
+                <Input autoFocus value={c.title.en} placeholder={t("newClause")} onChange={(e) => set(i, { title: { en: e.target.value, ar: e.target.value } })} className="h-8 flex-1" />
                 <Button variant="ghost" size="icon-sm" aria-label={t("removeClause")} onClick={() => patch({ clauses: f.clauses.filter((_, j) => j !== i) })}>
                   <Icon name="trash" size={20} />
                 </Button>
@@ -638,6 +852,7 @@ function PapersSection({ f, patch }: { f: ContractForm; patch: (p: Partial<Contr
   const t = useTranslations("billing.newContract")
   const { b, date } = useBillText()
   const input = React.useRef<HTMLInputElement>(null)
+  const p = candidateOf(f)
   const add = (files: FileList | null) => {
     if (!files?.length) return
     const docs: BillDocument[] = [...files].map((file, i) => {
@@ -656,8 +871,11 @@ function PapersSection({ f, patch }: { f: ContractForm; patch: (p: Partial<Contr
     })
     patch({ papers: [...f.papers, ...docs] })
   }
+  // "ends Mar 2028" — the month and year an expiring paper (licence, certificate) runs out.
+  const endsOn = (iso: string) => t("paperEnds", { date: date(iso).replace(/^\d+\s/, "") })
+  const description = f.kind === "staff" ? t("papersStaff") : f.kind === "insurer" && p ? t("papersInsurer", { insurer: b(p.short ?? p.name) }) : t("papersText")
   return (
-    <Card title={t("papers")} description={t("papersText")}>
+    <Card title={t("papers")} description={description}>
       {f.papers.length > 0 && (
         <ul className="flex flex-col">
           {f.papers.map((d, i) => (
@@ -667,8 +885,8 @@ function PapersSection({ f, patch }: { f: ContractForm; patch: (p: Partial<Contr
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="truncate text-sm text-foreground">{b(d.title)}</span>
-                <span dir="ltr" className="text-xs text-muted-foreground rtl:text-end">
-                  {[d.format, d.detail?.en, d.validTo ? date(d.validTo) : ""].filter(Boolean).join(" · ")}
+                <span className="text-xs text-muted-foreground">
+                  <bdi>{[ltrRun(d.format), d.detail ? ltrRun(b(d.detail)) : "", d.validTo ? endsOn(d.validTo) : ""].filter(Boolean).join(" · ")}</bdi>
                 </span>
               </div>
               <Button variant="ghost" size="icon-sm" aria-label={t("removeFile", { name: b(d.title) })} onClick={() => patch({ papers: f.papers.filter((_, j) => j !== i) })}>
@@ -714,6 +932,7 @@ function SignersSection({ f, patch, errors }: { f: ContractForm; patch: (p: Part
   const p = candidateOf(f)
   const me = useBillUser()
   const signer = STAFF[signatoryFor()]
+  const party = partySignerOf(f)
   const addSigner = () => {
     // Re-add a removed default signer (the other side, then the center); anyone else needs the signer picker (gap).
     if (p && !f.signers.includes("party")) patch({ signers: ["party", ...f.signers] })
@@ -734,10 +953,20 @@ function SignersSection({ f, patch, errors }: { f: ContractForm; patch: (p: Part
       <ol className="flex flex-col gap-3">
         {f.signers.map((s, i) => {
           const isParty = s === "party"
-          if (isParty && !p) return null
-          const contact = contactText(f, b)
-          const name = isParty ? (p!.kind === "employee" ? b(p!.name) : contact.split(" · ")[0] || b(p!.name)) : b(signer.name)
-          const initials = isParty ? (p!.kind === "employee" ? p!.initials : initialsOf(isParty && p!.contact && !f.contactName.trim() ? p!.contact.name.en : name)) : signer.initials
+          if (isParty && !party) return null
+          const name = isParty ? b(party!.name) : b(signer.name)
+          const initials = isParty ? party!.initials : signer.initials
+          const line = isParty
+            ? p!.kind === "employee"
+              ? t("employeeSigner", { role: b(party!.role), mobile: ltrRun(party!.mobile || "—") })
+              : t("signerLine", {
+                  org: b(p!.short ?? p!.name),
+                  role: p!.signatory ? b(p!.signatory.role) : (contactText(f, b).split(" · ")[1] ?? b(p!.contact?.role ?? p!.role)),
+                  mobile: ltrRun(party!.mobile || "—"),
+                })
+            : signer.id === me?.id
+              ? t("signerYou", { org: b(CENTER.short), role: b(signer.role) })
+              : t("signerLine", { org: b(CENTER.short), role: b(signer.role), mobile: ltrRun(signer.mobile) })
           return (
             <li key={s} className="flex items-center gap-2.5 rounded-[10px] border p-3">
               <span aria-hidden className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">
@@ -747,17 +976,7 @@ function SignersSection({ f, patch, errors }: { f: ContractForm; patch: (p: Part
               <div className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-sm text-foreground">{name}</span>
                 <span className="text-xs text-muted-foreground">
-                  <bdi>
-                    {isParty
-                      ? t("signerLine", {
-                          org: p!.kind === "employee" ? b(p!.role) : b(p!.short ?? p!.name),
-                          role: p!.kind === "employee" ? t("party.staff") : (contact.split(" · ")[1] ?? b(p!.contact?.role ?? p!.role)),
-                          mobile: ltrRun(f.mobile || "—"),
-                        })
-                      : signer.id === me?.id
-                        ? t("signerYou", { org: b(CENTER.short), role: b(signer.role) })
-                        : t("signerLine", { org: b(CENTER.short), role: b(signer.role), mobile: ltrRun(signer.mobile) })}
-                  </bdi>
+                  <bdi>{line}</bdi>
                 </span>
               </div>
               <Button variant="ghost" size="icon-sm" aria-label={t("removeSigner", { name })} onClick={() => patch({ signers: f.signers.filter((x) => x !== s) })}>
@@ -775,31 +994,96 @@ function SignersSection({ f, patch, errors }: { f: ContractForm; patch: (p: Part
 
 /* ------------------------------------------------------------------ summary */
 
-/** Widget / New Contract Summary: "Before you send" — kind, party, term, pricing / pay / discount, clauses, papers, signers, who signs first. */
+/**
+ * Widget / New Contract Summary: "Before you send", rows per type —
+ * Staff: employee, job, term + probation, pay, clauses, papers, signers;
+ * Partner: partner, term, pricing, clauses, papers, signers;
+ * Insurer: insurer, term, discount, co-pay + cap, pre-authorization, pay within, signers.
+ */
 export function ContractSummary({ f, className }: { f: ContractForm; className?: string }) {
   const t = useTranslations("billing.newContract.summary")
+  const tn = useTranslations("billing.newContract")
   const { b, locale } = useBillText()
   const p = candidateOf(f)
+  const none = t("none")
   const months = f.start && f.end > f.start ? (Number(f.end.slice(0, 4)) - Number(f.start.slice(0, 4))) * 12 + (Number(f.end.slice(5, 7)) - Number(f.start.slice(5, 7))) + 1 : 0
   const renews = f.autoRenew ? "yes" : "no"
-  const term = !months ? t("none") : months % 12 === 0 ? t("termValue", { n: months / 12, renews }) : t("termMonths", { n: months, renews })
-  const money =
-    f.kind === "partner"
-      ? [t("pricing"), PRICING_OPTIONS.find((o) => o.key === f.pricing) ? b(PRICING_OPTIONS.find((o) => o.key === f.pricing)!.label).replace(/^Their price list/, "Their list").replace(/^قائمة أسعارهم/, "أسعارهم") : t("none")]
-      : f.kind === "staff"
-        ? [t("pay"), toNum(f.basic) ? formatMoney(monthlyPay({ basic: toNum(f.basic), housing: toNum(f.housing), transport: toNum(f.transport), allowances: [{ amount: toNum(f.allowance) }] }), locale, { whole: true }) : t("none")]
-        : [t("discount"), f.discount ? ltrRun(`${f.discount}%`) : t("none")]
+  const length = !months ? none : months % 12 === 0 ? t("years", { n: months / 12 }) : t("months", { n: months })
+  const term =
+    !months ? none : f.kind === "staff" ? (f.probationDays ? t("termProbation", { length, n: f.probationDays }) : length) : months % 12 === 0 ? t("termValue", { n: months / 12, renews }) : t("termMonths", { n: months, renews })
+  const job = JOB_TITLES.find((j) => j.en === f.jobTitle)
+  const rule = PREAUTH_RULES.find((r) => r.key === f.preauth)
+  const signers = t("signersValue", { n: f.signers.length, nafath: f.nafath ? "yes" : "no" })
+  const clauses = String(f.clauses.filter((c) => c.on && (!c.custom || c.title.en.trim())).length)
+  const papers = t("papersValue", { n: f.papers.length })
+
+  const rows: [string, React.ReactNode][] =
+    f.kind === "staff"
+      ? [
+          [t("party.staff"), p ? b(p.name) : none],
+          [t("job"), job ? t("jobValue", { job: b(job), employment: tn(`employmentLower.${f.employment}`) }) : none],
+          [t("term"), term],
+          [t("pay"), toNum(f.basic) ? t("payValue", { amount: formatMoney(staffPay(f), locale, { whole: true }) }) : none],
+          [t("clauses"), clauses],
+          [t("papers"), papers],
+          [t("signers"), signers],
+        ]
+      : f.kind === "insurer"
+        ? [
+            [t("party.insurer"), p ? b(p.name) : none],
+            [t("term"), term],
+            [t("discount"), f.discount ? <bdi key="d">{t("discountValue", { pct: ltrRun(`${toNum(f.discount)}%`) })}</bdi> : none],
+            [
+              t("copay"),
+              f.copay ? (
+                <bdi key="c">
+                  {toNum(f.cap)
+                    ? t("copayCapped", { pct: ltrRun(`${toNum(f.copay)}%`), cap: formatMoney(toNum(f.cap), locale, { whole: true }) })
+                    : ltrRun(`${toNum(f.copay)}%`)}
+                </bdi>
+              ) : (
+                none
+              ),
+            ],
+            [t("preauth"), rule ? b(rule.label) : none],
+            [t("payWithin"), t("days", { n: f.insurerPays })],
+            [t("signers"), signers],
+          ]
+        : [
+            [t("party.partner"), p ? b(p.name) : none],
+            [t("term"), term],
+            [
+              t("pricing"),
+              <bdi key="m">
+                {PRICING_OPTIONS.find((o) => o.key === f.pricing)
+                  ? b(PRICING_OPTIONS.find((o) => o.key === f.pricing)!.label)
+                      .replace(/^Their price list/, "Their list")
+                      .replace(/^قائمة أسعارهم/, "أسعارهم")
+                  : none}
+              </bdi>,
+            ],
+            [t("clauses"), clauses],
+            [t("papers"), papers],
+            [t("signers"), signers],
+          ]
+
+  const party = partySignerOf(f)
   const first = f.signers[0]
-  const firstName = p && first === "party" ? (p.kind === "employee" ? b(p.short ?? p.name) : (contactText(f, b).split(" · ")[0] || b(p.name)).split(" ")[0]) : ""
-  const firstFemale = p ? (p.kind === "employee" ? p.female : p.contact?.female) : false
-  const rows: [string, React.ReactNode][] = [
-    [t(`party.${f.kind}`), p ? b(p.name) : t("none")],
-    [t("term"), term],
-    [money[0], <bdi key="m">{money[1]}</bdi>],
-    [t("clauses"), String(f.clauses.filter((c) => c.on && (!c.custom || c.title.en.trim())).length)],
-    [t("papers"), t("papersValue", { n: f.papers.length })],
-    [t("signers"), t("signersValue", { n: f.signers.length, nafath: f.nafath ? "yes" : "no" })],
-  ]
+  const firstName = (n: string) => (/^(Dr\.|د\.)/.test(n) ? n.split(" ").slice(0, 2).join(" ") : n.split(" ")[0])
+  const note = (() => {
+    if (!p || !f.signers.length) return null
+    if (first === "party" && party) {
+      const name = firstName(b(party.name))
+      const g = party.female ? "female" : "male"
+      if (f.kind === "staff") return t("firstStaff", { name, g })
+      if (f.kind === "insurer") return t("firstInsurer", { name, insurer: b(p.short ?? p.name) })
+      return t("first", { name, g })
+    }
+    return STAFF[signatoryFor()].id === currentUser()?.id
+      ? t("firstYou", { name: party ? b(party.name) : b(p.name) })
+      : t("first", { name: firstName(b(STAFF[signatoryFor()].name)), g: "male" })
+  })()
+
   return (
     <section className={cn("flex flex-col gap-4 rounded-xl border bg-card p-4 md:p-5", className)}>
       <header className="flex flex-col gap-1">
@@ -814,16 +1098,10 @@ export function ContractSummary({ f, className }: { f: ContractForm; className?:
           </div>
         ))}
       </div>
-      {p && f.signers.length > 0 && (
+      {note && (
         <p className="flex items-start gap-2 rounded-lg bg-info-soft p-3 text-xs text-info-soft-foreground">
           <Icon name="info-circle" size={18} className="shrink-0" />
-          <span>
-            {first === "party"
-              ? t("first", { name: firstName, g: firstFemale ? "female" : "male" })
-              : STAFF[signatoryFor()].id === currentUser()?.id
-                ? t("firstYou", { name: b(p.kind === "employee" ? (p.short ?? p.name) : (p.contact?.name ?? p.name)) })
-                : t("first", { name: b(STAFF[signatoryFor()].name).split(" ").slice(0, 2).join(" "), g: "male" })}
-          </span>
+          <span>{note}</span>
         </p>
       )}
     </section>
@@ -832,22 +1110,36 @@ export function ContractSummary({ f, className }: { f: ContractForm; className?:
 
 /* ------------------------------------------------------------------ page */
 
-/** The New contract form state; `initial` prefills it (dev stories: the drawn Partner state). */
-export function useContractForm(kind: ContractKind, initial?: Partial<ContractForm>) {
+/** The New contract form state; `initial` prefills it (dev stories: the drawn states). */
+export function useContractForm(kind: ContractKind, initial?: Partial<ContractForm>, template?: string) {
   const locale = useLocale()
-  const [f, setF] = React.useState<ContractForm>(() => ({ ...blankForm(kind, locale), ...initial }))
+  const [f, setF] = React.useState<ContractForm>(() => ({ ...blankForm(kind, locale, template), ...initial }))
   const patch = React.useCallback((p: Partial<ContractForm>) => setF((x) => ({ ...x, ...p })), [])
-  const setKind = (k: ContractKind) => setF(blankForm(k, locale))
+  const setKind = (k: ContractKind) => setF((x) => switchKind(x, k, locale))
   return { f, patch, setKind }
 }
 
-/** The form's cards (type → party → terms → clauses → papers → who signs). */
-export function ContractFormCards({ f, patch, setKind, errors, role }: { f: ContractForm; patch: (p: Partial<ContractForm>) => void; setKind: (k: ContractKind) => void; errors: Errors; role: BillRole }) {
+/** The form's cards: type → party → terms → (staff: monthly pay · insurer: patient share) → clauses → papers → who signs. */
+export function ContractFormCards({
+  f,
+  patch,
+  setKind,
+  errors,
+  role,
+}: {
+  f: ContractForm
+  patch: (p: Partial<ContractForm>) => void
+  setKind: (k: ContractKind) => void
+  errors: Errors
+  role: BillRole
+}) {
   return (
     <div className="@container/nc flex flex-col gap-4 md:gap-6">
       <TypeCards f={f} set={setKind} role={role} />
       <PartySection f={f} patch={patch} errors={errors} />
       <TermsSection f={f} patch={patch} errors={errors} />
+      {f.kind === "staff" && <PaySection f={f} patch={patch} errors={errors} />}
+      {f.kind === "insurer" && <ShareSection f={f} patch={patch} errors={errors} />}
       <ClausesSection f={f} patch={patch} />
       <PapersSection f={f} patch={patch} />
       <SignersSection f={f} patch={patch} errors={errors} />
@@ -855,12 +1147,14 @@ export function ContractFormCards({ f, patch, setKind, errors, role }: { f: Cont
   )
 }
 
+const KINDS: ContractKind[] = ["staff", "partner", "insurer"]
+
 /**
- * New contract (`/billing/contracts/new?kind=partner`): header Back · "Billing / Contracts" over "New contract"; actions
- * Save draft · Send for signature (mobile: a fixed action bar). The type radio cards drive the template list, the party
- * picker (employee vs company by CR) and the fields. Desktop: the form beside the "Before you send" card; tablet and
- * mobile: the card on top. Save draft → draft-saved toast; Send for signature → sent-for-signature toast and the
- * contract page.
+ * New contract (`/billing/contracts/new?type=staff|partner|insurer[&template=…]`): one page and one form; the type cards
+ * switch the type in place (and the URL). Header Back · "Billing / Contracts" — Insurer: "Billing / Insurers", Back to
+ * Insurers. Actions Save draft · Send for signature (mobile: a fixed action bar). Desktop: the form beside "Before you
+ * send"; tablet and mobile: the card on top. Send names the first signer (sent-staff / sent-for-signature /
+ * sent-insurer) and opens the new contract.
  */
 export function NewContractPage() {
   const t = useTranslations("billing.newContract")
@@ -870,17 +1164,32 @@ export function NewContractPage() {
   const { b } = useBillText()
   const router = useRouter()
   const role = useBillRole()
-  const soon = useSoon()
+  const clinics = useClinics()
   const params = useSearchParams()
-  const asked = params.get("kind") as ContractKind | null
+  const asked = (params.get("type") ?? params.get("kind")) as ContractKind | null
   const firstAllowed = (["partner", "staff", "insurer"] as ContractKind[]).find((k) => canDraft(role, k)) ?? "partner"
-  const kind = asked && ["staff", "partner", "insurer"].includes(asked) && canDraft(role, asked) ? asked : firstAllowed
-  const { f, patch, setKind } = useContractForm(kind)
+  const kind = asked && KINDS.includes(asked) && canDraft(role, asked) ? asked : firstAllowed
+  const { f, patch, setKind } = useContractForm(kind, undefined, params.get("template") ?? undefined)
   const [tried, setTried] = React.useState(false)
   const [draftNo, setDraftNo] = React.useState<string | null>(null)
   const errors = tried ? validate(f) : {}
   const alertRef = React.useRef<HTMLDivElement>(null)
   const allowed = canDraft(role, f.kind)
+
+  // The type lives in the URL too (?type=…), so a reload or a shared link opens the same type.
+  const changeKind = (k: ContractKind) => {
+    setKind(k)
+    const q = new URLSearchParams(params.toString())
+    q.set("type", k)
+    q.delete("kind")
+    q.delete("template")
+    router.replace(`/billing/contracts/new?${q}`, { scroll: false })
+  }
+
+  const clinicName = (key: string) => {
+    const c = clinics.find((x) => x.key === key)
+    return c ? { en: `${c.short.en} · ${c.branch.en}`, ar: `${c.short.ar} · ${c.branch.ar}` } : undefined
+  }
 
   const save = () => {
     if (!f.partyId) {
@@ -888,7 +1197,7 @@ export function NewContractPage() {
       return
     }
     const no = draftNo ?? nextContractNo(getContracts())
-    addContract(buildContract(f, no, false))
+    addContract(buildContract(f, no, false, clinicName(f.clinic)))
     setDraftNo(no)
     toast.success(t("draftToast"), { description: t("draftToastText") })
   }
@@ -901,12 +1210,15 @@ export function NewContractPage() {
       return
     }
     const no = draftNo ?? nextContractNo(getContracts())
-    const c = buildContract(f, no, true)
+    const c = buildContract(f, no, true, clinicName(f.clinic))
     addContract(c)
-    toast.success(t("sentToast"), { description: t("sentToastText", { name: b(c.signers[0].name) }) })
+    const first = b(c.signers[0].name)
+    if (f.kind === "insurer") toast.success(t("sentInsurerToast", { insurer: b(c.party.short ?? c.party.name) }), { description: t("sentToastText", { name: first }) })
+    else toast.success(t("sentToast"), { description: t("sentToastText", { name: first }) })
     router.push(contractHref(no))
   }
 
+  const backHref = f.kind === "insurer" ? INSURERS_HREF : CONTRACTS_HREF
   const actions = (
     <>
       <Button variant="outline" onClick={save} disabled={!allowed}>
@@ -925,13 +1237,13 @@ export function NewContractPage() {
         title={t("title")}
         crumbs={[
           { label: tn("billing"), href: "/billing" },
-          { label: tt("contracts"), href: CONTRACTS_HREF },
+          { label: tt(f.kind === "insurer" ? "insurers" : "contracts"), href: backHref },
         ]}
-        back={CONTRACTS_HREF}
+        back={backHref}
       />
       <div data-mobile-page-bar className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-card px-3 md:hidden">
         <Button variant="ghost" size="icon" asChild>
-          <Link href={CONTRACTS_HREF} aria-label={t("back")}>
+          <Link href={backHref} aria-label={t(f.kind === "insurer" ? "backInsurers" : "back")}>
             <Icon name="arrow-left" size={24} />
           </Link>
         </Button>
@@ -943,7 +1255,7 @@ export function NewContractPage() {
               <Icon name="more" size={20} />
             </Button>
           }
-          groups={[[{ key: "templates", icon: "note-2", label: tc("templates"), onSelect: soon }]]}
+          groups={[[{ key: "templates", icon: "note-2", label: tc("templates"), href: TEMPLATES_HREF }]]}
         />
       </div>
       <PageContainer className="pb-24 md:pb-8">
@@ -958,7 +1270,7 @@ export function NewContractPage() {
                 </Strip>
               </div>
             )}
-            <ContractFormCards f={f} patch={patch} setKind={setKind} errors={errors} role={role} />
+            <ContractFormCards f={f} patch={patch} setKind={changeKind} errors={errors} role={role} />
           </div>
         </div>
       </PageContainer>

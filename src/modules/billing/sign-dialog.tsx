@@ -17,9 +17,9 @@ import { formatMoney } from "./money"
 import { nafath, NAFATH_POLL_MS, NAFATH_TTL_SEC, type NafathStart } from "./nafath"
 import { ltrRun } from "./parts"
 import { billCan } from "./roles"
-import { canSignNow, maskId, monthlyPay, nextSigner, pdfHashOf, signContract } from "./rules"
+import { canSignNow, insurerFromContract, maskId, monthlyPay, nextSigner, pdfHashOf, signContract } from "./rules"
 import { clausesOf } from "./templates"
-import { getContract, saveContract, useBillRole, useContract } from "./store"
+import { getContract, getInsurer, saveContract, saveInsurer, useBillRole, useContract } from "./store"
 import { useBillText } from "./text"
 import { currentUser } from "./session"
 
@@ -64,6 +64,8 @@ export function SignDialog({ contractNo, onOpenChange, initialStep }: { contract
       if (!cur) return
       const next = signContract(cur, order, { at: BILL_NOW, nafathTxn: transId, pdfHash: pdfHashOf(cur, BILL_NOW) })
       saveContract(next)
+      // A fully signed insurer agreement becomes the insurer's terms (co-pay, cap, pre-auth, payment days).
+      if (next.locked && next.kind === "insurer" && next.terms.insurer) saveInsurer(insurerFromContract(next, getInsurer(next.party.ref ?? "")))
       onOpenChange(false)
       if (next.locked) {
         const party = b(cur.party.short ?? cur.party.name)

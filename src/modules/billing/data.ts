@@ -105,7 +105,7 @@ export type Insurer = {
   discountPct: number
   copay: { pct: number; capPerVisit?: number; classes: InsurerClass[] }
   /** Pre-authorization rule: amount threshold and/or service kinds. */
-  preauthRule: { above?: number; imaging?: boolean }
+  preauthRule: { above?: number; imaging?: boolean; dental?: boolean }
   claimDeadlineDays: number
   paymentDays: number
   noticeDays: number
@@ -292,18 +292,20 @@ export type BillPatient = {
   mobileOwner?: Bi
   /** Receipts / invoices go to the guardian (children). */
   guardian?: boolean
+  /** For sentences about the patient ("He paid in cash", "his new share"). */
+  sex?: "m" | "f"
 }
 
 const pt = (initials: string, en: string, ar: string, mrn: string, extra: Partial<BillPatient> = {}): BillPatient => ({ initials, name: bi(en, ar), mrn, ...extra })
 
 export const PATIENTS = {
-  shammari: pt("AS", "Abdullah Al-Shammari", "عبدالله الشمري", "MRN-15530", { mobile: "+966 55 218 4410", mobileOwner: bi("father", "الأب"), guardian: true }),
-  haddad: pt("LH", "Lina Haddad", "لينا حداد", "MRN-19022", { patientId: "004857", mobile: "+966 50 771 2045" }),
-  harbi: pt("OH", "Omar Al-Harbi", "عمر الحربي", "MRN-22310", { mobile: "+966 54 120 9931", mobileOwner: bi("mother", "الأم"), guardian: true }),
-  ahmed: pt("SA", "Sara Ahmed", "سارة أحمد", "MRN-23118", { patientId: "004812", mobile: "+966 53 640 1187" }),
-  qahtani: pt("MQ", "Mona Al-Qahtani", "منى القحطاني", "MRN-14402", { mobile: "+966 56 902 3318" }),
-  dosari: pt("FD", "Fahad Al-Dosari", "فهد الدوسري", "MRN-17654", { patientId: "004891", mobile: "+966 55 404 7712", mobileOwner: bi("father", "الأب"), guardian: true }),
-  mutairi: pt("RM", "Reem Al-Mutairi", "ريم المطيري", "MRN-23001", { mobile: "+966 50 318 6604", mobileOwner: bi("mother", "الأم"), guardian: true }),
+  shammari: pt("AS", "Abdullah Al-Shammari", "عبدالله الشمري", "MRN-15530", { mobile: "+966 55 218 4410", mobileOwner: bi("father", "الأب"), guardian: true, sex: "m" }),
+  haddad: pt("LH", "Lina Haddad", "لينا حداد", "MRN-19022", { patientId: "004857", mobile: "+966 50 771 2045", sex: "f" }),
+  harbi: pt("OH", "Omar Al-Harbi", "عمر الحربي", "MRN-22310", { mobile: "+966 54 120 9931", mobileOwner: bi("mother", "الأم"), guardian: true, sex: "m" }),
+  ahmed: pt("SA", "Sara Ahmed", "سارة أحمد", "MRN-23118", { patientId: "004812", mobile: "+966 53 640 1187", sex: "f" }),
+  qahtani: pt("MQ", "Mona Al-Qahtani", "منى القحطاني", "MRN-14402", { mobile: "+966 56 902 3318", sex: "f" }),
+  dosari: pt("FD", "Fahad Al-Dosari", "فهد الدوسري", "MRN-17654", { patientId: "004891", mobile: "+966 55 404 7712", mobileOwner: bi("father", "الأب"), guardian: true, sex: "m" }),
+  mutairi: pt("RM", "Reem Al-Mutairi", "ريم المطيري", "MRN-23001", { mobile: "+966 50 318 6604", mobileOwner: bi("mother", "الأم"), guardian: true, sex: "f" }),
   amri: pt("YA", "Yousef Al-Amri", "يوسف العمري", "MRN-20418", { mobile: "+966 59 233 0871", mobileOwner: bi("father", "الأب"), guardian: true }),
   subaie: pt("KS", "Khalid Al-Subaie", "خالد السبيعي", "MRN-18840", { mobile: "+966 50 552 1490" }),
 } satisfies Record<string, BillPatient>
@@ -384,10 +386,11 @@ export type ZatcaRecord = {
  */
 export type InvoiceEvent = {
   at: string
-  kind: "paid" | "issued" | "claimSent" | "sent" | "refunded"
+  kind: "paid" | "issued" | "claimSent" | "sent" | "refunded" | "credited"
   text?: Bi
   paid?: { amount: number; method: PayMethod; byName: Bi }
   sent?: { to: "guardian" | "patient" }
+  credited?: { cn: string; total: number; byName: Bi }
 }
 
 export type Invoice = {
@@ -411,12 +414,16 @@ export type Invoice = {
   payments: Payment[]
   zatca: ZatcaRecord
   claimNo?: string
-  /** Credit note that refunded it (refund flow is a known gap). */
-  creditNote?: string
-  /** A refunded invoice keeps its numbers; the refund is a credit note. */
-  refunded?: boolean
+  /**
+   * Credit notes issued against it. The invoice's own lines and totals never change: each credit note is a separate
+   * ZATCA document (type 381) that reverses some lines; this list only links them and keeps what they took off.
+   */
+  credits?: InvoiceCredit[]
   events: InvoiceEvent[]
 }
+
+/** A credit note as the invoice sees it: which lines it reversed, the amount with VAT, and the patient's refund. */
+export type InvoiceCredit = { cn: string; lines: number[]; total: number; refund: number }
 
 const line = (serviceCode: string, en: string, ar: string, price: number, vatRule = "standard", source?: InvoiceLine["source"]): InvoiceLine => ({
   serviceCode,
@@ -472,11 +479,11 @@ export const INVOICES: Invoice[] = [
       line("LAB-UA", "Urinalysis", "تحليل البول", 40, "standard", { kind: "lab", ref: "LAB-0142" }),
     ],
     copay: { pct: 20, cap: 75 },
-    payments: [pay("INV-2611-0241", 50, "cash", "2026-11-19T10:30")],
+    payments: [pay("INV-2611-0241", 100, "cash", "2026-11-19T10:30")],
     zatca: { ...zatca("8f3c41d2-7b0e-4c55-9a1e-2f6d0b7ea21e", "2026-11-19T10:58"), status: "reported" },
     claimNo: "CLM-26-01842",
     events: [
-      { at: "2026-11-19T10:30", kind: "paid", text: bi("SAR 50 paid in cash · Nora Al-Fahad", "انتدفع 50 ر.س كاش · نورة الفهد") },
+      { at: "2026-11-19T10:30", kind: "paid", text: bi("SAR 100 paid in cash · Nora Al-Fahad", "انتدفع 100 ر.س كاش · نورة الفهد") },
       { at: "2026-11-19T10:58", kind: "issued", text: bi("Invoice issued and reported to ZATCA", "صدرت الفاتورة وانرفعت للهيئة") },
       { at: "2026-11-19T11:20", kind: "claimSent", text: bi("Claim sent to Bupa", "انرسلت المطالبة لبوبا") },
       { at: "2026-11-19T11:21", kind: "sent", text: bi("Invoice sent to the guardian by SMS", "انرسلت الفاتورة لولي الأمر برسالة") },
@@ -544,8 +551,7 @@ export const INVOICES: Invoice[] = [
     copay: { pct: 100 },
     payments: [pay("INV-2611-0237", 240, "cash", "2026-11-18T12:06")],
     zatca: zatca("5d9b3e7a-0c18-4f62-b4a9-7e1d2c3f0237", "2026-11-18T12:05", "simplified"),
-    refunded: true,
-    creditNote: "CN-2611-0012",
+    credits: [{ cn: "CN-2611-0011", lines: [0], total: 240, refund: 240 }],
     events: [],
   },
   {
@@ -599,6 +605,97 @@ export const INVOICES: Invoice[] = [
   },
 ]
 
+/* ------------------------------------------------------------------ credit notes */
+
+/**
+ * Credit notes (brief §4): an issued invoice is never edited. A credit note (ZATCA type 381) references the invoice,
+ * lists the credited lines with VAT, gets its own CN-YYMM-NNNN number and is reported to ZATCA. The credit is split by
+ * the invoice's co-pay rule; the insurer's part goes to NPHIES as a claim adjustment, and the patient gets back what
+ * they paid above their new share. Every credit note keeps who issued it and why.
+ */
+export type CreditReason = "testsNotDone" | "notGiven" | "billedTwice" | "wrongPrice" | "other"
+export const CREDIT_REASONS: CreditReason[] = ["testsNotDone", "notGiven", "billedTwice", "wrongPrice", "other"]
+
+/** card: back to the card they paid with, through the terminal; visitCredit: kept as credit for the next visit. */
+export type RefundMethod = "card" | "cash" | "transfer" | "visitCredit"
+
+/** Refunds above this need the finance manager's approval (that state isn't drawn: a known gap). */
+export const REFUND_APPROVAL_LIMIT = 500
+
+/** The money of a credit note, fixed when it is issued. */
+export type CreditAmounts = {
+  subtotal: number
+  vat: number
+  /** Credited, with VAT. */
+  total: number
+  /** Off the insurer's claim / the patient's part of the credit. */
+  insurer: number
+  patient: number
+  /** The invoice before and after this credit note (total, insurer, patient). */
+  before: { total: number; insurer: number; patient: number }
+  after: { total: number; insurer: number; patient: number }
+  /** What the patient had paid (net of earlier refunds) and what goes back now. */
+  paid: number
+  refund: number
+}
+
+export type CreditEvent = {
+  at: string
+  kind: "issued" | "claimAdjusted" | "refunded"
+  /** The design's wording; session events carry facts instead. */
+  text?: Bi
+  byName?: Bi
+  insurer?: string
+  refund?: { amount: number; method: RefundMethod; receipt: boolean }
+}
+
+export type CreditNote = {
+  no: string
+  invoiceNo: string
+  issuedAt: string
+  /** Indexes of the invoice lines it reverses (the invoice keeps them). */
+  lines: number[]
+  reason: CreditReason
+  by: string
+  byName: Bi
+  amounts: CreditAmounts
+  refund?: { amount: number; method: RefundMethod; receipt: boolean; at: string; byName: Bi }
+  /** The insurer's claim, adjusted through NPHIES (old → new amount). */
+  claim?: { no: string; from: number; to: number; sentAt?: string }
+  zatca: ZatcaRecord
+  events: CreditEvent[]
+}
+
+/** November's earlier credit note: Mona Al-Qahtani's consultation was billed twice; refunded in cash. */
+export const CREDIT_NOTES: CreditNote[] = [
+  {
+    no: "CN-2611-0011",
+    invoiceNo: "INV-2611-0237",
+    issuedAt: "2026-11-18T12:40",
+    lines: [0],
+    reason: "billedTwice",
+    by: "u-nora",
+    byName: STAFF.nora.name,
+    amounts: {
+      subtotal: 240,
+      vat: 0,
+      total: 240,
+      insurer: 0,
+      patient: 240,
+      before: { total: 240, insurer: 0, patient: 240 },
+      after: { total: 0, insurer: 0, patient: 0 },
+      paid: 240,
+      refund: 240,
+    },
+    refund: { amount: 240, method: "cash", receipt: true, at: "2026-11-18T12:42", byName: STAFF.nora.name },
+    zatca: zatca("9c2d7e41-5b08-4a6f-8e13-0f4b6a2d0011", "2026-11-18T12:40", "simplified"),
+    events: [
+      { at: "2026-11-18T12:40", kind: "issued", byName: STAFF.nora.name },
+      { at: "2026-11-18T12:42", kind: "refunded", byName: STAFF.nora.name, refund: { amount: 240, method: "cash", receipt: true } },
+    ],
+  },
+]
+
 /** Invoices beyond the design's rows (November: 214 in all). */
 export const OTHER_INVOICES: Record<InvoiceStatus, number> = { unpaid: 7, part: 3, paid: 195, refunded: 1 }
 /** Patient balances on those other unpaid invoices (KPI "Unpaid by patients" SAR 6,420; 3 over 30 days). */
@@ -646,6 +743,8 @@ export type Claim = {
   resentAt?: string
   /** NPHIES bundle / request id (stub). */
   nphiesId?: string
+  /** A credit note took part of it off: the amount before, and when the adjustment went to NPHIES. */
+  adjusted?: { cn: string; from: number; at: string }
 }
 
 export const CLAIMS: Claim[] = [
@@ -831,6 +930,17 @@ export type Party = {
 }
 
 export type StaffTerms = {
+  /** Full time / part time / locum (Employment segmented). */
+  employment?: "full" | "part" | "locum"
+  jobTitle?: Bi
+  /** Clinic key (Clinics core entity). */
+  clinic?: string
+  /** "48 h a week · Sun to Thu" as typed. */
+  workingHours?: string
+  /** Register with GOSI from the start date. */
+  gosi?: boolean
+  /** HR is reminded this many days before the end when the contract doesn't renew itself. */
+  reminderDays?: number
   basic: number
   housing: number
   transport: number
@@ -841,7 +951,22 @@ export type StaffTerms = {
   payDay: number
 }
 export type PartnerTerms = { pricing: Bi; paymentDays: number; serviceLevel?: Bi; accreditation?: Bi; liabilityInsurance?: boolean }
-export type InsurerTerms = { discountPct: number; copayPct: number; capPerVisit?: number; preauthAbove?: number; preauthImaging?: boolean; paymentDays: number; claimDeadlineDays: number }
+export type InsurerTerms = {
+  discountPct: number
+  copayPct: number
+  capPerVisit?: number
+  /** Member classes the co-pay (and its cap) covers. */
+  classes?: InsurerClass[]
+  preauthAbove?: number
+  preauthImaging?: boolean
+  preauthDental?: boolean
+  paymentDays: number
+  claimDeadlineDays: number
+  /** Our price list the discount applies to. */
+  priceList?: string
+  /** Claims go through NPHIES (one batch every evening). */
+  nphies?: boolean
+}
 
 export type Contract = {
   no: string
@@ -849,7 +974,9 @@ export type Contract = {
   /** Detail line under the type ("employment", "provider agreement", …). */
   kindDetail: Bi
   party: Party
+  /** The template (library id) and its version this contract was made from; signed contracts never change. */
   template: string
+  templateVersion: number
   version: number
   draftedAt: string
   draftedBy: StaffKey
@@ -896,15 +1023,17 @@ const faisal = (order: number, status: SignerStatus, signedAt?: string) => cente
 const signedBy = (s: Omit<Signer, "order" | "method" | "status">, order: number, at: string) =>
   signer(order, { ...s, status: "signed", signedAt: at, nafathTxn: `NFD-${at.replace(/\D/g, "").slice(2, 12)}`, pdfHash: `sha256:${at.replace(/\D/g, "")}a1` })
 
-/** Clause library per contract kind (template clauses; New contract's checklist). */
+/**
+ * Optional clauses per contract type — New contract's checklist (the template's own clauses always print; these are
+ * added when ticked). Stored in Arabic and English.
+ */
 export const CLAUSES: Record<ContractKind, Clause[]> = {
   staff: [
-    { key: "job", title: bi("The job", "الوظيفة"), text: bi("", "") },
-    { key: "term", title: bi("Term", "المدة"), text: bi("", "") },
-    { key: "pay", title: bi("Pay", "الراتب"), text: bi("", "") },
-    { key: "hours", title: bi("Hours and leave", "الدوام والإجازات"), text: bi("", "") },
-    { key: "pdpl", title: bi("Patient data", "بيانات المرضى"), text: bi("Keeps patient information private under the PDPL and the center's policies.", "تحافظ على سرية بيانات المرضى حسب نظام حماية البيانات الشخصية وسياسات المجمع.") },
-    { key: "end", title: bi("Ending the contract", "إنهاء العقد"), text: bi("", "") },
+    { key: "pdpl", title: bi("Patient data protection (PDPL)", "حماية بيانات المرضى (نظام حماية البيانات)"), text: bi("", "") },
+    { key: "confidentiality", title: bi("Confidentiality", "السرية"), text: bi("", "") },
+    { key: "licenceValid", title: bi("SCFHS licence kept valid", "رخصة الهيئة تبقى سارية"), text: bi("", "") },
+    { key: "malpractice", title: bi("Malpractice insurance paid by the center", "تأمين الأخطاء الطبية على المجمع"), text: bi("", "") },
+    { key: "nonCompete", title: bi("No working at other clinics · 1 year, Riyadh", "عدم العمل بعيادات ثانية · سنة، الرياض"), text: bi("", "") },
   ],
   partner: [
     { key: "pdpl", title: bi("Patient data protection (PDPL)", "حماية بيانات المرضى (نظام حماية البيانات)"), text: bi("", "") },
@@ -914,11 +1043,11 @@ export const CLAUSES: Record<ContractKind, Clause[]> = {
     { key: "nonCompete", title: bi("No working with competitors", "عدم العمل مع المنافسين"), text: bi("", "") },
   ],
   insurer: [
-    { key: "nphies", title: bi("Claims through NPHIES", "المطالبات عبر نفيس"), text: bi("", "") },
-    { key: "priceAnnex", title: bi("Price list annex", "ملحق قائمة الأسعار"), text: bi("", "") },
     { key: "pdpl", title: bi("Patient data protection (PDPL)", "حماية بيانات المرضى (نظام حماية البيانات)"), text: bi("", "") },
-    { key: "confidentiality", title: bi("Confidentiality", "السرية"), text: bi("", "") },
-    { key: "audit", title: bi("Claim audits on site", "تدقيق المطالبات في الموقع"), text: bi("", "") },
+    { key: "cchiUnified", title: bi("CCHI unified policy terms", "شروط الوثيقة الموحدة لمجلس الضمان"), text: bi("", "") },
+    { key: "claims15", title: bi("Claims answered within 15 days", "الرد على المطالبات خلال 15 يوم"), text: bi("", "") },
+    { key: "appeals30", title: bi("Appeals on rejections within 30 days", "الاعتراض على الرفض خلال 30 يوم"), text: bi("", "") },
+    { key: "pricesPrivate", title: bi("Our prices not shared with other insurers", "أسعارنا ما تنعطى لشركات ثانية"), text: bi("", "") },
   ],
 }
 
@@ -938,7 +1067,8 @@ export const CONTRACTS: Contract[] = [
       licence: { no: "22RM0417", validTo: "2028-06-30" },
       ref: "saud",
     },
-    template: "staff-employment",
+    template: "staff-doctors",
+    templateVersion: 4,
     version: 2,
     draftedAt: "2026-11-18",
     draftedBy: "nora",
@@ -995,7 +1125,8 @@ export const CONTRACTS: Contract[] = [
     kind: "insurer",
     kindDetail: bi("provider agreement", "اتفاقية مقدم خدمة"),
     party: { kind: "company", initials: "ML", name: bi("Malath", "ملاذ"), role: bi("Provider agreement", "اتفاقية مقدم خدمة"), cr: "1010156711", city: bi("Riyadh", "الرياض"), ref: "malath" },
-    template: "insurer-provider",
+    template: "insurer-cchi",
+    templateVersion: 2,
     version: 1,
     draftedAt: "2026-11-15",
     draftedBy: "nora",
@@ -1035,6 +1166,7 @@ export const CONTRACTS: Contract[] = [
       contact: { name: bi("Majed Al-Ghamdi", "ماجد الغامدي"), role: bi("CEO", "الرئيس التنفيذي"), mobile: "+966 55 310 2290" },
     },
     template: "partner-reference-lab",
+    templateVersion: 3,
     version: 1,
     draftedAt: "2026-11-20",
     draftedBy: "nora",
@@ -1063,7 +1195,8 @@ export const CONTRACTS: Contract[] = [
     kind: "insurer",
     kindDetail: bi("provider agreement", "اتفاقية مقدم خدمة"),
     party: { kind: "company", initials: "MG", name: bi("MedGulf", "ميدغلف"), role: bi("Provider agreement", "اتفاقية مقدم خدمة"), cr: "1010174630", city: bi("Riyadh", "الرياض"), ref: "medgulf" },
-    template: "insurer-provider",
+    template: "insurer-cchi",
+    templateVersion: 2,
     version: 1,
     draftedAt: "2024-12-01",
     draftedBy: "nora",
@@ -1089,7 +1222,8 @@ export const CONTRACTS: Contract[] = [
     kind: "staff",
     kindDetail: bi("employment", "عقد عمل"),
     party: { kind: "employee", initials: "HO", name: bi("Hanan Al-Otaibi", "حنان العتيبي"), short: bi("Hanan", "حنان"), female: true, role: bi("Phlebotomist", "أخصائية سحب دم"), nationalId: "1090472216", licence: { no: "23RL1182", validTo: "2027-10-31" } },
-    template: "staff-employment",
+    template: "staff-nurses",
+    templateVersion: 3,
     version: 1,
     draftedAt: "2026-10-20",
     draftedBy: "nora",
@@ -1116,7 +1250,8 @@ export const CONTRACTS: Contract[] = [
     kind: "partner",
     kindDetail: bi("crowns and bridges", "التيجان والجسور"),
     party: { kind: "company", initials: "SD", name: bi("Smile Dental Lab", "مختبر سمايل للأسنان"), role: bi("Crowns and bridges", "التيجان والجسور"), cr: "1010398812", city: bi("Riyadh", "الرياض") },
-    template: "partner-dental-lab",
+    template: "partner-supplies",
+    templateVersion: 2,
     version: 1,
     draftedAt: "2026-09-15",
     draftedBy: "nora",
@@ -1143,6 +1278,7 @@ export const CONTRACTS: Contract[] = [
     kindDetail: bi("cleaning and waste", "النظافة والنفايات الطبية"),
     party: { kind: "company", initials: "RF", name: bi("Rawabi Facility Services", "روابي للخدمات"), role: bi("Cleaning and waste", "النظافة والنفايات الطبية"), cr: "1010287744", city: bi("Riyadh", "الرياض") },
     template: "partner-services",
+    templateVersion: 1,
     version: 1,
     draftedAt: "2025-06-10",
     draftedBy: "nora",
@@ -1168,7 +1304,8 @@ export const CONTRACTS: Contract[] = [
     kind: "staff",
     kindDetail: bi("employment", "عقد عمل"),
     party: { kind: "employee", initials: "AZ", name: bi("Dr. Ahmed Zaki", "د. أحمد زكي"), short: bi("Dr. Ahmed", "د. أحمد"), role: bi("Consultant pediatrician", "استشاري أطفال"), nationalId: "2381920571", licence: { no: "19RM2210", validTo: "2027-02-28" }, ref: "zaki" },
-    template: "staff-employment",
+    template: "staff-doctors",
+    templateVersion: 3,
     version: 1,
     draftedAt: "2025-02-10",
     draftedBy: "nora",
@@ -1231,19 +1368,203 @@ export const PATIENTS_PAID_SHARE = 38
 
 /* ------------------------------------------------------------------ new contract */
 
-/** Templates per contract kind (the Templates library itself is a known gap). */
-export const TEMPLATES: Record<ContractKind, { key: string; label: Bi }[]> = {
-  staff: [
-    { key: "staff-employment", label: bi("Employment · v4", "عقد عمل · النسخة 4") },
-    { key: "staff-locum", label: bi("Locum · v2", "تعاقد مؤقت · النسخة 2") },
-  ],
-  partner: [
-    { key: "partner-reference-lab", label: bi("Reference lab services · v3", "خدمات المختبر المرجعي · النسخة 3") },
-    { key: "partner-dental-lab", label: bi("Dental lab · v2", "مختبر أسنان · النسخة 2") },
-    { key: "partner-services", label: bi("Facility services · v1", "خدمات المنشأة · النسخة 1") },
-  ],
-  insurer: [{ key: "insurer-provider", label: bi("Provider agreement · v5", "اتفاقية مقدم خدمة · النسخة 5") }],
+/**
+ * The contract templates library (brief §4 · Templates). A template has versions; only one is published at a time and
+ * new contracts use it. Editing a published template makes a new draft version; publishing it archives the old one.
+ * Clauses are stored in Arabic and English. HR owns Staff templates; the finance manager owns Partner and Insurer.
+ */
+export type TemplateVersion = {
+  version: number
+  status: "published" | "draft" | "archived"
+  at: string
+  by: StaffKey
+  /** Signed contracts that stay on this (archived) version. */
+  signedOn?: number
+  /** Clauses added in this version (a draft can add to the published list). */
+  extraClauses?: Bi[]
 }
+
+export type ContractTemplate = {
+  id: string
+  kind: ContractKind
+  name: Bi
+  /** The Terms card's subtitle in New contract ("Saudi Labor Law template · you can edit"). */
+  basis?: Bi
+  clauses: Bi[]
+  placeholders: string[]
+  languages: "both" | "ar" | "en"
+  firstSigner: "party" | "center"
+  /** Contracts made from the published version. */
+  usedIn: number
+  versions: TemplateVersion[]
+  /** Staff: a locum template (New contract preselects Locum). */
+  locum?: boolean
+  /** Copied from another template (Duplicate / New template "start from"). */
+  copyOf?: string
+}
+
+const STAFF_CORE = [
+  bi("The job", "الوظيفة"),
+  bi("Pay and benefits", "الراتب والمزايا"),
+  bi("Hours and leave", "الدوام والإجازات"),
+  bi("Probation", "فترة التجربة"),
+  bi("Confidentiality and patient data", "السرية وبيانات المرضى"),
+  bi("Ending the contract", "إنهاء العقد"),
+]
+const STAFF_PH = ["{employee_name}", "{national_id}", "{job_title}", "{clinic}", "{basic_salary}", "{start_date}"]
+const PARTNER_PH = ["{company_name}", "{cr_number}", "{contact_name}", "{pricing}", "{start_date}", "{end_date}"]
+const INSURER_PH = ["{insurer_name}", "{cchi_licence}", "{discount}", "{copay}", "{preauth_rule}", "{start_date}"]
+
+export const TEMPLATE_LIBRARY: ContractTemplate[] = [
+  {
+    id: "staff-doctors",
+    kind: "staff",
+    name: bi("Employment · doctors", "عقد عمل · الأطباء"),
+    basis: bi("Saudi Labor Law template", "نموذج نظام العمل السعودي"),
+    clauses: STAFF_CORE,
+    placeholders: STAFF_PH,
+    languages: "both",
+    firstSigner: "party",
+    usedIn: 14,
+    versions: [
+      { version: 4, status: "published", at: "2026-11-03", by: "nora" },
+      { version: 3, status: "archived", at: "2025-09-10", by: "nora", signedOn: 9 },
+      { version: 2, status: "archived", at: "2025-03-01", by: "nora" },
+    ],
+  },
+  {
+    id: "staff-nurses",
+    kind: "staff",
+    name: bi("Employment · nurses and technicians", "عقد عمل · التمريض والفنيين"),
+    basis: bi("Saudi Labor Law template", "نموذج نظام العمل السعودي"),
+    clauses: STAFF_CORE,
+    placeholders: STAFF_PH,
+    languages: "both",
+    firstSigner: "party",
+    usedIn: 22,
+    versions: [
+      { version: 3, status: "published", at: "2026-09-12", by: "nora" },
+      { version: 2, status: "archived", at: "2025-06-01", by: "nora", signedOn: 17 },
+    ],
+  },
+  {
+    id: "staff-locum",
+    kind: "staff",
+    name: bi("Locum doctor", "تعاقد مؤقت · طبيب"),
+    basis: bi("Saudi Labor Law template", "نموذج نظام العمل السعودي"),
+    clauses: [
+      bi("The job", "الوظيفة"),
+      bi("Sessions and fees", "الجلسات والأتعاب"),
+      bi("Licence and insurance", "الرخصة والتأمين"),
+      bi("Confidentiality and patient data", "السرية وبيانات المرضى"),
+      bi("Ending the contract", "إنهاء العقد"),
+    ],
+    placeholders: STAFF_PH,
+    languages: "both",
+    firstSigner: "party",
+    usedIn: 4,
+    versions: [
+      { version: 2, status: "published", at: "2026-07-30", by: "nora" },
+      { version: 1, status: "archived", at: "2025-11-15", by: "nora", signedOn: 3 },
+    ],
+    locum: true,
+  },
+  {
+    id: "partner-reference-lab",
+    kind: "partner",
+    name: bi("Reference lab services", "خدمات المختبر المرجعي"),
+    clauses: [
+      bi("The service", "الخدمة"),
+      bi("Prices and payment", "الأسعار والدفع"),
+      bi("Results and turnaround", "النتائج ومدة الإنجاز"),
+      bi("Patient data protection", "حماية بيانات المرضى"),
+      bi("Ending the contract", "إنهاء العقد"),
+    ],
+    placeholders: PARTNER_PH,
+    languages: "both",
+    firstSigner: "party",
+    usedIn: 3,
+    versions: [
+      { version: 3, status: "published", at: "2026-10-18", by: "faisal" },
+      { version: 2, status: "archived", at: "2025-10-01", by: "faisal", signedOn: 2 },
+    ],
+  },
+  {
+    id: "partner-supplies",
+    kind: "partner",
+    name: bi("Supplies and equipment", "التوريد والأجهزة"),
+    clauses: [bi("What is supplied", "التوريد"), bi("Prices and payment", "الأسعار والدفع"), bi("Delivery and warranty", "التسليم والضمان"), bi("Ending the contract", "إنهاء العقد")],
+    placeholders: PARTNER_PH,
+    languages: "both",
+    firstSigner: "party",
+    usedIn: 6,
+    versions: [
+      { version: 2, status: "published", at: "2026-06-02", by: "faisal" },
+      { version: 1, status: "archived", at: "2025-01-20", by: "faisal", signedOn: 4 },
+    ],
+  },
+  {
+    id: "partner-services",
+    kind: "partner",
+    name: bi("Facility services", "خدمات المرافق"),
+    clauses: [bi("The service", "الخدمة"), bi("Monthly fee and payment", "الرسوم الشهرية والدفع"), bi("Service level", "مستوى الخدمة"), bi("Ending the contract", "إنهاء العقد")],
+    placeholders: PARTNER_PH,
+    languages: "both",
+    firstSigner: "party",
+    usedIn: 2,
+    versions: [{ version: 1, status: "published", at: "2026-01-15", by: "faisal" }],
+  },
+  {
+    id: "insurer-cchi",
+    kind: "insurer",
+    name: bi("Provider agreement · CCHI", "اتفاقية مقدم خدمة · المجلس"),
+    basis: bi("CCHI provider template", "نموذج مجلس الضمان لمقدمي الخدمة"),
+    clauses: [
+      bi("The network", "الشبكة"),
+      bi("Prices and discount", "الأسعار والخصم"),
+      bi("Patient co-pay", "نسبة تحمل المريض"),
+      bi("Pre-authorization", "الموافقة المسبقة"),
+      bi("Claims through NPHIES", "المطالبات عبر نفيس"),
+      bi("Payment", "الدفع"),
+      bi("Ending the agreement", "إنهاء الاتفاقية"),
+    ],
+    placeholders: INSURER_PH,
+    languages: "both",
+    firstSigner: "party",
+    usedIn: 5,
+    versions: [
+      // The draft adds an eighth clause (the library shows 8 clauses for v3).
+      { version: 3, status: "draft", at: "2026-11-22", by: "faisal", extraClauses: [bi("Appeals on rejections", "الاعتراض على الرفض")] },
+      { version: 2, status: "published", at: "2026-08-20", by: "faisal" },
+      { version: 1, status: "archived", at: "2024-11-01", by: "faisal", signedOn: 4 },
+    ],
+  },
+]
+
+/** Insurer agreements: our price lists, and the pre-authorization rules and member classes New contract offers. */
+export const PRICE_LISTS: { key: string; label: Bi }[] = [
+  { key: "pl-2027", label: bi("Our 2027 price list", "قائمة أسعارنا 2027") },
+  { key: "pl-2026", label: bi("Our 2026 price list", "قائمة أسعارنا 2026") },
+]
+export const PREAUTH_RULES: { key: string; label: Bi; above?: number; imaging?: boolean; dental?: boolean }[] = [
+  { key: "over500-dental", label: bi("Over SAR 500 · all dental", "فوق 500 ر.س · وكل الأسنان"), above: 500, dental: true },
+  { key: "over1000-imaging", label: bi("Over SAR 1,000 · all imaging", "فوق 1,000 ر.س · وكل الأشعة"), above: 1000, imaging: true },
+  { key: "over1000", label: bi("Over SAR 1,000", "فوق 1,000 ر.س"), above: 1000 },
+]
+export const CLASS_OPTIONS: { key: string; label: Bi; classes: InsurerClass[] }[] = [
+  { key: "all", label: bi("All classes", "كل الفئات"), classes: ["VIP", "A", "B", "C"] },
+  { key: "abc", label: bi("Classes A, B and C", "الفئات A و B و C"), classes: ["A", "B", "C"] },
+  { key: "bc", label: bi("Classes B and C", "الفئتين B و C"), classes: ["B", "C"] },
+]
+/** Staff: job titles HR offers (the HR job catalogue once it exists). */
+export const JOB_TITLES: Bi[] = [
+  bi("Specialist ophthalmologist", "أخصائي عيون"),
+  bi("Consultant cardiologist", "استشاري قلب"),
+  bi("Specialist dermatologist", "أخصائية جلدية"),
+  bi("Consultant pediatrician", "استشاري أطفال"),
+  bi("Staff nurse", "ممرضة"),
+  bi("Phlebotomist", "أخصائي سحب دم"),
+]
 
 export const PRICING_OPTIONS: { key: string; label: Bi }[] = [
   { key: "less10", label: bi("Their price list less 10%", "قائمة أسعارهم ناقص 10%") },
@@ -1253,10 +1574,39 @@ export const PRICING_OPTIONS: { key: string; label: Bi }[] = [
 ]
 
 /** People and companies the party picker searches (HR records and supplier / insurer registers, mocked). */
-export type PartyCandidate = Party & { id: string; mobile: string; contactNationalId: string }
+export type PartyCandidate = Party & {
+  id: string
+  mobile: string
+  contactNationalId: string
+  /** CCHI licence no. (insurers). */
+  cchiLicence?: string
+  /** Who signs for the company when it isn't the contact (insurers: the network director). */
+  signatory?: { initials: string; name: Bi; role: Bi; mobile: string; nationalId: string; female?: boolean }
+  /** Papers on file that New contract attaches (SCFHS licence, BLS certificate). */
+  papers?: BillDocument[]
+  /** Staff: the clinic key they work in (Clinics core entity). */
+  clinic?: string
+}
 
 export const PARTY_CANDIDATES: Record<ContractKind, PartyCandidate[]> = {
   staff: [
+    {
+      id: "emp-yousef",
+      kind: "employee",
+      initials: "YH",
+      name: bi("Dr. Yousef Al-Harbi", "د. يوسف الحربي"),
+      short: bi("Dr. Yousef", "د. يوسف"),
+      role: bi("Specialist ophthalmologist", "أخصائي عيون"),
+      nationalId: "1045528831",
+      licence: { no: "22R0041871", validTo: "2028-03-31" },
+      mobile: "+966 50 771 3204",
+      contactNationalId: "1045528831",
+      clinic: "eyes",
+      papers: [
+        { id: "yh-scfhs", kind: "licence", title: bi("SCFHS licence", "رخصة الهيئة"), file: "SCFHS-22R0041871.pdf", format: "PDF", detail: bi("410 KB", "410 KB"), validTo: "2028-03-31", status: "valid", version: 1 },
+        { id: "yh-bls", kind: "other", title: bi("BLS certificate", "شهادة الإنعاش BLS"), file: "BLS-Yousef.pdf", format: "PDF", detail: bi("220 KB", "220 KB"), validTo: "2027-06-30", status: "valid", version: 1 },
+      ],
+    },
     {
       id: "emp-haddad",
       kind: "employee",
@@ -1339,30 +1689,35 @@ export const PARTY_CANDIDATES: Record<ContractKind, PartyCandidate[]> = {
   ],
   insurer: [
     {
+      id: "ins-walaa",
+      kind: "company",
+      initials: "WL",
+      name: bi("Walaa Cooperative Insurance", "ولاء للتأمين التعاوني"),
+      short: bi("Walaa", "ولاء"),
+      role: bi("Insurer", "شركة تأمين"),
+      cr: "2050031105",
+      cchiLicence: "44",
+      city: bi("Al Khobar", "الخبر"),
+      contact: { name: bi("Reem Al-Zahrani", "ريم الزهراني"), role: bi("Provider relations", "علاقات مقدمي الخدمة"), mobile: "+966 53 640 1187", female: true },
+      // As drawn, Walaa's signatory shares the contact's mobile (reported).
+      signatory: { initials: "KM", name: bi("Khalid Al-Mansour", "خالد المنصور"), role: bi("Network director", "مدير الشبكة الطبية"), mobile: "+966 53 640 1187", nationalId: "1050331877" },
+      mobile: "+966 53 640 1187",
+      contactNationalId: "1058812406",
+    },
+    {
       id: "ins-gig",
       kind: "company",
       initials: "GS",
       name: bi("GIG Saudi", "جي آي جي السعودية"),
       short: bi("GIG", "جي آي جي"),
-      role: bi("Provider agreement", "اتفاقية مقدم خدمة"),
+      role: bi("Insurer", "شركة تأمين"),
       cr: "1010223310",
+      cchiLicence: "32",
       city: bi("Riyadh", "الرياض"),
       contact: { name: bi("Khalid Al-Zahrani", "خالد الزهراني"), role: bi("Provider relations", "علاقات مقدمي الخدمة"), mobile: "+966 11 418 2200" },
+      signatory: { initials: "SO", name: bi("Saad Al-Otaibi", "سعد العتيبي"), role: bi("Network director", "مدير الشبكة الطبية"), mobile: "+966 11 418 2299", nationalId: "1039920113" },
       mobile: "+966 11 418 2200",
       contactNationalId: "1044210935",
-    },
-    {
-      id: "ins-walaa",
-      kind: "company",
-      initials: "WA",
-      name: bi("Walaa Cooperative", "ولاء للتأمين التعاوني"),
-      short: bi("Walaa", "ولاء"),
-      role: bi("Provider agreement", "اتفاقية مقدم خدمة"),
-      cr: "2050031105",
-      city: bi("Al Khobar", "الخبر"),
-      contact: { name: bi("Faten Al-Dossary", "فاتن الدوسري"), role: bi("Network manager", "مديرة الشبكة"), mobile: "+966 13 847 1100", female: true },
-      mobile: "+966 13 847 1100",
-      contactNationalId: "1058812406",
     },
   ],
 }

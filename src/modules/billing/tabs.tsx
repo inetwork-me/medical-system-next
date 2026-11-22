@@ -44,8 +44,16 @@ function ExportButton() {
 function NewContractButton({ label = "newContract" }: { label?: "newContract" | "newAgreement" }) {
   const t = useTranslations("billing.actions")
   const role = useBillRole()
-  const kind = label === "newAgreement" ? "insurer" : undefined
-  if (!(kind ? billCan(role, "draftInsurer") : billCan(role, "draftStaff") || billCan(role, "draftPartner") || billCan(role, "draftInsurer"))) return null
+  // New agreement → Insurer; New contract → Partner, or the first type this role drafts (HR: Staff).
+  const kind =
+    label === "newAgreement"
+      ? billCan(role, "draftInsurer") && "insurer"
+      : billCan(role, "draftPartner")
+        ? "partner"
+        : billCan(role, "draftStaff")
+          ? "staff"
+          : billCan(role, "draftInsurer") && "insurer"
+  if (!kind) return null
   if (!isTabEnabled("billing", "contracts")) return null
   return (
     <Button asChild>

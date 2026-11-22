@@ -425,7 +425,7 @@ export function ContractPage() {
             </>
           }
         />
-        <div className="grid gap-4 @[70rem]/cp:grid-cols-[minmax(0,1fr)_360px] @[70rem]/cp:items-start @[70rem]/cp:gap-6">
+        <div className="grid gap-4 @[68rem]/cp:grid-cols-[minmax(0,1fr)_360px] @[68rem]/cp:items-start @[68rem]/cp:gap-6">
           <ContractPaper c={c} className="order-2 md:order-1" />
           <div className="order-1 md:order-2">
             <ContractSide c={c} onSign={sign} />

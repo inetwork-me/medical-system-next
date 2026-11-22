@@ -13,9 +13,12 @@ import { setBillRole, useBillRole } from "@/modules/billing/store"
 import { InvoicesList } from "@/modules/billing/invoices"
 import { InvoicePaper, InvoiceSide } from "@/modules/billing/invoice-page"
 import { RecordPaymentDialog } from "@/modules/billing/payment-dialog"
+import { CreditNoteDialog, CreditNotePaper, CreditNoteSide } from "@/modules/billing/credit-note"
+import { issueCreditNote } from "@/modules/billing/rules"
+import { STAFF as BILL_STAFF } from "@/modules/billing/data"
 import { applyZatca, readZatcaQr, zatcaQrPayload, zatcaRequest, zatcaStub } from "@/modules/billing/zatca"
 import { QrCode } from "@/components/ds/qr-code"
-import type { Invoice } from "@/modules/billing/data"
+import { PARTY_CANDIDATES, type Invoice } from "@/modules/billing/data"
 import { ClaimsList, ClaimsSummary } from "@/modules/billing/claims"
 import { FixClaimDialog, SubmitClaimsDialog } from "@/modules/billing/claim-dialogs"
 import { toBundle } from "@/modules/billing/nphies"
@@ -26,6 +29,7 @@ import { ContractPaper, ContractSide } from "@/modules/billing/contract-page"
 import { SignDialog } from "@/modules/billing/sign-dialog"
 import { ContractFormCards, ContractSummary, useContractForm, type ContractForm } from "@/modules/billing/new-contract"
 import { MoneyIn, NeedsAttention, OverviewKpis } from "@/modules/billing/overview"
+import { TemplatePreview, TemplatesLibrary } from "@/modules/billing/templates-page"
 import {
   ClaimStatusBadge,
   ContractStatusBadge,
@@ -277,10 +281,12 @@ export function BillingStories() {
       </Box>
 
       <InvoiceStories />
+      <CreditNoteStories />
       <ClaimStories />
       <InsurerStories />
       <ContractStories />
       <NewContractStories />
+      <TemplatesStories />
       <OverviewStories />
 
       <Box title="Derived statuses · insurers, papers, contracts" className="lg:col-span-2">
@@ -333,6 +339,76 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 }
 
 const inv = (no: string) => INVOICES.find((x) => x.no === no)!
+
+/**
+ * The drawn credit note: CN-2611-0012 against INV-2611-0241 — the 5 lab tests credited (samples rejected), SAR 31.00
+ * back in cash (Bupa class B keeps its SAR 75 cap, so the split is 482.75 / 6.00 rather than the frame's 80 / 20).
+ */
+function drawnCredit() {
+  const base = inv("INV-2611-0241")
+  const claim = CLAIMS.find((c) => c.no === base.claimNo)
+  const r = issueCreditNote(base, claim, {
+    no: "CN-2611-0012",
+    lines: [1, 2, 3, 4, 5],
+    reason: "testsNotDone",
+    method: "cash",
+    receipt: true,
+    at: "2026-11-20T09:14",
+    by: BILL_STAFF.nora.id,
+    byName: BILL_STAFF.nora.name,
+    uuid: "2b71e0c4-6d3a-4f19-9b52-7e8a1d04c90f",
+  })
+  const cn = {
+    ...r.cn,
+    zatca: { ...r.cn.zatca, status: "reported" as const, reportedAt: "2026-11-20T09:14" },
+    claim: r.cn.claim ? { ...r.cn.claim, sentAt: "2026-11-20T09:15" } : undefined,
+    events: [
+      r.cn.events[0],
+      { at: "2026-11-20T09:15", kind: "claimAdjusted" as const, insurer: "bupa" },
+      { ...r.cn.events[1], at: "2026-11-20T09:20" },
+    ],
+  }
+  return { cn, invoice: r.invoice }
+}
+
+/** v5.1 · Credit note: the paper (wide / compact), the side column and both dialog steps. */
+function CreditNoteStories() {
+  const [open, setOpen] = React.useState<0 | 1 | 2>(0)
+  const { cn, invoice } = React.useMemo(() => drawnCredit(), [])
+  return (
+    <>
+      <Box title="Widget / Bill Credit Note · Wide" className="lg:col-span-2">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+          <CreditNotePaper cn={cn} inv={invoice} />
+          <CreditNoteSide cn={cn} inv={invoice} />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Credit Note · Compact (358)">
+        <div className="w-[358px] max-w-full">
+          <CreditNotePaper cn={cn} inv={invoice} />
+        </div>
+      </Box>
+      <Box title="Overlay · Credit note · 1 / 2 (INV-2611-0241, the drawn state)">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setOpen(1)}>
+            Credit note · 1
+          </Button>
+          <Button variant="outline" onClick={() => setOpen(2)}>
+            Credit note · 2
+          </Button>
+        </div>
+      </Box>
+      {open > 0 && (
+        <CreditNoteDialog
+          key={open}
+          invoiceNo="INV-2611-0241"
+          initial={{ lines: [1, 2, 3, 4, 5], reason: "testsNotDone", step: open === 2 ? 2 : 1 }}
+          onOpenChange={(o) => !o && setOpen(0)}
+        />
+      )}
+    </>
+  )
+}
 
 /** Step 2 · Invoices: the list (wide / compact), the paper (insured, cash, refunded), the side column, Record payment, ZATCA stub. */
 function InvoiceStories() {
@@ -563,26 +639,73 @@ const DRAWN: Partial<ContractForm> = {
   ],
 }
 
-function FormStory({ kind, initial, title }: { kind: "staff" | "partner" | "insurer"; initial?: Partial<ContractForm>; title: string }) {
+function FormStory({ kind, initial, title, compact }: { kind: "staff" | "partner" | "insurer"; initial?: Partial<ContractForm>; title: string; compact?: boolean }) {
   const role = useBillRole()
   const { f, patch, setKind } = useContractForm(kind, initial)
   return (
-    <Box title={title} className="lg:col-span-2">
-      <div className="grid gap-6 xl:grid-cols-[816px_280px]">
+    <Box title={title} className={compact ? undefined : "lg:col-span-2"}>
+      <div className={compact ? "flex w-[358px] max-w-full flex-col gap-4" : "grid gap-6 xl:grid-cols-[816px_280px]"}>
+        {compact && <ContractSummary f={f} />}
         <ContractFormCards f={f} patch={patch} setKind={setKind} errors={{}} role={role} />
-        <ContractSummary f={f} className="xl:sticky xl:top-4 xl:self-start" />
+        {!compact && <ContractSummary f={f} className="xl:sticky xl:top-4 xl:self-start" />}
       </div>
     </Box>
   )
 }
 
-/** Step 6 · New contract: Partner as drawn; Staff and Insurer (same layout, not drawn — gaps to review). */
+/** The drawn Staff state: Dr. Yousef Al-Harbi, eyes clinic, SAR 24,000 + 6,000 + 2,400 = 32,400, from 1 Jan 2027. */
+const DRAWN_STAFF: Partial<ContractForm> = {
+  partyId: "emp-yousef",
+  jobTitle: "Specialist ophthalmologist",
+  clinic: "eyes",
+  start: "2027-01-01",
+  end: "2028-12-31",
+  basic: "24,000",
+  housing: "6,000",
+  transport: "2,400",
+  signers: ["party", "center"],
+  papers: PARTY_CANDIDATES.staff.find((p) => p.id === "emp-yousef")!.papers,
+}
+/** The drawn Insurer state: Walaa, 12% discount, 20% co-pay up to SAR 100, over SAR 500 + all dental, from 1 Jan 2027. */
+const DRAWN_INSURER: Partial<ContractForm> = { partyId: "ins-walaa", mobile: "+966 53 640 1187", start: "2027-01-01", end: "2028-12-31", signers: ["party", "center"] }
+
+/** v5.1 · New contract: Type (Staff / Partner / Insurer) × Layout (Two / One); switch the language for Dir. */
 function NewContractStories() {
   return (
     <>
-      <FormStory kind="partner" initial={DRAWN} title="Widget / New Contract Form · Two + Summary — Partner (as drawn)" />
-      <FormStory kind="staff" initial={{ partyId: "emp-haddad", mobile: "+966 50 611 2218", jobTitle: "Consultant cardiologist", department: "Cardiology · Riyadh", basic: "32000", housing: "8000", transport: "3000", signers: ["party", "center"] }} title="New Contract Form — Staff (not drawn: same layout)" />
-      <FormStory kind="insurer" initial={{ partyId: "ins-gig", mobile: "+966 11 418 2200", signers: ["party", "center"] }} title="New Contract Form — Insurer (not drawn: same layout)" />
+      <FormStory kind="staff" initial={DRAWN_STAFF} title="Widget / New Contract Form + Summary · Type=Staff, Layout=Two" />
+      <FormStory kind="partner" initial={DRAWN} title="Widget / New Contract Form + Summary · Type=Partner, Layout=Two" />
+      <FormStory kind="insurer" initial={DRAWN_INSURER} title="Widget / New Contract Form + Summary · Type=Insurer, Layout=Two" />
+      <FormStory kind="staff" initial={DRAWN_STAFF} title="Type=Staff, Layout=One (358)" compact />
+      <FormStory kind="partner" initial={DRAWN} title="Type=Partner, Layout=One (358)" compact />
+      <FormStory kind="insurer" initial={DRAWN_INSURER} title="Type=Insurer, Layout=One (358)" compact />
+    </>
+  )
+}
+
+/** v5.1 · Templates: the library (wide · compact) and the preview, for the published v4 and a draft (CCHI v3). */
+function TemplatesStories() {
+  const [sel, setSel] = React.useState("staff-doctors@4")
+  return (
+    <>
+      <Box title="Widget / Bill Templates · Layout=Wide" className="lg:col-span-2">
+        <TemplatesLibrary selected={sel} onSelect={setSel} />
+      </Box>
+      <Box title="Widget / Bill Templates · Layout=Compact (358)">
+        <div className="w-[358px] max-w-full">
+          <TemplatesLibrary selected={sel} onSelect={setSel} />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Template Preview (360) · selected row">
+        <div className="w-[360px] max-w-full">
+          <TemplatePreview rowKey={sel} />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Template Preview · Draft (insurer-cchi v3)">
+        <div className="w-[360px] max-w-full">
+          <TemplatePreview rowKey="insurer-cchi@3" />
+        </div>
+      </Box>
     </>
   )
 }

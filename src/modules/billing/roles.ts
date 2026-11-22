@@ -28,11 +28,15 @@ export type BillAction =
   | "sign"
   | "allContracts"
   | "export"
+  /** Issue a credit note (refunds up to the approval limit). */
+  | "creditNote"
+  /** Approve refunds over the limit (finance manager). */
+  | "approveRefund"
 
 const MATRIX: Record<Exclude<BillRole, "lead">, BillAction[]> = {
-  reception: ["viewMoney", "collect", "sendInvoice"],
+  reception: ["viewMoney", "collect", "sendInvoice", "creditNote"],
   billing: ["viewMoney", "sendInvoice", "claims", "export"],
-  finance: ["viewMoney", "insurers", "upload", "draftPartner", "draftInsurer", "allContracts", "export"],
+  finance: ["viewMoney", "insurers", "upload", "draftPartner", "draftInsurer", "allContracts", "export", "creditNote", "approveRefund"],
   hr: ["draftStaff", "upload", "allContracts"],
   signatory: ["viewMoney", "sign", "allContracts", "export"],
   doctor: [],

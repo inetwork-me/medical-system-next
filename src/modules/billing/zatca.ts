@@ -1,4 +1,4 @@
-import { CENTER, type Invoice, type ZatcaRecord } from "./data"
+import { CENTER, type CreditNote, type Invoice, type ZatcaRecord } from "./data"
 import { totals } from "./rules"
 
 /*
@@ -58,6 +58,37 @@ export function zatcaRequest(inv: Invoice): ZatcaRequest {
   const t = totals(inv)
   const xml = `<Invoice><ID>${inv.no}</ID><UUID>${inv.zatca.uuid}</UUID><IssueDate>${inv.issuedAt}</IssueDate><TaxTotal>${t.vat}</TaxTotal><Total>${t.total}</Total></Invoice>`
   return { invoiceHash: inv.zatca.hash, uuid: inv.zatca.uuid, invoice: typeof btoa === "function" ? btoa(xml) : xml }
+}
+
+/**
+ * A credit note's request: UBL InvoiceTypeCode 381 with a BillingReference to the original invoice (BR-KSA-56), and the
+ * credited totals. Reported (or cleared) like an invoice.
+ */
+export function zatcaCreditRequest(cn: CreditNote): ZatcaRequest {
+  const xml =
+    `<Invoice><ID>${cn.no}</ID><UUID>${cn.zatca.uuid}</UUID><IssueDate>${cn.issuedAt}</IssueDate>` +
+    `<InvoiceTypeCode name="${cn.zatca.type === "simplified" ? "0200000" : "0100000"}">381</InvoiceTypeCode>` +
+    `<BillingReference><InvoiceDocumentReference><ID>${cn.invoiceNo}</ID></InvoiceDocumentReference></BillingReference>` +
+    `<TaxTotal>${cn.amounts.vat}</TaxTotal><Total>${cn.amounts.total}</Total></Invoice>`
+  return { invoiceHash: cn.zatca.hash, uuid: cn.zatca.uuid, invoice: toBase64(Array.from(te.encode(xml))) }
+}
+
+/** Apply the API's answer to a credit note (reported like its invoice: cleared for standard, reported for simplified). */
+export function applyZatcaCredit(cn: CreditNote, res: ZatcaResponse, at: string): CreditNote {
+  const ok = res.reportingStatus === "REPORTED" || res.clearanceStatus === "CLEARED"
+  return { ...cn, zatca: { ...cn.zatca, status: ok ? (cn.zatca.type === "standard" ? "cleared" : "reported") : "failed", reportedAt: ok ? at : undefined } }
+}
+
+/** The credit note's QR: the same TLV fields, with its own time, totals and hash. */
+export function zatcaCreditQr(cn: CreditNote, sellerName = CENTER.name.ar, vatNo = CENTER.vatNo) {
+  return toBase64([
+    ...tlv(1, sellerName),
+    ...tlv(2, vatNo),
+    ...tlv(3, zatcaTimestamp(cn.issuedAt)),
+    ...tlv(4, cn.amounts.total.toFixed(2)),
+    ...tlv(5, cn.amounts.vat.toFixed(2)),
+    ...tlv(6, cn.zatca.hash),
+  ])
 }
 
 /** Apply the API's answer to the invoice's ZATCA record. */

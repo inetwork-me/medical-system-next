@@ -28,6 +28,8 @@ export type NphiesClaim = {
   item: { sequence: number; productOrService: { coding: FhirCoding[] }; net: { value: number; currency: "SAR" } }[]
   total: { value: number; currency: "SAR" }
   supportingInfo?: { sequence: number; category: { coding: FhirCoding[] }; valueString?: string }[]
+  /** A correction points at the claim it replaces (relationship "prior"). */
+  related?: { claim: { identifier: { system: string; value: string } }; relationship: { coding: FhirCoding[] } }[]
 }
 
 export type NphiesBundle = {
@@ -56,6 +58,8 @@ export interface NphiesClient {
   submit(bundles: NphiesBundle[]): Promise<ClaimResponse[]>
   /** priorauth-request for a held-back claim. */
   requestPreauth(bundle: NphiesBundle): Promise<ClaimResponse>
+  /** Claim adjustment after a credit note: the corrected claim, related to the one sent before. */
+  adjust(bundle: NphiesBundle): Promise<ClaimResponse>
   /** poll-request: answers that arrived since the last poll. */
   poll(): Promise<ClaimResponse[]>
 }
@@ -104,6 +108,19 @@ export function toBundle(c: Claim, event: "claim-request" | "priorauth-request",
   }
 }
 
+/**
+ * A credit note lowers a claim that's already with the insurer: the claim is sent again with the new amount, related
+ * to the earlier one ("prior"), and the credit note no. in supportingInfo.
+ */
+export function toAdjustmentBundle(c: Claim, creditNote: string, at: string): NphiesBundle {
+  const b = toBundle(c, "claim-request", at)
+  const claim = b.entry[1].resource as NphiesClaim
+  claim.id = `${c.no}-${creditNote}`
+  claim.related = [{ claim: { identifier: { system: `${SYS}/claim`, value: c.no } }, relationship: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/ex-relatedclaimrelationship", code: "prior" }] } }]
+  claim.supportingInfo = [...(claim.supportingInfo ?? []), { sequence: (claim.supportingInfo?.length ?? 0) + 1, category: { coding: [{ system: `${SYS}/info`, code: "credit-note" }] }, valueString: creditNote }]
+  return { ...b, id: `claim-adjust-${c.no}-${creditNote}` }
+}
+
 const claimId = (b: NphiesBundle) => (b.entry[1]?.resource as NphiesClaim).id
 
 /** Stub: every message is queued (In review) after ~1 s; `fail` returns a transport error for the batch. */
@@ -113,6 +130,7 @@ export function nphiesStub(opts: { delayMs?: number; fail?: boolean } = {}): Nph
   return {
     submit: (bundles) => later(() => bundles.map((b) => ({ resourceType: "ClaimResponse" as const, request: { identifier: { value: claimId(b) } }, outcome: "queued" as const }))),
     requestPreauth: (b) => later(() => ({ resourceType: "ClaimResponse" as const, request: { identifier: { value: claimId(b) } }, outcome: "queued" as const })),
+    adjust: (b) => later(() => ({ resourceType: "ClaimResponse" as const, request: { identifier: { value: claimId(b) } }, outcome: "queued" as const })),
     poll: () => later(() => []),
   }
 }

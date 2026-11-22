@@ -11,10 +11,19 @@ export const INSURERS_HREF = "/billing/insurers"
 export const CONTRACTS_HREF = "/billing/contracts"
 
 export const invoiceHref = (no: string) => `/billing/invoices/invoice?${new URLSearchParams({ no })}`
+/** Credit note page (inner page of Invoices): `/billing/invoices/credit-note?no=CN-2611-0012`. */
+export const creditNoteHref = (no: string) => `/billing/invoices/credit-note?${new URLSearchParams({ no })}`
 export const claimsHref = (query?: { q?: string; filter?: string }) => {
   const q = new URLSearchParams(Object.entries(query ?? {}).filter(([, v]) => v) as [string, string][]).toString()
   return q ? `${CLAIMS_HREF}?${q}` : CLAIMS_HREF
 }
 export const insurerHref = (id: string) => `/billing/insurers/insurer?${new URLSearchParams({ id })}`
 export const contractHref = (no: string) => `/billing/contracts/contract?${new URLSearchParams({ no })}`
-export const newContractHref = (kind?: "staff" | "partner" | "insurer") => (kind ? `/billing/contracts/new?${new URLSearchParams({ kind })}` : "/billing/contracts/new")
+/** New contract with a type (and optionally a template to start from): `/billing/contracts/new?type=staff&template=…`. */
+export const newContractHref = (type?: "staff" | "partner" | "insurer", template?: string) => {
+  const q = new URLSearchParams(Object.entries({ type, template }).filter(([, v]) => v) as [string, string][]).toString()
+  return q ? `/billing/contracts/new?${q}` : "/billing/contracts/new"
+}
+/** Templates library (inner page of Contracts); `?id=` selects a template. */
+export const TEMPLATES_HREF = "/billing/contracts/templates"
+export const templatesHref = (id?: string) => (id ? `${TEMPLATES_HREF}?${new URLSearchParams({ id })}` : TEMPLATES_HREF)

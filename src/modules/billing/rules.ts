@@ -19,7 +19,12 @@ import {
   type PayMethod,
   type Signer,
   type ContractEvent,
+  type CreditAmounts,
+  type CreditNote,
+  type CreditReason,
+  type RefundMethod,
 } from "./data"
+import type { Bi } from "@/lib/mock/bi"
 import { round2 } from "./money"
 import { currentUserId } from "./session"
 
@@ -45,26 +50,152 @@ export type InvoiceTotals = {
   vatRate: number | null
   /** The co-pay hit its per-visit cap (the insurer pays the rest). */
   capped: boolean
+  /** Taken off by credit notes (with VAT) and refunded to the patient. */
+  credited: number
+  refunded: number
+  /** The invoice after its credit notes: total, insurer and patient shares (same co-pay rule). */
+  net: { total: number; insurer: number; patient: number }
 }
 
+/** The patient's share of a total under the invoice's co-pay rule (cash: all of it; else the %, capped per visit). */
+export const patientShareOf = (inv: Pick<Invoice, "payer" | "copay">, total: number) =>
+  inv.payer === "cash" ? round2(total) : round2(Math.min((total * inv.copay.pct) / 100, inv.copay.cap ?? Infinity))
+
+/**
+ * The invoice's money. Subtotal → shares are as issued (the paper never changes); `net` and `balance` take the credit
+ * notes into account: the same co-pay rule on what is left, and the balance is the new share less what the patient
+ * paid and didn't get back.
+ */
 export function totals(inv: Invoice): InvoiceTotals {
   const subtotal = round2(inv.lines.reduce((s, l) => s + lineNet(l), 0))
   const vat = round2(inv.lines.reduce((s, l) => s + lineVat(l), 0))
   const total = round2(subtotal + vat)
-  // Co-pay as issued: a percentage of the total, capped per visit when the class has a cap; the insurer pays the rest.
-  const patientShare = inv.payer === "cash" ? total : round2(Math.min((total * inv.copay.pct) / 100, inv.copay.cap ?? Infinity))
+  const patientShare = patientShareOf(inv, total)
   const insurerShare = round2(total - patientShare)
   const paid = round2(inv.payments.reduce((s, p) => s + p.amount, 0))
+  const credits = inv.credits ?? []
+  const credited = round2(credits.reduce((s, c) => s + c.total, 0))
+  const refunded = round2(credits.reduce((s, c) => s + c.refund, 0))
+  const netTotal = round2(total - credited)
+  const netPatient = patientShareOf(inv, netTotal)
+  const net = { total: netTotal, insurer: round2(netTotal - netPatient), patient: netPatient }
   const rates = [...new Set(inv.lines.map((l) => l.vatRate))]
-  return { subtotal, vat, total, insurerShare, patientShare, paid, balance: round2(Math.max(0, patientShare - paid)), vatRate: rates.length === 1 ? rates[0] : null, capped: inv.payer !== "cash" && inv.copay.cap != null && patientShare === inv.copay.cap }
+  return {
+    subtotal,
+    vat,
+    total,
+    insurerShare,
+    patientShare,
+    paid,
+    balance: round2(Math.max(0, netPatient - (paid - refunded))),
+    vatRate: rates.length === 1 ? rates[0] : null,
+    capped: inv.payer !== "cash" && inv.copay.cap != null && patientShare === inv.copay.cap,
+    credited,
+    refunded,
+    net,
+  }
 }
 
-/** Status from the money: a refund (credit note) wins, then the patient balance. */
+/** Status from the money: Refunded once everything the patient paid went back, then the patient balance. */
 export function invoiceStatus(inv: Invoice): InvoiceStatus {
-  if (inv.refunded) return "refunded"
   const t = totals(inv)
+  if (t.refunded > 0 && t.refunded >= t.paid) return "refunded"
   if (t.balance <= 0) return "paid"
   return t.paid > 0 ? "part" : "unpaid"
+}
+
+/* ------------------------------------------------------------------ credit notes */
+
+/** Lines already reversed by a credit note (they can't be credited twice). */
+export const creditedLines = (inv: Invoice) => new Set((inv.credits ?? []).flatMap((c) => c.lines))
+
+/**
+ * What crediting these lines does (Credit note · 1 and 2): the credit with VAT, split by the co-pay rule (the patient's
+ * part = old share − new share; the insurer's part = the rest), and the refund = what the patient paid (less earlier
+ * refunds) above the new share. `owes` is what the patient still owes when they paid less than the new share.
+ */
+export function creditPreview(inv: Invoice, lines: number[]): CreditAmounts & { owes: number; pctSplit: boolean } {
+  const t = totals(inv)
+  const picked = lines.map((i) => inv.lines[i]).filter(Boolean)
+  const subtotal = round2(picked.reduce((s, l) => s + lineNet(l), 0))
+  const vat = round2(picked.reduce((s, l) => s + lineVat(l), 0))
+  const total = round2(picked.reduce((s, l) => s + lineTotal(l), 0))
+  const before = t.net
+  const afterTotal = round2(before.total - total)
+  const afterPatient = patientShareOf(inv, afterTotal)
+  const after = { total: afterTotal, insurer: round2(afterTotal - afterPatient), patient: afterPatient }
+  const patient = round2(before.patient - after.patient)
+  const insurer = round2(total - patient)
+  const paid = round2(t.paid - t.refunded)
+  const refund = round2(Math.max(0, paid - after.patient))
+  const owes = round2(Math.max(0, after.patient - paid))
+  // "Off Bupa's claim · 80%": the percentages only hold when no cap is involved before or after.
+  const uncapped = (x: { total: number; patient: number }) => inv.payer !== "cash" && Math.abs(x.patient - (x.total * inv.copay.pct) / 100) < 0.01
+  return { subtotal, vat, total, insurer, patient, before, after, paid, refund, owes, pctSplit: uncapped(before) && uncapped(after) }
+}
+
+const CARD: PayMethod[] = ["mada", "card", "applepay"]
+
+/**
+ * Refund by: only the methods that fit how they paid. A card payment goes back to the same card through the terminal;
+ * cash and transfer payments can't go to a card: cash, bank transfer or credit for the next visit.
+ */
+export function refundMethods(inv: Invoice): RefundMethod[] {
+  const card = inv.payments.some((p) => CARD.includes(p.method))
+  const other = inv.payments.some((p) => !CARD.includes(p.method))
+  return [...(card ? (["card"] as const) : []), ...(other || !card ? (["cash", "transfer"] as const) : []), "visitCredit"]
+}
+
+/** How the patient paid, for the refund note ("He paid in cash, so it can't go back to a card"). */
+export const paidByCard = (inv: Invoice) => inv.payments.length > 0 && inv.payments.every((p) => CARD.includes(p.method))
+
+/** The next CN-YYMM-NNNN for the month of `at` (numbers run on across the month's credit notes). */
+export function nextCreditNo(existing: string[], at: string) {
+  const ym = `${at.slice(2, 4)}${at.slice(5, 7)}`
+  const top = existing.filter((n) => n.startsWith(`CN-${ym}-`)).reduce((m, n) => Math.max(m, Number(n.slice(-4))), 0)
+  return `CN-${ym}-${String(top + 1).padStart(4, "0")}`
+}
+
+/**
+ * Issue a credit note: a new document (the invoice only gets a link to it), the refund when the patient paid above
+ * their new share, and the insurer's claim lowered by the insurer's part (sent to NPHIES by the caller). ZATCA starts
+ * "pending" and the caller applies the API's answer.
+ */
+export function issueCreditNote(
+  inv: Invoice,
+  claim: Claim | undefined,
+  input: { no: string; lines: number[]; reason: CreditReason; method?: RefundMethod; receipt: boolean; at: string; by: string; byName: Bi; uuid: string }
+): { cn: CreditNote; invoice: Invoice; claim?: Claim } {
+  const a = creditPreview(inv, input.lines)
+  const { owes: _owes, pctSplit: _pct, ...amounts } = a
+  void _owes
+  void _pct
+  const refund = a.refund > 0 && input.method ? { amount: a.refund, method: input.method, receipt: input.receipt, at: input.at, byName: input.byName } : undefined
+  const claimNext = claim && a.insurer > 0 ? { ...claim, amount: round2(claim.amount - a.insurer), adjusted: { cn: input.no, from: claim.amount, at: input.at } } : undefined
+  const cn: CreditNote = {
+    no: input.no,
+    invoiceNo: inv.no,
+    issuedAt: input.at,
+    lines: [...input.lines].sort((x, y) => x - y),
+    reason: input.reason,
+    by: input.by,
+    byName: input.byName,
+    amounts,
+    refund,
+    claim: claimNext ? { no: claimNext.no, from: claim!.amount, to: claimNext.amount } : undefined,
+    // Reported or cleared the way its invoice was (an invoice ZATCA reported → a reported credit note).
+    zatca: { uuid: input.uuid, hash: `sha256:${input.uuid.replace(/-/g, "").slice(0, 16)}`, qr: "", status: "pending", type: inv.zatca.status === "reported" ? "simplified" : inv.zatca.type },
+    events: [
+      { at: input.at, kind: "issued", byName: input.byName },
+      ...(refund ? [{ at: input.at, kind: "refunded" as const, byName: input.byName, refund: { amount: refund.amount, method: refund.method, receipt: refund.receipt } }] : []),
+    ],
+  }
+  const invoice: Invoice = {
+    ...inv,
+    credits: [...(inv.credits ?? []), { cn: input.no, lines: cn.lines, total: a.total, refund: refund?.amount ?? 0 }],
+    events: [...inv.events, { at: input.at, kind: "credited", credited: { cn: input.no, total: a.total, byName: input.byName } }],
+  }
+  return { cn, invoice, claim: claimNext }
 }
 
 /** Collect shows on unpaid and partly paid invoices. */
@@ -239,4 +370,43 @@ export function pdfHashOf(c: Pick<Contract, "no" | "version">, at: string) {
   let h = 2166136261
   for (const ch of `${c.no}|${c.version}|${at}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619)
   return `sha256:${(h >>> 0).toString(16).padStart(8, "0")}${c.no.replace(/\D/g, "")}`
+}
+
+/* ------------------------------------------------------------------ insurer agreements */
+
+/**
+ * When the last signature lands on an insurer agreement, its terms become the insurer's agreement terms (brief §4):
+ * discount, co-pay % + cap per visit for the classes it covers, the pre-authorization rule and the payment days —
+ * the same rules invoices (co-pay) and claims (pre-auth, deadlines) use. A new insurer joins Insurers as Active.
+ */
+export function insurerFromContract(c: Contract, existing?: Insurer): Insurer {
+  const t = c.terms.insurer!
+  const p = c.party
+  const classes = t.classes ?? ["A", "B", "C"]
+  return {
+    ...(existing ?? {
+      id: p.ref ?? `ins-${c.no.toLowerCase()}`,
+      initials: p.initials,
+      name: p.name,
+      short: p.short ?? p.name,
+      documents: [],
+      contacts: p.contact ? [{ role: p.contact.role, name: p.contact.name, phone: p.contact.mobile }] : [],
+      stats: { owed: 0, owedOverdueClaims: 0, claimsThisMonth: 0, claimsThisMonthAmount: 0, months: [0, 0, 0, 0, 0, 0], split: { approved: 0, part: 0, rejected: 0 } },
+      paidShare: 0,
+      nphiesId: `NPHIES-INS-${c.no.slice(-3)}`,
+      allBranches: true,
+    }),
+    agreementNo: existing?.agreementNo ?? c.no,
+    contractNo: c.no,
+    signed: true,
+    validFrom: c.start,
+    validTo: c.end,
+    discountPct: t.discountPct,
+    copay: { pct: t.copayPct, capPerVisit: t.capPerVisit, classes },
+    preauthRule: { above: t.preauthAbove, imaging: t.preauthImaging, dental: t.preauthDental },
+    claimDeadlineDays: t.claimDeadlineDays,
+    paymentDays: t.paymentDays,
+    noticeDays: c.noticeDays,
+    classes: existing?.classes ?? classes,
+  }
 }

@@ -171,7 +171,9 @@
       "paid": "انتدفع · {method} {date}",
       "balance": "المتبقي",
       "insurerPaysCapped": "{insurer} تدفع",
-      "patientPaysCapped": "المريض يدفع · {pct} بحد {cap}"
+      "patientPaysCapped": "المريض يدفع · {pct} بحد {cap}",
+      "credited": "إشعار دائن {cn}",
+      "refunded": "المسترجع"
     },
     "footer": {
       "reported": "مرفوعة لهيئة الزكاة · {date} {time} · UUID {uuid}",
@@ -179,7 +181,8 @@
       "pending": "بانتظار تأكيد الهيئة · UUID {uuid}",
       "failed": "الهيئة ما قبلتها · UUID {uuid}",
       "refund": "الاسترجاع خلال {days} يوم بهالفاتورة. للاستفسار: {email}",
-      "refunded": "انسترجعت بإشعار دائن {cn}"
+      "refunded": "انسترجعت بإشعار دائن {cn}",
+      "credited": "صدر عليها إشعار دائن {cn}، والفاتورة نفسها ما تتغير."
     },
     "pay": {
       "title": "دفع المريض",
@@ -188,7 +191,8 @@
       "patientPays": "على المريض",
       "paid": "انتدفع",
       "balance": "المتبقي",
-      "copayCapped": "نسبة التحمل {pct}، بحد أقصى {cap} للزيارة · {insurer} فئة {cls}"
+      "copayCapped": "نسبة التحمل {pct}، بحد أقصى {cap} للزيارة · {insurer} فئة {cls}",
+      "refunded": "المسترجع"
     },
     "claim": {
       "title": "مطالبة التأمين",
@@ -200,7 +204,8 @@
     "history": {
       "title": "السجل",
       "paid": "انتدفع {amount} {method} · {name}",
-      "sent": "انرسلت الفاتورة {who} برسالة"
+      "sent": "انرسلت الفاتورة {who} برسالة",
+      "credited": "صدر إشعار دائن {cn} · {amount} · {name}"
     },
     "sentToast": "انرسلت الفاتورة",
     "sentGuardian": "برسالة وإيميل لولي الأمر",
@@ -208,7 +213,9 @@
     "who": {
       "guardian": "لولي الأمر",
       "patient": "للمريض"
-    }
+    },
+    "creditNote": "إشعار دائن",
+    "openCredit": "افتح الإشعار {cn}"
   },
   "payment": {
     "title": "تسجيل دفعة",
@@ -618,9 +625,9 @@
       "insurer": "شركة التأمين"
     },
     "partySearch": {
-      "staff": "دوّر بالاسم أو رقم الهوية",
+      "staff": "دوّر بالاسم أو الهوية أو رقم الهيئة",
       "partner": "دوّر بالاسم أو رقم السجل التجاري",
-      "insurer": "دوّر بالاسم أو رقم السجل التجاري"
+      "insurer": "دوّر بالاسم أو رخصة مجلس الضمان"
     },
     "partyEmpty": "ما فيه أحد يطابق",
     "partyPick": "اختر…",
@@ -644,7 +651,7 @@
     "resultsWithin": "النتائج خلال",
     "jobTitle": "المسمى الوظيفي",
     "department": "القسم",
-    "basic": "الراتب الأساسي",
+    "basic": "الأساسي",
     "housing": "السكن",
     "transport": "النقل",
     "allowance": "بدلات ثانية",
@@ -684,12 +691,12 @@
       "kind": {
         "staff": "عقد عمل",
         "partner": "عقد شريك",
-        "insurer": "اتفاقية مقدم خدمة"
+        "insurer": "اتفاقية تأمين"
       },
       "party": {
         "staff": "الموظف",
         "partner": "الشريك",
-        "insurer": "شركة التأمين"
+        "insurer": "الشركة"
       },
       "term": "المدة",
       "termValue": "{n, plural, one {سنة} two {سنتين} few {# سنوات} other {# سنة}}{renews, select, yes { · يتجدد} other {}}",
@@ -704,7 +711,21 @@
       "signersValue": "{n}{nafath, select, yes { · نفاذ} other {}}",
       "first": "{name} {g, select, female {توقّع أول، وبتشوف متى تفتحه وتوقّع} other {يوقّع أول، وبتشوف متى يفتحه ويوقّع}}.",
       "firstYou": "أنت توقّع أول، وبعدها يوصل الرابط لـ{name}.",
-      "none": "—"
+      "none": "—",
+      "job": "الوظيفة",
+      "jobValue": "{job} · {employment}",
+      "years": "{n, plural, one {سنة} two {سنتين} few {# سنوات} other {# سنة}}",
+      "months": "{n, plural, one {شهر} two {شهرين} few {# شهور} other {# شهر}}",
+      "termProbation": "{length} · تجربة {n} يوم",
+      "payValue": "{amount} بالشهر",
+      "discountValue": "{pct} من أسعارنا",
+      "copay": "نسبة المريض",
+      "copayCapped": "{pct} · بحد {cap}",
+      "preauth": "الموافقة المسبقة",
+      "payWithin": "يدفعون خلال",
+      "days": "{n} يوم",
+      "firstStaff": "{name} {g, select, female {توقّع أول، والموارد البشرية تضيفها للرواتب بعد ما يوقّع الطرفين} other {يوقّع أول، والموارد البشرية تضيفه للرواتب بعد ما يوقّع الطرفين}}.",
+      "firstInsurer": "{name} يوقّع أول، وبعد ما يوقّع الطرفين تطلع {insurer} في شركات التأمين وتقدر ترسل لهم مطالبات."
     },
     "error": {
       "party": "اختر الطرف الثاني",
@@ -717,13 +738,58 @@
       "basic": "اكتب الراتب الأساسي",
       "hours": "نظام العمل يسمح بـ48 ساعة بالأسبوع كحد أقصى",
       "signers": "أضف الطرف الثاني والمفوّض بالتوقيع عن المجمع",
-      "summary": "عبّ الحقول المحددة قبل الإرسال"
+      "summary": "عبّ الحقول المحددة قبل الإرسال",
+      "jobTitle": "اختر المسمى الوظيفي",
+      "clinic": "اختر العيادة",
+      "priceList": "اختر قائمة الأسعار",
+      "percent": "اكتب نسبة من 0 إلى 100",
+      "preauth": "اختر قاعدة الموافقة المسبقة"
     },
     "draftToast": "انحفظت المسودة",
     "draftToastText": "ما ينرسل شي لين تضغط أرسل",
     "sentToast": "انرسل للتوقيع",
     "sentToastText": "{name} يوصله الرابط أول",
-    "noKind": "ما تقدر تكتب هالنوع من العقود"
+    "noKind": "ما تقدر تكتب هالنوع من العقود",
+    "insurerLine": "{role} · رخصة المجلس {licence} · {city}",
+    "clinic": "العيادة",
+    "employment": "نوع التوظيف",
+    "employmentType": {
+      "full": "دوام كامل",
+      "part": "دوام جزئي",
+      "locum": "تعاقد مؤقت"
+    },
+    "employmentLower": {
+      "full": "دوام كامل",
+      "part": "دوام جزئي",
+      "locum": "تعاقد مؤقت"
+    },
+    "termsBasis": "{basis} · تقدر تعدّله",
+    "versionShort": "النسخة {v}",
+    "workingHours": "ساعات العمل",
+    "renewsOff": "مقفل · الموارد البشرية يوصلها تذكير قبل النهاية بـ {n} يوم",
+    "priceList": "قائمة الأسعار",
+    "discountPct": "الخصم (%)",
+    "discountHint": "من قائمة أسعارنا",
+    "claimValue": "{n} يوم من المطالبة",
+    "payTitle": "الراتب الشهري",
+    "payText": "ينضاف للرواتب بعد توقيع الطرفين",
+    "totalMonth": "الإجمالي بالشهر",
+    "gosi": "تسجيل في التأمينات الاجتماعية",
+    "gosiText": "من تاريخ المباشرة",
+    "shareTitle": "نسبة المريض والموافقات",
+    "shareText": "تنطبق على كل فاتورة لمشتركينهم",
+    "copayPct": "نسبة المريض (%)",
+    "capVisit": "الحد الأعلى بالزيارة",
+    "classes": "الفئات المشمولة",
+    "preauth": "الموافقة المسبقة",
+    "nphies": "إرسال المطالبات عبر نفيس",
+    "nphiesText": "دفعة وحدة كل مساء",
+    "papersStaff": "الرخصة والشهادات · تراجعها الموارد البشرية",
+    "papersInsurer": "{insurer} تطلبها قبل ما توقّع",
+    "paperEnds": "تخلص {date}",
+    "employeeSigner": "{role} · {mobile}",
+    "backInsurers": "ارجع لشركات التأمين",
+    "sentInsurerToast": "انرسلت ل{insurer} للتوقيع"
   },
   "overview": {
     "kpi": {
@@ -767,6 +833,270 @@
       "them": "{name} ما {g, select, female {وقّعت} other {وقّع}} لين الحين",
       "themText": "انرسل {sent}{reminded, select, none {} other { · وتذكير {reminded}}}",
       "open": "افتح"
+    }
+  },
+  "templates": {
+    "title": "النماذج",
+    "text": "كل عقد جديد يبدأ من نموذج · والعقود الموقعة تبقى على نسختها",
+    "back": "ارجع للعقود",
+    "search": "دوّر نموذج…",
+    "filter": {
+      "label": "نوع النموذج",
+      "all": "الكل · {n}",
+      "staff": "الموظفين · {n}",
+      "partner": "الشركاء · {n}",
+      "insurer": "التأمين · {n}"
+    },
+    "col": {
+      "template": "النموذج",
+      "type": "النوع",
+      "clauses": "البنود",
+      "used": "مستخدم في",
+      "status": "الحالة"
+    },
+    "nameVersion": "{name} · النسخة {v}",
+    "edited": "تعديل {date} · {name}",
+    "today": "اليوم",
+    "status": {
+      "published": "منشور",
+      "draft": "مسودة"
+    },
+    "compactLine": "{type} · {clauses, plural, one {بند} two {بندين} few {# بنود} other {# بند}} · {used} عقد",
+    "open": "اعرض {name}",
+    "empty": "ما فيه نماذج تطابق",
+    "emptyText": "جرّب اسم ثاني، أو امسح الفلتر.",
+    "clear": "امسح البحث والفلتر",
+    "newTemplate": "نموذج جديد",
+    "preview": {
+      "meta": "{type} · النسخة {v} · انتشر {date}",
+      "metaDraft": "{type} · النسخة {v} · مسودة",
+      "languages": "اللغات",
+      "lang": {
+        "both": "عربي وإنجليزي",
+        "ar": "عربي",
+        "en": "إنجليزي"
+      },
+      "whoSigns": "مين يوقّع",
+      "first": {
+        "staff": "الموظف أول",
+        "partner": "الشريك أول",
+        "insurer": "شركة التأمين أول",
+        "center": "نوقّع إحنا أول"
+      },
+      "usedIn": "مستخدم في",
+      "usedValue": "{n} عقد",
+      "use": "استخدم النموذج",
+      "newVersion": "نسخة جديدة",
+      "duplicate": "انسخ {name}",
+      "clauses": "البنود",
+      "clausesText": "بهالترتيب في العقد",
+      "noClauses": "ما فيه بنود للحين — اكتبها في المحرر",
+      "filled": "تتعبّى من صفحة العقد",
+      "filledText": "هالفراغات تاخذ القيم من صفحة عقد جديد",
+      "versions": "النسخ",
+      "current": "الحالية",
+      "archived": "مؤرشفة",
+      "draft": "مسودة",
+      "published": "انتشرت {date} · {name}",
+      "signedOn": "{n, plural, one {عقد موقع باقي عليها} two {عقدين موقعين باقيين عليها} few {# عقود موقعة باقية عليها} other {# عقد موقع باقي عليها}}",
+      "replaced": "انستبدلت {date}",
+      "started": "بدأت {date} · {name}"
+    },
+    "versionToast": "انسوت النسخة {v}",
+    "versionToastText": "مسودة · انشرها من المحرر لما تجهز",
+    "versionExists": "النسخة {v} مسودة من قبل",
+    "versionExistsText": "كمّلها أو انشرها قبل ما تبدأ نسخة ثانية",
+    "duplicateToast": "انتسخ النموذج",
+    "duplicateToastText": "{name} يبدأ كمسودة",
+    "copy": "(نسخة)",
+    "createdToast": "انسوى النموذج",
+    "createdToastText": "{name} يبدأ كمسودة",
+    "dialog": {
+      "title": "نموذج جديد",
+      "text": "يبدأ كمسودة",
+      "name": "اسم النموذج",
+      "nameError": "اكتب اسم النموذج",
+      "type": "النوع",
+      "from": "ابدأ من",
+      "blank": "فاضي",
+      "copyOf": "نسخة من {name}",
+      "bilingual": "عربي وإنجليزي جنب بعض",
+      "note": "يبدأ كمسودة، وما ينشره إلا الموارد البشرية أو المدير المالي.",
+      "cancel": "إلغاء",
+      "create": "أنشئ مسودة"
+    }
+  },
+  "creditNote": {
+    "title": "{no} · {name}",
+    "mobileTitle": "إشعار دائن",
+    "back": "ارجع للفاتورة",
+    "more": "خيارات أكثر",
+    "notFound": "ما لقينا هذا الإشعار",
+    "notFoundText": "يمكن يكون من شهر أو فرع ثاني.",
+    "backToList": "ارجع للفواتير",
+    "download": "حمّل PDF",
+    "openInvoice": "افتح الفاتورة",
+    "paper": "إشعار دائن ضريبي",
+    "issued": "{no} · صدر {date} · {time}",
+    "status": {
+      "refunded": "انسترجع",
+      "issued": "صادر"
+    },
+    "field": {
+      "patient": "المريض",
+      "mrn": "رقم الملف",
+      "against": "على الفاتورة",
+      "insurer": "التأمين",
+      "reason": "السبب",
+      "claim": "المطالبة"
+    },
+    "against": "{no} · بتاريخ {date}",
+    "line": {
+      "item": "البند المسترجع",
+      "qty": "الكمية",
+      "price": "السعر",
+      "vat": "الضريبة {rate}",
+      "vatMixed": "الضريبة",
+      "total": "الإجمالي"
+    },
+    "sum": {
+      "subtotal": "المجموع",
+      "vat": "الضريبة {rate}",
+      "vatMixed": "الضريبة",
+      "total": "إجمالي المسترجع",
+      "insurer": "ينقص من مطالبة {insurer}",
+      "insurerPct": "ينقص من مطالبة {insurer} · {pct}",
+      "patient": "حصة المريض",
+      "patientPct": "حصة المريض · {pct}",
+      "refunded": {
+        "cash": "انرجع كاش",
+        "transfer": "انرجع بتحويل",
+        "card": "انرجع للبطاقة",
+        "visitCredit": "انحفظ رصيد"
+      },
+      "owes": "باقي عليه"
+    },
+    "footer": {
+      "reported": "مرفوع لهيئة الزكاة · {date} {time} · UUID {uuid}",
+      "cleared": "معتمد من هيئة الزكاة · {date} {time} · UUID {uuid}",
+      "pending": "ينرفع لهيئة الزكاة… · UUID {uuid}",
+      "failed": "الهيئة ما قبلته · UUID {uuid}",
+      "against": "صادر على الفاتورة {no}، والفاتورة الأصلية ما تتغير."
+    },
+    "stays": {
+      "consult": "الكشفية باقية على الفاتورة.",
+      "items": "{n, plural, one {بند واحد باقي} two {بندين باقيين} other {# بنود باقية}} على الفاتورة.",
+      "none": "ما بقى شي على الفاتورة."
+    },
+    "reason": {
+      "testsNotDone": "التحاليل ما انسوّت · العينات انرفضت",
+      "notGiven": "الخدمة ما انقدّمت",
+      "billedTwice": "انحسبت مرتين",
+      "wrongPrice": "سعر أو كود غلط",
+      "other": "سبب ثاني"
+    },
+    "reasonShort": {
+      "testsNotDone": "التحاليل ما انسوّت",
+      "notGiven": "الخدمة ما انقدّمت",
+      "billedTwice": "انحسبت مرتين",
+      "wrongPrice": "سعر أو كود غلط",
+      "other": "سبب ثاني"
+    },
+    "reasonNote": {
+      "testsNotDone": "العينات انرفضت (متكسرة) والمريض ما بغى يعيد السحب.",
+      "notGiven": "الخدمة انحسبت وما انقدّمت.",
+      "billedTwice": "نفس الخدمة انحسبت مرتين.",
+      "wrongPrice": "البند انحسب بسعر أو كود غلط.",
+      "other": ""
+    },
+    "refund": {
+      "title": "الاسترجاع للمريض",
+      "text": "{sex, select, f {دفعت أكثر من حصتها الجديدة} other {دفع أكثر من حصته الجديدة}}",
+      "textNone": "ما فيه شي يرجع",
+      "newShare": "حصة المريض الجديدة",
+      "paid": "اللي دفعه",
+      "refunded": "المسترجع",
+      "owes": "باقي عليه",
+      "how": "الطريقة",
+      "method": {
+        "cash": "كاش من الاستقبال · {name}",
+        "transfer": "تحويل بنكي · {name}",
+        "card": "رجع للبطاقة · {name}",
+        "visitCredit": "رصيد للزيارة الجاية · {name}"
+      },
+      "receipt": "حمّل إيصال الاسترجاع"
+    },
+    "after": {
+      "title": "الفاتورة بعد الإشعار",
+      "consult": "{no} · الكشفية بس",
+      "items": "{no} · {n, plural, one {باقي بند واحد} two {باقي بندين} other {باقي # بنود}}",
+      "none": "{no} · انرجعت كلها",
+      "total": "الإجمالي",
+      "insurerPays": "{insurer} تدفع",
+      "patientPays": "على المريض",
+      "balance": "المتبقي",
+      "open": "افتح الفاتورة"
+    },
+    "claim": {
+      "title": "مطالبة {insurer}",
+      "text": "انعدّلت عبر نفيس",
+      "open": "افتح المطالبات"
+    },
+    "history": {
+      "title": "السجل",
+      "issued": "صدر الإشعار وانرفع للهيئة · {name}",
+      "issuedPending": "صدر الإشعار · {name}",
+      "claimAdjusted": "انرسل تعديل المطالبة ل{insurer}",
+      "refunded": "انرجع {amount} {how}",
+      "refundedReceipt": "انرجع {amount} {how} · وانطبع إيصال يوقّع عليه المريض",
+      "how": {
+        "cash": "كاش",
+        "transfer": "بتحويل بنكي",
+        "card": "للبطاقة",
+        "visitCredit": "رصيد للزيارة الجاية"
+      }
+    },
+    "dialog": {
+      "title1": "اصدر إشعار دائن",
+      "sub1": "{no} · الخطوة 1 من 2 · وش بترجّع",
+      "info": "الفاتورة بعد ما تصدر ما تتعدّل. الإشعار الدائن يعكس البنود اللي تختارها وينرفع لهيئة الزكاة.",
+      "lines": "البنود اللي بترجع",
+      "linesError": "اختر بند واحد على الأقل",
+      "lineCredited": "انرجع · {cn}",
+      "reason": "السبب",
+      "reasonPick": "اختر السبب",
+      "reasonError": "اختر السبب",
+      "alert": "صحّح الحقول المعلّمة عشان تكمل.",
+      "creditVat": "المسترجع مع الضريبة",
+      "cancel": "إلغاء",
+      "next": "التالي",
+      "title2": "رجّع للمريض",
+      "sub2": "الخطوة 2 من 2 · {amount} ترجع لـ{name}",
+      "title2None": "راجع واصدر",
+      "sub2None": "الخطوة 2 من 2 · ما فيه استرجاع",
+      "newShare": "حصة المريض الجديدة",
+      "paid": "اللي دفعه",
+      "toRefund": "المبلغ اللي يرجع",
+      "owes": "باقي عليه",
+      "refundBy": "طريقة الاسترجاع",
+      "method": {
+        "cash": "كاش",
+        "transfer": "تحويل بنكي",
+        "card": "للبطاقة",
+        "visitCredit": "رصيد للزيارة الجاية"
+      },
+      "noteCash": "{sex, select, f {دفعت {how}، فما يرجع لبطاقة.} other {دفع {how}، فما يرجع لبطاقة.}} الاسترجاع فوق {limit} يحتاج موافقة المدير المالي.",
+      "noteCard": "{sex, select, f {دفعت {how}، فيرجع لنفس البطاقة عن طريق جهاز الشبكة.} other {دفع {how}، فيرجع لنفس البطاقة عن طريق جهاز الشبكة.}} الاسترجاع فوق {limit} يحتاج موافقة المدير المالي.",
+      "noteNone": "{sex, select, f {ما فيه شي يرجع: دفعت أقل من حصتها الجديدة.} other {ما فيه شي يرجع: دفع أقل من حصته الجديدة.}} المتبقي يصير {owes}.",
+      "overLimit": "{amount} فوق {limit}: لازم يوافق عليه المدير المالي قبل ما يصدر.",
+      "receipt": "اطبع إيصال استرجاع يوقّع عليه المريض",
+      "nphies": "حصة {insurer} ({amount}) تنقص من المطالبة {claim} عبر نفيس.",
+      "nphiesNoClaim": "حصة {insurer} ({amount}) تنقص من اللي على {insurer} لهذي الفاتورة.",
+      "back": "رجوع",
+      "issue": "اصدر الإشعار",
+      "approval": "أرسل للموافقة",
+      "failed": "ما قدرنا نصدر الإشعار",
+      "failedText": "ما انحفظ شي. جرّب مرة ثانية."
     }
   }
 }

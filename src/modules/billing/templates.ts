@@ -98,7 +98,10 @@ function insurerClauses(c: Contract): Clause[] {
   const t = c.terms.insurer!
   const pre =
     t.preauthAbove != null
-      ? bi(`Needed above ${sar(t.preauthAbove).en}${t.preauthImaging ? ", and for all imaging" : ""}.`, `مطلوبة فوق ${sar(t.preauthAbove).ar}${t.preauthImaging ? "، ولكل الأشعة" : ""}.`)
+      ? bi(
+          `Needed above ${sar(t.preauthAbove).en}${t.preauthImaging ? ", and for all imaging" : ""}${t.preauthDental ? ", and for all dental" : ""}.`,
+          `مطلوبة فوق ${sar(t.preauthAbove).ar}${t.preauthImaging ? "، ولكل الأشعة" : ""}${t.preauthDental ? "، ولكل الأسنان" : ""}.`
+        )
       : bi("Not needed.", "ما تحتاج.")
   return [
     { key: "network", title: bi("The network", "الشبكة"), text: bi(`${CENTER.name.en} joins the insurer's provider network for all its branches.`, `ينضم ${CENTER.name.ar} لشبكة مقدمي الخدمة عند الشركة بكل فروعه.`) },
@@ -115,17 +118,33 @@ function insurerClauses(c: Contract): Clause[] {
   ]
 }
 
+/** Optional staff clauses (New contract checklist) — text printed when ticked. */
+const STAFF_OPTIONAL: Record<string, Bi> = {
+  licenceValid: bi("Keeps the SCFHS licence valid for the whole term and sends HR the renewal before it ends.", "يحافظ على رخصة الهيئة سارية طول مدة العقد ويرسل التجديد للموارد البشرية قبل ما تخلص."),
+  malpractice: bi("The center pays the medical malpractice insurance for the whole term.", "يتحمل المجمع تأمين الأخطاء الطبية طول مدة العقد."),
+  nonCompete: bi("Doesn't work at other clinics in Riyadh for one year after the contract ends.", "ما يشتغل بعيادات ثانية في الرياض لمدة سنة بعد نهاية العقد."),
+}
+
+/** Optional insurer clauses — text printed when ticked. */
+const INSURER_OPTIONAL: Record<string, Bi> = {
+  pdpl: bi("Member data is shared only for claims, kept in the Kingdom and protected under the PDPL.", "بيانات المشتركين ما تنشارك إلا للمطالبات، وتنحفظ داخل المملكة حسب نظام حماية البيانات الشخصية."),
+  cchiUnified: bi("Coverage follows the CCHI unified health insurance policy.", "التغطية حسب الوثيقة الموحدة للتأمين الصحي من مجلس الضمان."),
+  claims15: bi("The insurer answers each claim within 15 days of receiving it.", "ترد الشركة على كل مطالبة خلال 15 يوم من استلامها."),
+  appeals30: bi("The center can appeal a rejection within 30 days.", "يقدر المجمع يعترض على الرفض خلال 30 يوم."),
+  pricesPrivate: bi("The insurer doesn't share the center's prices with other insurers.", "ما تشارك الشركة أسعار المجمع مع شركات ثانية."),
+}
+
 /** The clauses the paper prints: as written when the contract carries full text, else from its template. */
 export function clausesOf(c: Contract): Clause[] {
   if (c.clauses.length && c.clauses.every((x) => x.text.en)) return c.clauses
-  if (c.kind === "staff" && c.terms.staff) {
-    // A contract drafted here keeps only the ticked clauses (and its own added ones) in the template's order.
-    const all = staffClauses(c)
-    if (!c.clauses.length) return all
-    const keys = new Set(c.clauses.map((x) => x.key))
-    return [...all.filter((x) => keys.has(x.key)), ...c.clauses.filter((x) => x.key.startsWith("custom-"))]
-  }
+  // The template's clauses always print; the ticked optional clauses (New contract's checklist) follow, then any
+  // clause the user added. Optional ones already covered by a template clause aren't repeated.
+  const optional = (texts: Record<string, Bi>, skip: string[] = []) => [
+    ...c.clauses.filter((x) => texts[x.key] && !skip.includes(x.key)).map((x) => ({ ...x, text: texts[x.key] })),
+    ...c.clauses.filter((x) => x.key.startsWith("custom-")),
+  ]
+  if (c.kind === "staff" && c.terms.staff) return [...staffClauses(c), ...optional(STAFF_OPTIONAL)]
   if (c.kind === "partner" && c.terms.partner) return partnerClauses(c)
-  if (c.kind === "insurer" && c.terms.insurer) return insurerClauses(c)
+  if (c.kind === "insurer" && c.terms.insurer) return [...insurerClauses(c), ...optional(INSURER_OPTIONAL)]
   return c.clauses
 }

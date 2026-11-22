@@ -61,7 +61,7 @@ function SumRow({ label, value, tone, last }: { label: string; value: string; to
 export function InvoicePaper({ inv, className }: { inv: Invoice; className?: string }) {
   const t = useTranslations("billing.invoice")
   const tm = useTranslations("billing")
-  const { b, patient, payerName, insurerShort, doctorName } = useBillText()
+  const { b, patient, payerName, insurerShort, doctorName, date } = useBillText()
   const dates = useDates()
   const money = useMoney()
   const p = patient(inv.patient)
@@ -123,7 +123,7 @@ export function InvoicePaper({ inv, className }: { inv: Invoice; className?: str
               <bdi>
                 {t("issued", {
                   no: ltrRun(inv.no),
-                  date: dates.short(inv.issuedAt),
+                  date: date(inv.issuedAt),
                   time: timeOf(inv.issuedAt),
                 })}
               </bdi>
@@ -147,7 +147,7 @@ export function InvoicePaper({ inv, className }: { inv: Invoice; className?: str
           </Info>
           <Info label={t("field.visit")}>
             {t("visit", {
-              date: dates.short(inv.visitAt),
+              date: date(inv.visitAt),
               clinic: b(inv.clinic),
             })}
           </Info>
@@ -215,7 +215,7 @@ export function InvoicePaper({ inv, className }: { inv: Invoice; className?: str
             <bdi>
               {z.status === "reported" || z.status === "cleared"
                 ? t(`footer.${z.status}`, {
-                    date: dates.short(z.reportedAt ?? inv.issuedAt),
+                    date: date(z.reportedAt ?? inv.issuedAt),
                     time: timeOf(z.reportedAt ?? inv.issuedAt),
                     uuid: ltrRun(uuid),
                   })

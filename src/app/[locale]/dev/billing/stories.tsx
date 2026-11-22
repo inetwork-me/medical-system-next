@@ -18,6 +18,8 @@ import type { Invoice } from "@/modules/billing/data"
 import { ClaimsList, ClaimsSummary } from "@/modules/billing/claims"
 import { FixClaimDialog, SubmitClaimsDialog } from "@/modules/billing/claim-dialogs"
 import { toBundle } from "@/modules/billing/nphies"
+import { InsurersGrid } from "@/modules/billing/insurers"
+import { InsurerHeader, InsurerSide, InsurerTerms } from "@/modules/billing/insurer-page"
 import {
   ClaimStatusBadge,
   ContractStatusBadge,
@@ -269,6 +271,7 @@ export function BillingStories() {
 
       <InvoiceStories />
       <ClaimStories />
+      <InsurerStories />
 
       <Box title="Derived statuses · insurers, papers, contracts" className="lg:col-span-2">
         <div className="grid gap-4 md:grid-cols-3">
@@ -436,6 +439,44 @@ function ClaimStories() {
           }
         />
       )}
+    </>
+  )
+}
+
+/** Step 4 · Insurers: the grid (wide / compact), the Insurer page widgets for Bupa (drawn) and MedGulf (ending, no papers). */
+function InsurerStories() {
+  const bupa = INSURERS[0]
+  const medgulf = INSURERS.find((i) => i.id === "medgulf")!
+  return (
+    <>
+      <Box title="Widget / Bill Insurers · Wide" className="lg:col-span-2">
+        <InsurersGrid />
+      </Box>
+      <Box title="Widget / Bill Insurers · Compact (358)">
+        <div className="w-[358px] max-w-full">
+          <InsurersGrid />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Insurer Header · Compact (358) — MedGulf, ending">
+        <div className="w-[358px] max-w-full">
+          <InsurerHeader ins={medgulf} />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Insurer Header + Terms + Side · Wide — Bupa" className="lg:col-span-2">
+        <div className="@container/ins flex flex-col gap-6">
+          <InsurerHeader ins={bupa} />
+          <div className="grid gap-6 xl:grid-cols-[736px_360px]">
+            <InsurerTerms ins={bupa} onUpload={() => undefined} />
+            <InsurerSide ins={bupa} />
+          </div>
+        </div>
+      </Box>
+      <Box title="Widget / Bill Insurer Terms + Side · Compact (358) — MedGulf">
+        <div className="@container/ins flex w-[358px] max-w-full flex-col gap-4">
+          <InsurerTerms ins={medgulf} />
+          <InsurerSide ins={medgulf} />
+        </div>
+      </Box>
     </>
   )
 }

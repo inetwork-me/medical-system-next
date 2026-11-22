@@ -318,5 +318,91 @@
     "sending": "جاري الإرسال…",
     "toast": "انرسلت المطالبة ل{insurer} مرة ثانية",
     "toastText": "مع الموافقة المسبقة {no}"
+  },
+  "monthsShort": "ينا,فبر,مار,أبر,ماي,يون,يول,أغس,سبت,أكت,نوف,ديس",
+  "insurers": {
+    "title": "شركات التأمين المتعاقدين معها",
+    "subtitle": "{n, plural, one {اتفاقية وحدة} two {اتفاقيتين} few {# اتفاقيات} other {# اتفاقية}} · لنا عندهم {amount}",
+    "agreement": "اتفاقية {no}",
+    "validUntil": "سارية لين",
+    "discount": "الخصم",
+    "paysWithin": "يدفعون خلال",
+    "owed": "لنا عندهم",
+    "days": "{n} يوم",
+    "approved": "{pct} من المطالبات انقبلت",
+    "open": "افتح",
+    "add": "أضف شركة تأمين",
+    "addText": "يبدأ اتفاقية جديدة"
+  },
+  "insurer": {
+    "back": "ارجع لشركات التأمين",
+    "more": "إجراءات ثانية",
+    "notFound": "ما لقينا شركة التأمين هذي",
+    "notFoundText": "يمكن انشالت من الشبكة.",
+    "backToList": "ارجع لشركات التأمين",
+    "download": "حمّل الاتفاقية",
+    "upload": "ارفع مستند",
+    "agreement": "اتفاقية مقدم خدمة {no} · من {date}",
+    "agreementUnsigned": "اتفاقية مقدم خدمة {no} · بانتظار توقيعهم",
+    "classes": "الفئات {list} · {branches}",
+    "allBranches": "كل الفروع",
+    "until": "لين {date}",
+    "tile": {
+      "owed": "لنا عندهم",
+      "owedText": "{n, plural, one {مطالبة وحدة} two {مطالبتين} few {# مطالبات} other {# مطالبة}} فوق {days} يوم",
+      "owedNone": "ما فيه شي متأخر",
+      "claims": "مطالبات الشهر",
+      "approved": "انقبلت",
+      "target": "الهدف {pct}",
+      "payIn": "يدفعون خلال",
+      "payInValue": "{n} يوم",
+      "agreementSays": "الاتفاقية {n}"
+    },
+    "terms": {
+      "title": "شروط الاتفاقية",
+      "text": "اللي اتفقنا عليه مع {insurer}",
+      "discount": "الخصم على أسعارنا",
+      "copay": "نسبة تحمل المريض",
+      "copayValue": "{pct}، بحد أقصى {cap} للزيارة · فئة {classes}",
+      "copayNoCap": "{pct} · فئة {classes}",
+      "preauth": "الموافقة المسبقة",
+      "preauthBoth": "فوق {amount}، وكل الأشعة",
+      "preauthAmount": "فوق {amount}",
+      "preauthImaging": "كل الأشعة",
+      "preauthNone": "ما تحتاج",
+      "deadline": "نرسل المطالبات خلال",
+      "deadlineValue": "{n} يوم من الزيارة",
+      "payment": "يدفعون خلال",
+      "paymentValue": "{n} يوم من المطالبة",
+      "notice": "مدة إشعار الإنهاء",
+      "noticeValue": "{n} يوم كتابياً"
+    },
+    "papers": {
+      "title": "الأوراق",
+      "text": "{n, plural, one {مستند واحد} two {مستندين} few {# مستندات} other {# مستند}} · محفوظة طول مدة الاتفاقية",
+      "upload": "ارفع",
+      "empty": "ما فيه أوراق للحين",
+      "emptyText": "ارفع الاتفاقية الموقعة وملاحقها هنا.",
+      "download": "حمّل {name}",
+      "pages": "{n, plural, one {صفحة} two {صفحتين} few {# صفحات} other {# صفحة}}",
+      "signed": "انوقعت عبر نفاذ {date}",
+      "ends": "تخلص {date}",
+      "uploadedBy": "انرفع {date}"
+    },
+    "chart": {
+      "title": "المطالبات · آخر 6 شهور",
+      "text": "بالألف ريال",
+      "approved": "انقبلت",
+      "part": "انقبلت جزئياً",
+      "rejected": "انرفضت",
+      "view": "اعرض مطالبات {insurer}",
+      "empty": "ما فيه مطالبات للحين"
+    },
+    "contacts": {
+      "title": "مين نكلم"
+    },
+    "noData": "—",
+    "uploaded": "انرفع المستند",
+    "uploadedText": "بانتظار المدير يراجعه"
   }
 }

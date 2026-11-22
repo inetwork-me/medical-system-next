@@ -23,5 +23,10 @@ export function useBillText() {
   const payerName = (inv: Pick<Invoice, "payer">) => (inv.payer === "cash" ? t("cash") : b(insurerOf(inv.payer)?.name ?? { en: inv.payer, ar: inv.payer }))
   /** Short insurer name in sentences ("Bupa pays · 80%", "Sent to Bupa through NPHIES"). */
   const insurerShort = (id: string) => b(insurerOf(id)?.short ?? { en: id, ar: id })
-  return { locale, ar, t, b, doctorName, patient, payerName, insurerShort }
+  /** "1 Dec 2026" / "1 ديسمبر 2026": the Billing frames print the day without a leading zero (Latin digits, Gregorian). */
+  const date = (iso: string) =>
+    new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en-GB", { day: "numeric", month: "short", year: "numeric", numberingSystem: "latn", calendar: "gregory" }).format(
+      new Date(`${iso.slice(0, 10)}T12:00`)
+    )
+  return { locale, ar, t, b, doctorName, patient, payerName, insurerShort, date }
 }

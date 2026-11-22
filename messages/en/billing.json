@@ -318,5 +318,91 @@
     "sending": "Sending…",
     "toast": "Claim resent to {insurer}",
     "toastText": "With pre-authorization {no}"
+  },
+  "monthsShort": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+  "insurers": {
+    "title": "Insurance partners",
+    "subtitle": "{n, plural, one {# provider agreement} other {# provider agreements}} · {amount} owed to us",
+    "agreement": "Agreement {no}",
+    "validUntil": "Valid until",
+    "discount": "Discount",
+    "paysWithin": "Pays within",
+    "owed": "Owed to us",
+    "days": "{n} days",
+    "approved": "{pct} of claims approved",
+    "open": "Open",
+    "add": "Add an insurer",
+    "addText": "Starts a provider agreement"
+  },
+  "insurer": {
+    "back": "Back to insurers",
+    "more": "More actions",
+    "notFound": "We couldn't find this insurer",
+    "notFoundText": "It may have been removed from the network.",
+    "backToList": "Back to insurers",
+    "download": "Download agreement",
+    "upload": "Upload document",
+    "agreement": "Provider agreement {no} · since {date}",
+    "agreementUnsigned": "Provider agreement {no} · waiting for their signature",
+    "classes": "Classes {list} · {branches}",
+    "allBranches": "all branches",
+    "until": "Until {date}",
+    "tile": {
+      "owed": "Owed to us",
+      "owedText": "{n, plural, one {# claim} other {# claims}} over {days} days",
+      "owedNone": "Nothing overdue",
+      "claims": "Claims this month",
+      "approved": "Approved",
+      "target": "Target {pct}",
+      "payIn": "They pay in",
+      "payInValue": "{n} d",
+      "agreementSays": "Agreement says {n}"
+    },
+    "terms": {
+      "title": "Agreement terms",
+      "text": "What {insurer} and the center agreed on",
+      "discount": "Discount on our price list",
+      "copay": "Patient co-pay",
+      "copayValue": "{pct}, up to {cap} a visit · classes {classes}",
+      "copayNoCap": "{pct} · classes {classes}",
+      "preauth": "Pre-authorization",
+      "preauthBoth": "Above {amount}, and all imaging",
+      "preauthAmount": "Above {amount}",
+      "preauthImaging": "All imaging",
+      "preauthNone": "Not needed",
+      "deadline": "Send claims within",
+      "deadlineValue": "{n} days of the visit",
+      "payment": "They pay within",
+      "paymentValue": "{n} days of the claim",
+      "notice": "Notice to end",
+      "noticeValue": "{n} days in writing"
+    },
+    "papers": {
+      "title": "Papers",
+      "text": "{n, plural, one {# document} other {# documents}} · kept for the agreement's life",
+      "upload": "Upload",
+      "empty": "No papers yet",
+      "emptyText": "Upload the signed agreement and its annexes here.",
+      "download": "Download {name}",
+      "pages": "{n, plural, one {# page} other {# pages}}",
+      "signed": "signed with Nafath {date}",
+      "ends": "ends {date}",
+      "uploadedBy": "uploaded {date}"
+    },
+    "chart": {
+      "title": "Claims · last 6 months",
+      "text": "SAR thousands",
+      "approved": "Approved",
+      "part": "Partly approved",
+      "rejected": "Rejected",
+      "view": "View {insurer} claims",
+      "empty": "No claims yet"
+    },
+    "contacts": {
+      "title": "Who to call"
+    },
+    "noData": "—",
+    "uploaded": "Document uploaded",
+    "uploadedText": "Waiting for a manager to check it"
   }
 }

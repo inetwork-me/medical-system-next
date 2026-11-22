@@ -10,6 +10,7 @@ import { readyBatch } from "./counts"
 import { ClaimsList, ClaimsSummary } from "./claims"
 import { FixClaimDialog, SubmitClaimsDialog } from "./claim-dialogs"
 import { BillingFrame } from "./frame"
+import { InsurersGrid } from "./insurers"
 import { InvoicesList } from "./invoices"
 import { RecordPaymentDialog } from "./payment-dialog"
 import { useSoon } from "./parts"
@@ -108,9 +109,13 @@ export function ClaimsTab() {
   )
 }
 
-/** Insurers: header "Billing / Insurers"; New agreement. */
+/** Insurers: header "Billing / Insurers"; New agreement; the insurer card grid. */
 export function InsurersTab() {
-  return <BillingFrame tab="insurers" actions={<NewContractButton label="newAgreement" />} />
+  return (
+    <BillingFrame tab="insurers" actions={<NewContractButton label="newAgreement" />}>
+      <InsurersGrid />
+    </BillingFrame>
+  )
 }
 
 /** Contracts: header "Billing / Contracts"; Export · New contract. */

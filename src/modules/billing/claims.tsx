@@ -14,7 +14,7 @@ import { EmptyState } from "@/components/ds/states"
 import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { BILL_NOW, BILL_TODAY, OTHER_CLAIMS, type Claim } from "./data"
+import { BILL_NOW, BILL_TODAY, OTHER_CLAIMS, insurerOf, type Claim } from "./data"
 import { claimCounts } from "./counts"
 import { invoiceHref } from "./href"
 import { useMoney } from "./money"
@@ -151,13 +151,24 @@ export function ClaimsList({ onFix }: { onFix: (no: string) => void }) {
   const claims = useClaims()
   const params = useSearchParams()
   const [query, setQuery] = React.useState(() => params.get("q") ?? "")
+  // A deep link with a search (Invoice → Open claims, Insurer → View claims) re-reads it when the URL changes.
+  const qParam = params.get("q") ?? ""
+  const [seenQ, setSeenQ] = React.useState(qParam)
+  if (seenQ !== qParam) {
+    setSeenQ(qParam)
+    setQuery(qParam)
+  }
   const [filter, setFilter] = React.useState<ClaimFilter>(() => (FILTERS as string[]).includes(params.get("filter") ?? "") ? (params.get("filter") as ClaimFilter) : "all")
   const c = claimCounts(claims, useBatchSent())
   const q = query.trim().toLowerCase()
   const matches = (x: Claim) => {
     if (!q) return true
     const p = patient(x.patient)
-    return [x.no, x.invoiceNo, p.mrn, p.name.en].some((v) => v.toLowerCase().includes(q)) || p.name.ar.includes(query.trim())
+    const ins = insurerOf(x.insurer)
+    return (
+      [x.no, x.invoiceNo, p.mrn, p.name.en, ins?.name.en ?? ""].some((v) => v.toLowerCase().includes(q)) ||
+      [p.name.ar, ins?.name.ar ?? ""].some((v) => v.includes(query.trim()))
+    )
   }
   const rows = claims.filter((x) => matches(x) && inFilter(x, filter)).sort(byPriority)
   const label = (f: ClaimFilter) => t(`filter.${f}`, { n: f === "toFix" ? c.toFix : f === "ready" ? c.ready : f === "review" ? c.review : 0 })

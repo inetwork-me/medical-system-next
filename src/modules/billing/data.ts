@@ -170,7 +170,7 @@ export const INSURERS: Insurer[] = [
       approvedPct: 96,
       targetPct: 95,
       paysInDays: 38,
-      months: months([214, 236, 228, 262, 251, 288]),
+      months: months([245, 262, 250, 270, 280, 288]),
       split: { approved: 96, part: 3, rejected: 1 },
     },
     paidShare: 27,

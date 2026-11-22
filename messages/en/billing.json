@@ -404,5 +404,191 @@
     "noData": "—",
     "uploaded": "Document uploaded",
     "uploadedText": "Waiting for a manager to check it"
-  }
+  },
+  "contracts": {
+    "title": "Contracts",
+    "subtitle": "Staff, partners and insurers · signed with Nafath",
+    "templates": "Templates",
+    "search": "Search name or contract no…",
+    "filter": {
+      "label": "Contract type",
+      "all": "All · {n}",
+      "staff": "Staff · {n}",
+      "partner": "Partners · {n}",
+      "insurer": "Insurers · {n}",
+      "toSign": "To sign · {n}"
+    },
+    "col": {
+      "contract": "Contract",
+      "party": "Party",
+      "type": "Type",
+      "period": "Period",
+      "signed": "Signed",
+      "status": "Status",
+      "action": "Action"
+    },
+    "sign": "Sign",
+    "open": "Open",
+    "renew": "Renew",
+    "openLabel": "Open {no}",
+    "sub": "{no} · {type} · {role}",
+    "showing": "Showing {shown} of {total} contracts",
+    "showMore": "Show more",
+    "showMoreN": "Show {n} more",
+    "empty": "No contracts match",
+    "emptyText": "Try another name or contract no., or clear the filter.",
+    "clear": "Clear search and filter"
+  },
+  "contract": {
+    "title": "{no} · {name}",
+    "mobileTitle": "Contract",
+    "back": "Back to contracts",
+    "more": "More actions",
+    "notFound": "We couldn't find this contract",
+    "notFoundText": "It may be one you can't open, or from another branch.",
+    "backToList": "Back to contracts",
+    "download": "Download PDF",
+    "signNafath": "Sign with Nafath",
+    "letterhead": "CR {cr} · {city} · {email}",
+    "kindTitle": {
+      "staff": "Employment contract",
+      "partner": "Partner contract",
+      "insurer": "Provider agreement"
+    },
+    "meta": "{no} · drafted {date} · version {v}",
+    "paperStatus": {
+      "awaitingYou": "Waiting for your signature",
+      "awaitingThem": "Waiting for their signature",
+      "draft": "Draft",
+      "signed": "Signed",
+      "ending": "Ends in {n} days",
+      "ended": "Ended"
+    },
+    "firstParty": "First party",
+    "secondParty": "Second party",
+    "firstRole": "First party · employer",
+    "firstRoleCompany": "First party · provider",
+    "secondRole": {
+      "staff": "Second party · employee",
+      "partner": "Second party · partner",
+      "insurer": "Second party · insurer"
+    },
+    "represented": "Represented by {name}, {role}",
+    "employeeIds": "National ID {id} · SCFHS {licence}",
+    "employeeId": "National ID {id}",
+    "companyIds": "CR {cr} · {city}",
+    "clause": "{n}. {title}",
+    "box": {
+      "signed": "Signed with Nafath · {date} · {time}",
+      "yourTurn": "Your turn to sign",
+      "waiting": "Waiting to sign",
+      "first": "Signs first"
+    },
+    "verify": "Page 1 of {pages} · check it at {url} · code {code}",
+    "signatures": "Signatures",
+    "signaturesText": "{n} of {total} signed · in this order",
+    "signerSigned": "{role} · {date} {time} · Nafath",
+    "you": "{role} · you",
+    "details": "Details",
+    "d": {
+      "type": "Type",
+      "typeValue": "{kind} · {detail}",
+      "department": "Department",
+      "starts": "Starts",
+      "ends": "Ends",
+      "endsRenews": "{date} · renews",
+      "pay": "Pay",
+      "payValue": "{amount} a month",
+      "pricing": "Pricing",
+      "discount": "Discount",
+      "preparedBy": "Prepared by",
+      "preparedValue": "{name} · {role}"
+    },
+    "attached": "Attached",
+    "noFiles": "No files attached",
+    "fileMeta": {
+      "pages": "{format} · {n, plural, one {# page} other {# pages}}",
+      "ends": "{format} · ends {year}",
+      "plain": "{format}"
+    },
+    "downloadFile": "Download {name}",
+    "activity": "Activity",
+    "noActivity": "Nothing yet",
+    "event": {
+      "signed": "Signed by {name} with Nafath",
+      "locked": "All signed · the document is locked",
+      "copies": "Copies sent to {to}",
+      "filed": "Filed in {place}"
+    },
+    "filedIn": {
+      "staff": "the HR file",
+      "partner": "the partner's record",
+      "insurer": "the insurer page"
+    },
+    "copiesTo": {
+      "staff": "{party} and HR",
+      "partner": "{party} and finance",
+      "insurer": "{party} and finance"
+    },
+    "print": "Print"
+  },
+  "sign": {
+    "title": "Sign with Nafath",
+    "text": "{no} · {kind}",
+    "kindLower": {
+      "staff": "employment contract",
+      "partner": "partner contract",
+      "insurer": "provider agreement"
+    },
+    "contract": "Contract",
+    "contractValue": "{kind} · {no}",
+    "kindShort": {
+      "staff": "Employment",
+      "partner": "Partner",
+      "insurer": "Provider agreement"
+    },
+    "otherSide": {
+      "staff": "Employee",
+      "partner": "Partner",
+      "insurer": "Insurer"
+    },
+    "otherSigned": "{name} · signed {date}",
+    "otherWaiting": "{name} · signs after you",
+    "term": "Term",
+    "termValue": "{n, plural, one {# year} other {# years}} from {date}",
+    "termMonths": "{n, plural, one {# month} other {# months}} from {date}",
+    "pay": "Pay",
+    "payValue": "{amount} a month",
+    "pricing": "Pricing",
+    "read": "I read the whole contract ({clauses, plural, one {# clause} other {# clauses}}, {pages, plural, one {# page} other {# pages}})",
+    "readError": "Tick this after reading the contract",
+    "id": "Your national ID",
+    "idHint": "From your profile",
+    "info": "Nafath sends a request to your phone. The signature is saved with the time and your ID.",
+    "cancel": "Cancel",
+    "send": "Send to Nafath",
+    "sending": "Sending…",
+    "notYourTurn": "It isn't your turn to sign yet.",
+    "approveTitle": "Approve it in Nafath",
+    "approveText": "We sent a request to your phone",
+    "pick": "Pick this number in Nafath",
+    "expires": "Expires in {time}",
+    "step1": "Open the Nafath app on your phone",
+    "step2": "Tap the request from {center}",
+    "step3": "Pick {n} and confirm with your face or fingerprint",
+    "waiting": "Waiting for your approval… this updates by itself.",
+    "check": "Check again",
+    "expired": "The request expired",
+    "expiredText": "Nothing was signed. Send a new request to Nafath.",
+    "rejected": "The request was declined in Nafath",
+    "rejectedText": "Nothing was signed. Send a new request if that was a mistake.",
+    "again": "Send a new request",
+    "failed": "Nafath isn't answering",
+    "failedText": "Nothing was signed. Try again in a minute.",
+    "toast": "Contract signed",
+    "toastAll": "{n, plural, =2 {Both sides signed} other {All # signed}} · copies sent to {to}",
+    "toastNext": "{name} signs next",
+    "toastNextText": "Your signature is saved · they get the SMS link now"
+  },
+  "pdfToast": "PDF downloaded"
 }

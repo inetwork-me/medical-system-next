@@ -404,5 +404,191 @@
     "noData": "—",
     "uploaded": "انرفع المستند",
     "uploadedText": "بانتظار المدير يراجعه"
-  }
+  },
+  "contracts": {
+    "title": "العقود",
+    "subtitle": "الموظفين والشركاء والتأمين · التوقيع عبر نفاذ",
+    "templates": "النماذج",
+    "search": "دوّر اسم أو رقم عقد…",
+    "filter": {
+      "label": "نوع العقد",
+      "all": "الكل · {n}",
+      "staff": "الموظفين · {n}",
+      "partner": "الشركاء · {n}",
+      "insurer": "التأمين · {n}",
+      "toSign": "للتوقيع · {n}"
+    },
+    "col": {
+      "contract": "العقد",
+      "party": "الطرف",
+      "type": "النوع",
+      "period": "المدة",
+      "signed": "التواقيع",
+      "status": "الحالة",
+      "action": "الإجراء"
+    },
+    "sign": "وقّع",
+    "open": "افتح",
+    "renew": "جدّد",
+    "openLabel": "افتح {no}",
+    "sub": "{role} · {type} · {no}",
+    "showing": "يعرض {shown} من {total} عقد",
+    "showMore": "اعرض أكثر",
+    "showMoreN": "اعرض {n} زيادة",
+    "empty": "ما فيه عقود تطابق",
+    "emptyText": "جرّب اسم أو رقم عقد ثاني، أو امسح الفلتر.",
+    "clear": "امسح البحث والفلتر"
+  },
+  "contract": {
+    "title": "{no} · {name}",
+    "mobileTitle": "العقد",
+    "back": "ارجع للعقود",
+    "more": "إجراءات ثانية",
+    "notFound": "ما لقينا هالعقد",
+    "notFoundText": "يمكن ما تقدر تفتحه، أو يكون من فرع ثاني.",
+    "backToList": "ارجع للعقود",
+    "download": "حمّل PDF",
+    "signNafath": "وقّع عبر نفاذ",
+    "letterhead": "السجل التجاري {cr} · {city} · {email}",
+    "kindTitle": {
+      "staff": "عقد عمل",
+      "partner": "عقد شراكة",
+      "insurer": "اتفاقية مقدم خدمة"
+    },
+    "meta": "{no} · انكتب {date} · النسخة {v}",
+    "paperStatus": {
+      "awaitingYou": "بانتظار توقيعك",
+      "awaitingThem": "بانتظار الطرف الثاني",
+      "draft": "مسودة",
+      "signed": "موقّع",
+      "ending": "يخلص بعد {n} يوم",
+      "ended": "منتهي"
+    },
+    "firstParty": "الطرف الأول",
+    "secondParty": "الطرف الثاني",
+    "firstRole": "الطرف الأول · صاحب العمل",
+    "firstRoleCompany": "الطرف الأول · مقدم الخدمة",
+    "secondRole": {
+      "staff": "الطرف الثاني · {female, select, yes {الموظفة} other {الموظف}}",
+      "partner": "الطرف الثاني · الشريك",
+      "insurer": "الطرف الثاني · شركة التأمين"
+    },
+    "represented": "يمثله {name}، {role}",
+    "employeeIds": "الهيئة {licence} · الهوية تنتهي بـ {tail}",
+    "employeeId": "الهوية تنتهي بـ {tail}",
+    "companyIds": "السجل التجاري {cr} · {city}",
+    "clause": "البند {n} · {title}",
+    "box": {
+      "signed": "{female, select, yes {وقّعت} other {وقّع}} عبر نفاذ · {date} · {time}",
+      "yourTurn": "دورك توقّع",
+      "waiting": "ينتظر التوقيع",
+      "first": "يوقّع أول"
+    },
+    "verify": "صفحة 1 من {pages} · تأكد منه على {url} · الكود {code}",
+    "signatures": "التواقيع",
+    "signaturesText": "{n} من {total} وقّعوا · بهالترتيب",
+    "signerSigned": "{role} · {date} {time} · نفاذ",
+    "you": "{role} · أنت",
+    "details": "التفاصيل",
+    "d": {
+      "type": "النوع",
+      "typeValue": "{kind} · {detail}",
+      "department": "القسم",
+      "starts": "يبدأ",
+      "ends": "ينتهي",
+      "endsRenews": "{date} · يتجدد",
+      "pay": "الراتب",
+      "payValue": "{amount} بالشهر",
+      "pricing": "التسعير",
+      "discount": "الخصم",
+      "preparedBy": "جهّزته",
+      "preparedValue": "{name} · {role}"
+    },
+    "attached": "المرفقات",
+    "noFiles": "ما فيه ملفات مرفقة",
+    "fileMeta": {
+      "pages": "{format} · {n, plural, one {صفحة} two {صفحتين} few {# صفحات} other {# صفحة}}",
+      "ends": "{format} · تخلص {year}",
+      "plain": "{format}"
+    },
+    "downloadFile": "حمّل {name}",
+    "activity": "النشاط",
+    "noActivity": "ما فيه شي للحين",
+    "event": {
+      "signed": "وقّعه {name} عبر نفاذ",
+      "locked": "وقّع الكل · وانقفل المستند",
+      "copies": "انرسلت نسخة لـ {to}",
+      "filed": "انحفظ في {place}"
+    },
+    "filedIn": {
+      "staff": "ملف الموارد البشرية",
+      "partner": "سجل الشريك",
+      "insurer": "صفحة شركة التأمين"
+    },
+    "copiesTo": {
+      "staff": "{party} والموارد البشرية",
+      "partner": "{party} والمالية",
+      "insurer": "{party} والمالية"
+    },
+    "print": "اطبع"
+  },
+  "sign": {
+    "title": "التوقيع عبر نفاذ",
+    "text": "{no} · {kind}",
+    "kindLower": {
+      "staff": "عقد عمل",
+      "partner": "عقد شراكة",
+      "insurer": "اتفاقية مقدم خدمة"
+    },
+    "contract": "العقد",
+    "contractValue": "{kind} · {no}",
+    "kindShort": {
+      "staff": "عقد عمل",
+      "partner": "عقد شراكة",
+      "insurer": "اتفاقية مقدم خدمة"
+    },
+    "otherSide": {
+      "staff": "الموظف",
+      "partner": "الشريك",
+      "insurer": "شركة التأمين"
+    },
+    "otherSigned": "{name} · {female, select, yes {وقّعت} other {وقّع}} {date}",
+    "otherWaiting": "{name} · يوقّع بعدك",
+    "term": "المدة",
+    "termValue": "{n, plural, one {سنة} two {سنتين} few {# سنوات} other {# سنة}} من {date}",
+    "termMonths": "{n, plural, one {شهر} two {شهرين} few {# شهور} other {# شهر}} من {date}",
+    "pay": "الراتب",
+    "payValue": "{amount} بالشهر",
+    "pricing": "التسعير",
+    "read": "قريت العقد كامل ({clauses, plural, one {بند واحد} two {بندين} few {# بنود} other {# بند}}، {pages, plural, one {صفحة} two {صفحتين} few {# صفحات} other {# صفحة}})",
+    "readError": "أشّر عليها بعد ما تقرا العقد",
+    "id": "هويتك الوطنية",
+    "idHint": "من ملفك",
+    "info": "نفاذ يرسل طلب لجوالك، والتوقيع ينحفظ مع الوقت ورقم هويتك.",
+    "cancel": "إلغاء",
+    "send": "أرسل لنفاذ",
+    "sending": "جاري الإرسال…",
+    "notYourTurn": "مو دورك توقّع للحين.",
+    "approveTitle": "وافق من تطبيق نفاذ",
+    "approveText": "أرسلنا طلب لجوالك",
+    "pick": "اختر هالرقم في نفاذ",
+    "expires": "ينتهي بعد {time}",
+    "step1": "افتح تطبيق نفاذ في جوالك",
+    "step2": "اضغط على الطلب من {center}",
+    "step3": "اختر {n} وأكّد بوجهك أو بصمتك",
+    "waiting": "ننتظر موافقتك… الصفحة تتحدث لحالها.",
+    "check": "تحقق",
+    "expired": "انتهت مدة الطلب",
+    "expiredText": "ما انوقّع شي. أرسل طلب جديد لنفاذ.",
+    "rejected": "انرفض الطلب في نفاذ",
+    "rejectedText": "ما انوقّع شي. أرسل طلب جديد لو كان بالغلط.",
+    "again": "أرسل طلب جديد",
+    "failed": "نفاذ ما يرد",
+    "failedText": "ما انوقّع شي. جرّب بعد دقيقة.",
+    "toast": "انوقّع العقد",
+    "toastAll": "{n, plural, =2 {وقّع الطرفين} other {وقّع الكل}} · وانرسلت نسخة لـ {to}",
+    "toastNext": "الدور على {name}",
+    "toastNextText": "توقيعك انحفظ · ويوصله رابط برسالة الحين"
+  },
+  "pdfToast": "تحمّل الملف"
 }

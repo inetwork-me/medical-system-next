@@ -24,9 +24,13 @@ export function useBillText() {
   /** Short insurer name in sentences ("Bupa pays · 80%", "Sent to Bupa through NPHIES"). */
   const insurerShort = (id: string) => b(insurerOf(id)?.short ?? { en: id, ar: id })
   /** "1 Dec 2026" / "1 ديسمبر 2026": the Billing frames print the day without a leading zero (Latin digits, Gregorian). */
-  const date = (iso: string) =>
-    new Intl.DateTimeFormat(locale === "ar" ? "ar" : "en-GB", { day: "numeric", month: "short", year: "numeric", numberingSystem: "latn", calendar: "gregory" }).format(
-      new Date(`${iso.slice(0, 10)}T12:00`)
-    )
+  const date = (iso: string) => {
+    const d = new Date(`${iso.slice(0, 10)}T12:00`)
+    if (locale === "ar")
+      return new Intl.DateTimeFormat("ar", { day: "numeric", month: "long", year: "numeric", numberingSystem: "latn", calendar: "gregory" }).format(d)
+    // "30 Sep 2027": en-GB order with the 3-letter month ("Sept" in en-GB).
+    const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(d)
+    return `${d.getDate()} ${month} ${d.getFullYear()}`
+  }
   return { locale, ar, t, b, doctorName, patient, payerName, insurerShort, date }
 }

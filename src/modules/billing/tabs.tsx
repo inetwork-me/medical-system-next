@@ -10,7 +10,9 @@ import { readyBatch } from "./counts"
 import { ClaimsList, ClaimsSummary } from "./claims"
 import { FixClaimDialog, SubmitClaimsDialog } from "./claim-dialogs"
 import { BillingFrame } from "./frame"
+import { ContractsList } from "./contracts"
 import { InsurersGrid } from "./insurers"
+import { SignDialog } from "./sign-dialog"
 import { InvoicesList } from "./invoices"
 import { RecordPaymentDialog } from "./payment-dialog"
 import { useSoon } from "./parts"
@@ -118,8 +120,9 @@ export function InsurersTab() {
   )
 }
 
-/** Contracts: header "Billing / Contracts"; Export · New contract. */
+/** Contracts: header "Billing / Contracts"; Export · New contract; the contracts list (Sign → Nafath signing). */
 export function ContractsTab() {
+  const [signing, setSigning] = React.useState<string | null>(null)
   return (
     <BillingFrame
       tab="contracts"
@@ -129,6 +132,9 @@ export function ContractsTab() {
           <NewContractButton />
         </>
       }
-    />
+    >
+      <ContractsList onSign={setSigning} />
+      {signing && <SignDialog contractNo={signing} onOpenChange={(o) => !o && setSigning(null)} />}
+    </BillingFrame>
   )
 }

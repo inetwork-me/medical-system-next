@@ -47,7 +47,7 @@ export function KvBox({ rows }: { rows: [React.ReactNode, React.ReactNode][] }) 
       {rows.map(([k, v], i) => (
         <div key={i} className="flex items-center gap-3 border-b py-2.5 last:border-b-0">
           <span className="w-[140px] shrink-0 text-xs text-muted-foreground">{k}</span>
-          <span className="min-w-0 flex-1 text-sm text-foreground tabular-nums">{v}</span>
+          <span className="min-w-0 flex-1 text-sm text-foreground">{v}</span>
         </div>
       ))}
     </div>

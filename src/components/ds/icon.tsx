@@ -85,6 +85,7 @@ const ICONS = {
   eye: Iconsax.Eye,
   "eye-slash": Iconsax.EyeSlash,
   filter: Iconsax.Filter,
+  "finger-scan": Iconsax.FingerScan,
   gallery: Iconsax.Gallery,
   // The design's Iconsax "glass" is the lab flask; this package calls it ChemicalGlass (its Glass is spectacles).
   glass: Iconsax.ChemicalGlass,

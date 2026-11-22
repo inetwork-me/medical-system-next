@@ -20,6 +20,9 @@ import { FixClaimDialog, SubmitClaimsDialog } from "@/modules/billing/claim-dial
 import { toBundle } from "@/modules/billing/nphies"
 import { InsurersGrid } from "@/modules/billing/insurers"
 import { InsurerHeader, InsurerSide, InsurerTerms } from "@/modules/billing/insurer-page"
+import { ContractsList } from "@/modules/billing/contracts"
+import { ContractPaper, ContractSide } from "@/modules/billing/contract-page"
+import { SignDialog } from "@/modules/billing/sign-dialog"
 import {
   ClaimStatusBadge,
   ContractStatusBadge,
@@ -272,6 +275,7 @@ export function BillingStories() {
       <InvoiceStories />
       <ClaimStories />
       <InsurerStories />
+      <ContractStories />
 
       <Box title="Derived statuses · insurers, papers, contracts" className="lg:col-span-2">
         <div className="grid gap-4 md:grid-cols-3">
@@ -477,6 +481,52 @@ function InsurerStories() {
           <InsurerSide ins={medgulf} />
         </div>
       </Box>
+    </>
+  )
+}
+
+/** Step 5 · Contracts: the list (wide / compact), the paper + side (staff as drawn; partner and insurer from templates), signing. */
+function ContractStories() {
+  const [sign, setSign] = React.useState<null | 1 | 2>(null)
+  const c = (no: string) => CONTRACTS.find((x) => x.no === no)!
+  return (
+    <>
+      <Box title="Widget / Bill Contracts · Wide" className="lg:col-span-2">
+        <ContractsList onSign={() => setSign(1)} />
+      </Box>
+      <Box title="Widget / Bill Contracts · Compact (358)">
+        <div className="w-[358px] max-w-full">
+          <ContractsList onSign={() => setSign(1)} />
+        </div>
+      </Box>
+      <Box title="Overlays · Sign contract 1 · 2 (Nafath stub: approves on the 3rd poll)">
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={() => setSign(1)}>
+            Sign contract · 1
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setSign(2)}>
+            Sign contract · 2 (as drawn, static)
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">Step 1 → Send to Nafath swaps to step 2, which polls until approved (contract-signed toast) or expired.</p>
+      </Box>
+      <Box title="Widget / Bill Contract + Side · Wide — CTR-26-031 (staff, your turn)" className="lg:col-span-2">
+        <div className="@container/cp grid gap-6 xl:grid-cols-[736px_360px]">
+          <ContractPaper c={c("CTR-26-031")} />
+          <ContractSide c={c("CTR-26-031")} onSign={() => setSign(1)} />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Contract · Compact (358) — CTR-26-030 (partner draft, template clauses)">
+        <div className="w-[358px] max-w-full">
+          <ContractPaper c={c("CTR-26-030")} />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Contract · Compact (358) — CTR-26-029 (insurer, waiting for them)">
+        <div className="w-[358px] max-w-full">
+          <ContractPaper c={c("CTR-26-029")} />
+        </div>
+      </Box>
+      {sign && <SignDialog contractNo="CTR-26-031" initialStep={sign === 2 ? 2 : undefined} onOpenChange={(o) => !o && setSign(null)} />}
     </>
   )
 }

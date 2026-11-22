@@ -77,11 +77,12 @@ export function InsurerStatusBadge({ status, days, className }: { status: Insure
   )
 }
 
-export function ContractStatusBadge({ status, days, className }: { status: ContractStatus; days?: number; className?: string }) {
+/** `label` overrides the wording (the paper says "Waiting for your signature"); the tone stays the status's. */
+export function ContractStatusBadge({ status, days, label, className }: { status: ContractStatus; days?: number; label?: string; className?: string }) {
   const t = useTranslations("billing.status.contract")
   return (
     <StatusBadge tone={CONTRACT_TONE[status]} className={className}>
-      {t(status, { n: days ?? 0 })}
+      {label ?? t(status, { n: days ?? 0 })}
     </StatusBadge>
   )
 }

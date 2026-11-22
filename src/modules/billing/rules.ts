@@ -18,6 +18,7 @@ import {
   type Payment,
   type PayMethod,
   type Signer,
+  type ContractEvent,
 } from "./data"
 import { round2 } from "./money"
 
@@ -195,3 +196,36 @@ export function resendClaim(c: Claim, fix: { preauthNo: string; attachments: Cla
 
 /** Ask for approval: a pre-auth request goes to the insurer; the claim stays held back until it answers. */
 export const askPreauth = (c: Claim, at: string): Claim => ({ ...c, preauthRequestedAt: at })
+
+/* ------------------------------------------------------------------ signing */
+
+export type SignRefusal = "notSent" | "locked" | "notYourTurn"
+
+/** Only the next signer in order may sign; a draft or a locked document can't be signed. */
+export function canSignNow(c: Pick<Contract, "sent" | "locked" | "signers">, signer: Pick<Signer, "order">): SignRefusal | null {
+  if (!c.sent) return "notSent"
+  if (c.locked) return "locked"
+  return nextSigner(c)?.order === signer.order ? null : "notYourTurn"
+}
+
+/**
+ * Record a Nafath signature on the next signer: time, Nafath transaction id and the signed PDF's hash are stored with
+ * the (stored, never shown) national ID. After the last signature the document locks; the caller sends the copies and
+ * files it with the party (HR file for staff, the partner / insurer record for companies) — logged as events.
+ */
+export function signContract(c: Contract, order: number, proof: { at: string; nafathTxn: string; pdfHash: string }): Contract {
+  const who = c.signers.find((s) => s.order === order)?.name
+  const signers = c.signers.map((s) => (s.order === order ? { ...s, status: "signed" as const, signedAt: proof.at, nafathTxn: proof.nafathTxn, pdfHash: proof.pdfHash } : s))
+  const done = signers.every((s) => s.status === "signed")
+  const day = proof.at.slice(0, 10)
+  const events: ContractEvent[] = [...c.events, { at: day, kind: "signed", who }]
+  if (done) events.push({ at: day, kind: "locked" }, { at: day, kind: "copies", who: c.party.short ?? c.party.name }, { at: day, kind: "filed" })
+  return { ...c, signers, locked: done, events }
+}
+
+/** A stand-in for the signed PDF's SHA-256 (the real one hashes the rendered document). */
+export function pdfHashOf(c: Pick<Contract, "no" | "version">, at: string) {
+  let h = 2166136261
+  for (const ch of `${c.no}|${c.version}|${at}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619)
+  return `sha256:${(h >>> 0).toString(16).padStart(8, "0")}${c.no.replace(/\D/g, "")}`
+}

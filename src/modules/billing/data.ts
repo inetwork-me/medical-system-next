@@ -781,12 +781,17 @@ export type Signer = {
 
 export type Clause = { key: string; title: Bi; text: Bi }
 
-export type ContractEvent = { at: string; text: Bi }
+/** Contract activity: the design's lines carry their text; session events carry facts, worded in the reader's language. */
+export type ContractEvent = { at: string; text?: Bi; kind?: "signed" | "locked" | "copies" | "filed" | "sent" | "drafted"; who?: Bi }
 
 export type Party = {
   kind: "employee" | "company"
   initials: string
   name: Bi
+  /** Arabic agreement for an employee ("الموظفة"). */
+  female?: boolean
+  /** How sentences name the party ("Dr. Lama", "Al Borg"). */
+  short?: Bi
   /** List subtitle: job title or what the company does. */
   role: Bi
   /** Company CR, or the employee's national ID (masked in the UI). */
@@ -888,6 +893,8 @@ export const CONTRACTS: Contract[] = [
       kind: "employee",
       initials: "LS",
       name: bi("Dr. Lama Al-Saud", "د. لمى آل سعود"),
+      short: bi("Dr. Lama", "د. لمى"),
+      female: true,
       role: bi("Consultant pediatrician", "استشارية أطفال"),
       nationalId: "1048213417",
       licence: { no: "22RM0417", validTo: "2028-06-30" },
@@ -1041,7 +1048,7 @@ export const CONTRACTS: Contract[] = [
     no: "CTR-26-027",
     kind: "staff",
     kindDetail: bi("employment", "عقد عمل"),
-    party: { kind: "employee", initials: "HO", name: bi("Hanan Al-Otaibi", "حنان العتيبي"), role: bi("Phlebotomist", "أخصائية سحب دم"), nationalId: "1090472216", licence: { no: "23RL1182", validTo: "2027-10-31" } },
+    party: { kind: "employee", initials: "HO", name: bi("Hanan Al-Otaibi", "حنان العتيبي"), short: bi("Hanan", "حنان"), female: true, role: bi("Phlebotomist", "أخصائية سحب دم"), nationalId: "1090472216", licence: { no: "23RL1182", validTo: "2027-10-31" } },
     template: "staff-employment",
     version: 1,
     draftedAt: "2026-10-20",
@@ -1120,7 +1127,7 @@ export const CONTRACTS: Contract[] = [
     no: "CTR-25-071",
     kind: "staff",
     kindDetail: bi("employment", "عقد عمل"),
-    party: { kind: "employee", initials: "AZ", name: bi("Dr. Ahmed Zaki", "د. أحمد زكي"), role: bi("Consultant pediatrician", "استشاري أطفال"), nationalId: "2381920571", licence: { no: "19RM2210", validTo: "2027-02-28" }, ref: "zaki" },
+    party: { kind: "employee", initials: "AZ", name: bi("Dr. Ahmed Zaki", "د. أحمد زكي"), short: bi("Dr. Ahmed", "د. أحمد"), role: bi("Consultant pediatrician", "استشاري أطفال"), nationalId: "2381920571", licence: { no: "19RM2210", validTo: "2027-02-28" }, ref: "zaki" },
     template: "staff-employment",
     version: 1,
     draftedAt: "2025-02-10",

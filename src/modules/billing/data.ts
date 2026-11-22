@@ -839,6 +839,9 @@ export type Contract = {
   signers: Signer[]
   /** True once sent for signature (draft before). */
   sent: boolean
+  /** When it went out for signature, and the last SMS reminder (Needs attention: "Sent 16 Nov · reminded 20 Nov"). */
+  sentAt?: string
+  remindedAt?: string
   /** Locked after the last signature: no edits, copies sent, filed with the party. */
   locked: boolean
   pages: number
@@ -979,6 +982,8 @@ export const CONTRACTS: Contract[] = [
       signer(2, { initials: "MA", name: bi("Malath provider relations", "علاقات مقدمي الخدمة · ملاذ"), role: bi("Malath", "ملاذ"), side: "party", mobile: "+966 11 410 5500", nationalId: "1077120539", status: "waiting" }),
     ],
     sent: true,
+    sentAt: "2026-11-16",
+    remindedAt: "2026-11-20",
     locked: false,
     pages: 18,
     verifyCode: "CTR-3MX8",
@@ -1172,18 +1177,18 @@ export const OTHER_CONTRACTS = {
 
 /* ------------------------------------------------------------------ overview */
 
-/** Money in · last 2 weeks (Sun–Thu), SAR thousands; the last bar is today. */
+/** Money in · the last 2 working weeks (Sun–Thu), SAR thousands: the design's bars for the 9 working days before
+ * today; today's bar is the live "Collected today". */
 export const MONEY_IN_DAYS: { day: string; value: number }[] = [
-  { day: "2026-11-08", value: 41 },
-  { day: "2026-11-09", value: 44 },
-  { day: "2026-11-10", value: 39 },
-  { day: "2026-11-11", value: 47 },
-  { day: "2026-11-12", value: 34 },
-  { day: "2026-11-15", value: 43 },
-  { day: "2026-11-16", value: 50 },
-  { day: "2026-11-17", value: 42 },
-  { day: "2026-11-18", value: 47 },
-  { day: "2026-11-19", value: 28 },
+  { day: "2026-11-09", value: 38.1 },
+  { day: "2026-11-10", value: 41.1 },
+  { day: "2026-11-11", value: 36.1 },
+  { day: "2026-11-12", value: 43.9 },
+  { day: "2026-11-15", value: 31.1 },
+  { day: "2026-11-16", value: 40 },
+  { day: "2026-11-17", value: 46.1 },
+  { day: "2026-11-18", value: 38.9 },
+  { day: "2026-11-19", value: 43.1 },
 ]
 /** "Who paid this month": patients (cash and cards) share, percent; insurers carry their own paidShare. */
 export const PATIENTS_PAID_SHARE = 38

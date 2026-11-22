@@ -721,5 +721,49 @@
     "sentToast": "Sent for signature",
     "sentToastText": "{name} gets the SMS link first",
     "noKind": "You can't draft this kind of contract"
+  },
+  "overview": {
+    "kpi": {
+      "collected": "Collected today",
+      "vsLastSunday": "vs last {day}",
+      "unpaid": "Unpaid by patients",
+      "invoices": "{n, plural, one {# invoice} other {# invoices}}",
+      "over30": "{n} over 30 days",
+      "review": "Claims in review",
+      "claims": "{n, plural, one {# claim} other {# claims}}",
+      "answerIn": "answer in {days} days",
+      "contracts": "Contracts to act on",
+      "forYou": "{n} for you",
+      "toSignEnding": "{sign} to sign · {ending} ending"
+    },
+    "money": {
+      "title": "Money in",
+      "text": "Last 2 weeks · patients and insurers · SAR thousands",
+      "chartLabel": "Money in per working day, SAR thousands; today highlighted",
+      "who": "Who paid this month",
+      "patients": "Patients · cash and cards"
+    },
+    "attention": {
+      "title": "Needs attention",
+      "text": "{n, plural, one {# item} other {# items}} · oldest first",
+      "empty": "Nothing needs you right now",
+      "emptyText": "Rejected claims, signatures and renewals show up here.",
+      "rejected": "Claim rejected · {name}",
+      "rejectedText": "{insurer} · {reason} · {amount}",
+      "fix": "Fix",
+      "sign": "Your signature · {name}",
+      "signText": "{kind} contract · {g, select, female {she signed} other {he signed}} {date}",
+      "signTextNone": "{kind} contract · your turn",
+      "signBtn": "Sign",
+      "ending": "{insurer} agreement ends in {n} days",
+      "endingText": "Ends {date} · start the renewal",
+      "renew": "Renew",
+      "unpaid": "{n, plural, one {# invoice still unpaid} other {# invoices still unpaid}}",
+      "unpaidText": "{amount} · {k} are over 30 days",
+      "view": "View",
+      "them": "{name} hasn't signed yet",
+      "themText": "Sent {sent}{reminded, select, none {} other { · reminded {reminded}}}",
+      "open": "Open"
+    }
   }
 }

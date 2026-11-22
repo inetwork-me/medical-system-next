@@ -721,5 +721,49 @@
     "sentToast": "انرسل للتوقيع",
     "sentToastText": "{name} يوصله الرابط أول",
     "noKind": "ما تقدر تكتب هالنوع من العقود"
+  },
+  "overview": {
+    "kpi": {
+      "collected": "المحصّل اليوم",
+      "vsLastSunday": "عن {day} اللي فات",
+      "unpaid": "ما دفعها المرضى",
+      "invoices": "{n, plural, one {فاتورة} two {فاتورتين} few {# فواتير} other {# فاتورة}}",
+      "over30": "{n} فوق 30 يوم",
+      "review": "مطالبات تحت المراجعة",
+      "claims": "{n, plural, one {مطالبة} two {مطالبتين} few {# مطالبات} other {# مطالبة}}",
+      "answerIn": "الرد خلال {days} يوم",
+      "contracts": "عقود تبي إجراء",
+      "forYou": "{n} لك",
+      "toSignEnding": "{sign} للتوقيع · {ending} تخلص"
+    },
+    "money": {
+      "title": "الدخل",
+      "text": "آخر أسبوعين · المرضى والتأمين · بالألف ريال",
+      "chartLabel": "الدخل لكل يوم عمل بالألف ريال، واليوم مميز",
+      "who": "مين دفع هالشهر",
+      "patients": "المرضى · كاش وبطاقات"
+    },
+    "attention": {
+      "title": "يبي لها متابعة",
+      "text": "{n, plural, one {شي واحد} two {شيئين} few {# أشياء} other {# شي}} · الأقدم أول",
+      "empty": "ما فيه شي يبيك الحين",
+      "emptyText": "المطالبات المرفوضة والتواقيع والتجديدات تطلع هنا.",
+      "rejected": "مطالبة مرفوضة · {name}",
+      "rejectedText": "{insurer} · {reason} · {amount}",
+      "fix": "صلّحها",
+      "sign": "توقيعك · {name}",
+      "signText": "{kind} · {g, select, female {هي وقّعت} other {هو وقّع}} {date}",
+      "signTextNone": "{kind} · دورك",
+      "signBtn": "وقّع",
+      "ending": "اتفاقية {insurer} تخلص بعد {n} يوم",
+      "endingText": "تخلص {date} · ابدأ التجديد",
+      "renew": "جدّد",
+      "unpaid": "{n, plural, one {فاتورة ما انتدفعت} two {فاتورتين ما انتدفعت} few {# فواتير ما انتدفعت} other {# فاتورة ما انتدفعت}}",
+      "unpaidText": "{amount} · {k} منها فوق 30 يوم",
+      "view": "اعرض",
+      "them": "{name} ما {g, select, female {وقّعت} other {وقّع}} لين الحين",
+      "themText": "انرسل {sent}{reminded, select, none {} other { · وتذكير {reminded}}}",
+      "open": "افتح"
+    }
   }
 }

@@ -24,6 +24,7 @@ import { ContractsList } from "@/modules/billing/contracts"
 import { ContractPaper, ContractSide } from "@/modules/billing/contract-page"
 import { SignDialog } from "@/modules/billing/sign-dialog"
 import { ContractFormCards, ContractSummary, useContractForm, type ContractForm } from "@/modules/billing/new-contract"
+import { MoneyIn, NeedsAttention, OverviewKpis } from "@/modules/billing/overview"
 import {
   ClaimStatusBadge,
   ContractStatusBadge,
@@ -278,6 +279,7 @@ export function BillingStories() {
       <InsurerStories />
       <ContractStories />
       <NewContractStories />
+      <OverviewStories />
 
       <Box title="Derived statuses · insurers, papers, contracts" className="lg:col-span-2">
         <div className="grid gap-4 md:grid-cols-3">
@@ -564,6 +566,32 @@ function NewContractStories() {
       <FormStory kind="partner" initial={DRAWN} title="Widget / New Contract Form · Two + Summary — Partner (as drawn)" />
       <FormStory kind="staff" initial={{ partyId: "emp-haddad", mobile: "+966 50 611 2218", jobTitle: "Consultant cardiologist", department: "Cardiology · Riyadh", basic: "32000", housing: "8000", transport: "3000", signers: ["party", "center"] }} title="New Contract Form — Staff (not drawn: same layout)" />
       <FormStory kind="insurer" initial={{ partyId: "ins-gig", mobile: "+966 11 418 2200", signers: ["party", "center"] }} title="New Contract Form — Insurer (not drawn: same layout)" />
+    </>
+  )
+}
+
+/** Step 7 · Overview: KPIs, Money in (wide / compact), Needs attention — all from the live records. */
+function OverviewStories() {
+  return (
+    <>
+      <Box title="Overview KPIs" className="lg:col-span-2">
+        <OverviewKpis />
+      </Box>
+      <Box title="Widget / Bill Money In · Wide (736)">
+        <div className="w-[736px] max-w-full">
+          <MoneyIn />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Money In · Compact (358) · Widget / Bill Attention (360)">
+        <div className="flex flex-wrap gap-6">
+          <div className="w-[358px] max-w-full">
+            <MoneyIn />
+          </div>
+          <div className="w-[360px] max-w-full">
+            <NeedsAttention onFix={() => undefined} onSign={() => undefined} />
+          </div>
+        </div>
+      </Box>
     </>
   )
 }

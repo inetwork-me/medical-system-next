@@ -294,6 +294,7 @@ export function buildContract(f: ContractForm, no: string, sent: boolean): Contr
     files: f.papers,
     signers,
     sent,
+    sentAt: sent ? BILL_TODAY : undefined,
     locked: false,
     pages: 4,
     verifyCode: `CTR-${no.slice(-3)}X`,

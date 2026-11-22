@@ -15,6 +15,7 @@ import { FixClaimDialog, SubmitClaimsDialog } from "./claim-dialogs"
 import { BillingFrame } from "./frame"
 import { ContractsList } from "./contracts"
 import { InsurersGrid } from "./insurers"
+import { MoneyIn, NeedsAttention, OverviewKpis } from "./overview"
 import { SignDialog } from "./sign-dialog"
 import { InvoicesList } from "./invoices"
 import { RecordPaymentDialog } from "./payment-dialog"
@@ -61,6 +62,8 @@ export function OverviewTab() {
   const t = useTranslations("billing")
   const tn = useTranslations("shell.nav")
   usePageTitle({ title: t("title"), mobileTitle: true, crumbs: [{ label: tn("home"), href: "/dashboard" }] })
+  const [fixing, setFixing] = React.useState<string | null>(null)
+  const [signing, setSigning] = React.useState<string | null>(null)
   return (
     <BillingFrame
       tab="overview"
@@ -70,7 +73,20 @@ export function OverviewTab() {
           <NewContractButton />
         </>
       }
-    />
+    >
+      <OverviewKpis />
+      {/* Desktop: Money in beside Needs attention; tablet / mobile: Needs attention first (as drawn). */}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start xl:gap-6">
+        <div className="order-2 xl:order-1">
+          <MoneyIn />
+        </div>
+        <div className="order-1 xl:order-2">
+          <NeedsAttention onFix={setFixing} onSign={setSigning} />
+        </div>
+      </div>
+      {fixing && <FixClaimDialog claimNo={fixing} onOpenChange={(o) => !o && setFixing(null)} />}
+      {signing && <SignDialog contractNo={signing} onOpenChange={(o) => !o && setSigning(null)} />}
+    </BillingFrame>
   )
 }
 

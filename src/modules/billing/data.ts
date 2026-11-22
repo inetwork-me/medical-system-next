@@ -357,7 +357,17 @@ export type ZatcaRecord = {
   type: "simplified" | "standard"
 }
 
-export type InvoiceEvent = { at: string; kind: "paid" | "issued" | "claimSent" | "sent" | "refunded"; text: Bi }
+/**
+ * Invoice history. The design's events carry their text; events recorded in the session carry their facts
+ * (amount, method, who) and are worded in the reader's language.
+ */
+export type InvoiceEvent = {
+  at: string
+  kind: "paid" | "issued" | "claimSent" | "sent" | "refunded"
+  text?: Bi
+  paid?: { amount: number; method: PayMethod; byName: Bi }
+  sent?: { to: "guardian" | "patient" }
+}
 
 export type Invoice = {
   no: string

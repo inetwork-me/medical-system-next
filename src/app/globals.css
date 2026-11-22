@@ -342,20 +342,21 @@ html[lang="ar"] {
   }
 }
 
-/* Lab report (Order page · Report): printing the page prints only the A4 paper, edge to edge. */
+/* Lab report (Order page · Report) and Billing papers (tax invoice, contract): printing the page prints only the A4
+   paper, edge to edge. */
 @media print {
   @page {
     size: A4;
     margin: 12mm;
   }
-  html:has([data-lab-report]) body * {
+  html:has([data-lab-report], [data-bill-paper]) body * {
     visibility: hidden !important;
   }
-  html:has([data-lab-report]) [data-lab-report],
-  html:has([data-lab-report]) [data-lab-report] * {
+  html:has([data-lab-report], [data-bill-paper]) :is([data-lab-report], [data-bill-paper]),
+  html:has([data-lab-report], [data-bill-paper]) :is([data-lab-report], [data-bill-paper]) * {
     visibility: visible !important;
   }
-  html:has([data-lab-report]) [data-lab-report] {
+  html:has([data-lab-report], [data-bill-paper]) :is([data-lab-report], [data-bill-paper]) {
     position: absolute;
     inset-block-start: 0;
     inset-inline-start: 0;

@@ -68,5 +68,167 @@
     "newContract": "عقد جديد",
     "newAgreement": "اتفاقية جديدة",
     "sendClaims": "{n, plural, one {أرسل مطالبة} two {أرسل مطالبتين} few {أرسل # مطالبات} other {أرسل # مطالبة}}"
+  },
+  "method": {
+    "cash": "كاش",
+    "mada": "مدى",
+    "card": "بطاقة",
+    "applepay": "Apple Pay",
+    "transfer": "تحويل"
+  },
+  "methodIn": {
+    "cash": "كاش",
+    "mada": "بمدى",
+    "card": "ببطاقة",
+    "applepay": "بـ Apple Pay",
+    "transfer": "بتحويل"
+  },
+  "cash": "كاش",
+  "pdf": {
+    "done": "تحمّل الملف",
+    "doneText": "انحفظ في التنزيلات",
+    "failed": "ما قدرنا نسوي الملف",
+    "failedText": "ما انحفظ شي. جرّب مرة ثانية."
+  },
+  "invoices": {
+    "title": "الفواتير",
+    "subtitle": "{month} · كلها مرفوعة لهيئة الزكاة",
+    "subtitlePending": "{month} · {n} بانتظار الهيئة",
+    "downloadAll": "حمّل الكل",
+    "search": "دوّر مريض أو رقم ملف أو فاتورة…",
+    "filter": {
+      "label": "حالة الفاتورة",
+      "all": "الكل · {n}",
+      "unpaid": "غير مدفوعة · {n}",
+      "part": "جزئي · {n}",
+      "paid": "مدفوعة · {n}",
+      "refunded": "مسترجعة · {n}"
+    },
+    "col": {
+      "invoice": "الفاتورة",
+      "patient": "المريض",
+      "payer": "الجهة",
+      "total": "الإجمالي",
+      "patientPays": "على المريض",
+      "status": "الحالة",
+      "action": "الإجراء"
+    },
+    "collect": "حصّل",
+    "view": "اعرض",
+    "open": "افتح {no}",
+    "sub": "{payer} · {no}",
+    "patientPays": "على المريض {amount}",
+    "showing": "يعرض {shown} من {total} فاتورة",
+    "showMore": "اعرض أكثر",
+    "showMoreN": "اعرض {n} زيادة",
+    "empty": "ما فيه فواتير تطابق",
+    "emptyText": "جرّب اسم أو رقم ملف أو رقم فاتورة ثاني، أو امسح الفلتر.",
+    "clear": "امسح البحث والفلتر",
+    "pdfTitle": "الفواتير · {month}"
+  },
+  "invoice": {
+    "title": "{no} · {name}",
+    "mobileTitle": "الفاتورة",
+    "back": "ارجع للفواتير",
+    "more": "إجراءات ثانية",
+    "notFound": "ما لقينا هالفاتورة",
+    "notFoundText": "يمكن تكون من شهر أو فرع ثاني.",
+    "backToList": "ارجع للفواتير",
+    "send": "أرسل للمريض",
+    "record": "سجّل دفعة",
+    "print": "اطبع",
+    "taxInvoice": "فاتورة ضريبية",
+    "issued": "{no} · صدرت {date} · {time}",
+    "seller": "الرقم الضريبي {vat} · السجل التجاري {cr} · {city}",
+    "zatca": "ZATCA",
+    "qr": "رمز الهيئة",
+    "field": {
+      "patient": "المريض",
+      "mrn": "رقم الملف",
+      "insurer": "التأمين",
+      "visit": "الزيارة",
+      "doctor": "الطبيب",
+      "claim": "المطالبة"
+    },
+    "insurerClass": "{name} · فئة {cls}",
+    "visit": "{date} · {clinic}",
+    "line": {
+      "item": "البند",
+      "qty": "الكمية",
+      "price": "السعر",
+      "vat": "الضريبة {rate}",
+      "vatMixed": "الضريبة",
+      "total": "الإجمالي"
+    },
+    "sum": {
+      "subtotal": "المجموع",
+      "vat": "الضريبة {rate}",
+      "vatMixed": "الضريبة",
+      "total": "الإجمالي",
+      "insurerPays": "{insurer} تدفع · {pct}",
+      "patientPays": "المريض يدفع · {pct}",
+      "patientPaysCash": "المريض يدفع",
+      "paid": "انتدفع · {method} {date}",
+      "balance": "المتبقي"
+    },
+    "footer": {
+      "reported": "مرفوعة لهيئة الزكاة · {date} {time} · UUID {uuid}",
+      "cleared": "معتمدة من هيئة الزكاة · {date} {time} · UUID {uuid}",
+      "pending": "بانتظار تأكيد الهيئة · UUID {uuid}",
+      "failed": "الهيئة ما قبلتها · UUID {uuid}",
+      "refund": "الاسترجاع خلال {days} يوم بهالفاتورة. للاستفسار: {email}",
+      "refunded": "انسترجعت بإشعار دائن {cn}"
+    },
+    "pay": {
+      "title": "دفع المريض",
+      "copay": "نسبة التحمل {pct} · {insurer} فئة {cls}",
+      "cash": "كاش · بدون تأمين",
+      "patientPays": "على المريض",
+      "paid": "انتدفع",
+      "balance": "المتبقي"
+    },
+    "claim": {
+      "title": "مطالبة التأمين",
+      "sent": "انرسلت ل{insurer} عبر نفيس",
+      "notSent": "ما انرسلت ل{insurer} للحين",
+      "line": "{amount} · انرسلت {date} {time}",
+      "open": "افتح المطالبات"
+    },
+    "history": {
+      "title": "السجل",
+      "paid": "انتدفع {amount} {method} · {name}",
+      "sent": "انرسلت الفاتورة {who} برسالة"
+    },
+    "sentToast": "انرسلت الفاتورة",
+    "sentGuardian": "برسالة وإيميل لولي الأمر",
+    "sentPatient": "برسالة وإيميل للمريض",
+    "who": {
+      "guardian": "لولي الأمر",
+      "patient": "للمريض"
+    }
+  },
+  "payment": {
+    "title": "تسجيل دفعة",
+    "sub": "{no} · {name}",
+    "paidBy": "طريقة الدفع",
+    "amount": "المبلغ",
+    "terminal": "جهاز الشبكة",
+    "approval": "رقم الموافقة",
+    "approvalHint": "من إيصال الجهاز",
+    "sms": "أرسل الإيصال برسالة",
+    "smsTo": "{phone} · {owner}",
+    "cancel": "إلغاء",
+    "save": "احفظ الدفعة",
+    "error": {
+      "amount": "اكتب المبلغ",
+      "overBalance": "أكثر من المتبقي ({amount}). الاسترجاع يكون بإشعار دائن.",
+      "approval": "6 أرقام من إيصال الجهاز",
+      "closed": "هالفاتورة ما عليها شي"
+    },
+    "toast": "انستلم {amount} {method}",
+    "toastFull": "الفاتورة انسددت كاملة · وانرسل الإيصال برسالة",
+    "toastFullNoSms": "الفاتورة انسددت كاملة",
+    "toastPart": "باقي {balance} · وانرسل الإيصال برسالة",
+    "toastPartNoSms": "باقي {balance}"
   }
 }

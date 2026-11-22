@@ -68,5 +68,167 @@
     "newContract": "New contract",
     "newAgreement": "New agreement",
     "sendClaims": "{n, plural, one {Send # claim} other {Send # claims}}"
+  },
+  "method": {
+    "cash": "Cash",
+    "mada": "mada",
+    "card": "Card",
+    "applepay": "Apple Pay",
+    "transfer": "Transfer"
+  },
+  "methodIn": {
+    "cash": "in cash",
+    "mada": "by mada",
+    "card": "by card",
+    "applepay": "by Apple Pay",
+    "transfer": "by transfer"
+  },
+  "cash": "Cash",
+  "pdf": {
+    "done": "PDF downloaded",
+    "doneText": "Saved to Downloads",
+    "failed": "Couldn't make the PDF",
+    "failedText": "Nothing was saved. Try again."
+  },
+  "invoices": {
+    "title": "Invoices",
+    "subtitle": "{month} · all reported to ZATCA",
+    "subtitlePending": "{month} · {n} waiting for ZATCA",
+    "downloadAll": "Download all",
+    "search": "Search patient, MRN or invoice no…",
+    "filter": {
+      "label": "Invoice status",
+      "all": "All · {n}",
+      "unpaid": "Unpaid · {n}",
+      "part": "Partly paid · {n}",
+      "paid": "Paid · {n}",
+      "refunded": "Refunded · {n}"
+    },
+    "col": {
+      "invoice": "Invoice",
+      "patient": "Patient",
+      "payer": "Payer",
+      "total": "Total",
+      "patientPays": "Patient pays",
+      "status": "Status",
+      "action": "Action"
+    },
+    "collect": "Collect",
+    "view": "View",
+    "open": "Open {no}",
+    "sub": "{no} · {payer}",
+    "patientPays": "Patient pays {amount}",
+    "showing": "Showing {shown} of {total} invoices",
+    "showMore": "Show more",
+    "showMoreN": "Show {n} more",
+    "empty": "No invoices match",
+    "emptyText": "Try another name, MRN or invoice no., or clear the filter.",
+    "clear": "Clear search and filter",
+    "pdfTitle": "Invoices · {month}"
+  },
+  "invoice": {
+    "title": "{no} · {name}",
+    "mobileTitle": "Invoice",
+    "back": "Back to invoices",
+    "more": "More actions",
+    "notFound": "We couldn't find this invoice",
+    "notFoundText": "It may be from another month or branch.",
+    "backToList": "Back to invoices",
+    "send": "Send to patient",
+    "record": "Record payment",
+    "print": "Print",
+    "taxInvoice": "Tax invoice",
+    "issued": "{no} · issued {date} · {time}",
+    "seller": "VAT no. {vat} · CR {cr} · {city}",
+    "zatca": "ZATCA",
+    "qr": "ZATCA QR code",
+    "field": {
+      "patient": "Patient",
+      "mrn": "MRN",
+      "insurer": "Insurer",
+      "visit": "Visit",
+      "doctor": "Doctor",
+      "claim": "Claim"
+    },
+    "insurerClass": "{name} · class {cls}",
+    "visit": "{date} · {clinic}",
+    "line": {
+      "item": "Item",
+      "qty": "Qty",
+      "price": "Price",
+      "vat": "VAT {rate}",
+      "vatMixed": "VAT",
+      "total": "Total"
+    },
+    "sum": {
+      "subtotal": "Subtotal",
+      "vat": "VAT {rate}",
+      "vatMixed": "VAT",
+      "total": "Total",
+      "insurerPays": "{insurer} pays · {pct}",
+      "patientPays": "Patient pays · {pct}",
+      "patientPaysCash": "Patient pays",
+      "paid": "Paid · {method} {date}",
+      "balance": "Balance"
+    },
+    "footer": {
+      "reported": "Reported to ZATCA · {date} {time} · UUID {uuid}",
+      "cleared": "Cleared by ZATCA · {date} {time} · UUID {uuid}",
+      "pending": "Waiting for ZATCA to confirm · UUID {uuid}",
+      "failed": "ZATCA didn't accept it · UUID {uuid}",
+      "refund": "Refunds within {days} days with this invoice. Questions: {email}",
+      "refunded": "Refunded with credit note {cn}"
+    },
+    "pay": {
+      "title": "Patient payment",
+      "copay": "Co-pay {pct} · {insurer} class {cls}",
+      "cash": "Cash · no insurance",
+      "patientPays": "Patient pays",
+      "paid": "Paid",
+      "balance": "Balance"
+    },
+    "claim": {
+      "title": "Insurance claim",
+      "sent": "Sent to {insurer} through NPHIES",
+      "notSent": "Not sent to {insurer} yet",
+      "line": "{amount} · sent {date} {time}",
+      "open": "Open claims"
+    },
+    "history": {
+      "title": "History",
+      "paid": "{amount} paid {method} · {name}",
+      "sent": "Invoice sent to the {who} by SMS"
+    },
+    "sentToast": "Invoice sent",
+    "sentGuardian": "SMS and email to the guardian",
+    "sentPatient": "SMS and email to the patient",
+    "who": {
+      "guardian": "guardian",
+      "patient": "patient"
+    }
+  },
+  "payment": {
+    "title": "Record payment",
+    "sub": "{no} · {name}",
+    "paidBy": "Paid by",
+    "amount": "Amount",
+    "terminal": "Card machine",
+    "approval": "Approval code",
+    "approvalHint": "From the card slip",
+    "sms": "Send the receipt by SMS",
+    "smsTo": "{phone} · {owner}",
+    "cancel": "Cancel",
+    "save": "Save payment",
+    "error": {
+      "amount": "Enter the amount",
+      "overBalance": "More than the balance ({amount}). Refunds go through a credit note.",
+      "approval": "6 digits from the card slip",
+      "closed": "This invoice has nothing left to pay"
+    },
+    "toast": "{amount} received {method}",
+    "toastFull": "{no} is fully paid · receipt sent by SMS",
+    "toastFullNoSms": "{no} is fully paid",
+    "toastPart": "{balance} still to pay · receipt sent by SMS",
+    "toastPartNoSms": "{balance} still to pay"
   }
 }

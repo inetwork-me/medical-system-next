@@ -20,7 +20,7 @@ export function useB() {
 /** Latin text (invoice / claim / contract nos., VAT, CR, MRN, phones, emails) kept LTR inside Arabic. */
 export function Latin({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <bdi dir="ltr" className={cn("tabular-nums", className)}>
+    <bdi dir="ltr" className={className}>
       {children}
     </bdi>
   )

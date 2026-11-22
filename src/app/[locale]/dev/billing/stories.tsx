@@ -10,6 +10,11 @@ import { claimCounts, contractCounts, invoiceCounts } from "@/modules/billing/co
 import { contractStatus, copayFor, docStatus, insurerStatus, invoiceStatus, daysLeft, maskId, signedCount, totals } from "@/modules/billing/rules"
 import { BILL_ROLES, billCan, roleTabs, type BillAction } from "@/modules/billing/roles"
 import { setBillRole, useBillRole } from "@/modules/billing/store"
+import { InvoicesList } from "@/modules/billing/invoices"
+import { InvoicePaper, InvoiceSide } from "@/modules/billing/invoice-page"
+import { RecordPaymentDialog } from "@/modules/billing/payment-dialog"
+import { applyZatca, zatcaRequest, zatcaStub } from "@/modules/billing/zatca"
+import type { Invoice } from "@/modules/billing/data"
 import {
   ClaimStatusBadge,
   ContractStatusBadge,
@@ -259,6 +264,8 @@ export function BillingStories() {
         </table>
       </Box>
 
+      <InvoiceStories />
+
       <Box title="Derived statuses · insurers, papers, contracts" className="lg:col-span-2">
         <div className="grid gap-4 md:grid-cols-3">
           <div className="flex flex-col gap-2">
@@ -305,5 +312,72 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
       </span>
       {children}
     </div>
+  )
+}
+
+const inv = (no: string) => INVOICES.find((x) => x.no === no)!
+
+/** Step 2 · Invoices: the list (wide / compact), the paper (insured, cash, refunded), the side column, Record payment, ZATCA stub. */
+function InvoiceStories() {
+  const [paying, setPaying] = React.useState<string | null>(null)
+  const [z, setZ] = React.useState<Invoice>(() => ({ ...inv("INV-2611-0239"), zatca: { ...inv("INV-2611-0239").zatca, status: "pending", reportedAt: undefined } }))
+  const report = async (fail: boolean) => {
+    const pending: Invoice = { ...z, zatca: { ...z.zatca, status: "pending", reportedAt: undefined } }
+    setZ(pending)
+    const res = await zatcaStub({ fail }).report(zatcaRequest(pending), pending.zatca.type)
+    setZ(applyZatca(pending, res, "2026-11-22T11:41"))
+  }
+  return (
+    <>
+      <Box title="Widget / Bill Invoices · Wide (Collect → Record payment)" className="lg:col-span-2">
+        <InvoicesList onCollect={setPaying} />
+      </Box>
+      <Box title="Widget / Bill Invoices · Compact (358)">
+        <div className="w-[358px] max-w-full">
+          <InvoicesList onCollect={setPaying} />
+        </div>
+      </Box>
+      <Box title="Overlay · Record payment (open from a row)">
+        <div className="flex flex-wrap gap-2">
+          {["INV-2611-0241", "INV-2611-0239", "INV-2611-0235"].map((no) => (
+            <Button key={no} variant="outline" size="sm" onClick={() => setPaying(no)}>
+              <Latin>{no}</Latin>
+            </Button>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">Payments change the session store; the role switch above hides Collect for roles without it.</p>
+      </Box>
+      <Box title="Widget / Bill Invoice · Wide (736) — insured, partly paid" className="lg:col-span-2">
+        <div className="grid gap-6 xl:grid-cols-[736px_360px]">
+          <InvoicePaper inv={inv("INV-2611-0241")} />
+          <InvoiceSide inv={inv("INV-2611-0241")} onRecord={() => setPaying("INV-2611-0241")} />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Invoice · Compact (358) — cash, unpaid">
+        <div className="w-[358px] max-w-full">
+          <InvoicePaper inv={inv("INV-2611-0239")} />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Invoice · Compact (358) — refunded (credit note)">
+        <div className="w-[358px] max-w-full">
+          <InvoicePaper inv={inv("INV-2611-0237")} />
+        </div>
+      </Box>
+      <Box title="ZATCA stub · report → confirmed / rejected (badge only after the API confirms)" className="lg:col-span-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <Button size="sm" variant="outline" onClick={() => void report(false)}>
+            Report (passes)
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => void report(true)}>
+            Report (BR-KSA-37 error)
+          </Button>
+          <ZatcaLine status={z.zatca.status} />
+          <span className="font-mono text-xs text-muted-foreground" dir="ltr">
+            status: {z.zatca.status} · reportedAt: {z.zatca.reportedAt ?? "—"}
+          </span>
+        </div>
+      </Box>
+      {paying && <RecordPaymentDialog invoiceNo={paying} onOpenChange={(o) => !o && setPaying(null)} />}
+    </>
   )
 }

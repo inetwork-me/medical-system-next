@@ -14,6 +14,9 @@ import {
   type Invoice,
   type InvoiceLine,
   type InvoiceStatus,
+  type InvoiceEvent,
+  type Payment,
+  type PayMethod,
   type Signer,
 } from "./data"
 import { round2 } from "./money"
@@ -144,3 +147,32 @@ export const monthlyPay = (t: { basic: number; housing: number; transport: numbe
 
 /** Labor Law: at most 48 working hours a week. */
 export const MAX_WEEK_HOURS = 48
+
+/* ------------------------------------------------------------------ payments */
+
+export type PaymentError = "amount" | "overBalance" | "approval" | "closed"
+
+/** Card methods go through a card machine (terminal + slip approval code); cash and transfers don't. */
+export const usesTerminal = (m: PayMethod) => m === "mada" || m === "card" || m === "applepay"
+
+/** Check a payment before saving it. Amounts above the balance are refused (refunds need a credit note). */
+export function paymentError(inv: Invoice, p: Pick<Payment, "amount" | "method" | "approvalCode">): PaymentError | null {
+  if (!canCollect(inv)) return "closed"
+  if (!(p.amount > 0)) return "amount"
+  if (round2(p.amount) > totals(inv).balance) return "overBalance"
+  // The approval code is optional (design: no asterisk); when given it's the slip's 6 digits.
+  if (usesTerminal(p.method) && p.approvalCode && !/^\d{6}$/.test(p.approvalCode)) return "approval"
+  return null
+}
+
+/** Record a payment: appended to the issued invoice (lines and totals never change), with a history event. */
+export function recordPayment(inv: Invoice, p: Payment): Invoice {
+  const amount = round2(p.amount)
+  const event: InvoiceEvent = { at: p.at, kind: "paid", paid: { amount, method: p.method, byName: p.byName } }
+  return { ...inv, payments: [...inv.payments, { ...p, amount }], events: [...inv.events, event] }
+}
+
+/** Send to patient: SMS + email to the guardian (children) or the patient; logged in the history. */
+export function sendInvoice(inv: Invoice, to: "guardian" | "patient", at: string): Invoice {
+  return { ...inv, events: [...inv.events, { at, kind: "sent", sent: { to } }] }
+}

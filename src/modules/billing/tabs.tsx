@@ -8,6 +8,8 @@ import { usePageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
 import { claimCounts } from "./counts"
 import { BillingFrame } from "./frame"
+import { InvoicesList } from "./invoices"
+import { RecordPaymentDialog } from "./payment-dialog"
 import { useSoon } from "./parts"
 import { billCan } from "./roles"
 import { useBatchSent, useBillRole, useClaims } from "./store"
@@ -61,9 +63,15 @@ export function OverviewTab() {
   )
 }
 
-/** Invoices: header "Billing / Invoices"; Export. */
+/** Invoices: header "Billing / Invoices"; Export; the invoice list with Collect → Record payment. */
 export function InvoicesTab() {
-  return <BillingFrame tab="invoices" actions={<ExportButton />} />
+  const [collecting, setCollecting] = React.useState<string | null>(null)
+  return (
+    <BillingFrame tab="invoices" actions={<ExportButton />}>
+      <InvoicesList onCollect={setCollecting} />
+      {collecting && <RecordPaymentDialog invoiceNo={collecting} onOpenChange={(o) => !o && setCollecting(null)} />}
+    </BillingFrame>
+  )
 }
 
 /** Claims: header "Billing / Insurance claims"; Export · Send 12 claims. */

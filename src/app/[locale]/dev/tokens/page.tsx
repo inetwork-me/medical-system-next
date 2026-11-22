@@ -29,7 +29,6 @@ const TYPE = [
 ] as const;
 
 export default async function TokensPage({ params }: PageProps<"/[locale]/dev/tokens">) {
-  if (process.env.NODE_ENV === "production") notFound();
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);

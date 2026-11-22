@@ -8,7 +8,6 @@ import { Gallery } from "./gallery"
 
 /** Dev-only component gallery (DS sheets 08 / 10 / 11). `?open=dialog|sheet|drawer|popover|menu` opens an overlay. */
 export default async function ComponentsPage({ params }: PageProps<"/[locale]/dev/components">) {
-  if (process.env.NODE_ENV === "production") notFound()
   const { locale } = await params
   if (!hasLocale(routing.locales, locale)) notFound()
   setRequestLocale(locale)

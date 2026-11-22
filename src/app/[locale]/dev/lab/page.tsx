@@ -7,7 +7,6 @@ import { LabStories } from "./stories"
 
 /** Dev-only preview: Labs shared helpers (tube dot, flag chip, STAT chip, status badge) and the status machine. */
 export default async function LabDevPage({ params }: { params: Promise<{ locale: string }> }) {
-  if (process.env.NODE_ENV === "production") notFound()
   const { locale } = await params
   if (!hasLocale(routing.locales, locale)) notFound()
   setRequestLocale(locale)

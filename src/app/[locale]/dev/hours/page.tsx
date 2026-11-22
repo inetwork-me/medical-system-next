@@ -7,7 +7,6 @@ import { HoursStories } from "./stories"
 
 /** Dev-only preview stories for Overlay · Edit hours: desktop (680) / mobile (390) × default / conflict / errors. */
 export default async function HoursPage({ params }: { params: Promise<{ locale: string }> }) {
-  if (process.env.NODE_ENV === "production") notFound()
   const { locale } = await params
   if (!hasLocale(routing.locales, locale)) notFound()
   setRequestLocale(locale)

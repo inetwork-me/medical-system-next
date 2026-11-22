@@ -7,7 +7,6 @@ import { BillingStories } from "./stories"
 
 /** Dev-only preview: Billing atoms, money, rules and counts. */
 export default async function BillingDevPage({ params }: { params: Promise<{ locale: string }> }) {
-  if (process.env.NODE_ENV === "production") notFound()
   const { locale } = await params
   if (!hasLocale(routing.locales, locale)) notFound()
   setRequestLocale(locale)

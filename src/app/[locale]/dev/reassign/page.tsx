@@ -7,7 +7,6 @@ import { ReassignStories } from "./stories"
 
 /** Dev-only preview stories for the Move bookings block: target × selected option (EN at /en, AR at /ar). */
 export default async function ReassignPage({ params }: { params: Promise<{ locale: string }> }) {
-  if (process.env.NODE_ENV === "production") notFound()
   const { locale } = await params
   if (!hasLocale(routing.locales, locale)) notFound()
   setRequestLocale(locale)

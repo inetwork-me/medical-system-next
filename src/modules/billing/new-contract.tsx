@@ -10,7 +10,7 @@ import { Link, useRouter } from "@/i18n/navigation"
 import { ActionMenu } from "@/components/ds/action-menu"
 import { Field } from "@/components/ds/field"
 import { Icon, type IconName } from "@/components/ds/icon"
-import { Combobox, DatePicker } from "@/components/ds/pickers"
+import { DatePicker } from "@/components/ds/pickers"
 import { Segmented } from "@/components/ds/segmented"
 import { toast } from "@/components/ds/toast"
 import { MobileActionBar, PageContainer, PageHeader } from "@/components/shell/page"
@@ -42,18 +42,20 @@ import {
 } from "./data"
 import { CONTRACTS_HREF, INSURERS_HREF, TEMPLATES_HREF, contractHref } from "./href"
 import { formatMoney } from "./money"
-import { InitialsAvatar, InitialsTile, ltrRun, useSoon } from "./parts"
+import { InitialsAvatar, InitialsTile, ltrRun } from "./parts"
 import { canDraft, type BillRole } from "./roles"
 import { MAX_WEEK_HOURS, monthlyPay } from "./rules"
 import { addContract, getContracts, useBillRole } from "./store"
 import { currentUser, signatoryFor, useBillUser } from "./session"
 import { Strip } from "./claim-dialogs"
+import { AddClausesDialog, AddSignerDialog, ChoosePartyDialog, useOrdinal, usePartyLine, type AddedClause, type ExtraSigner } from "./contract-dialogs"
 import { publishedTemplates, templateById, useTemplates } from "./templates-store"
 import { useBillText } from "./text"
 
 /* ------------------------------------------------------------------ form model */
 
-type ClauseRow = { key: string; title: { en: string; ar: string }; on: boolean; custom?: boolean }
+/** A clause in the checklist: the type's optional clauses, library clauses (`lib-…`) and ones written by hand (`custom-…`). */
+type ClauseRow = { key: string; title: { en: string; ar: string }; on: boolean; custom?: boolean; text?: { en: string; ar: string } }
 export type Employment = "full" | "part" | "locum"
 
 /**
@@ -97,8 +99,10 @@ export type ContractForm = {
   nphies: boolean
   clauses: ClauseRow[]
   papers: BillDocument[]
-  /** Party signer first (by default), the center's signatory after; removable. */
-  signers: ("party" | "center")[]
+  /** The signing order: the party, the center's signatory and anyone added (their ExtraSigner id); removable. */
+  signers: string[]
+  /** People added with Add a signer (signs / approves only / gets a copy — copies aren't in `signers`). */
+  extras: ExtraSigner[]
   nafath: boolean
 }
 
@@ -186,6 +190,7 @@ export function blankForm(kind: ContractKind, locale = "en", template?: string):
     clauses: clauseRows(kind),
     papers: kind === "insurer" ? INSURER_PAPERS : [],
     signers: ["center"],
+    extras: [],
     nafath: true,
     ...templateDefaults(kind, tpl, locale),
   }
@@ -313,6 +318,24 @@ function partySignerOf(f: ContractForm): Omit<Signer, "order"> | undefined {
   }
 }
 
+/** Someone added with Add a signer, as a contract signer (their national ID comes from Nafath when they sign). */
+function extraSigner(f: ContractForm, x: ExtraSigner, order: number): Signer {
+  const p = candidateOf(f)
+  const org = x.side === "center" ? CENTER.short : (p?.short ?? p?.name ?? { en: "", ar: "" })
+  return {
+    order,
+    initials: initialsOf(x.name),
+    name: { en: x.name, ar: x.name },
+    role: { en: `${org.en} · ${x.role}`, ar: `${org.ar} · ${x.role}` },
+    side: x.side,
+    mobile: x.mobile,
+    nationalId: "",
+    status: "waiting",
+    method: "nafath",
+    ...(x.does === "approves" ? { does: "approves" as const } : {}),
+  }
+}
+
 /** The form as a Contract (draft or sent): stores the template id + the published version it was made from. */
 export function buildContract(f: ContractForm, no: string, sent: boolean, clinicName?: { en: string; ar: string }): Contract {
   const p = candidateOf(f)!
@@ -327,8 +350,16 @@ export function buildContract(f: ContractForm, no: string, sent: boolean, clinic
   }[f.kind]
   const ps = partySignerOf(f)!
   // The center signs through the signed-in user when they're an authorized signatory, else the center's signatory.
-  const signers = f.signers.map((s, i) => (s === "party" ? { ...ps, order: i + 1 } : centerSigner(signatoryFor(), i + 1)))
-  const clauses: Clause[] = f.clauses.filter((c) => c.on && c.title.en.trim()).map((c) => ({ key: c.key, title: c.title, text: c.custom ? c.title : { en: "", ar: "" } }))
+  const signers: Signer[] = f.signers.flatMap((s, i) => {
+    if (s === "party") return [{ ...ps, order: i + 1 }]
+    if (s === "center") return [centerSigner(signatoryFor(), i + 1)]
+    const x = f.extras.find((e) => e.id === s)
+    return x ? [extraSigner(f, x, i + 1)] : []
+  })
+  const copies = f.extras.filter((x) => x.does === "copy").map((x) => ({ name: { en: x.name, ar: x.name }, role: { en: x.role, ar: x.role }, mobile: x.mobile, side: x.side }))
+  const clauses: Clause[] = f.clauses
+    .filter((c) => c.on && c.title.en.trim())
+    .map((c) => ({ key: c.key, title: c.title, text: c.text ?? (c.custom ? c.title : { en: "", ar: "" }) }))
   const rule = PREAUTH_RULES.find((r) => r.key === f.preauth)
   return {
     no,
@@ -393,6 +424,7 @@ export function buildContract(f: ContractForm, no: string, sent: boolean, clinic
     clauses,
     files: f.papers,
     signers,
+    copies: copies.length ? copies : undefined,
     sent,
     sentAt: sent ? BILL_TODAY : undefined,
     locked: false,
@@ -534,10 +566,13 @@ function PartySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partia
   const te = useTranslations("billing.newContract.error")
   const { b } = useBillText()
   const clinics = useClinics()
+  const line = usePartyLine()
+  const [choosing, setChoosing] = React.useState(false)
   const p = candidateOf(f)
+  // Swapping the party keeps the shared fields; the party's own details (contact, mobile, staff job + papers) follow it.
   const pick = (id: string) => {
     const c = PARTY_CANDIDATES[f.kind].find((x) => x.id === id)
-    if (!c) return
+    if (!c || id === f.partyId) return
     patch({
       partyId: id,
       contactName: "",
@@ -546,7 +581,6 @@ function PartySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partia
       signers: f.signers.includes("party") ? f.signers : ["party", ...f.signers],
     })
   }
-  const searchKey = (c: PartyCandidate) => [b(c.name), c.cr, c.cchiLicence && `CCHI ${c.cchiLicence}`, c.nationalId, c.licence?.no].filter(Boolean).join(" · ")
   return (
     <Card title={t(`party.${f.kind}`)} description={t(`partySearch.${f.kind}`)}>
       {p ? (
@@ -555,40 +589,29 @@ function PartySection({ f, patch, errors }: { f: ContractForm; patch: (p: Partia
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className="truncate text-sm text-foreground">{b(p.name)}</span>
             <span className="text-xs text-muted-foreground">
-              <bdi>
-                {p.kind === "employee"
-                  ? t("employeeLine", { role: b(p.role), licence: ltrRun(p.licence?.no ?? "—") })
-                  : p.cchiLicence
-                    ? t("insurerLine", { role: b(p.role), licence: ltrRun(p.cchiLicence), city: p.city ? b(p.city) : "" })
-                    : t("companyLine", { role: b(p.role), cr: ltrRun(p.cr ?? "—"), city: p.city ? b(p.city) : "" })}
-              </bdi>
+              <bdi>{line(p)}</bdi>
             </span>
           </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={t("change", { name: b(p.name) })}
-            onClick={() => patch({ partyId: null, contactName: "", mobile: "", ...(f.kind === "staff" ? { papers: [] } : {}), signers: f.signers.filter((s) => s !== "party") })}
-          >
+          <Button variant="ghost" size="icon-sm" aria-label={t("change", { name: b(p.name) })} onClick={() => setChoosing(true)}>
             <Icon name="close-circle" size={24} />
           </Button>
         </div>
       ) : (
         <Field label={t(`party.${f.kind}`)} required error={errors.party ? te("party") : undefined}>
           {(fp) => (
-            <Combobox
+            <button
+              type="button"
               {...fp}
-              options={PARTY_CANDIDATES[f.kind].map((c) => ({ value: c.id, label: searchKey(c) }))}
-              value={undefined}
-              onChange={pick}
-              placeholder={t("partyPick")}
-              searchPlaceholder={t(`partySearch.${f.kind}`)}
-              emptyText={t("partyEmpty")}
-              className="w-full"
-            />
+              onClick={() => setChoosing(true)}
+              className="flex h-9 w-full items-center gap-2 rounded-md border border-input bg-card px-3 text-start text-sm text-muted-foreground shadow-xs outline-none hover:bg-muted/50 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive"
+            >
+              <Icon name="search-normal-1" size={20} />
+              <span className="min-w-0 flex-1 truncate">{t("partyPick")}</span>
+            </button>
           )}
         </Field>
       )}
+      {choosing && <ChoosePartyDialog kind={f.kind} current={f.partyId} onOpenChange={setChoosing} onPick={pick} />}
       {f.kind === "staff" ? (
         <>
           <Row>
@@ -810,40 +833,56 @@ function ShareSection({ f, patch, errors }: { f: ContractForm; patch: (p: Partia
 function ClausesSection({ f, patch }: { f: ContractForm; patch: (p: Partial<ContractForm>) => void }) {
   const t = useTranslations("billing.newContract")
   const { b } = useBillText()
+  const [adding, setAdding] = React.useState(false)
+  const remove = useRemove()
   const on = f.clauses.filter((c) => c.on).length
   const set = (i: number, c: Partial<ClauseRow>) => patch({ clauses: f.clauses.map((x, j) => (j === i ? { ...x, ...c } : x)) })
+  const add = (list: AddedClause[]) => {
+    patch({ clauses: [...f.clauses, ...list.map((c) => ({ key: c.key, title: c.title, text: c.text, on: true, custom: c.key.startsWith("custom-") }))] })
+    toast.success(t("clausesAddedToast", { n: list.length }), { description: t("clausesAddedText") })
+  }
   return (
     <Card
       title={t("clauses")}
       description={t("clausesText", { n: on, total: f.clauses.length })}
       action={
-        <Button variant="ghost" size="sm" onClick={() => patch({ clauses: [...f.clauses, { key: `custom-${f.clauses.length}`, title: { en: "", ar: "" }, on: true, custom: true }] })}>
+        <Button variant="ghost" size="sm" onClick={() => setAdding(true)}>
           <Icon name="add" size={20} />
           {t("addClause")}
         </Button>
       }
     >
       <ul className="flex flex-col gap-3">
-        {f.clauses.map((c, i) => (
-          <li key={c.key} className="flex items-center gap-2">
-            <Checkbox checked={c.on} onCheckedChange={(v) => set(i, { on: v === true })} aria-label={c.custom ? t("newClause") : b(c.title)} id={`clause-${c.key}`} />
-            {c.custom ? (
-              <>
-                <Input autoFocus value={c.title.en} placeholder={t("newClause")} onChange={(e) => set(i, { title: { en: e.target.value, ar: e.target.value } })} className="h-8 flex-1" />
-                <Button variant="ghost" size="icon-sm" aria-label={t("removeClause")} onClick={() => patch({ clauses: f.clauses.filter((_, j) => j !== i) })}>
-                  <Icon name="trash" size={20} />
-                </Button>
-              </>
-            ) : (
-              <label htmlFor={`clause-${c.key}`} className="cursor-pointer text-sm text-foreground">
+        {f.clauses.map((c, i) => {
+          // The type's own optional clauses are ticked on or off; added ones (library or written) can also be removed.
+          const added = c.custom || c.key.startsWith("lib-")
+          return (
+            <li key={c.key} className="flex items-center gap-2">
+              <Checkbox checked={c.on} onCheckedChange={(v) => set(i, { on: v === true })} id={`clause-${c.key}`} />
+              <label htmlFor={`clause-${c.key}`} className="min-w-0 flex-1 cursor-pointer text-sm text-foreground">
                 {b(c.title)}
               </label>
-            )}
-          </li>
-        ))}
+              {added && (
+                <Button variant="ghost" size="icon-sm" aria-label={t("removeNamed", { name: b(c.title) })} onClick={() => remove(() => patch({ clauses: f.clauses.filter((_, j) => j !== i) }))}>
+                  <Icon name="trash" size={20} />
+                </Button>
+              )}
+            </li>
+          )
+        })}
       </ul>
+      {adding && <AddClausesDialog have={f.clauses.map((c) => c.key)} onOpenChange={setAdding} onAdd={add} />}
     </Card>
   )
+}
+
+/** Remove file / Remove signer / Remove clause: do it, then `item-removed` ("You can add it back any time"). */
+function useRemove() {
+  const t = useTranslations("billing.newContract")
+  return (run: () => void) => {
+    run()
+    toast.info(t("removedToast"), { description: t("removedToastText") })
+  }
 }
 
 const kb = (bytes: number) => (bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`)
@@ -852,6 +891,7 @@ function PapersSection({ f, patch }: { f: ContractForm; patch: (p: Partial<Contr
   const t = useTranslations("billing.newContract")
   const { b, date } = useBillText()
   const input = React.useRef<HTMLInputElement>(null)
+  const remove = useRemove()
   const p = candidateOf(f)
   const add = (files: FileList | null) => {
     if (!files?.length) return
@@ -889,7 +929,7 @@ function PapersSection({ f, patch }: { f: ContractForm; patch: (p: Partial<Contr
                   <bdi>{[ltrRun(d.format), d.detail ? ltrRun(b(d.detail)) : "", d.validTo ? endsOn(d.validTo) : ""].filter(Boolean).join(" · ")}</bdi>
                 </span>
               </div>
-              <Button variant="ghost" size="icon-sm" aria-label={t("removeFile", { name: b(d.title) })} onClick={() => patch({ papers: f.papers.filter((_, j) => j !== i) })}>
+              <Button variant="ghost" size="icon-sm" aria-label={t("removeFile", { name: b(d.title) })} onClick={() => remove(() => patch({ papers: f.papers.filter((_, j) => j !== i) }))}>
                 <Icon name="trash" size={20} />
               </Button>
             </li>
@@ -928,45 +968,59 @@ function SignersSection({ f, patch, errors }: { f: ContractForm; patch: (p: Part
   const t = useTranslations("billing.newContract")
   const te = useTranslations("billing.newContract.error")
   const { b } = useBillText()
-  const soon = useSoon()
+  const remove = useRemove()
+  const ord = useOrdinal()
+  const [adding, setAdding] = React.useState(false)
   const p = candidateOf(f)
   const me = useBillUser()
   const signer = STAFF[signatoryFor()]
   const party = partySignerOf(f)
-  const addSigner = () => {
-    // Re-add a removed default signer (the other side, then the center); anyone else needs the signer picker (gap).
-    if (p && !f.signers.includes("party")) patch({ signers: ["party", ...f.signers] })
-    else if (!f.signers.includes("center")) patch({ signers: [...f.signers, "center"] })
-    else soon()
+  const nameOf = (s: string) => (s === "party" ? (party ? b(party.name) : "") : s === "center" ? b(signer.name) : (f.extras.find((x) => x.id === s)?.name ?? ""))
+  const order = f.signers.filter((s) => s !== "party" || party)
+  const addSigner = (x: ExtraSigner, at: number) => {
+    const signers = x.does === "copy" ? f.signers : [...f.signers.slice(0, at), x.id, ...f.signers.slice(at)]
+    patch({ extras: [...f.extras, x], signers })
+    const n = signers.indexOf(x.id) + 1
+    toast.success(t("signerAddedToast"), {
+      description: x.does === "copy" ? t("signerAddedCopy", { name: x.name }) : t(x.does === "approves" ? "signerAddedApproves" : "signerAddedText", { name: x.name, n: ord.word(n) }),
+    })
   }
+  const dropExtra = (id: string) => patch({ extras: f.extras.filter((x) => x.id !== id), signers: f.signers.filter((s) => s !== id) })
+  const extraLine = (x: ExtraSigner) =>
+    [x.side === "center" ? b(CENTER.short) : p ? b(p.short ?? p.name) : t("otherSide"), x.role, ltrRun(x.mobile), x.does !== "signs" ? t(`signerDialog.doesValue.${x.does}`) : ""]
+      .filter(Boolean)
+      .join(" · ")
+  const copies = f.extras.filter((x) => x.does === "copy")
   return (
     <Card
       title={t("signers")}
       description={t("signersText")}
       action={
-        <Button variant="ghost" size="sm" onClick={addSigner}>
+        <Button variant="ghost" size="sm" onClick={() => setAdding(true)}>
           <Icon name="user-add" size={24} />
           {t("addSigner")}
         </Button>
       }
     >
       <ol className="flex flex-col gap-3">
-        {f.signers.map((s, i) => {
+        {order.map((s, i) => {
           const isParty = s === "party"
-          if (isParty && !party) return null
-          const name = isParty ? b(party!.name) : b(signer.name)
-          const initials = isParty ? party!.initials : signer.initials
-          const line = isParty
-            ? p!.kind === "employee"
-              ? t("employeeSigner", { role: b(party!.role), mobile: ltrRun(party!.mobile || "—") })
-              : t("signerLine", {
-                  org: b(p!.short ?? p!.name),
-                  role: p!.signatory ? b(p!.signatory.role) : (contactText(f, b).split(" · ")[1] ?? b(p!.contact?.role ?? p!.role)),
-                  mobile: ltrRun(party!.mobile || "—"),
-                })
-            : signer.id === me?.id
-              ? t("signerYou", { org: b(CENTER.short), role: b(signer.role) })
-              : t("signerLine", { org: b(CENTER.short), role: b(signer.role), mobile: ltrRun(signer.mobile) })
+          const x = !isParty && s !== "center" ? f.extras.find((e) => e.id === s) : undefined
+          const name = nameOf(s)
+          const initials = isParty ? party!.initials : x ? initialsOf(x.name) : signer.initials
+          const line = x
+            ? extraLine(x)
+            : isParty
+              ? p!.kind === "employee"
+                ? t("employeeSigner", { role: b(party!.role), mobile: ltrRun(party!.mobile || "—") })
+                : t("signerLine", {
+                    org: b(p!.short ?? p!.name),
+                    role: p!.signatory ? b(p!.signatory.role) : (contactText(f, b).split(" · ")[1] ?? b(p!.contact?.role ?? p!.role)),
+                    mobile: ltrRun(party!.mobile || "—"),
+                  })
+              : signer.id === me?.id
+                ? t("signerYou", { org: b(CENTER.short), role: b(signer.role) })
+                : t("signerLine", { org: b(CENTER.short), role: b(signer.role), mobile: ltrRun(signer.mobile) })
           return (
             <li key={s} className="flex items-center gap-2.5 rounded-[10px] border p-3">
               <span aria-hidden className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">
@@ -979,13 +1033,40 @@ function SignersSection({ f, patch, errors }: { f: ContractForm; patch: (p: Part
                   <bdi>{line}</bdi>
                 </span>
               </div>
-              <Button variant="ghost" size="icon-sm" aria-label={t("removeSigner", { name })} onClick={() => patch({ signers: f.signers.filter((x) => x !== s) })}>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={t("removeSigner", { name })}
+                onClick={() => remove(() => (x ? dropExtra(x.id) : patch({ signers: f.signers.filter((y) => y !== s) })))}
+              >
                 <Icon name="trash" size={20} />
               </Button>
             </li>
           )
         })}
       </ol>
+      {copies.length > 0 && (
+        <ul className="flex flex-col gap-3">
+          {copies.map((x) => (
+            <li key={x.id} className="flex items-center gap-2.5 rounded-[10px] border border-dashed p-3">
+              <span aria-hidden className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <Icon name="sms" size={14} />
+              </span>
+              <InitialsAvatar initials={initialsOf(x.name)} />
+              <div className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm text-foreground">{x.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  <bdi>{extraLine(x)}</bdi>
+                </span>
+              </div>
+              <Button variant="ghost" size="icon-sm" aria-label={t("removeSigner", { name: x.name })} onClick={() => remove(() => dropExtra(x.id))}>
+                <Icon name="trash" size={20} />
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {adding && <AddSignerDialog order={order.map(nameOf)} partyName={p ? b(p.name) : undefined} onOpenChange={setAdding} onAdd={addSigner} />}
       {errors.signers && <p className="text-xs text-destructive">{te("signers")}</p>}
       <SwitchRow label={t("nafath")} hint={t("nafathText")} checked={f.nafath} onCheckedChange={(v) => patch({ nafath: v })} />
     </Card>
@@ -1072,6 +1153,8 @@ export function ContractSummary({ f, className }: { f: ContractForm; className?:
   const firstName = (n: string) => (/^(Dr\.|د\.)/.test(n) ? n.split(" ").slice(0, 2).join(" ") : n.split(" ")[0])
   const note = (() => {
     if (!p || !f.signers.length) return null
+    const extra = f.extras.find((x) => x.id === first)
+    if (extra) return t("first", { name: extra.name, g: "male" })
     if (first === "party" && party) {
       const name = firstName(b(party.name))
       const g = party.female ? "female" : "male"

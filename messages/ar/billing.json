@@ -67,7 +67,8 @@
     "export": "تصدير",
     "newContract": "عقد جديد",
     "newAgreement": "اتفاقية جديدة",
-    "sendClaims": "{n, plural, =0 {أرسل المطالبات} one {أرسل مطالبة} two {أرسل مطالبتين} few {أرسل # مطالبات} other {أرسل # مطالبة}}"
+    "sendClaims": "{n, plural, =0 {أرسل المطالبات} one {أرسل مطالبة} two {أرسل مطالبتين} few {أرسل # مطالبات} other {أرسل # مطالبة}}",
+    "newInvoice": "فاتورة جديدة"
   },
   "method": {
     "cash": "كاش",
@@ -789,7 +790,84 @@
     "paperEnds": "تخلص {date}",
     "employeeSigner": "{role} · {mobile}",
     "backInsurers": "ارجع لشركات التأمين",
-    "sentInsurerToast": "انرسلت ل{insurer} للتوقيع"
+    "sentInsurerToast": "انرسلت ل{insurer} للتوقيع",
+    "insurerLineShort": "رخصة المجلس {licence} · {city}",
+    "removeNamed": "احذف {name}",
+    "otherSide": "الطرف الثاني",
+    "removedToast": "انحذف",
+    "removedToastText": "تقدر ترجعه بأي وقت",
+    "clausesAddedToast": "{n, plural, one {انضاف بند} two {انضاف بندين} few {انضافت # بنود} other {انضاف # بند}}",
+    "clausesAddedText": "في الآخر · اسحبهم عشان ترتّب",
+    "signerAddedToast": "انضاف الموقّع",
+    "signerAddedText": "{name} · {n} بالتوقيع",
+    "signerAddedApproves": "{name} · {n} بالموافقة",
+    "signerAddedCopy": "{name} توصله نسخة بعد ما يوقّع الكل",
+    "choose": {
+      "title": {
+        "staff": "اختر الموظف",
+        "partner": "اختر الشريك",
+        "insurer": "اختر شركة التأمين"
+      },
+      "search": "دوّر",
+      "use": {
+        "staff": "اختر هالموظف",
+        "partner": "اختر هالشركة",
+        "insurer": "اختر هالشركة"
+      },
+      "hint": {
+        "staff": "ما لقيته؟ أضفه من الأطباء أو الموارد البشرية أول.",
+        "partner": "شركة جديدة؟ اكتب رقم سجلها التجاري ونعبّي الباقي من السجل.",
+        "insurer": "تطلع هنا شركات التأمين المرخصة من مجلس الضمان بس."
+      },
+      "cancel": "إلغاء"
+    },
+    "addClauses": {
+      "title": "إضافة بنود",
+      "text": "من مكتبة البنود أو اكتب بندك",
+      "from": "من",
+      "library": "مكتبة البنود",
+      "own": "اكتب بندي",
+      "search": "دوّر",
+      "searchPlaceholder": "دوّر بند…",
+      "inForm": "موجود في العقد",
+      "none": "ما فيه بنود تطابق",
+      "note": "بنود المكتبة جاهزة بالعربي والإنجليزي ومراجعة من المحامي.",
+      "ownTitle": "عنوان البند",
+      "ownTitleError": "اكتب عنوان للبند",
+      "ownText": "نص البند",
+      "ownTextError": "اكتب وش يقول البند",
+      "ownNote": "بندك ينطبع مثل ما كتبته. خل المحامي يراجعه قبل ما ترسل.",
+      "add": "{n, plural, zero {أضف بنود} one {أضف البند} two {أضف البندين} few {أضف # بنود} other {أضف # بند}}",
+      "addOwn": "أضف البند",
+      "cancel": "إلغاء"
+    },
+    "signerDialog": {
+      "title": "إضافة موقّع",
+      "text": "يوقّع عبر نفاذ بالترتيب اللي تختاره",
+      "name": "الاسم",
+      "nameError": "اكتب اسمه",
+      "role": "الصفة",
+      "roleError": "اكتب صفته",
+      "mobile": "الجوال",
+      "mobileError": "اكتب جوال سعودي، مثل +966 55 902 1146",
+      "signsFor": "توقّع عن",
+      "otherSide": "الطرف الثاني",
+      "does": "دوره",
+      "doesValue": {
+        "signs": "يوقّع",
+        "approves": "يوافق بس",
+        "copy": "توصله نسخة"
+      },
+      "order": "الترتيب",
+      "ordinal": "{n, select, 1 {الأول} 2 {الثاني} 3 {الثالث} 4 {الرابع} 5 {الخامس} 6 {السادس} other {رقم {n}}}",
+      "ordinalWord": "{n, select, 1 {الأول} 2 {الثاني} 3 {الثالث} 4 {الرابع} 5 {الخامس} 6 {السادس} other {رقم {n}}}",
+      "orderFirst": "{n} · قبل {name}",
+      "orderAfter": "{n} · بعد {name}",
+      "note": "يوصله رابط برسالة لما يجي دوره ويوقّع عبر نفاذ.",
+      "noteCopy": "توصله النسخة الموقّعة برسالة بعد ما يوقّع الكل.",
+      "add": "أضف الموقّع",
+      "cancel": "إلغاء"
+    }
   },
   "overview": {
     "kpi": {
@@ -832,7 +910,10 @@
       "view": "اعرض",
       "them": "{name} ما {g, select, female {وقّعت} other {وقّع}} لين الحين",
       "themText": "انرسل {sent}{reminded, select, none {} other { · وتذكير {reminded}}}",
-      "open": "افتح"
+      "open": "افتح",
+      "refund": "استرجاع ينتظر موافقتك · {name}",
+      "refundText": "{amount} {to} · {g, select, female {طلبته} other {طلبه}} {name}",
+      "review": "راجع"
     }
   },
   "templates": {
@@ -907,10 +988,10 @@
     "versionExists": "النسخة {v} مسودة من قبل",
     "versionExistsText": "كمّلها أو انشرها قبل ما تبدأ نسخة ثانية",
     "duplicateToast": "انتسخ النموذج",
-    "duplicateToastText": "{name} يبدأ كمسودة",
+    "duplicateToastText": "انحفظ كمسودة · غيّر اسمه قبل النشر",
     "copy": "(نسخة)",
-    "createdToast": "انسوى النموذج",
-    "createdToastText": "{name} يبدأ كمسودة",
+    "createdToast": "انشأت مسودة النموذج",
+    "createdToastText": "أضف بنوده، بعدين انشره",
     "dialog": {
       "title": "نموذج جديد",
       "text": "يبدأ كمسودة",
@@ -940,7 +1021,8 @@
     "issued": "{no} · صدر {date} · {time}",
     "status": {
       "refunded": "انسترجع",
-      "issued": "صادر"
+      "issued": "صادر",
+      "approval": "ينتظر الموافقة"
     },
     "field": {
       "patient": "المريض",
@@ -1021,10 +1103,17 @@
       "method": {
         "cash": "كاش من الاستقبال · {name}",
         "transfer": "تحويل بنكي · {name}",
-        "card": "رجع للبطاقة · {name}",
+        "card": "{brand, select, mada {يرجع لمدى} applepay {يرجع لـ Apple Pay} other {يرجع للبطاقة}} · {name}",
         "visitCredit": "رصيد للزيارة الجاية · {name}"
       },
-      "receipt": "حمّل إيصال الاسترجاع"
+      "receipt": "حمّل إيصال الاسترجاع",
+      "waiting": "ينتظر الموافقة",
+      "kept": "باقي كرصيد",
+      "to": "الطريقة",
+      "keptAs": "رصيد للزيارة الجاية",
+      "pending": "ينتظر موافقة {name} ({role}) · انطلب الساعة {time}. الفلوس ترجع بعد {g, select, female {موافقتها} other {موافقته}}.",
+      "rejected": "{name} {g, select, female {رفضت} other {رفض}} الاسترجاع: {note} الرصيد يبقى للمريض للزيارة الجاية.",
+      "review": "راجع الاسترجاع"
     },
     "after": {
       "title": "الفاتورة بعد الإشعار",
@@ -1054,7 +1143,10 @@
         "transfer": "بتحويل بنكي",
         "card": "للبطاقة",
         "visitCredit": "رصيد للزيارة الجاية"
-      }
+      },
+      "approvalRequested": "انرسل استرجاع {amount} لـ{approver} للموافقة · {name}",
+      "refundApproved": "انوافق على الاسترجاع · {name}",
+      "refundRejected": "انرفض الاسترجاع وبقي رصيد · {name}"
     },
     "dialog": {
       "title1": "اصدر إشعار دائن",
@@ -1083,12 +1175,13 @@
         "cash": "كاش",
         "transfer": "تحويل بنكي",
         "card": "للبطاقة",
-        "visitCredit": "رصيد للزيارة الجاية"
+        "visitCredit": "رصيد للزيارة الجاية",
+        "cardTo": "{brand, select, mada {يرجع لمدى} applepay {يرجع لـ Apple Pay} other {يرجع للبطاقة}}"
       },
       "noteCash": "{sex, select, f {دفعت {how}، فما يرجع لبطاقة.} other {دفع {how}، فما يرجع لبطاقة.}} الاسترجاع فوق {limit} يحتاج موافقة المدير المالي.",
       "noteCard": "{sex, select, f {دفعت {how}، فيرجع لنفس البطاقة عن طريق جهاز الشبكة.} other {دفع {how}، فيرجع لنفس البطاقة عن طريق جهاز الشبكة.}} الاسترجاع فوق {limit} يحتاج موافقة المدير المالي.",
       "noteNone": "{sex, select, f {ما فيه شي يرجع: دفعت أقل من حصتها الجديدة.} other {ما فيه شي يرجع: دفع أقل من حصته الجديدة.}} المتبقي يصير {owes}.",
-      "overLimit": "{amount} فوق {limit}: لازم يوافق عليه المدير المالي قبل ما يصدر.",
+      "overLimit": "المبلغ فوق {limit}، فلازم {g, select, female {توافق} other {يوافق}} عليه {name} ({role}) أول. الإشعار يصدر الحين، والفلوس ترجع بعد {g, select, female {موافقتها} other {موافقته}}.",
       "receipt": "اطبع إيصال استرجاع يوقّع عليه المريض",
       "nphies": "حصة {insurer} ({amount}) تنقص من المطالبة {claim} عبر نفيس.",
       "nphiesNoClaim": "حصة {insurer} ({amount}) تنقص من اللي على {insurer} لهذي الفاتورة.",
@@ -1096,7 +1189,309 @@
       "issue": "اصدر الإشعار",
       "approval": "أرسل للموافقة",
       "failed": "ما قدرنا نصدر الإشعار",
-      "failedText": "ما انحفظ شي. جرّب مرة ثانية."
+      "failedText": "ما انحفظ شي. جرّب مرة ثانية.",
+      "noteFor": "ملاحظة ل{name}",
+      "approvalToast": "انرسل للموافقة",
+      "approvalToastText": "{name} {g, select, female {يوصلها} other {يوصله}} الحين · والإشعار صادر"
+    }
+  },
+  "refundApproval": {
+    "title": "الموافقة على الاسترجاع",
+    "text": "{no} · {name}",
+    "patient": "المريض",
+    "patientF": "المريضة",
+    "selfPay": "{name} · بدون تأمين",
+    "invoice": "الفاتورة",
+    "invoiceValue": "{no} · بتاريخ {date}",
+    "reason": "السبب",
+    "refund": "الاسترجاع",
+    "backToLabel": "يرجع لـ",
+    "askedBy": "طلبه",
+    "askedByF": "طلبته",
+    "askedValue": "{name} · {role} · {time}",
+    "note": "ملاحظتك",
+    "noteError": "اكتب لـ{name} ليش رفضته",
+    "info": {
+      "card": "بعد الموافقة ينرسل لمزود أجهزة الدفع، والفلوس توصل خلال 3 إلى 5 أيام عمل.",
+      "cash": "بعد الموافقة يصير مستحق، والاستقبال يرجع الكاش للمريض.",
+      "transfer": "بعد الموافقة ينرسل للمالية عشان التحويل البنكي على آيبان المريض.",
+      "visitCredit": "بعد الموافقة ينحفظ رصيد للمريض لزيارته الجاية."
+    },
+    "reject": "ارفض",
+    "approve": "وافق على الاسترجاع",
+    "onlyFinance": "بس المدير المالي يقدر يوافق أو يرفض الاسترجاع.",
+    "approvedToast": "انوافق على الاسترجاع",
+    "approvedText": "{amount} {to} خلال 3 إلى 5 أيام عمل",
+    "approvedDue": "{amount} {to} · صار مستحق الحين",
+    "rejectedToast": "انرفض الاسترجاع",
+    "rejectedText": "{name} {g, select, female {يوصلها} other {يوصله}} تعليقك · والإشعار باقي",
+    "backTo": {
+      "card": "{brand, select, mada {ترجع لمدى} applepay {ترجع لـ Apple Pay} other {ترجع للبطاقة}}",
+      "cash": "ترجع كاش",
+      "transfer": "ترجع بتحويل بنكي",
+      "visitCredit": "تنحفظ رصيد للزيارة الجاية"
+    },
+    "cardEnding": "{brand, select, mada {بطاقة مدى} applepay {بطاقة Apple Pay} other {البطاقة}} تنتهي بـ {last4}",
+    "cardOnly": "{brand, select, mada {بطاقة مدى} applepay {Apple Pay} other {البطاقة}}"
+  },
+  "newInvoice": {
+    "title": "فاتورة جديدة",
+    "back": "رجوع للفواتير",
+    "saveDraft": "احفظ مسودة",
+    "issue": "أصدر الفاتورة",
+    "onlyBilling": "بس موظفي الفوترة والمدير المالي يقدرون يصدرون فواتير يدوية. تقدر تحفظها مسودة.",
+    "patientTitle": "المريض والزيارة",
+    "patientText": "أغلب الفواتير تطلع من الزيارات · استخدم هذي لأي شي ثاني",
+    "patient": "المريض",
+    "patientPick": "دوّر بالاسم أو رقم الملف",
+    "patientSearch": "الاسم أو رقم الملف…",
+    "patientEmpty": "ما فيه مريض يطابق",
+    "visit": "الزيارة",
+    "visitValue": "{date} · {clinic} · {doctor}",
+    "noVisit": "بدون زيارة · مراجعة أو غيرها",
+    "payerTitle": "مين يدفع",
+    "payerText": "معبّاة من ملف المريض",
+    "payer": "الجهة",
+    "payerValue": {
+      "insurance": "التأمين",
+      "cash": "كاش",
+      "company": "شركة"
+    },
+    "insurer": "شركة التأمين",
+    "insurerPick": "اختر شركة التأمين والفئة",
+    "insurerValue": "{name} · فئة {cls}",
+    "policyNo": "رقم الوثيقة",
+    "copay": "نسبة المريض {pct} · من اتفاقية {insurer}",
+    "copayCapped": "نسبة المريض {pct} بحد {cap} ر.س للزيارة · من اتفاقية {insurer}",
+    "cashNote": "المريض يدفع الفاتورة كاملة.",
+    "company": "الشركة",
+    "companyPick": "اختر حساب الشركة",
+    "companyNote": "حساب الشركة يدفع الفاتورة كاملة، وما ناخذ شي من المريض.",
+    "servicesTitle": "الخدمات",
+    "servicesText": "الأسعار من القائمة · الضريبة {rate}",
+    "line": {
+      "service": "الخدمة",
+      "qty": "الكمية",
+      "qtyOf": "كمية {name}",
+      "price": "السعر",
+      "vat": "الضريبة",
+      "total": "الإجمالي",
+      "remove": "حذف",
+      "removeNamed": "احذف {name}"
+    },
+    "addService": "أضف خدمة · دوّر في القائمة بالاسم أو الكود",
+    "serviceSearch": "اسم الخدمة أو الكود…",
+    "serviceEmpty": "ما فيه شي بالقائمة يطابق",
+    "noteTitle": "ملاحظة",
+    "noteText": "اختيارية · تنطبع على الفاتورة",
+    "noteLabel": "ملاحظة للمريض",
+    "removedToast": "انحذف",
+    "removedToastText": "تقدر ترجعه بأي وقت",
+    "draftToast": "انحفظت مسودة الفاتورة",
+    "draftToastText": "ما تنرفع للهيئة لين تصدرها",
+    "issuedToast": "صدرت الفاتورة",
+    "issuedText": "{no} · انرفعت للهيئة",
+    "issuedClaim": "{no} · انرفعت للهيئة · والمطالبة جاهزة {toInsurer}",
+    "issuedPreauth": "{no} · انرفعت للهيئة · والمطالبة تنتظر موافقة {insurer} المسبقة",
+    "zatcaFailed": "ما انرفعت للحين",
+    "zatcaFailedText": "الهيئة ما ردّت. الفاتورة محفوظة وبنحاول مرة ثانية.",
+    "error": {
+      "summary": "فيه بيانات ناقصة. شيّك الحقول اللي بالأحمر.",
+      "patient": "اختر المريض",
+      "insurer": "اختر شركة التأمين والفئة",
+      "policyNo": "اكتب رقم الوثيقة",
+      "company": "اختر الشركة",
+      "lines": "أضف خدمة وحدة على الأقل"
+    },
+    "summary": {
+      "title": "ملخص الفاتورة",
+      "text": "يتحدث مع كل خدمة تضيفها",
+      "subtotal": "المجموع",
+      "vat": "الضريبة {rate}",
+      "vatMixed": "الضريبة",
+      "total": "الإجمالي",
+      "insurerPays": "{insurer} تدفع",
+      "companyPays": "{company} تدفع",
+      "patient": "على المريض",
+      "patientPct": "على المريض · {pct}",
+      "patientCap": "على المريض · الحد",
+      "zatca": "تنرفع لهيئة الزكاة أول ما تصدرها، وبعدها ما يغيّرها إلا إشعار دائن."
+    }
+  },
+  "templateEditor": {
+    "titleDraft": "{name} · مسودة النسخة {v}",
+    "titleVersion": "{name} · النسخة {v}",
+    "mobileTitle": "محرر النموذج",
+    "back": "رجوع للنماذج",
+    "backToList": "رجوع للنماذج",
+    "notFound": "ما لقينا هالنسخة من النموذج",
+    "notFoundText": "يمكن انتشرت أو انحذفت. افتحها مرة ثانية من النماذج.",
+    "save": "احفظ مسودة",
+    "publishBtn": "انشر",
+    "error": "كل بند لازم له عنوان بالعربي والإنجليزي. أول بند ناقص مفتوح تحت.",
+    "empty": "ما فيه بنود للحين",
+    "emptyText": "أضف بنود من المكتبة أو اكتب بندك.",
+    "savedToast": "انحفظت المسودة",
+    "savedToastText": "النسخة {v} تبقى شغّالة لين تنشر",
+    "savedToastTextNew": "ما ينستخدم شي لين تنشر",
+    "publishedToast": "انتشرت النسخة {v}",
+    "publishedToastText": "العقود الجديدة تستخدمها من الحين",
+    "status": {
+      "draft": "مسودة · النسخة {v} من {name} · مبنية على النسخة {base} · {saved}",
+      "draftNew": "مسودة · النسخة {v} من {name} · {saved}",
+      "readOnly": "النسخة {v} من {name} · للقراءة بس (المسودات بس تنعدّل)",
+      "readOnlyDraft": "مسودة · النسخة {v} من {name} · للقراءة بس لدورك",
+      "notSaved": "ما انحفظت للحين",
+      "savedNow": "انحفظت الحين",
+      "savedAgo": "{n, plural, one {انحفظت قبل دقيقة} two {انحفظت قبل دقيقتين} few {انحفظت قبل # دقايق} other {انحفظت قبل # دقيقة}}",
+      "unsaved": "فيه تعديلات ما انحفظت"
+    },
+    "list": {
+      "title": "البنود",
+      "text": "اسحب عشان ترتّب · {n} في هالنسخة",
+      "add": "أضف",
+      "move": "حرّك {name} (بالأسهم)",
+      "new": "جديد",
+      "locked": "مقفل",
+      "untitled": "بند بدون عنوان",
+      "note": "البنود المقفلة ما تنشال من العقد."
+    },
+    "clause": {
+      "title": "البند {n} · {name}",
+      "edited": "انعدّل في هالنسخة",
+      "added": "جديد في هالنسخة",
+      "same": "مثل النسخة {v}",
+      "draft": "في هالمسودة",
+      "remove": "احذف",
+      "titleIn": {
+        "en": "العنوان · إنجليزي",
+        "ar": "العنوان · عربي"
+      },
+      "textIn": {
+        "en": "النص · إنجليزي",
+        "ar": "النص · عربي"
+      },
+      "titleError": "اكتب العنوان",
+      "insert": "أضف فراغ · يتعبّى من صفحة عقد جديد",
+      "locked": "مقفل في كل عقد",
+      "lockedText": "اللي يكتب العقد ما يقدر يشيله أو يعدّله",
+      "showChanges": "وضّح التعديلات للطرف الثاني",
+      "showChangesText": "يبيّن وش تغيّر عن النسخة {v} لما يفتحه"
+    },
+    "changes": {
+      "title": "التعديلات عن النسخة {v}",
+      "edited": "معدّل",
+      "added": "مضاف",
+      "removed": "محذوف",
+      "line": "البند {n} · {name}",
+      "none": "ما فيه تعديلات للحين"
+    },
+    "publish": {
+      "title": "تنشر النسخة {v}؟",
+      "changes": "التعديلات",
+      "changesValue": "{edited, plural, =0 {} one {بند معدّل} two {بندين معدّلة} few {# بنود معدّلة} other {# بند معدّل}}{added, plural, =0 {} other { · و}}{added, plural, =0 {} one {بند مضاف} two {بندين مضافة} few {# بنود مضافة} other {# بند مضاف}}{removed, plural, =0 {} other { · و}}{removed, plural, =0 {} one {بند محذوف} two {بندين محذوفة} few {# بنود محذوفة} other {# بند محذوف}}",
+      "noChanges": "نفس البنود",
+      "newContracts": "العقود الجديدة",
+      "newContractsValue": "تستخدم النسخة {v} من الحين",
+      "signedOn": "الموقعة على النسخة {v}",
+      "signedValue": "{n} · تبقى مثل ما هي",
+      "draftsOn": "المسودات على النسخة {v}",
+      "draftsValue": "{n} · بنسأل نحدّثها",
+      "draftsNone": "ما فيه",
+      "email": "أرسل إيميل للموارد البشرية ومدراء العيادات",
+      "archived": "النسخة {v} تنأرشف بس تنحفظ، مع كل العقود الموقعة عليها.",
+      "cancel": "إلغاء",
+      "publish": "انشر"
+    }
+  },
+  "showMore": {
+    "toast": "{n, plural, one {انعرض واحد زيادة} two {انعرض اثنين زيادة} few {انعرض # زيادة} other {انعرض # زيادة}}",
+    "toastText": "انزل تحت عشان تشوفها"
+  },
+  "export": {
+    "title": "تصدير",
+    "text": "ملف باللي قدامك، للمالية أو المراجع",
+    "whatLabel": "وش تصدّر",
+    "what": {
+      "summary": "ملخص الفوترة",
+      "invoices": "الفواتير",
+      "claims": "مطالبات التأمين",
+      "contracts": "العقود"
+    },
+    "periodLabel": "الفترة",
+    "period": {
+      "thisMonth": "هالشهر · من {from} لـ {to}",
+      "last7": "آخر 7 أيام · من {from} لـ {to}",
+      "lastMonth": "الشهر اللي فات · {month}",
+      "thisYear": "هالسنة · {year}"
+    },
+    "formatLabel": "الصيغة",
+    "onlyFilter": "اللي يطلع بالفلتر بس ({filter})",
+    "vatColumn": "الضريبة في عمود لحالها",
+    "names": "أسماء المرضى",
+    "note": "الأسماء ما تنضاف إلا إذا اخترتها، حماية لبيانات المرضى. وكل تصدير ينسجل.",
+    "noteLogged": "كل تصدير ينسجل.",
+    "cancel": "إلغاء",
+    "download": "حمّل",
+    "readyToast": "جاهز التصدير",
+    "readyToastText": "{file} · انحفظ في التنزيلات",
+    "failed": "ما قدرنا نسوي الملف",
+    "failedText": "ما انحفظ شي. جرّب مرة ثانية.",
+    "pdfNote": "{n, plural, one {صف واحد} two {صفين} few {# صفوف} other {# صف}} · مصدّرة من النظام الطبي",
+    "filterName": {
+      "invoices": {
+        "all": "الكل",
+        "unpaid": "غير مدفوعة",
+        "part": "جزئي",
+        "paid": "مدفوعة",
+        "refunded": "مسترجعة"
+      },
+      "claims": {
+        "all": "الكل",
+        "toFix": "تبي تصليح",
+        "ready": "جاهزة",
+        "review": "تحت المراجعة",
+        "paid": "انصرفت"
+      },
+      "contracts": {
+        "all": "الكل",
+        "staff": "الموظفين",
+        "partner": "الشركاء",
+        "insurer": "التأمين",
+        "toSign": "للتوقيع"
+      }
+    },
+    "col": {
+      "invoice": "الفاتورة",
+      "date": "التاريخ",
+      "mrn": "رقم الملف",
+      "patient": "المريض",
+      "payer": "الجهة",
+      "subtotal": "المجموع",
+      "vat": "الضريبة",
+      "total": "الإجمالي",
+      "patientPays": "على المريض",
+      "paid": "المدفوع",
+      "balance": "المتبقي",
+      "status": "الحالة",
+      "claim": "المطالبة",
+      "insurer": "شركة التأمين",
+      "amount": "المبلغ",
+      "contract": "العقد",
+      "type": "النوع",
+      "party": "الطرف",
+      "start": "يبدأ",
+      "end": "ينتهي",
+      "measure": "المؤشر",
+      "value": "القيمة"
+    },
+    "summary": {
+      "invoices": "فواتير هالشهر",
+      "unpaid": "اللي على المرضى",
+      "claimsReview": "مطالبات تحت المراجعة",
+      "claimsPaid": "مطالبات انصرفت هالشهر",
+      "contracts": "العقود",
+      "toSign": "عقود للتوقيع"
     }
   }
 }

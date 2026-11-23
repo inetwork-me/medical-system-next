@@ -6,6 +6,8 @@
  */
 export const BILLING_HREF = "/billing"
 export const INVOICES_HREF = "/billing/invoices"
+/** New invoice by hand (inner page of Invoices). */
+export const NEW_INVOICE_HREF = "/billing/invoices/new"
 export const CLAIMS_HREF = "/billing/claims"
 export const INSURERS_HREF = "/billing/insurers"
 export const CONTRACTS_HREF = "/billing/contracts"
@@ -27,3 +29,5 @@ export const newContractHref = (type?: "staff" | "partner" | "insurer", template
 /** Templates library (inner page of Contracts); `?id=` selects a template. */
 export const TEMPLATES_HREF = "/billing/contracts/templates"
 export const templatesHref = (id?: string) => (id ? `${TEMPLATES_HREF}?${new URLSearchParams({ id })}` : TEMPLATES_HREF)
+/** Template editor (inner page of Contracts › Templates): `/billing/contracts/templates/edit?id=staff-doctors&v=5`. */
+export const templateEditHref = (id: string, v: number) => `/billing/contracts/templates/edit?${new URLSearchParams({ id, v: String(v) })}`

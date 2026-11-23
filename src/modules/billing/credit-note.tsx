@@ -23,11 +23,14 @@ import { PageTitle } from "@/components/shell/page-title"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import {
   BILL_NOW,
   CENTER,
   CREDIT_REASONS,
   REFUND_APPROVAL_LIMIT,
+  REFUND_APPROVER,
+  STAFF,
   insurerOf,
   type CreditEvent,
   type CreditNote,
@@ -38,9 +41,10 @@ import {
 import { claimsHref, creditNoteHref, INVOICES_HREF, invoiceHref } from "./href"
 import { formatMoney, useMoney } from "./money"
 import { nphies, toAdjustmentBundle } from "./nphies"
-import { ClaimStatusBadge, Latin, ltrRun, useSoon } from "./parts"
+import { ClaimStatusBadge, Latin, ltrRun } from "./parts"
 import { billCan } from "./roles"
-import { creditedLines, creditPreview, issueCreditNote, lineNet, lineTotal, lineVat, nextCreditNo, paidByCard, refundMethods } from "./rules"
+import { creditedLines, creditPreview, issueCreditNote, lineNet, lineTotal, lineVat, needsApproval, nextCreditNo, paidBack, paidByCard, refundMethods } from "./rules"
+import { ApproveRefundDialog, refundCard, ROLE_LABEL } from "./refund-approval"
 import { currentUser } from "./session"
 import { getClaim, getCreditNote, getCreditNotes, getInvoice, saveCreditIssue, saveCreditNote, useBillRole, useClaim, useCreditNote, useInvoice } from "./store"
 import { useBillText } from "./text"
@@ -127,7 +131,7 @@ function useStays() {
 
 /* ------------------------------------------------------------------ dialog */
 
-export type CreditDialogInitial = { lines?: number[]; reason?: CreditReason; step?: 1 | 2; method?: RefundMethod }
+export type CreditDialogInitial = { lines?: number[]; reason?: CreditReason; step?: 1 | 2; method?: RefundMethod; note?: string }
 
 /**
  * Overlay · Credit note · 1 → 2 (Invoice page → Credit note).
@@ -135,9 +139,21 @@ export type CreditDialogInitial = { lines?: number[]; reason?: CreditReason; ste
  *     credited lines are locked), the reason, and the live split: credit with VAT, off the insurer's claim, patient's part.
  * 2 · refund: the patient's new share, already paid, to refund; Refund by (only methods that fit how they paid), the
  *     approval note, "Print a refund receipt", the NPHIES note; Back · Issue credit note → the Credit note page. A refund
- *     over SAR 500 shows Send for approval instead (finance manager; that state isn't drawn — coming soon).
+ *     over the limit (SAR 500) is the Over limit state: the warning names the finance manager, a note for them, Cancel ·
+ *     Send for approval — the credit note is issued now and the money waits for approval (`approval-requested`).
  */
-export function CreditNoteDialog({ invoiceNo, onOpenChange, initial }: { invoiceNo: string; onOpenChange: (open: boolean) => void; initial?: CreditDialogInitial }) {
+export function CreditNoteDialog({
+  invoiceNo,
+  onOpenChange,
+  initial,
+  preview,
+}: {
+  invoiceNo: string
+  onOpenChange: (open: boolean) => void
+  initial?: CreditDialogInitial
+  /** Dev stories: show the dialog against this invoice state (e.g. before a seeded credit note existed). */
+  preview?: Invoice
+}) {
   const t = useTranslations("billing.creditNote.dialog")
   const tr = useTranslations("billing.creditNote")
   const tm = useTranslations("billing")
@@ -145,14 +161,15 @@ export function CreditNoteDialog({ invoiceNo, onOpenChange, initial }: { invoice
   const money = useMoney()
   const router = useRouter()
   const role = useBillRole()
-  const soon = useSoon()
-  const inv = useInvoice(invoiceNo)
+  const stored = useInvoice(invoiceNo)
+  const inv = preview ?? stored
   const [step, setStep] = React.useState<1 | 2>(initial?.step ?? 1)
   const [lines, setLines] = React.useState<number[]>(initial?.lines ?? [])
   const [reason, setReason] = React.useState<CreditReason | "">(initial?.reason ?? "")
   const [tried, setTried] = React.useState(false)
   const [receipt, setReceipt] = React.useState(true)
   const [method, setMethod] = React.useState<RefundMethod | undefined>(initial?.method)
+  const [forApprover, setForApprover] = React.useState(initial?.note ?? "")
   const receiptId = React.useId()
   if (!inv) return null
 
@@ -163,7 +180,9 @@ export function CreditNoteDialog({ invoiceNo, onOpenChange, initial }: { invoice
   const ins = inv.payer === "cash" ? undefined : inv.payer
   const methods = refundMethods(inv)
   const how = methods.includes(method as RefundMethod) ? (method as RefundMethod) : methods[0]
-  const overLimit = a.refund > REFUND_APPROVAL_LIMIT && !billCan(role, "approveRefund")
+  // Over the limit the money always waits for the finance manager (nobody approves their own refund on the way out).
+  const overLimit = a.refund > 0 && needsApproval(a.refund)
+  const approver = STAFF[REFUND_APPROVER]
   const limit = formatMoney(REFUND_APPROVAL_LIMIT, locale, { whole: true })
   const errors = { lines: lines.length === 0, reason: !reason }
   const invalid = errors.lines || errors.reason
@@ -178,7 +197,6 @@ export function CreditNoteDialog({ invoiceNo, onOpenChange, initial }: { invoice
 
   const issue = () => {
     if (!reason || !billCan(role, "creditNote")) return
-    if (overLimit) return soon()
     const cur = getInvoice(inv.no)
     if (!cur) return
     const claim = cur.claimNo ? getClaim(cur.claimNo) : undefined
@@ -195,10 +213,12 @@ export function CreditNoteDialog({ invoiceNo, onOpenChange, initial }: { invoice
       by: user?.id ?? "session",
       byName: user?.name ?? SESSION_USER.name,
       uuid,
+      approval: overLimit ? { approver: REFUND_APPROVER, askedRole: ROLE_LABEL[role], note: forApprover } : undefined,
     })
     saveCreditIssue(r.cn, r.invoice, r.claim)
     onOpenChange(false)
     router.push(creditNoteHref(no))
+    if (overLimit) toast.success(t("approvalToast"), { description: t("approvalToastText", { name: b(approver.name), g: approver.female ? "female" : "male" }) })
     // ZATCA (type 381, referencing the invoice) and the NPHIES claim adjustment, behind their stubs.
     zatca
       .report(zatcaCreditRequest(r.cn), r.cn.zatca.type)
@@ -309,9 +329,15 @@ export function CreditNoteDialog({ invoiceNo, onOpenChange, initial }: { invoice
       icon="money-send"
       width="sm:max-w-140"
       secondary={
-        <Button variant="outline" onClick={() => setStep(1)}>
-          {t("back")}
-        </Button>
+        overLimit ? (
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t("cancel")}
+          </Button>
+        ) : (
+          <Button variant="outline" onClick={() => setStep(1)}>
+            {t("back")}
+          </Button>
+        )
       }
       primary={<Button onClick={issue}>{overLimit ? t("approval") : t("issue")}</Button>}
     >
@@ -332,22 +358,30 @@ export function CreditNoteDialog({ invoiceNo, onOpenChange, initial }: { invoice
                 onValueChange={setMethod}
                 aria-label={t("refundBy")}
                 className="w-full *:flex-1"
-                options={methods.map((m) => ({ value: m, label: t(`method.${m}`) }))}
+                options={methods.map((m) => ({ value: m, label: m === "card" ? t("method.cardTo", { brand: refundCard(inv)?.brand ?? "card" }) : t(`method.${m}`) }))}
               />
             )}
           </Field>
-          <Note tone="info" icon="info-circle">
-            {t(paidByCard(inv) ? "noteCard" : "noteCash", { sex, how: methodHow, limit })}
-          </Note>
-          {overLimit && (
-            <Note tone="warning" icon="warning-2">
-              {t("overLimit", { amount: money(a.refund), limit })}
-            </Note>
+          {overLimit ? (
+            <>
+              <Note tone="warning" icon="warning-2">
+                {t("overLimit", { limit, name: b(approver.name), role: locale === "ar" ? approver.role.ar : approver.role.en.toLowerCase(), g: approver.female ? "female" : "male" })}
+              </Note>
+              <Field label={t("noteFor", { name: b(approver.name).split(" ")[0] })}>
+                <Textarea value={forApprover} onChange={(e) => setForApprover(e.target.value)} rows={3} />
+              </Field>
+            </>
+          ) : (
+            <>
+              <Note tone="info" icon="info-circle">
+                {t(paidByCard(inv) ? "noteCard" : "noteCash", { sex, how: methodHow, limit })}
+              </Note>
+              <label htmlFor={receiptId} className="flex cursor-pointer items-center gap-2 text-sm">
+                <Checkbox id={receiptId} checked={receipt} onCheckedChange={(v) => setReceipt(v === true)} />
+                {t("receipt")}
+              </label>
+            </>
           )}
-          <label htmlFor={receiptId} className="flex cursor-pointer items-center gap-2 text-sm">
-            <Checkbox id={receiptId} checked={receipt} onCheckedChange={(v) => setReceipt(v === true)} />
-            {t("receipt")}
-          </label>
         </>
       ) : (
         <Note tone="info" icon="info-circle">
@@ -385,6 +419,7 @@ export function CreditNotePaper({ cn: c, inv, className }: { cn: CreditNote; inv
   const p = patient(inv.patient)
   const ins = inv.payer === "cash" ? undefined : insurerOf(inv.payer)
   const lines = c.lines.map((i) => inv.lines[i]).filter(Boolean)
+  const back = paidBack(c)
   const rates = [...new Set(lines.map((l) => l.vatRate))]
   const rate = rates.length === 1 ? rates[0] : null
   const vatLabel = (k: "line" | "sum") => (rate == null ? t(`${k}.vatMixed`) : t(`${k}.vat`, { rate: pctRun(Math.round(rate * 100)) }))
@@ -428,7 +463,11 @@ export function CreditNotePaper({ cn: c, inv, className }: { cn: CreditNote; inv
               <bdi>{t("issued", { no: ltrRun(c.no), date: date(c.issuedAt), time: timeOf(c.issuedAt) })}</bdi>
             </p>
           </div>
-          <StatusBadge tone={c.refund ? "success" : "neutral"}>{t(c.refund ? "status.refunded" : "status.issued")}</StatusBadge>
+          {c.approval?.status === "pending" ? (
+            <StatusBadge tone="warning">{t("status.approval")}</StatusBadge>
+          ) : (
+            <StatusBadge tone={back ? "success" : "neutral"}>{t(back ? "status.refunded" : "status.issued")}</StatusBadge>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-x-4 gap-y-5 @xl/paper:grid-cols-3">
@@ -486,8 +525,8 @@ export function CreditNotePaper({ cn: c, inv, className }: { cn: CreditNote; inv
                 value={money(a.insurer)}
               />
             )}
-            <SumRow label={pct ? t("sum.patientPct", { pct: pctRun(inv.copay.pct) }) : t("sum.patient")} value={money(a.patient)} last={!c.refund} />
-            {c.refund && <SumRow label={t(`sum.refunded.${c.refund.method}`)} value={money(c.refund.amount)} tone="success" last />}
+            <SumRow label={pct ? t("sum.patientPct", { pct: pctRun(inv.copay.pct) }) : t("sum.patient")} value={money(a.patient)} last={!back} />
+            {back && <SumRow label={t(`sum.refunded.${back.method}`)} value={money(back.amount)} tone="success" last />}
           </div>
         </div>
 
@@ -510,7 +549,7 @@ export function CreditNotePaper({ cn: c, inv, className }: { cn: CreditNote; inv
 
 /* ------------------------------------------------------------------ side */
 
-function useCreditEventText(zatcaDone: boolean) {
+function useCreditEventText(zatcaDone: boolean, c: CreditNote) {
   const t = useTranslations("billing.creditNote.history")
   const { b, insurerShort } = useBillText()
   const money = useMoney()
@@ -519,6 +558,9 @@ function useCreditEventText(zatcaDone: boolean) {
     const name = e.byName ? b(e.byName) : ""
     if (e.kind === "issued") return t(zatcaDone ? "issued" : "issuedPending", { name })
     if (e.kind === "claimAdjusted") return t("claimAdjusted", { insurer: insurerShort(e.insurer ?? "") })
+    if (e.kind === "approvalRequested") return t("approvalRequested", { name, amount: money(c.refund?.amount ?? 0), approver: c.approval ? b(STAFF[c.approval.approver].name) : "" })
+    if (e.kind === "refundApproved") return t("refundApproved", { name })
+    if (e.kind === "refundRejected") return t("refundRejected", { name })
     if (e.refund) return t(e.refund.receipt ? "refundedReceipt" : "refunded", { amount: money(e.refund.amount), how: t(`how.${e.refund.method}`) })
     return ""
   }
@@ -539,13 +581,20 @@ export function CreditNoteSide({ cn: c, inv }: { cn: CreditNote; inv: Invoice })
   const claim = useClaim(c.claim?.no ?? "")
   const a = c.amounts
   const zatcaDone = c.zatca.status === "reported" || c.zatca.status === "cleared"
-  const eventText = useCreditEventText(zatcaDone)
+  const eventText = useCreditEventText(zatcaDone, c)
   const events = [...c.events].sort((x, y) => x.at.localeCompare(y.at))
   const sameDay = (iso: string) => iso.slice(0, 10) === c.issuedAt.slice(0, 10)
   const ins = inv.payer === "cash" ? undefined : inv.payer
   const sex = patient(inv.patient).sex ?? "m"
   const owes = Math.max(0, a.after.patient - a.paid)
-  const balance = Math.max(0, a.after.patient - (a.paid - (c.refund?.amount ?? 0)))
+  const back = paidBack(c)
+  const balance = Math.max(0, a.after.patient - (a.paid - (back?.amount ?? 0)))
+  const role = useBillRole()
+  const [reviewing, setReviewing] = React.useState(false)
+  const ap = c.approval
+  const methodLabel = (m: RefundMethod) => (m === "card" ? t("dialog.method.cardTo", { brand: refundCard(inv)?.brand ?? "card" }) : t(`dialog.method.${m}`))
+  const roleText = (r: { en: string; ar: string }) => (ar ? r.ar : r.en.toLowerCase())
+  const approver = ap ? STAFF[ap.approver] : undefined
   const upTo = new Set([...(inv.credits ?? []).filter((x) => x.cn <= c.no).flatMap((x) => x.lines)])
   const pdf = () => toast.success(tp("done"), { description: tp("doneText") })
 
@@ -555,21 +604,39 @@ export function CreditNoteSide({ cn: c, inv }: { cn: CreditNote; inv: Invoice })
         <div className="flex flex-col">
           <SumRow label={t("refund.newShare")} value={money(a.after.patient)} />
           <SumRow label={t("refund.paid")} value={money(a.paid)} />
-          {c.refund ? (
+          {c.refund && ap && ap.status !== "approved" ? (
+            <>
+              <SumRow label={t(ap.status === "pending" ? "refund.waiting" : "refund.kept")} value={money(c.refund.amount)} />
+              <SumRow label={t("refund.to")} value={ap.status === "pending" ? methodLabel(c.refund.method) : t("refund.keptAs")} last />
+            </>
+          ) : c.refund ? (
             <>
               <SumRow label={t("refund.refunded")} value={money(c.refund.amount)} tone="success" />
-              <SumRow label={t("refund.how")} value={t(`refund.method.${c.refund.method}`, { name: b(c.refund.byName) })} last />
+              <SumRow label={t("refund.how")} value={t(`refund.method.${c.refund.method}`, { name: b(c.refund.byName), brand: refundCard(inv)?.brand ?? "card" })} last />
             </>
           ) : (
             <SumRow label={t("refund.owes")} value={money(owes)} tone={owes > 0 ? "destructive" : undefined} last />
           )}
         </div>
-        {c.refund && (
+        {ap && approver && ap.status !== "approved" && (
+          <Note tone={ap.status === "pending" ? "warning" : "info"} icon={ap.status === "pending" ? "clock" : "info-circle"}>
+            {ap.status === "pending"
+              ? t("refund.pending", { name: b(approver.name), role: roleText(approver.role), g: approver.female ? "female" : "male", time: timeOf(ap.askedAt) })
+              : t("refund.rejected", { name: b(approver.name), g: approver.female ? "female" : "male", note: ap.decisionNote ? b(ap.decisionNote) : "" })}
+          </Note>
+        )}
+        {ap?.status === "pending" && billCan(role, "approveRefund") && (
+          <Button className="w-full" onClick={() => setReviewing(true)}>
+            {t("refund.review")}
+          </Button>
+        )}
+        {back && (
           <Button variant="outline" className="w-full" onClick={pdf}>
             <Icon name="document-download" size={24} />
             {t("refund.receipt")}
           </Button>
         )}
+        {reviewing && <ApproveRefundDialog cnNo={c.no} onOpenChange={setReviewing} />}
       </Card>
 
       <Card title={t("after.title")} description={<bdi>{stays(inv, upTo, "after")}</bdi>}>

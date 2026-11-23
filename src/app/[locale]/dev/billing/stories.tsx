@@ -14,7 +14,9 @@ import { InvoicesList } from "@/modules/billing/invoices"
 import { InvoicePaper, InvoiceSide } from "@/modules/billing/invoice-page"
 import { RecordPaymentDialog } from "@/modules/billing/payment-dialog"
 import { CreditNoteDialog, CreditNotePaper, CreditNoteSide } from "@/modules/billing/credit-note"
-import { issueCreditNote } from "@/modules/billing/rules"
+import { issueCreditNote, rejectRefund } from "@/modules/billing/rules"
+import { ApproveRefundDialog } from "@/modules/billing/refund-approval"
+import { useCreditNote, useInvoice } from "@/modules/billing/store"
 import { STAFF as BILL_STAFF } from "@/modules/billing/data"
 import { applyZatca, readZatcaQr, zatcaQrPayload, zatcaRequest, zatcaStub } from "@/modules/billing/zatca"
 import { QrCode } from "@/components/ds/qr-code"
@@ -28,8 +30,16 @@ import { ContractsList } from "@/modules/billing/contracts"
 import { ContractPaper, ContractSide } from "@/modules/billing/contract-page"
 import { SignDialog } from "@/modules/billing/sign-dialog"
 import { ContractFormCards, ContractSummary, useContractForm, type ContractForm } from "@/modules/billing/new-contract"
+import { AddClausesDialog, AddSignerDialog, ChoosePartyDialog } from "@/modules/billing/contract-dialogs"
+import { blankInvoiceForm, formForPatient, NewInvoiceFormCards, NewInvoiceSummary, validateInvoice, type NewInvoiceForm } from "@/modules/billing/new-invoice"
+import { toast } from "@/components/ds/toast"
+import { useLocale, useTranslations } from "next-intl"
 import { MoneyIn, NeedsAttention, OverviewKpis } from "@/modules/billing/overview"
 import { TemplatePreview, TemplatesLibrary } from "@/modules/billing/templates-page"
+import { ClauseEditor, PublishTemplateDialog, TemplateClausesList } from "@/modules/billing/template-editor"
+import { changesFrom, versionClauses } from "@/modules/billing/templates-store"
+import { TEMPLATE_LIBRARY, type TemplateClause } from "@/modules/billing/data"
+import { useBillText } from "@/modules/billing/text"
 import {
   ClaimStatusBadge,
   ContractStatusBadge,
@@ -286,6 +296,8 @@ export function BillingStories() {
       <InsurerStories />
       <ContractStories />
       <NewContractStories />
+      <NewContractDialogStories />
+      <NewInvoiceStories />
       <TemplatesStories />
       <OverviewStories />
 
@@ -405,6 +417,75 @@ function CreditNoteStories() {
           initial={{ lines: [1, 2, 3, 4, 5], reason: "testsNotDone", step: open === 2 ? 2 : 1 }}
           onOpenChange={(o) => !o && setOpen(0)}
         />
+      )}
+      <RefundApprovalStories />
+    </>
+  )
+}
+
+/**
+ * v5.2 · Refund approval: Credit note · 2 · Over limit (Huda's SAR 920 back to mada), Approve the refund (CN-2611-0013),
+ * the credit note while it waits / once rejected, and the three toasts.
+ */
+function RefundApprovalStories() {
+  const t = useTranslations("billing")
+  const ar = useLocale() === "ar"
+  const [open, setOpen] = React.useState<null | "over" | "approve">(null)
+  const cn = useCreditNote("CN-2611-0013")
+  const inv = useInvoice("INV-2611-0229")
+  const rejected = React.useMemo(() => (cn ? rejectRefund(cn, { at: `${cn.issuedAt.slice(0, 10)}T11:20`, byName: BILL_STAFF.abeer.name, note: ar ? "سجل الجهاز ما يبيّن عطل." : "The scanner log shows no outage." }) : undefined), [cn, ar])
+  const toasts: [string, () => void][] = [
+    ["approval-requested", () => toast.success(t("creditNote.dialog.approvalToast"), { description: t("creditNote.dialog.approvalToastText", { name: ar ? "عبير السلمي" : "Abeer Al-Sulami", g: "female" }) })],
+    ["refund-approved", () => toast.success(t("refundApproval.approvedToast"), { description: t("refundApproval.approvedText", { amount: ar ? "920.00 ر.س" : "SAR 920.00", to: t("refundApproval.backTo.card", { brand: "mada" }) }) })],
+    ["refund-rejected", () => toast.success(t("refundApproval.rejectedToast"), { description: t("refundApproval.rejectedText", { name: ar ? "نورة" : "Nora", g: "female" }) })],
+  ]
+  return (
+    <>
+      <Box title="Overlay · Credit note · 2 · Over limit · Approve refund (v5.2)">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setOpen("over")}>
+            Credit note · 2 · Over limit
+          </Button>
+          <Button variant="outline" onClick={() => setOpen("approve")}>
+            Approve refund
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">Approve / Reject change the session data (sessionStorage); reload the page with a clear session to see the pending state again.</p>
+      </Box>
+      <Box title="Toasts · Refund approval (v5.2)">
+        <div className="flex flex-wrap gap-2">
+          {toasts.map(([k, fire]) => (
+            <Button key={k} size="sm" variant="outline" onClick={fire}>
+              {k}
+            </Button>
+          ))}
+        </div>
+      </Box>
+      {cn && inv && (
+        <Box title="Widget / Bill Credit Note + Side · waiting for approval (CN-2611-0013)" className="lg:col-span-2">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+            <CreditNotePaper cn={cn} inv={inv} />
+            <CreditNoteSide cn={cn} inv={inv} />
+          </div>
+        </Box>
+      )}
+      {rejected && inv && (
+        <Box title="Widget / Bill Credit Note Side · refund rejected (kept as credit)">
+          <div className="w-[360px] max-w-full">
+            <CreditNoteSide cn={rejected} inv={inv} />
+          </div>
+        </Box>
+      )}
+      {open === "over" && (
+        <CreditNoteDialog
+          invoiceNo="INV-2611-0229"
+          preview={inv ? { ...inv, credits: [] } : undefined}
+          initial={{ lines: [1], reason: "notGiven", step: 2, note: ar ? "ما انسوّت أشعة CBCT · الجهاز كان معطل طول اليوم." : "CBCT scan not done · the scanner was down all day." }}
+          onOpenChange={(o) => !o && setOpen(null)}
+        />
+      )}
+      {open === "approve" && (
+        <ApproveRefundDialog cnNo="CN-2611-0013" initialNote={ar ? "موافق · سجل الجهاز مرفق." : "Approved · scanner log attached."} onOpenChange={(o) => !o && setOpen(null)} />
       )}
     </>
   )
@@ -683,6 +764,79 @@ function NewContractStories() {
   )
 }
 
+/**
+ * v5.2 · New contract pickers: Choose party × Staff / Partner / Insurer (the drawn searches), Add clauses (library with
+ * two ticked · write my own), Add a signer (Abeer Al-Sulami, 3rd), and the toasts they fire.
+ */
+function NewContractDialogStories() {
+  const t = useTranslations("billing.newContract")
+  const ar = useLocale() === "ar"
+  const [open, setOpen] = React.useState<string | null>(null)
+  const close = (o: boolean) => !o && setOpen(null)
+  // The drawn searches and names, in the frame's language.
+  const party = ar ? ({ staff: "يوسف", partner: "مختبر", insurer: "ولا" } as const) : ({ staff: "Yousef", partner: "lab", insurer: "Wa" } as const)
+  const nm = (en: string, a: string) => (ar ? a : en)
+  const toasts: [string, () => void][] = [
+    ["sent-for-signature", () => toast.success(t("sentToast"), { description: t("sentToastText", { name: nm("Majed Al-Ghamdi", "ماجد الغامدي") }) })],
+    ["sent-staff", () => toast.success(t("sentToast"), { description: t("sentToastText", { name: nm("Dr. Yousef Al-Harbi", "د. يوسف الحربي") }) })],
+    ["sent-insurer", () => toast.success(t("sentInsurerToast", { insurer: nm("Walaa", "ولاء") }), { description: t("sentToastText", { name: nm("Khalid Al-Mansour", "خالد المنصور") }) })],
+    ["clause-added", () => toast.success(t("clausesAddedToast", { n: 2 }), { description: t("clausesAddedText") })],
+    ["signer-added", () => toast.success(t("signerAddedToast"), { description: t("signerAddedText", { name: nm("Abeer Al-Sulami", "عبير السلمي"), n: t("signerDialog.ordinalWord", { n: 3 }) }) })],
+    ["item-removed", () => toast.info(t("removedToast"), { description: t("removedToastText") })],
+  ]
+  return (
+    <>
+      <Box title="Overlay · Choose party · Staff / Partner / Insurer · Add clause · Add signer (v5.2)">
+        <div className="flex flex-wrap gap-2">
+          {(["staff", "partner", "insurer"] as const).map((k) => (
+            <Button key={k} size="sm" variant="outline" onClick={() => setOpen(`party-${k}`)}>
+              Choose party · {k}
+            </Button>
+          ))}
+          <Button size="sm" variant="outline" onClick={() => setOpen("clauses")}>
+            Add clause · library
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setOpen("clauses-own")}>
+            Add clause · write my own
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setOpen("signer")}>
+            Add signer · drawn
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setOpen("signer-empty")}>
+            Add signer · empty (errors on Add)
+          </Button>
+        </div>
+      </Box>
+      <Box title="Toasts · New contract (v5.2)">
+        <div className="flex flex-wrap gap-2">
+          {toasts.map(([k, fire]) => (
+            <Button key={k} size="sm" variant="outline" onClick={fire}>
+              {k}
+            </Button>
+          ))}
+        </div>
+      </Box>
+      {open?.startsWith("party-") && (() => {
+        const k = open.slice(6) as keyof typeof party
+        const first = { staff: "emp-yousef", partner: "co-alborg", insurer: "ins-walaa" }[k]
+        return <ChoosePartyDialog kind={k} current={first} initialQuery={party[k]} onOpenChange={close} onPick={() => {}} />
+      })()}
+      {open === "clauses" && <AddClausesDialog have={[]} initial={{ ticked: ["noPoaching", "continuity"] }} onOpenChange={close} onAdd={() => {}} />}
+      {open === "clauses-own" && <AddClausesDialog have={[]} initial={{ from: "own" }} onOpenChange={close} onAdd={() => {}} />}
+      {open === "signer" && (
+        <AddSignerDialog
+          order={[nm("Dr. Yousef Al-Harbi", "د. يوسف الحربي"), nm("Faisal Al-Qahtani", "فيصل القحطاني")]}
+          partyName={nm("Dr. Yousef Al-Harbi", "د. يوسف الحربي")}
+          initial={{ name: nm("Abeer Al-Sulami", "عبير السلمي"), role: nm("Finance manager", "المدير المالي"), mobile: "+966 55 902 1146", side: "center", does: "signs", at: 2 }}
+          onOpenChange={close}
+          onAdd={() => {}}
+        />
+      )}
+      {open === "signer-empty" && <AddSignerDialog order={[nm("Dr. Yousef Al-Harbi", "د. يوسف الحربي"), nm("Faisal Al-Qahtani", "فيصل القحطاني")]} onOpenChange={close} onAdd={() => {}} />}
+    </>
+  )
+}
+
 /** v5.1 · Templates: the library (wide · compact) and the preview, for the published v4 and a draft (CCHI v3). */
 function TemplatesStories() {
   const [sel, setSel] = React.useState("staff-doctors@4")
@@ -706,6 +860,88 @@ function TemplatesStories() {
           <TemplatePreview rowKey="insurer-cchi@3" />
         </div>
       </Box>
+      <TemplateEditorStories />
+    </>
+  )
+}
+
+/** The drawn draft v5 of Employment · doctors: payday moved to the 27th, notice 60 days, Training and CME hours added. */
+function drawnTemplateDraft(): TemplateClause[] {
+  const tpl = TEMPLATE_LIBRARY.find((x) => x.id === "staff-doctors")!
+  return [
+    ...versionClauses(tpl, 4).map((c) =>
+      c.key === "pay-and-benefits"
+        ? { ...c, text: { en: c.text.en.replace("25th", "27th"), ar: c.text.ar.replace("25", "27") } }
+        : c.key === "ending-the-contract"
+          ? { ...c, text: { en: c.text.en.replace("30 days", "60 days"), ar: c.text.ar.replace("30 يوم", "60 يوم") } }
+          : c
+    ),
+    {
+      key: "training-cme",
+      title: { en: "Training and CME hours", ar: "التدريب وساعات التعليم الطبي" },
+      text: {
+        en: "The center gives {employee_name} 5 paid days a year for training and counts the CME hours SCFHS asks for.",
+        ar: "يعطي المجمع {employee_name} 5 أيام مدفوعة بالسنة للتدريب، ويحسب ساعات التعليم الطبي المستمر اللي تطلبها الهيئة.",
+      },
+      locked: false,
+      isNew: true,
+    },
+  ]
+}
+
+/** v5.2 · Template editor: Widget / Bill Template Clauses + Clause Editor (wide / compact), Publish version 5?, toasts. */
+function TemplateEditorStories() {
+  const t = useTranslations("billing")
+  const { b } = useBillText()
+  const tpl = TEMPLATE_LIBRARY.find((x) => x.id === "staff-doctors")!
+  const draftTpl = React.useMemo(() => ({ ...tpl, versions: [{ version: 5, status: "draft" as const, at: "2026-11-22", by: "nora" as const, basedOn: 4 }, ...tpl.versions] }), [tpl])
+  const [clauses, setClauses] = React.useState(drawnTemplateDraft)
+  const [sel, setSel] = React.useState("pay-and-benefits")
+  const [publishing, setPublishing] = React.useState(false)
+  const changes = changesFrom(versionClauses(tpl, 4), clauses)
+  const i = clauses.findIndex((c) => c.key === sel)
+  const update = (c: TemplateClause) => setClauses((xs) => xs.map((x) => (x.key === c.key ? c : x)))
+  const move = (from: number, to: number) =>
+    setClauses((xs) => {
+      const n = [...xs]
+      const [it] = n.splice(from, 1)
+      n.splice(to, 0, it)
+      return n
+    })
+  const status = t("templateEditor.status.draft", { v: 5, name: b(tpl.name), base: 4, saved: t("templateEditor.status.savedAgo", { n: 2 }) })
+  const toasts: [string, () => void][] = [
+    ["template-created", () => toast.success(t("templates.createdToast"), { description: t("templates.createdToastText", { name: "" }) })],
+    ["template-duplicated", () => toast.success(t("templates.duplicateToast"), { description: t("templates.duplicateToastText", { name: "" }) })],
+    ["template-saved", () => toast.success(t("templateEditor.savedToast"), { description: t("templateEditor.savedToastText", { v: 4 }) })],
+    ["template-published", () => toast.success(t("templateEditor.publishedToast", { v: 5 }), { description: t("templateEditor.publishedToastText") })],
+  ]
+  return (
+    <>
+      <Box title="Widget / Bill Template Clauses + Clause Editor · Wide (draft v5, the drawn state)" className="lg:col-span-2">
+        <div className="grid gap-6 xl:grid-cols-[300px_796px] xl:items-start">
+          <TemplateClausesList clauses={clauses} selected={sel} onSelect={setSel} onMove={move} onAdd={() => undefined} />
+          <ClauseEditor tpl={draftTpl} version={5} clause={clauses[i]} index={i} changes={changes} baseVersion={4} status={status} onChange={update} onRemove={() => undefined} />
+        </div>
+      </Box>
+      <Box title="Widget / Bill Template Clauses + Clause Editor · Compact (358)">
+        <div className="flex w-[358px] max-w-full flex-col gap-4">
+          <TemplateClausesList clauses={clauses} selected={sel} onSelect={setSel} onMove={move} onAdd={() => undefined} />
+          <ClauseEditor tpl={draftTpl} version={5} clause={clauses[i]} index={i} changes={changes} baseVersion={4} status={status} onChange={update} onRemove={() => undefined} />
+        </div>
+      </Box>
+      <Box title="Overlay · Publish version 5? · toasts (v5.2)">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setPublishing(true)}>
+            Publish version 5?
+          </Button>
+          {toasts.map(([k, fire]) => (
+            <Button key={k} size="sm" variant="outline" onClick={fire}>
+              {k}
+            </Button>
+          ))}
+        </div>
+      </Box>
+      {publishing && <PublishTemplateDialog tpl={draftTpl} version={5} changes={changes} onOpenChange={setPublishing} onPublish={() => setPublishing(false)} />}
     </>
   )
 }
@@ -730,6 +966,70 @@ function OverviewStories() {
           <div className="w-[360px] max-w-full">
             <NeedsAttention onFix={() => undefined} onSign={() => undefined} />
           </div>
+        </div>
+      </Box>
+    </>
+  )
+}
+
+/** The drawn New invoice: Reem Al-Mutairi, Al Rajhi class A (10%, up to SAR 75), three services, the biopsy note. */
+function drawnInvoice(ar: boolean): NewInvoiceForm {
+  return {
+    ...formForPatient(blankInvoiceForm(), "mutairi"),
+    lines: [
+      { code: "CONS-DER", qty: 1 },
+      { code: "PROC-BX", qty: 1 },
+      { code: "LAB-HIS", qty: 1 },
+    ],
+    note: ar ? "نتيجة الخزعة خلال 5 أيام عمل." : "Biopsy result in 5 working days.",
+  }
+}
+
+function InvoiceFormStory({ initial, title, compact, showErrors }: { initial: NewInvoiceForm; title: string; compact?: boolean; showErrors?: boolean }) {
+  const [f, setF] = React.useState(initial)
+  const patch = (p: Partial<NewInvoiceForm>) => setF((x) => ({ ...x, ...p }))
+  return (
+    <Box title={title} className={compact ? undefined : "lg:col-span-2"}>
+      <div className={compact ? "flex w-[358px] max-w-full flex-col gap-4" : "grid gap-6 xl:grid-cols-[776px_320px]"}>
+        {compact && <NewInvoiceSummary f={f} />}
+        <NewInvoiceFormCards f={f} patch={patch} errors={showErrors ? validateInvoice(f) : {}} />
+        {!compact && <NewInvoiceSummary f={f} className="xl:self-start" />}
+      </div>
+    </Box>
+  )
+}
+
+/** v5.2 · New invoice: Wide / Compact, the summary per payer (capped insurance, insurance %, cash, company), errors, toasts. */
+function NewInvoiceStories() {
+  const t = useTranslations("billing.newInvoice")
+  const ar = useLocale() === "ar"
+  const drawn = React.useMemo(() => drawnInvoice(ar), [ar])
+  const small = { ...drawn, lines: [{ code: "CONS-DER", qty: 1 }] }
+  const toasts: [string, () => void][] = [
+    ["invoice-draft", () => toast.success(t("draftToast"), { description: t("draftToastText") })],
+    ["invoice-issued", () => toast.success(t("issuedToast"), { description: t("issuedClaim", { no: "INV-2611-0242", insurer: ar ? "الراجحي" : "Al Rajhi", toInsurer: "للراجحي" }) })],
+    ["invoice-issued · pre-auth", () => toast.success(t("issuedToast"), { description: t("issuedPreauth", { no: "INV-2611-0242", insurer: ar ? "الراجحي" : "Al Rajhi", toInsurer: "" }) })],
+  ]
+  return (
+    <>
+      <InvoiceFormStory key={`w-${ar}`} initial={drawn} title="Widget / Bill New Invoice + Summary · Wide (the drawn state)" />
+      <InvoiceFormStory key={`c-${ar}`} initial={drawn} title="Widget / Bill New Invoice · Compact (358)" compact />
+      <Box title="Widget / Bill New Invoice Summary · payers">
+        <div className="flex w-[320px] max-w-full flex-col gap-4">
+          <NewInvoiceSummary f={drawn} />
+          <NewInvoiceSummary f={small} />
+          <NewInvoiceSummary f={{ ...drawn, payer: "cash", vatRule: "citizen" }} />
+          <NewInvoiceSummary f={{ ...drawn, payer: "company", company: "sec" }} />
+        </div>
+      </Box>
+      <InvoiceFormStory key={`e-${ar}`} initial={{ ...blankInvoiceForm(), payer: "insurance" }} title="New invoice · errors on Issue (nothing filled)" compact showErrors />
+      <Box title="Toasts · New invoice (v5.2)">
+        <div className="flex flex-wrap gap-2">
+          {toasts.map(([k, fire]) => (
+            <Button key={k} size="sm" variant="outline" onClick={fire}>
+              {k}
+            </Button>
+          ))}
         </div>
       </Box>
     </>

@@ -12,11 +12,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Contract, ContractKind } from "./data"
 import { contractCounts } from "./counts"
-import { contractHref, TEMPLATES_HREF } from "./href"
-import { ContractStatusBadge, InitialsAvatar, KindChip, Latin, SignatureDots, ltrRun, useSoon } from "./parts"
-import { billCan, DEMO_DOCTOR_KEY, type BillRole } from "./roles"
+import { contractHref, newContractHref, TEMPLATES_HREF } from "./href"
+import { ContractStatusBadge, InitialsAvatar, KindChip, Latin, SignatureDots, ltrRun, useShowMore } from "./parts"
+import { billCan, canDraft, DEMO_DOCTOR_KEY, type BillRole } from "./roles"
 import { contractStatus, daysLeft, signedCount, toSign } from "./rules"
-import { useBillRole, useContracts } from "./store"
+import { useAllContracts, useBillRole, useContracts } from "./store"
+import { usePublishListView } from "./list-view"
 import { useBillText } from "./text"
 
 export type ContractFilter = "all" | ContractKind | "toSign"
@@ -30,7 +31,7 @@ export function visibleContracts(list: Contract[], role: BillRole) {
   return role === "doctor" ? list.filter((c) => c.party.ref === DEMO_DOCTOR_KEY) : list
 }
 
-const inFilter = (c: Contract, f: ContractFilter) => f === "all" || (f === "toSign" ? toSign(contractStatus(c)) : c.kind === f)
+export const inContractFilter = (c: Contract, f: ContractFilter) => f === "all" || (f === "toSign" ? toSign(contractStatus(c)) : c.kind === f)
 
 /** Waiting for you first, then the other signing ones, ending, drafts, signed; newest start first. */
 const RANK = { awaitingYou: 0, awaitingThem: 1, draft: 2, ending: 3, signed: 4, ended: 5 } as const
@@ -40,7 +41,6 @@ const byPriority = (a: Contract, b: Contract) => RANK[contractStatus(a)] - RANK[
 function RowAction({ c, onSign }: { c: Contract; onSign: (no: string) => void }) {
   const t = useTranslations("billing.contracts")
   const role = useBillRole()
-  const soon = useSoon()
   const s = contractStatus(c)
   if (s === "awaitingYou" && billCan(role, "sign"))
     return (
@@ -48,10 +48,11 @@ function RowAction({ c, onSign }: { c: Contract; onSign: (no: string) => void })
         {t("sign")}
       </Button>
     )
-  if (s === "ending" && (billCan(role, "draftInsurer") || billCan(role, "draftPartner") || billCan(role, "draftStaff")))
+  // Renew: New contract with the same type (an ending insurer agreement opens New contract · Insurer).
+  if (s === "ending" && canDraft(role, c.kind))
     return (
-      <Button size="sm" variant="outline" onClick={soon}>
-        {t("renew")}
+      <Button size="sm" variant="outline" asChild>
+        <Link href={newContractHref(c.kind)}>{t("renew")}</Link>
       </Button>
     )
   return (
@@ -69,17 +70,21 @@ function RowAction({ c, onSign }: { c: Contract; onSign: (no: string) => void })
  */
 export function ContractsList({ onSign }: { onSign: (no: string) => void }) {
   const t = useTranslations("billing.contracts")
-  const soon = useSoon()
   const role = useBillRole()
   const all = visibleContracts(useContracts(), role)
+  const listed = visibleContracts(useAllContracts(), role)
   const [query, setQuery] = React.useState("")
   const [filter, setFilter] = React.useState<ContractFilter>("all")
+  usePublishListView("contracts", { filter, query: query.trim() })
+  const { extra, more } = useShowMore(`${filter}|${query.trim()}`)
   const c = contractCounts(all)
   const own = role === "doctor"
-  const count = (f: ContractFilter) => (own ? all.filter((x) => inFilter(x, f)).length : f === "all" ? c.all : f === "toSign" ? c.toSign : c[f])
+  const count = (f: ContractFilter) => (own ? all.filter((x) => inContractFilter(x, f)).length : f === "all" ? c.all : f === "toSign" ? c.toSign : c[f])
   const q = query.trim().toLowerCase()
   const matches = (x: Contract) => !q || [x.no, x.party.name.en, x.party.role.en].some((v) => v.toLowerCase().includes(q)) || [x.party.name.ar, x.party.role.ar].some((v) => v.includes(query.trim()))
-  const rows = all.filter((x) => matches(x) && inFilter(x, filter)).sort(byPriority)
+  const rows = listed.filter((x) => matches(x) && inContractFilter(x, filter)).sort(byPriority)
+  const wide = Math.min(PAGE_WIDE + extra, rows.length)
+  const compact = Math.min(PAGE_COMPACT + extra, rows.length)
   const total = q ? rows.length : count(filter)
   const label = (f: ContractFilter) => t(`filter.${f}`, { n: count(f) })
 
@@ -150,19 +155,21 @@ export function ContractsList({ onSign }: { onSign: (no: string) => void }) {
         />
       ) : (
         <>
-          <ContractsTable rows={rows.slice(0, PAGE_WIDE)} onSign={onSign} />
-          <ContractCards rows={rows.slice(0, PAGE_COMPACT)} />
+          <ContractsTable rows={rows.slice(0, wide)} onSign={onSign} />
+          <ContractCards rows={rows.slice(0, compact)} />
           <footer className="hidden items-center gap-3 @4xl/ct:flex">
-            <span className="flex-1 text-xs text-muted-foreground">{t("showing", { shown: Math.min(PAGE_WIDE, rows.length), total })}</span>
-            {total > PAGE_WIDE && (
-              <Button variant="outline" size="sm" onClick={soon}>
+            <span className="flex-1 text-xs text-muted-foreground" aria-live="polite">
+              {t("showing", { shown: wide, total: Math.max(total, wide) })}
+            </span>
+            {wide < rows.length && (
+              <Button variant="outline" size="sm" onClick={() => more(rows.length - wide)}>
                 {t("showMore")}
               </Button>
             )}
           </footer>
-          {total > PAGE_COMPACT && (
-            <Button variant="outline" size="sm" className="w-full @4xl/ct:hidden" onClick={soon}>
-              {t("showMoreN", { n: total - Math.min(PAGE_COMPACT, rows.length) })}
+          {compact < rows.length && (
+            <Button variant="outline" size="sm" className="w-full @4xl/ct:hidden" onClick={() => more(rows.length - compact)}>
+              {t("showMoreN", { n: rows.length - compact })}
             </Button>
           )}
         </>

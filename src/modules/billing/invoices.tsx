@@ -20,10 +20,11 @@ import { BILL_TODAY, CENTER, type Invoice, type InvoiceStatus } from "./data"
 import { invoiceCounts } from "./counts"
 import { invoiceHref } from "./href"
 import { formatMoney, useMoney } from "./money"
-import { InitialsAvatar, InvoiceStatusBadge, Latin, ZatcaLine, useSoon } from "./parts"
+import { InitialsAvatar, InvoiceStatusBadge, Latin, ZatcaLine, useShowMore } from "./parts"
 import { billCan } from "./roles"
 import { canCollect, invoiceStatus, totals, zatcaConfirmed } from "./rules"
-import { useBillRole, useInvoices } from "./store"
+import { useAllInvoices, useBillRole, useInvoices } from "./store"
+import { usePublishListView } from "./list-view"
 import { useBillText } from "./text"
 
 export type InvoiceFilter = "all" | InvoiceStatus
@@ -80,11 +81,13 @@ export function InvoicesList({ onCollect }: { onCollect: (no: string) => void })
   const t = useTranslations("billing.invoices")
   const { patient } = useBillText()
   const dates = useDates()
-  const soon = useSoon()
   const pdf = useListPdf()
   const invoices = useInvoices()
+  const listed = useAllInvoices()
   const [query, setQuery] = React.useState("")
   const [filter, setFilter] = React.useState<InvoiceFilter>("all")
+  usePublishListView("invoices", { filter, query: query.trim() })
+  const { extra, more } = useShowMore(`${filter}|${query.trim()}`)
   const c = invoiceCounts(invoices)
   const q = query.trim().toLowerCase()
   const matches = (x: Invoice) => {
@@ -92,7 +95,9 @@ export function InvoicesList({ onCollect }: { onCollect: (no: string) => void })
     const p = patient(x.patient)
     return [x.no, p.mrn, p.name.en].some((v) => v.toLowerCase().includes(q)) || p.name.ar.includes(query.trim())
   }
-  const rows = invoices.filter((x) => matches(x) && (filter === "all" || invoiceStatus(x) === filter)).sort(byNewest)
+  const rows = listed.filter((x) => matches(x) && (filter === "all" || invoiceStatus(x) === filter)).sort(byNewest)
+  const wide = Math.min(PAGE_WIDE + extra, rows.length)
+  const compact = Math.min(PAGE_COMPACT + extra, rows.length)
   // Without a search the totals include the rest of the month; a search only looks through the loaded invoices.
   const total = q ? rows.length : c[filter]
   const pending = invoices.filter((x) => !zatcaConfirmed(x)).length
@@ -162,19 +167,21 @@ export function InvoicesList({ onCollect }: { onCollect: (no: string) => void })
         />
       ) : (
         <>
-          <InvoicesTable rows={rows.slice(0, PAGE_WIDE)} onCollect={onCollect} />
-          <InvoiceCards rows={rows.slice(0, PAGE_COMPACT)} />
+          <InvoicesTable rows={rows.slice(0, wide)} onCollect={onCollect} />
+          <InvoiceCards rows={rows.slice(0, compact)} />
           <footer className="hidden items-center gap-3 @4xl/inv:flex">
-            <span className="flex-1 text-xs text-muted-foreground">{t("showing", { shown: Math.min(PAGE_WIDE, rows.length), total })}</span>
-            {total > PAGE_WIDE && (
-              <Button variant="outline" size="sm" onClick={soon}>
+            <span className="flex-1 text-xs text-muted-foreground" aria-live="polite">
+              {t("showing", { shown: wide, total: Math.max(total, wide) })}
+            </span>
+            {wide < rows.length && (
+              <Button variant="outline" size="sm" onClick={() => more(rows.length - wide)}>
                 {t("showMore")}
               </Button>
             )}
           </footer>
-          {total > PAGE_COMPACT && (
-            <Button variant="outline" size="sm" className="w-full @4xl/inv:hidden" onClick={soon}>
-              {t("showMoreN", { n: total - Math.min(PAGE_COMPACT, rows.length) })}
+          {compact < rows.length && (
+            <Button variant="outline" size="sm" className="w-full @4xl/inv:hidden" onClick={() => more(rows.length - compact)}>
+              {t("showMoreN", { n: rows.length - compact })}
             </Button>
           )}
         </>

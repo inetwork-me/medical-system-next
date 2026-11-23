@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl"
 
 import { bi, type Bi } from "@/lib/mock/bi"
 import { useDoctors } from "@/modules/doctors/store"
-import { PATIENTS, insurerOf, type Invoice, type PatientKey } from "./data"
+import { COMPANY_ACCOUNTS, OPEN_VISITS, PATIENTS, insurerOf, type Invoice, type PatientKey } from "./data"
 
 /** Locale helpers shared by the Billing screens. */
 export function useBillText() {
@@ -16,11 +16,16 @@ export function useBillText() {
   const doctors = useDoctors()
   const doctorName = (key: string) => {
     const d = doctors.find((x) => x.key === key)
-    return d ? b(d.name) : key
+    // Visiting doctors aren't in the branch roster: their name is on the visit (New invoice · Visit).
+    const v = d ? undefined : OPEN_VISITS.find((x) => x.doctor === key)
+    return d ? b(d.name) : v ? b(v.doctorName) : key
   }
   const patient = (k: PatientKey) => PATIENTS[k]
   /** "Bupa Arabia" or "Cash" — who pays the rest of the invoice. */
-  const payerName = (inv: Pick<Invoice, "payer">) => (inv.payer === "cash" ? t("cash") : b(insurerOf(inv.payer)?.name ?? { en: inv.payer, ar: inv.payer }))
+  const payerName = (inv: Pick<Invoice, "payer" | "company">) => {
+    if (inv.company) return b(COMPANY_ACCOUNTS.find((c) => c.id === inv.company)?.name ?? { en: inv.company, ar: inv.company })
+    return inv.payer === "cash" ? t("cash") : b(insurerOf(inv.payer)?.name ?? { en: inv.payer, ar: inv.payer })
+  }
   /** Short insurer name in sentences ("Bupa pays · 80%", "Sent to Bupa through NPHIES"). */
   const insurerShort = (id: string) => b(insurerOf(id)?.short ?? { en: id, ar: id })
   /** "1 Dec 2026" / "1 ديسمبر 2026": the Billing frames print the day without a leading zero (Latin digits, Gregorian). */

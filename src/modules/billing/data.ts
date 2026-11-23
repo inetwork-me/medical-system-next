@@ -235,7 +235,7 @@ export const INSURERS: Insurer[] = [
     validFrom: "2025-04-01",
     validTo: "2027-03-31",
     discountPct: 12,
-    copay: { pct: 10, classes: ["A", "B", "C"] },
+    copay: { pct: 10, capPerVisit: 75, classes: ["A", "B", "C"] },
     preauthRule: { above: 1000, imaging: true },
     claimDeadlineDays: 30,
     paymentDays: 45,
@@ -294,20 +294,26 @@ export type BillPatient = {
   guardian?: boolean
   /** For sentences about the patient ("He paid in cash", "his new share"). */
   sex?: "m" | "f"
+  /**
+   * From the patient's file: who pays and the VAT rule (New invoice fills "Who pays" from it). Insurance carries the
+   * insurer, the member's class and the policy no.; company carries the company account.
+   */
+  file?: { payer: "insurance" | "cash" | "company"; insurer?: string; class?: InsurerClass; policyNo?: string; company?: string; vat?: string }
 }
 
 const pt = (initials: string, en: string, ar: string, mrn: string, extra: Partial<BillPatient> = {}): BillPatient => ({ initials, name: bi(en, ar), mrn, ...extra })
 
 export const PATIENTS = {
-  shammari: pt("AS", "Abdullah Al-Shammari", "عبدالله الشمري", "MRN-15530", { mobile: "+966 55 218 4410", mobileOwner: bi("father", "الأب"), guardian: true, sex: "m" }),
-  haddad: pt("LH", "Lina Haddad", "لينا حداد", "MRN-19022", { patientId: "004857", mobile: "+966 50 771 2045", sex: "f" }),
-  harbi: pt("OH", "Omar Al-Harbi", "عمر الحربي", "MRN-22310", { mobile: "+966 54 120 9931", mobileOwner: bi("mother", "الأم"), guardian: true, sex: "m" }),
-  ahmed: pt("SA", "Sara Ahmed", "سارة أحمد", "MRN-23118", { patientId: "004812", mobile: "+966 53 640 1187", sex: "f" }),
-  qahtani: pt("MQ", "Mona Al-Qahtani", "منى القحطاني", "MRN-14402", { mobile: "+966 56 902 3318", sex: "f" }),
-  dosari: pt("FD", "Fahad Al-Dosari", "فهد الدوسري", "MRN-17654", { patientId: "004891", mobile: "+966 55 404 7712", mobileOwner: bi("father", "الأب"), guardian: true, sex: "m" }),
-  mutairi: pt("RM", "Reem Al-Mutairi", "ريم المطيري", "MRN-23001", { mobile: "+966 50 318 6604", mobileOwner: bi("mother", "الأم"), guardian: true, sex: "f" }),
-  amri: pt("YA", "Yousef Al-Amri", "يوسف العمري", "MRN-20418", { mobile: "+966 59 233 0871", mobileOwner: bi("father", "الأب"), guardian: true }),
-  subaie: pt("KS", "Khalid Al-Subaie", "خالد السبيعي", "MRN-18840", { mobile: "+966 50 552 1490" }),
+  shammari: pt("AS", "Abdullah Al-Shammari", "عبدالله الشمري", "MRN-15530", { mobile: "+966 55 218 4410", mobileOwner: bi("father", "الأب"), guardian: true, sex: "m", file: { payer: "insurance", insurer: "bupa", class: "B", policyNo: "BUP-4410-7731", vat: "standard" } }),
+  haddad: pt("LH", "Lina Haddad", "لينا حداد", "MRN-19022", { patientId: "004857", mobile: "+966 50 771 2045", sex: "f", file: { payer: "insurance", insurer: "tawuniya", class: "A", policyNo: "TAW-2045-0193", vat: "citizen" } }),
+  harbi: pt("OH", "Omar Al-Harbi", "عمر الحربي", "MRN-22310", { mobile: "+966 54 120 9931", mobileOwner: bi("mother", "الأم"), guardian: true, sex: "m", file: { payer: "cash", vat: "citizen" } }),
+  ahmed: pt("SA", "Sara Ahmed", "سارة أحمد", "MRN-23118", { patientId: "004812", mobile: "+966 53 640 1187", sex: "f", file: { payer: "insurance", insurer: "medgulf", class: "B", policyNo: "MGF-1187-5520", vat: "standard" } }),
+  qahtani: pt("MQ", "Mona Al-Qahtani", "منى القحطاني", "MRN-14402", { mobile: "+966 56 902 3318", sex: "f", file: { payer: "cash", vat: "citizen" } }),
+  dosari: pt("FD", "Fahad Al-Dosari", "فهد الدوسري", "MRN-17654", { patientId: "004891", mobile: "+966 55 404 7712", mobileOwner: bi("father", "الأب"), guardian: true, sex: "m", file: { payer: "insurance", insurer: "bupa", class: "B", policyNo: "BUP-7712-0418", vat: "standard" } }),
+  mutairi: pt("RM", "Reem Al-Mutairi", "ريم المطيري", "MRN-23001", { mobile: "+966 50 318 6604", mobileOwner: bi("mother", "الأم"), guardian: true, sex: "f", file: { payer: "insurance", insurer: "alrajhi", class: "A", policyNo: "ART-7781-2290", vat: "standard" } }),
+  amri: pt("YA", "Yousef Al-Amri", "يوسف العمري", "MRN-20418", { mobile: "+966 59 233 0871", mobileOwner: bi("father", "الأب"), guardian: true, file: { payer: "cash", vat: "citizen" } }),
+  subaie: pt("KS", "Khalid Al-Subaie", "خالد السبيعي", "MRN-18840", { mobile: "+966 50 552 1490", file: { payer: "company", company: "sec", vat: "citizen" } }),
+  shehri: pt("HS", "Huda Al-Shehri", "هدى الشهري", "MRN-21907", { mobile: "+966 55 781 6620", sex: "f", file: { payer: "cash", vat: "citizen" } }),
 } satisfies Record<string, BillPatient>
 
 export type PatientKey = keyof typeof PATIENTS
@@ -327,12 +333,16 @@ export type BillUser = {
   nationalId: string
   mobile: string
   signatory: boolean
+  /** Arabic verb agreement ("طلبته" / "طلبه", "توافق" / "يوافق"). */
+  female?: boolean
 }
 
 export const STAFF = {
-  nora: { id: "u-nora", email: "nora.f@clinic.sa", initials: "NF", name: bi("Nora Al-Fahad", "نورة الفهد"), role: bi("HR", "الموارد البشرية"), nationalId: "1066102338", mobile: "+966 55 410 2338", signatory: false },
-  faisal: { id: "u-faisal", email: "faisal.q@clinic.sa", initials: "FQ", name: bi("Faisal Al-Qahtani", "فيصل القحطاني"), role: bi("CEO", "الرئيس التنفيذي"), nationalId: "1029384482", mobile: "+966 50 100 2482", signatory: true },
-  khaled: { id: "u-khaled", email: "khaled.m@clinic.sa", initials: "KM", name: bi("Dr. Khaled Mansour", "د. خالد منصور"), role: bi("Medical director", "المدير الطبي"), nationalId: "1031457726", mobile: "+966 55 123 4287", signatory: true },
+  nora: { id: "u-nora", email: "nora.f@clinic.sa", initials: "NF", name: bi("Nora Al-Fahad", "نورة الفهد"), role: bi("HR", "الموارد البشرية"), nationalId: "1066102338", mobile: "+966 55 410 2338", signatory: false, female: true },
+  faisal: { id: "u-faisal", email: "faisal.q@clinic.sa", initials: "FQ", name: bi("Faisal Al-Qahtani", "فيصل القحطاني"), role: bi("CEO", "الرئيس التنفيذي"), nationalId: "1029384482", mobile: "+966 50 100 2482", signatory: true, female: false },
+  // Finance manager: approves refunds over REFUND_APPROVAL_LIMIT (Needs attention · Refund to approve).
+  abeer: { id: "u-abeer", email: "abeer.s@clinic.sa", initials: "AS", name: bi("Abeer Al-Sulami", "عبير السلمي"), role: bi("Finance manager", "المدير المالي"), nationalId: "1052907714", mobile: "+966 55 902 1146", signatory: false, female: true },
+  khaled: { id: "u-khaled", email: "khaled.m@clinic.sa", initials: "KM", name: bi("Dr. Khaled Mansour", "د. خالد منصور"), role: bi("Medical director", "المدير الطبي"), nationalId: "1031457726", mobile: "+966 55 123 4287", signatory: true, female: false },
 } satisfies Record<string, BillUser>
 export type StaffKey = keyof typeof STAFF
 
@@ -367,6 +377,8 @@ export type Payment = {
   byName: Bi
   at: string
   smsReceipt?: boolean
+  /** Card payments: the card's last 4 digits (a refund goes back to it: "mada card ending in 4410"). */
+  last4?: string
 }
 
 export type ZatcaRecord = {
@@ -420,10 +432,22 @@ export type Invoice = {
    */
   credits?: InvoiceCredit[]
   events: InvoiceEvent[]
+  /** New invoice (by hand): the note printed on the invoice, and the company that pays (payer "company"). */
+  note?: Bi
+  manual?: boolean
+  company?: string
 }
 
 /** A credit note as the invoice sees it: which lines it reversed, the amount with VAT, and the patient's refund. */
-export type InvoiceCredit = { cn: string; lines: number[]; total: number; refund: number }
+/** A credit note on the invoice: `refund` is money actually paid back (a refund waiting for approval counts 0). */
+export type InvoiceCredit = {
+  cn: string
+  lines: number[]
+  total: number
+  refund: number
+  /** A refund waiting for the finance manager: promised, not paid (a later credit note can't refund it again). */
+  pending?: number
+}
 
 const line = (serviceCode: string, en: string, ar: string, price: number, vatRule = "standard", source?: InvoiceLine["source"]): InvoiceLine => ({
   serviceCode,
@@ -458,6 +482,7 @@ const PEDS = bi("Pediatrics", "الأطفال")
 const GP = bi("General practice", "الطب العام")
 const DERM = bi("Dermatology", "الجلدية")
 const IM = bi("Internal medicine", "الباطنة")
+const DENT = bi("Dentistry", "الأسنان")
 
 export const INVOICES: Invoice[] = [
   {
@@ -603,6 +628,68 @@ export const INVOICES: Invoice[] = [
     zatca: zatca("2e6f9a1b-8c3d-4b70-a5e2-1d4c7b9e0234", "2026-11-17T11:02", "simplified"),
     events: [],
   },
+  // Refund approval (v5.2): Huda paid SAR 1,380 by mada; the CBCT scan wasn't done (scanner down), so Nora issued
+  // CN-2611-0013 for SAR 920 this morning. Over SAR 500, it waits for Abeer (finance manager).
+  {
+    no: "INV-2611-0229",
+    issuedAt: "2026-11-18T09:15",
+    patient: "shehri",
+    visitId: "V-2611-0902",
+    visitAt: "2026-11-18T08:30",
+    clinic: DENT,
+    doctor: "odeh",
+    payer: "cash",
+    lines: [
+      line("CONS-DEN", "Consultation · Dentistry", "كشفية · الأسنان", 460, "citizen", { kind: "consult" }),
+      line("IMG-CBCT", "CBCT scan", "أشعة CBCT", 920, "citizen", { kind: "procedure" }),
+    ],
+    copay: { pct: 100 },
+    payments: [pay("INV-2611-0229", 1380, "mada", "2026-11-18T09:16", { terminal: "POS-2", approvalCode: "604418", last4: "4410" })],
+    zatca: zatca("7a4c1e90-2b6d-4f13-9e58-c0d3b1a80229", "2026-11-18T09:15", "simplified"),
+    credits: [{ cn: "CN-2611-0013", lines: [1], total: 920, refund: 0, pending: 920 }],
+    events: [],
+  },
+]
+
+/* ------------------------------------------------------------------ new invoice (by hand) */
+
+/**
+ * The center's price list as New invoice searches it ("Add a service · search the price list by name or code"). Each
+ * service carries its price before VAT; the VAT rule comes from the patient's file. Codes stay Latin.
+ */
+export type PriceItem = { code: string; item: Bi; price: number; kind: "consult" | "lab" | "procedure" }
+export const PRICE_LIST: PriceItem[] = [
+  { code: "CONS-DER", item: bi("Consultation · Dermatology", "كشفية · الجلدية"), price: 350, kind: "consult" },
+  { code: "CONS-GP", item: bi("Consultation · General practice", "كشفية · الطب العام"), price: 250, kind: "consult" },
+  { code: "CONS-IM", item: bi("Consultation · Internal medicine", "كشفية · الباطنة"), price: 240, kind: "consult" },
+  { code: "CONS-PED", item: bi("Consultation · Pediatrics", "كشفية · الأطفال"), price: 300, kind: "consult" },
+  { code: "CONS-DEN", item: bi("Consultation · Dentistry", "كشفية · الأسنان"), price: 460, kind: "consult" },
+  { code: "PROC-BX", item: bi("Skin biopsy", "خزعة جلد"), price: 450, kind: "procedure" },
+  { code: "LAB-HIS", item: bi("Histopathology", "فحص الأنسجة"), price: 280, kind: "lab" },
+  { code: "PROC-CRY", item: bi("Cryotherapy · per lesion", "علاج بالتبريد · لكل آفة"), price: 220, kind: "procedure" },
+  { code: "PROC-NEB", item: bi("Nebulizer session", "جلسة بخار"), price: 300, kind: "procedure" },
+  { code: "PROC-DRS", item: bi("Wound dressing", "غيار جرح"), price: 120, kind: "procedure" },
+  { code: "IMG-CBCT", item: bi("CBCT scan", "أشعة CBCT"), price: 920, kind: "procedure" },
+  { code: "LAB-CBC", item: bi("Complete blood count", "صورة الدم الكاملة"), price: 90, kind: "lab" },
+  { code: "LAB-TSH", item: bi("TSH", "TSH"), price: 80, kind: "lab" },
+  { code: "LAB-VITD", item: bi("Vitamin D", "فيتامين د"), price: 160, kind: "lab" },
+  { code: "LAB-IGE", item: bi("Allergy panel (IgE)", "تحليل الحساسية (IgE)"), price: 1000, kind: "lab" },
+]
+
+/** Company accounts that pay for their staff (payer "Company" on New invoice). */
+export const COMPANY_ACCOUNTS: { id: string; name: Bi }[] = [
+  { id: "sec", name: bi("Saudi Electricity Company", "الشركة السعودية للكهرباء") },
+  { id: "almarai", name: bi("Almarai", "المراعي") },
+]
+
+/**
+ * Visits with nothing billed yet (New invoice · Visit). The doctor is named on the visit: Dr. Hala Nasser isn't in the
+ * Doctors roster of this branch (a visiting consultant).
+ */
+export type OpenVisit = { id: string; patient: PatientKey; at: string; clinic: Bi; doctor: string; doctorName: Bi }
+export const OPEN_VISITS: OpenVisit[] = [
+  { id: "V-2611-1012", patient: "mutairi", at: "2026-11-17T16:10", clinic: DERM, doctor: "hnasser", doctorName: bi("Dr. Hala Nasser", "د. هالة ناصر") },
+  { id: "V-2611-1047", patient: "subaie", at: "2026-11-19T10:30", clinic: GP, doctor: "odeh", doctorName: bi("Dr. Sami Odeh", "د. سامي عودة") },
 ]
 
 /* ------------------------------------------------------------------ credit notes */
@@ -619,8 +706,13 @@ export const CREDIT_REASONS: CreditReason[] = ["testsNotDone", "notGiven", "bill
 /** card: back to the card they paid with, through the terminal; visitCredit: kept as credit for the next visit. */
 export type RefundMethod = "card" | "cash" | "transfer" | "visitCredit"
 
-/** Refunds above this need the finance manager's approval (that state isn't drawn: a known gap). */
+/**
+ * Refunds above this (SAR) need the finance manager's approval: the credit note is issued right away, the money waits.
+ * One setting for the whole module (configurable per center once settings exist).
+ */
 export const REFUND_APPROVAL_LIMIT = 500
+/** Who approves refunds over the limit (the finance manager). */
+export const REFUND_APPROVER: StaffKey = "abeer"
 
 /** The money of a credit note, fixed when it is issued. */
 export type CreditAmounts = {
@@ -641,7 +733,7 @@ export type CreditAmounts = {
 
 export type CreditEvent = {
   at: string
-  kind: "issued" | "claimAdjusted" | "refunded"
+  kind: "issued" | "claimAdjusted" | "refunded" | "approvalRequested" | "refundApproved" | "refundRejected"
   /** The design's wording; session events carry facts instead. */
   text?: Bi
   byName?: Bi
@@ -659,7 +751,25 @@ export type CreditNote = {
   by: string
   byName: Bi
   amounts: CreditAmounts
+  /** The refund due. With `approval` it only goes out once the finance manager approves it. */
   refund?: { amount: number; method: RefundMethod; receipt: boolean; at: string; byName: Bi }
+  /**
+   * Over REFUND_APPROVAL_LIMIT: the request to the finance manager and the answer. Approved → the money goes back
+   * (card: through the terminal provider, 3 to 5 working days). Rejected → no money goes back; the credit stays with
+   * the patient (lowers what they owe next) and the approver's note goes to the requester.
+   */
+  approval?: {
+    status: "pending" | "approved" | "rejected"
+    approver: StaffKey
+    askedAt: string
+    askedBy: Bi
+    /** The requester's role when they asked ("reception"). */
+    askedRole: Bi
+    /** The requester's note for the approver (shown as the reason on Approve the refund); typed notes keep one text. */
+    note: Bi
+    decidedAt?: string
+    decisionNote?: Bi
+  }
   /** The insurer's claim, adjusted through NPHIES (old → new amount). */
   claim?: { no: string; from: number; to: number; sentAt?: string }
   zatca: ZatcaRecord
@@ -694,10 +804,44 @@ export const CREDIT_NOTES: CreditNote[] = [
       { at: "2026-11-18T12:42", kind: "refunded", byName: STAFF.nora.name, refund: { amount: 240, method: "cash", receipt: true } },
     ],
   },
+  {
+    no: "CN-2611-0013",
+    invoiceNo: "INV-2611-0229",
+    issuedAt: `${BILL_TODAY}T09:42`,
+    lines: [1],
+    reason: "notGiven",
+    by: "u-nora",
+    byName: STAFF.nora.name,
+    amounts: {
+      subtotal: 920,
+      vat: 0,
+      total: 920,
+      insurer: 0,
+      patient: 920,
+      before: { total: 1380, insurer: 0, patient: 1380 },
+      after: { total: 460, insurer: 0, patient: 460 },
+      paid: 1380,
+      refund: 920,
+    },
+    refund: { amount: 920, method: "card", receipt: false, at: `${BILL_TODAY}T09:42`, byName: STAFF.nora.name },
+    approval: {
+      status: "pending",
+      approver: "abeer",
+      askedAt: `${BILL_TODAY}T09:42`,
+      askedBy: STAFF.nora.name,
+      askedRole: bi("reception", "الاستقبال"),
+      note: bi("CBCT scan not done · scanner down", "ما انسوّت أشعة CBCT · الجهاز معطل"),
+    },
+    zatca: zatca("e3b81f5c-6a20-4d97-b1c4-58f2a9c00013", `${BILL_TODAY}T09:42`, "simplified"),
+    events: [
+      { at: `${BILL_TODAY}T09:42`, kind: "issued", byName: STAFF.nora.name },
+      { at: `${BILL_TODAY}T09:42`, kind: "approvalRequested", byName: STAFF.nora.name },
+    ],
+  },
 ]
 
-/** Invoices beyond the design's rows (November: 214 in all). */
-export const OTHER_INVOICES: Record<InvoiceStatus, number> = { unpaid: 7, part: 3, paid: 195, refunded: 1 }
+/** Invoices beyond the design's rows (November: 214 in all; INV-2611-0229 is one of the paid ones). */
+export const OTHER_INVOICES: Record<InvoiceStatus, number> = { unpaid: 7, part: 3, paid: 194, refunded: 1 }
 /** Patient balances on those other unpaid invoices (KPI "Unpaid by patients" SAR 6,420; 3 over 30 days). */
 export const OTHER_UNPAID = { balance: 6040.5, over30: 3 }
 /** Collected today (cash + cards + insurers' remittances) before this session's payments; last Sunday for the trend. */
@@ -901,6 +1045,8 @@ export type Signer = {
   /** Nafath transaction id and the signed PDF hash (stored per signature). */
   nafathTxn?: string
   pdfHash?: string
+  /** Add a signer · "Approves only": confirms in order with Nafath, but isn't a party to the contract. */
+  does?: "approves"
 }
 
 export type Clause = { key: string; title: Bi; text: Bi }
@@ -989,6 +1135,8 @@ export type Contract = {
   clauses: Clause[]
   files: BillDocument[]
   signers: Signer[]
+  /** Add a signer · "Gets a copy": not in the signing order; gets the signed copy with the parties. */
+  copies?: { name: Bi; role: Bi; mobile: string; side: "center" | "party" }[]
   /** True once sent for signature (draft before). */
   sent: boolean
   /** When it went out for signature, and the last SMS reminder (Needs attention: "Sent 16 Nov · reminded 20 Nov"). */
@@ -1050,6 +1198,39 @@ export const CLAUSES: Record<ContractKind, Clause[]> = {
     { key: "pricesPrivate", title: bi("Our prices not shared with other insurers", "أسعارنا ما تنعطى لشركات ثانية"), text: bi("", "") },
   ],
 }
+
+/**
+ * Add clauses · Clause library: ready clauses in Arabic and English (checked by the center's lawyer). `inTemplate` ones
+ * are already in every template ("Already in this template") and can't be added again.
+ */
+export type LibraryClause = Clause & { summary: Bi; inTemplate?: boolean }
+export const CLAUSE_LIBRARY: LibraryClause[] = [
+  {
+    key: "noPoaching",
+    title: bi("Not taking our patients", "عدم أخذ مرضانا"),
+    summary: bi("For 1 year after the contract ends", "لمدة سنة بعد نهاية العقد"),
+    text: bi("Doesn't approach or take the center's patients for one year after the contract ends.", "ما يتواصل مع مرضى المجمع ولا ياخذهم لمدة سنة بعد نهاية العقد."),
+  },
+  {
+    key: "continuity",
+    title: bi("Business continuity", "استمرار الخدمة"),
+    summary: bi("Backup plan if they can't deliver", "خطة بديلة إذا ما قدروا يقدمون الخدمة"),
+    text: bi("Keeps a backup plan so the service carries on if they can't deliver, and tells the center straight away.", "عنده خطة بديلة عشان تستمر الخدمة إذا ما قدر يقدمها، ويبلغ المجمع على طول."),
+  },
+  {
+    key: "antiBribery",
+    title: bi("Anti-bribery", "مكافحة الرشوة"),
+    summary: bi("Saudi anti-bribery law applies", "ينطبق نظام مكافحة الرشوة"),
+    text: bi("Both sides follow the Saudi Anti-Bribery Law: no gifts or payments to win or keep business.", "يلتزم الطرفين بنظام مكافحة الرشوة، وما فيه هدايا أو مبالغ عشان كسب الشغل أو استمراره."),
+  },
+  {
+    key: "forceMajeure",
+    title: bi("Force majeure", "القوة القاهرة"),
+    summary: bi("Already in this template", "موجود في النموذج"),
+    text: bi("Neither side is liable for delays caused by events outside their control.", "ما يتحمل أي طرف التأخير بسبب ظروف خارجة عن إرادته."),
+    inTemplate: true,
+  },
+]
 
 export const CONTRACTS: Contract[] = [
   {
@@ -1382,6 +1563,27 @@ export type TemplateVersion = {
   signedOn?: number
   /** Clauses added in this version (a draft can add to the published list). */
   extraClauses?: Bi[]
+  /**
+   * The version's clauses as the template editor keeps them (title + text in Arabic and English, lock, flags). Missing
+   * on versions never opened in the editor: they're built from the template's clause titles.
+   */
+  clauses?: TemplateClause[]
+  /** Drafts: the version it started from, and when it was last saved (ISO, this session). */
+  basedOn?: number
+  savedAt?: string
+}
+
+/** A clause in a template version (template editor). Placeholders like {basic_salary} are filled from New contract. */
+export type TemplateClause = {
+  key: string
+  title: Bi
+  text: Bi
+  /** Locked in every contract: people drafting a contract can't remove or edit it. */
+  locked: boolean
+  /** Added in this version ("New" chip). */
+  isNew?: boolean
+  /** Highlight what changed since the previous version when the other side opens it. */
+  showChanges?: boolean
 }
 
 export type ContractTemplate = {
@@ -1412,6 +1614,32 @@ const STAFF_CORE = [
   bi("Ending the contract", "إنهاء العقد"),
 ]
 const STAFF_PH = ["{employee_name}", "{national_id}", "{job_title}", "{clinic}", "{basic_salary}", "{start_date}"]
+
+/**
+ * Template editor · "Insert a blank": the blanks New contract fills, per type (staff as drawn; partner / insurer: their
+ * template placeholders).
+ */
+export const INSERTABLE: Record<ContractKind, string[]> = {
+  staff: ["{employee_name}", "{job_title}", "{basic_salary}", "{housing}", "{transport}", "{start_date}", "{probation_days}"],
+  partner: ["{company_name}", "{cr_number}", "{contact_name}", "{pricing}", "{start_date}", "{end_date}"],
+  insurer: ["{insurer_name}", "{cchi_licence}", "{discount}", "{copay}", "{preauth_rule}", "{start_date}"],
+}
+
+/** Clause text as written in the published templates (keyed by the English title; others start empty). */
+export const TEMPLATE_TEXTS: Record<string, Bi> = {
+  "The job": bi("{employee_name} works as {job_title} at {clinic}, reporting to the medical director.", "يشتغل {employee_name} {job_title} في {clinic}، ويرجع للمدير الطبي."),
+  "Pay and benefits": bi(
+    "The basic salary is {basic_salary} a month, plus {housing} for housing and {transport} for transport, paid by the 25th.",
+    "الراتب الأساسي {basic_salary} بالشهر، مع بدل سكن {housing} ومواصلات {transport}، وينزل قبل يوم 25."
+  ),
+  "Hours and leave": bi("48 hours a week, Sunday to Thursday, with 30 days of annual leave and the official holidays.", "48 ساعة بالأسبوع من الأحد للخميس، مع 30 يوم إجازة سنوية والإجازات الرسمية."),
+  Probation: bi("A probation of {probation_days} days from {start_date}; either side can end the contract during it.", "فترة تجربة {probation_days} يوم من {start_date}، ويقدر أي طرف ينهي العقد خلالها."),
+  "Confidentiality and patient data": bi(
+    "Keeps patient information private under the PDPL and the center's policies, during and after the contract.",
+    "يحافظ على سرية بيانات المرضى حسب نظام حماية البيانات الشخصية وسياسات المجمع، خلال العقد وبعده."
+  ),
+  "Ending the contract": bi("30 days' written notice from either side, as the Labor Law sets out.", "إشعار كتابي قبل 30 يوم من أي طرف، حسب نظام العمل."),
+}
 const PARTNER_PH = ["{company_name}", "{cr_number}", "{contact_name}", "{pricing}", "{start_date}", "{end_date}"]
 const INSURER_PH = ["{insurer_name}", "{cchi_licence}", "{discount}", "{copay}", "{preauth_rule}", "{start_date}"]
 
@@ -1564,6 +1792,8 @@ export const JOB_TITLES: Bi[] = [
   bi("Consultant pediatrician", "استشاري أطفال"),
   bi("Staff nurse", "ممرضة"),
   bi("Phlebotomist", "أخصائي سحب دم"),
+  bi("Lab technician", "فني مختبر"),
+  bi("Locum dentist", "طبيب أسنان متعاقد"),
 ]
 
 export const PRICING_OPTIONS: { key: string; label: Bi }[] = [
@@ -1606,6 +1836,30 @@ export const PARTY_CANDIDATES: Record<ContractKind, PartyCandidate[]> = {
         { id: "yh-scfhs", kind: "licence", title: bi("SCFHS licence", "رخصة الهيئة"), file: "SCFHS-22R0041871.pdf", format: "PDF", detail: bi("410 KB", "410 KB"), validTo: "2028-03-31", status: "valid", version: 1 },
         { id: "yh-bls", kind: "other", title: bi("BLS certificate", "شهادة الإنعاش BLS"), file: "BLS-Yousef.pdf", format: "PDF", detail: bi("220 KB", "220 KB"), validTo: "2027-06-30", status: "valid", version: 1 },
       ],
+    },
+    {
+      id: "emp-amri",
+      kind: "employee",
+      initials: "YA",
+      name: bi("Yousef Al-Amri", "يوسف العمري"),
+      short: bi("Yousef", "يوسف"),
+      role: bi("Lab technician", "فني مختبر"),
+      nationalId: "1062281904",
+      licence: { no: "19R0087120", validTo: "2027-08-31" },
+      mobile: "+966 54 118 2203",
+      contactNationalId: "1062281904",
+    },
+    {
+      id: "emp-saleh",
+      kind: "employee",
+      initials: "YS",
+      name: bi("Dr. Yousef Al-Saleh", "د. يوسف الصالح"),
+      short: bi("Dr. Yousef", "د. يوسف"),
+      role: bi("Locum dentist", "طبيب أسنان متعاقد"),
+      nationalId: "1058830217",
+      licence: { no: "21R0033458", validTo: "2027-11-30" },
+      mobile: "+966 56 330 9182",
+      contactNationalId: "1058830217",
     },
     {
       id: "emp-haddad",
@@ -1660,6 +1914,31 @@ export const PARTY_CANDIDATES: Record<ContractKind, PartyCandidate[]> = {
       mobile: "+966 55 310 2290",
       contactNationalId: "1033829105",
     },
+    // Choose the partner (drawn): Delta Medical Labs and Smile Dental Lab with these CRs.
+    {
+      id: "co-deltalabs",
+      kind: "company",
+      initials: "DL",
+      name: bi("Delta Medical Labs", "مختبرات دلتا الطبية"),
+      short: bi("Delta Labs", "مختبرات دلتا"),
+      role: bi("Reference lab", "مختبر مرجعي"),
+      cr: "1010778812",
+      city: bi("Riyadh", "الرياض"),
+      mobile: "",
+      contactNationalId: "",
+    },
+    {
+      id: "co-smile",
+      kind: "company",
+      initials: "SD",
+      name: bi("Smile Dental Lab", "مختبر سمايل للأسنان"),
+      short: bi("Smile Dental Lab", "مختبر سمايل"),
+      role: bi("Dental lab", "مختبر أسنان"),
+      cr: "1010551290",
+      city: bi("Riyadh", "الرياض"),
+      mobile: "",
+      contactNationalId: "",
+    },
     {
       id: "co-delta",
       kind: "company",
@@ -1703,6 +1982,19 @@ export const PARTY_CANDIDATES: Record<ContractKind, PartyCandidate[]> = {
       signatory: { initials: "KM", name: bi("Khalid Al-Mansour", "خالد المنصور"), role: bi("Network director", "مدير الشبكة الطبية"), mobile: "+966 53 640 1187", nationalId: "1050331877" },
       mobile: "+966 53 640 1187",
       contactNationalId: "1058812406",
+    },
+    {
+      id: "ins-wataniya",
+      kind: "company",
+      initials: "WT",
+      name: bi("Wataniya Insurance", "الوطنية للتأمين"),
+      short: bi("Wataniya", "الوطنية"),
+      role: bi("Insurer", "شركة تأمين"),
+      cr: "4030177702",
+      cchiLicence: "31",
+      city: bi("Jeddah", "جدة"),
+      mobile: "",
+      contactNationalId: "",
     },
     {
       id: "ins-gig",

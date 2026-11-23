@@ -23,6 +23,7 @@ import { ClaimStatusBadge, InitialsAvatar, Latin, ltrRun } from "./parts"
 import { billCan } from "./roles"
 import { askPreauth, toFix } from "./rules"
 import { getClaim, saveClaims, useBatchSent, useBillRole, useClaims } from "./store"
+import { usePublishListView } from "./list-view"
 import { useBillText } from "./text"
 
 const timeOf = (iso: string) => iso.slice(11, 16)
@@ -70,7 +71,7 @@ export type ClaimFilter = "all" | "toFix" | "ready" | "review" | "paid"
 const FILTERS: ClaimFilter[] = ["all", "toFix", "ready", "review", "paid"]
 const FILTERS_COMPACT: ClaimFilter[] = ["all", "toFix", "ready"]
 
-const inFilter = (c: Claim, f: ClaimFilter) =>
+export const inClaimFilter = (c: Claim, f: ClaimFilter) =>
   f === "all" || (f === "toFix" ? toFix(c) : f === "ready" ? c.status === "ready" : f === "review" ? c.status === "review" : !!c.paidAt)
 
 /** "Rejected and held back first", then newest. */
@@ -159,6 +160,7 @@ export function ClaimsList({ onFix }: { onFix: (no: string) => void }) {
     setQuery(qParam)
   }
   const [filter, setFilter] = React.useState<ClaimFilter>(() => (FILTERS as string[]).includes(params.get("filter") ?? "") ? (params.get("filter") as ClaimFilter) : "all")
+  usePublishListView("claims", { filter, query: query.trim() })
   const c = claimCounts(claims, useBatchSent())
   const q = query.trim().toLowerCase()
   const matches = (x: Claim) => {
@@ -170,7 +172,7 @@ export function ClaimsList({ onFix }: { onFix: (no: string) => void }) {
       [p.name.ar, ins?.name.ar ?? ""].some((v) => v.includes(query.trim()))
     )
   }
-  const rows = claims.filter((x) => matches(x) && inFilter(x, filter)).sort(byPriority)
+  const rows = claims.filter((x) => matches(x) && inClaimFilter(x, filter)).sort(byPriority)
   const label = (f: ClaimFilter) => t(`filter.${f}`, { n: f === "toFix" ? c.toFix : f === "ready" ? c.ready : f === "review" ? c.review : 0 })
 
   return (

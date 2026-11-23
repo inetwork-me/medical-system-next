@@ -101,7 +101,7 @@ function Header({ onToggle, className }: { onToggle: () => void; className?: str
       <Button variant="ghost" size="icon" onClick={onToggle} aria-label={t("toggleSidebar")}>
         <Icon name="sidebar-left" size={24} />
       </Button>
-      <HeaderTitle className="max-w-1/2 shrink-0" />
+      <HeaderTitle className="max-w-1/2 min-w-0 shrink" />
       <div className="flex-1" />
       <HeaderSearch className="w-40 min-w-24 shrink lg:w-70" />
       <Button variant="outline" onClick={switchLocale} aria-label={tc("switchLabel")}>

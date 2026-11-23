@@ -1,5 +1,7 @@
 import {
   BILL_TODAY,
+  REFUND_APPROVAL_LIMIT,
+  type StaffKey,
   ENDING_DAYS,
   daysBetween,
   type Claim,
@@ -10,6 +12,10 @@ import {
   type DocStatus,
   type Insurer,
   type InsurerClass,
+  type OpenVisit,
+  type PatientKey,
+  PRICE_LIST,
+  vatRuleOf,
   type InsurerStatus,
   type Invoice,
   type InvoiceLine,
@@ -58,8 +64,13 @@ export type InvoiceTotals = {
 }
 
 /** The patient's share of a total under the invoice's co-pay rule (cash: all of it; else the %, capped per visit). */
-export const patientShareOf = (inv: Pick<Invoice, "payer" | "copay">, total: number) =>
-  inv.payer === "cash" ? round2(total) : round2(Math.min((total * inv.copay.pct) / 100, inv.copay.cap ?? Infinity))
+export const patientShareOf = (inv: Pick<Invoice, "payer" | "copay" | "company">, total: number) =>
+  inv.payer === "cash"
+    ? // A company account pays its staff's invoices in full; otherwise cash patients pay everything.
+      inv.company
+      ? 0
+      : round2(total)
+    : round2(Math.min((total * inv.copay.pct) / 100, inv.copay.cap ?? Infinity))
 
 /**
  * The invoice's money. Subtotal → shares are as issued (the paper never changes); `net` and `balance` take the credit
@@ -126,7 +137,9 @@ export function creditPreview(inv: Invoice, lines: number[]): CreditAmounts & { 
   const after = { total: afterTotal, insurer: round2(afterTotal - afterPatient), patient: afterPatient }
   const patient = round2(before.patient - after.patient)
   const insurer = round2(total - patient)
-  const paid = round2(t.paid - t.refunded)
+  // What they paid and haven't had back — or been promised back (a refund waiting for approval counts as given).
+  const pending = round2((inv.credits ?? []).reduce((s, c) => s + (c.pending ?? 0), 0))
+  const paid = round2(t.paid - t.refunded - pending)
   const refund = round2(Math.max(0, paid - after.patient))
   const owes = round2(Math.max(0, after.patient - paid))
   // "Off Bupa's claim · 80%": the percentages only hold when no cap is involved before or after.
@@ -137,13 +150,14 @@ export function creditPreview(inv: Invoice, lines: number[]): CreditAmounts & { 
 const CARD: PayMethod[] = ["mada", "card", "applepay"]
 
 /**
- * Refund by: only the methods that fit how they paid. A card payment goes back to the same card through the terminal;
- * cash and transfer payments can't go to a card: cash, bank transfer or credit for the next visit.
+ * Refund by: only the methods that fit how they paid. A card payment goes back to the same card through the terminal
+ * (or by bank transfer — v5.2 "Back to mada · Bank transfer · Credit for next visit"), never as cash; cash and transfer
+ * payments can't go to a card: cash, bank transfer or credit for the next visit.
  */
 export function refundMethods(inv: Invoice): RefundMethod[] {
   const card = inv.payments.some((p) => CARD.includes(p.method))
   const other = inv.payments.some((p) => !CARD.includes(p.method))
-  return [...(card ? (["card"] as const) : []), ...(other || !card ? (["cash", "transfer"] as const) : []), "visitCredit"]
+  return [...(card ? (["card"] as const) : []), ...(other || !card ? (["cash"] as const) : []), "transfer", "visitCredit"]
 }
 
 /** How the patient paid, for the refund note ("He paid in cash, so it can't go back to a card"). */
@@ -164,13 +178,37 @@ export function nextCreditNo(existing: string[], at: string) {
 export function issueCreditNote(
   inv: Invoice,
   claim: Claim | undefined,
-  input: { no: string; lines: number[]; reason: CreditReason; method?: RefundMethod; receipt: boolean; at: string; by: string; byName: Bi; uuid: string }
+  input: {
+    no: string
+    lines: number[]
+    reason: CreditReason
+    method?: RefundMethod
+    receipt: boolean
+    at: string
+    by: string
+    byName: Bi
+    uuid: string
+    /** Over the limit: send the refund for approval (the credit note is issued now; the money waits). */
+    approval?: { approver: StaffKey; askedRole: Bi; note: string }
+  }
 ): { cn: CreditNote; invoice: Invoice; claim?: Claim } {
   const a = creditPreview(inv, input.lines)
   const { owes: _owes, pctSplit: _pct, ...amounts } = a
   void _owes
   void _pct
   const refund = a.refund > 0 && input.method ? { amount: a.refund, method: input.method, receipt: input.receipt, at: input.at, byName: input.byName } : undefined
+  const waits = !!(refund && input.approval)
+  const approval =
+    refund && input.approval
+      ? {
+          status: "pending" as const,
+          approver: input.approval.approver,
+          askedAt: input.at,
+          askedBy: input.byName,
+          askedRole: input.approval.askedRole,
+          note: { en: input.approval.note.trim(), ar: input.approval.note.trim() },
+        }
+      : undefined
   const claimNext = claim && a.insurer > 0 ? { ...claim, amount: round2(claim.amount - a.insurer), adjusted: { cn: input.no, from: claim.amount, at: input.at } } : undefined
   const cn: CreditNote = {
     no: input.no,
@@ -182,20 +220,68 @@ export function issueCreditNote(
     byName: input.byName,
     amounts,
     refund,
+    approval,
     claim: claimNext ? { no: claimNext.no, from: claim!.amount, to: claimNext.amount } : undefined,
     // Reported or cleared the way its invoice was (an invoice ZATCA reported → a reported credit note).
     zatca: { uuid: input.uuid, hash: `sha256:${input.uuid.replace(/-/g, "").slice(0, 16)}`, qr: "", status: "pending", type: inv.zatca.status === "reported" ? "simplified" : inv.zatca.type },
     events: [
       { at: input.at, kind: "issued", byName: input.byName },
-      ...(refund ? [{ at: input.at, kind: "refunded" as const, byName: input.byName, refund: { amount: refund.amount, method: refund.method, receipt: refund.receipt } }] : []),
+      ...(waits ? [{ at: input.at, kind: "approvalRequested" as const, byName: input.byName }] : []),
+      ...(refund && !waits ? [{ at: input.at, kind: "refunded" as const, byName: input.byName, refund: { amount: refund.amount, method: refund.method, receipt: refund.receipt } }] : []),
     ],
   }
   const invoice: Invoice = {
     ...inv,
-    credits: [...(inv.credits ?? []), { cn: input.no, lines: cn.lines, total: a.total, refund: refund?.amount ?? 0 }],
+    credits: [...(inv.credits ?? []), { cn: input.no, lines: cn.lines, total: a.total, refund: waits ? 0 : (refund?.amount ?? 0), ...(waits ? { pending: refund!.amount } : {}) }],
     events: [...inv.events, { at: input.at, kind: "credited", credited: { cn: input.no, total: a.total, byName: input.byName } }],
   }
   return { cn, invoice, claim: claimNext }
+}
+
+/** Does this refund need the finance manager first? (over the limit; the limit is one setting) */
+export const needsApproval = (refund: number, limit = REFUND_APPROVAL_LIMIT) => refund > limit
+
+/** The refund as actually paid back: none while it waits for approval or after it was rejected. */
+export const paidBack = (c: Pick<CreditNote, "refund" | "approval">) => (c.approval && c.approval.status !== "approved" ? undefined : c.refund)
+
+/**
+ * Approve the refund (finance manager): the money goes out the way it was asked (card: to the terminal provider,
+ * arrives in 3 to 5 working days; cash / transfer: marked as due) and the invoice counts it as refunded.
+ */
+export function approveRefund(cn: CreditNote, inv: Invoice, input: { at: string; byName: Bi; note: string }): { cn: CreditNote; invoice: Invoice } {
+  if (!cn.refund || cn.approval?.status !== "pending") return { cn, invoice: inv }
+  const note = input.note.trim()
+  return {
+    cn: {
+      ...cn,
+      refund: { ...cn.refund, at: input.at, byName: input.byName },
+      approval: { ...cn.approval, status: "approved", decidedAt: input.at, decisionNote: note ? { en: note, ar: note } : undefined },
+      events: [
+        ...cn.events,
+        { at: input.at, kind: "refundApproved", byName: input.byName },
+        { at: input.at, kind: "refunded", byName: input.byName, refund: { amount: cn.refund.amount, method: cn.refund.method, receipt: cn.refund.receipt } },
+      ],
+    },
+    invoice: { ...inv, credits: (inv.credits ?? []).map((c) => (c.cn === cn.no ? { ...c, refund: cn.refund!.amount, pending: undefined } : c)) },
+  }
+}
+
+/**
+ * Reject the refund: the credit note stays (it is a tax document, already reported), no money goes back, and the
+ * credit stays with the patient against what they owe next. The approver's note goes to whoever asked.
+ */
+export function rejectRefund(cn: CreditNote, input: { at: string; byName: Bi; note: string }): CreditNote
+export function rejectRefund(cn: CreditNote, input: { at: string; byName: Bi; note: string }, inv: Invoice): { cn: CreditNote; invoice: Invoice }
+export function rejectRefund(cn: CreditNote, input: { at: string; byName: Bi; note: string }, inv?: Invoice): CreditNote | { cn: CreditNote; invoice: Invoice } {
+  if (cn.approval?.status !== "pending") return inv ? { cn, invoice: inv } : cn
+  const note = input.note.trim()
+  const next: CreditNote = {
+    ...cn,
+    approval: { ...cn.approval, status: "rejected", decidedAt: input.at, decisionNote: { en: note, ar: note } },
+    events: [...cn.events, { at: input.at, kind: "refundRejected", byName: input.byName }],
+  }
+  // The promised money is released: it stays with the patient as credit (it no longer blocks later refunds).
+  return inv ? { cn: next, invoice: { ...inv, credits: (inv.credits ?? []).map((c) => (c.cn === cn.no ? { ...c, pending: undefined } : c)) } } : next
 }
 
 /** Collect shows on unpaid and partly paid invoices. */
@@ -408,5 +494,106 @@ export function insurerFromContract(c: Contract, existing?: Insurer): Insurer {
     paymentDays: t.paymentDays,
     noticeDays: c.noticeDays,
     classes: existing?.classes ?? classes,
+  }
+}
+
+/* ------------------------------------------------------------------ new invoice (by hand) */
+
+/** New invoice: who pays, from the patient's file (editable on the form). */
+export type ManualPayer = "insurance" | "cash" | "company"
+export type ManualLine = { code: string; qty: number }
+export type ManualInvoiceInput = {
+  patient: PatientKey
+  visit?: OpenVisit
+  payer: ManualPayer
+  insurer?: string
+  class?: InsurerClass
+  policyNo?: string
+  company?: string
+  lines: ManualLine[]
+  note: string
+  /** The VAT rule from the patient's file (each line keeps the rate it was issued with). */
+  vatRule: string
+}
+
+/** The next INV-YYMM-NNNN of the month (numbers run on across the month's invoices). */
+export function nextInvoiceNo(existing: string[], at: string) {
+  const ym = `${at.slice(2, 4)}${at.slice(5, 7)}`
+  const top = existing.filter((n) => n.startsWith(`INV-${ym}-`)).reduce((m, n) => Math.max(m, Number(n.slice(-4))), 0)
+  return `INV-${ym}-${String(top + 1).padStart(4, "0")}`
+}
+
+/** The next CLM-YY-NNNNN (the claims register runs on through the year). */
+export function nextClaimNo(existing: string[], at: string) {
+  const yy = at.slice(2, 4)
+  const top = existing.filter((n) => n.startsWith(`CLM-${yy}-`)).reduce((m, n) => Math.max(m, Number(n.slice(-5))), 0)
+  return `CLM-${yy}-${String(top + 1).padStart(5, "0")}`
+}
+
+/** Lines from the price list, with the patient's VAT rule. */
+export function manualLines(input: Pick<ManualInvoiceInput, "lines" | "vatRule">): InvoiceLine[] {
+  const rule = vatRuleOf(input.vatRule)
+  return input.lines.flatMap((l) => {
+    const s = PRICE_LIST.find((x) => x.code === l.code)
+    return s ? [{ serviceCode: s.code, item: s.item, qty: Math.max(1, l.qty), price: s.price, vatRate: rule.rate, vatRule: rule.key, source: { kind: s.kind } }] : []
+  })
+}
+
+/**
+ * The invoice as New invoice builds it (live summary and Issue use the same thing): same numbering, VAT and co-pay as a
+ * visit invoice. Insurance: the agreement's co-pay for the member's class (percentage + per-visit cap); cash: the
+ * patient pays all; company: the company account pays all. ZATCA starts "pending" — the caller reports it.
+ */
+export function buildManualInvoice(input: ManualInvoiceInput, ins: Insurer | undefined, meta: { no: string; at: string; uuid: string }): Invoice {
+  const insured = input.payer === "insurance" && ins
+  const rule = insured ? copayRuleFor(ins, input.class) : undefined
+  return {
+    no: meta.no,
+    issuedAt: meta.at,
+    patient: input.patient,
+    visitId: input.visit?.id ?? "",
+    visitAt: input.visit?.at ?? meta.at,
+    clinic: input.visit?.clinic ?? { en: "—", ar: "—" },
+    doctor: input.visit?.doctor ?? "",
+    payer: insured ? ins.id : "cash",
+    class: insured ? input.class : undefined,
+    lines: manualLines(input),
+    copay: rule ? { pct: rule.pct, ...(rule.cap != null ? { cap: rule.cap } : {}) } : { pct: 100 },
+    payments: [],
+    zatca: {
+      uuid: meta.uuid,
+      hash: `sha256:${meta.uuid.replace(/-/g, "").slice(0, 16)}`,
+      qr: "",
+      status: "pending",
+      // Insurer and company invoices are B2B (cleared); a patient's own is B2C (reported).
+      type: insured || input.payer === "company" ? "standard" : "simplified",
+    },
+    events: [],
+    note: input.note.trim() ? { en: input.note.trim(), ar: input.note.trim() } : undefined,
+    manual: true,
+    company: input.payer === "company" ? input.company : undefined,
+  }
+}
+
+/**
+ * The insurer's claim for an issued hand-made invoice: the insurer's share, ready for the next batch — or held back
+ * ("Needs pre-auth") when the agreement asks for a pre-authorization above an amount (brief §4: claims missing a
+ * pre-auth are held back from the batch).
+ */
+export function manualClaim(inv: Invoice, ins: Insurer, meta: { no: string; at: string }): Claim {
+  const amount = totals(inv).insurerShare
+  const imaging = inv.lines.some((l) => l.serviceCode.startsWith("IMG-"))
+  return {
+    no: meta.no,
+    createdAt: meta.at,
+    invoiceNo: inv.no,
+    patient: inv.patient,
+    insurer: ins.id,
+    amount,
+    status: needsPreauth(ins, amount, imaging) ? "needsPreauth" : "ready",
+    service: inv.lines[0]?.item ?? { en: "", ar: "" },
+    visitAt: inv.visitAt,
+    doctor: inv.doctor,
+    attachments: [],
   }
 }

@@ -10,14 +10,15 @@ import { Icon, type IconName } from "@/components/ds/icon"
 import { StatCard } from "@/components/ds/stat-card"
 import { EmptyState } from "@/components/ds/states"
 import { Button } from "@/components/ui/button"
-import { BILL_TODAY, COLLECTED, MONEY_IN_DAYS, PATIENTS_PAID_SHARE, REJECTION_CODES, type Claim, type Contract, type Insurer } from "./data"
+import { BILL_TODAY, COLLECTED, MONEY_IN_DAYS, PATIENTS_PAID_SHARE, REJECTION_CODES, userById, type Claim, type Contract, type Insurer } from "./data"
 import { claimCounts, contractCounts, invoiceCounts } from "./counts"
-import { contractHref, INVOICES_HREF } from "./href"
+import { contractHref, INVOICES_HREF, newContractHref } from "./href"
 import { formatMoney, round2, useMoney } from "./money"
-import { ltrRun, useSoon } from "./parts"
+import { ltrRun } from "./parts"
 import { billCan } from "./roles"
 import { contractStatus, daysLeft, insurerStatus, nextSigner } from "./rules"
-import { useBatchSent, useBillRole, useClaims, useContracts, useInsurers, useInvoices } from "./store"
+import { useBatchSent, useBillRole, useClaims, useContracts, useCreditNotes, useInsurers, useInvoices } from "./store"
+import { useRefundTo } from "./refund-approval"
 import { useBillText } from "./text"
 
 /** Collected today = the day's takings before this session + the payments recorded in it today. */
@@ -211,19 +212,51 @@ const TONE: Record<Item["tone"], string> = {
  * View, a partner who hasn't signed → Open. Built from the live records; an item shows only when the role can act on it
  * and its tab is on for the branch.
  */
-export function NeedsAttention({ onFix, onSign }: { onFix: (claimNo: string) => void; onSign: (contractNo: string) => void }) {
+export function NeedsAttention({
+  onFix,
+  onSign,
+  onReview,
+}: {
+  onFix: (claimNo: string) => void
+  onSign: (contractNo: string) => void
+  /** Refund to approve → Approve the refund (finance manager). */
+  onReview?: (cnNo: string) => void
+}) {
   const t = useTranslations("billing.overview.attention")
   const tk = useTranslations("billing.sign.kindShort")
   const { b, date, locale, patient, insurerShort } = useBillText()
   const role = useBillRole()
-  const soon = useSoon()
+  const money = useMoney()
+  const refundTo = useRefundTo()
   const claims = useClaims()
   const contracts = useContracts()
   const insurers = useInsurers()
-  const inv = invoiceCounts(useInvoices())
+  const invoices = useInvoices()
+  const creditNotes = useCreditNotes()
+  const inv = invoiceCounts(invoices)
   const dm = (iso: string) => date(iso).replace(/\s\d{4}$/, "")
   const items: Item[] = []
   const on = (tab: string) => isTabEnabled("billing", tab)
+
+  // Refunds over the limit wait for the finance manager: "Refund to approve · Huda Al-Shehri" → Review.
+  if (on("invoices") && billCan(role, "approveRefund"))
+    for (const c of creditNotes.filter((x) => x.approval?.status === "pending" && x.refund)) {
+      const i = invoices.find((x) => x.no === c.invoiceNo)
+      if (!i) continue
+      const asker = userById(c.by)
+      items.push({
+        key: `refund-${c.no}`,
+        icon: "money-send",
+        tone: "warning",
+        title: t("refund", { name: b(patient(i.patient).name) }),
+        text: t("refundText", { amount: money(c.refund!.amount), to: refundTo.phrase(c.refund!.method, i), name: b(c.approval!.askedBy), g: asker?.female ? "female" : "male" }),
+        action: (
+          <Button size="sm" variant="outline" onClick={() => onReview?.(c.no)}>
+            {t("review")}
+          </Button>
+        ),
+      })
+    }
 
   if (on("claims") && billCan(role, "claims"))
     for (const c of claims.filter((x: Claim) => x.status === "rejected"))
@@ -276,8 +309,8 @@ export function NeedsAttention({ onFix, onSign }: { onFix: (claimNo: string) => 
         title: t("ending", { insurer: insurerShort(i.id), n: daysLeft(i.validTo!) }),
         text: t("endingText", { date: date(i.validTo!) }),
         action: (
-          <Button size="sm" variant="outline" onClick={soon}>
-            {t("renew")}
+          <Button size="sm" variant="outline" asChild>
+            <Link href={newContractHref("insurer")}>{t("renew")}</Link>
           </Button>
         ),
       })

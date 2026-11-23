@@ -8,7 +8,7 @@ import { usePageTitle } from "@/components/shell/page-title"
 import { Link } from "@/i18n/navigation"
 import { isTabEnabled } from "@/lib/modules"
 import { Button } from "@/components/ui/button"
-import { newContractHref } from "./href"
+import { NEW_INVOICE_HREF, newContractHref } from "./href"
 import { readyBatch } from "./counts"
 import { ClaimsList, ClaimsSummary } from "./claims"
 import { FixClaimDialog, SubmitClaimsDialog } from "./claim-dialogs"
@@ -17,9 +17,10 @@ import { ContractsList } from "./contracts"
 import { InsurersGrid } from "./insurers"
 import { MoneyIn, NeedsAttention, OverviewKpis } from "./overview"
 import { SignDialog } from "./sign-dialog"
+import { ApproveRefundDialog } from "./refund-approval"
 import { InvoicesList } from "./invoices"
 import { RecordPaymentDialog } from "./payment-dialog"
-import { useSoon } from "./parts"
+import { ExportDialog, type ExportWhat } from "./export-dialog"
 import { billCan } from "./roles"
 import { useBatchSent, useBillRole, useClaims } from "./store"
 
@@ -29,14 +30,32 @@ import { useBatchSent, useBillRole, useClaims } from "./store"
  * Send claims (billing staff).
  */
 
-function ExportButton() {
+/** Export (Overview, Invoices, Claims, Contracts): the dialog opens on the current tab's data. */
+function ExportButton({ what }: { what: ExportWhat }) {
   const t = useTranslations("billing.actions")
-  const soon = useSoon()
+  const [open, setOpen] = React.useState(false)
   if (!billCan(useBillRole(), "export")) return null
   return (
-    <Button variant="outline" onClick={soon}>
-      <Icon name="export" size={18} />
-      {t("export")}
+    <>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        <Icon name="export" size={18} />
+        {t("export")}
+      </Button>
+      {open && <ExportDialog initial={what} onOpenChange={setOpen} />}
+    </>
+  )
+}
+
+/** New invoice (by hand): billing staff and the finance manager. */
+function NewInvoiceButton() {
+  const t = useTranslations("billing.actions")
+  if (!billCan(useBillRole(), "newInvoice")) return null
+  return (
+    <Button asChild>
+      <Link href={NEW_INVOICE_HREF}>
+        <Icon name="add" size={18} />
+        {t("newInvoice")}
+      </Link>
     </Button>
   )
 }
@@ -72,12 +91,13 @@ export function OverviewTab() {
   usePageTitle({ title: t("title"), mobileTitle: true, crumbs: [{ label: tn("home"), href: "/dashboard" }] })
   const [fixing, setFixing] = React.useState<string | null>(null)
   const [signing, setSigning] = React.useState<string | null>(null)
+  const [reviewing, setReviewing] = React.useState<string | null>(null)
   return (
     <BillingFrame
       tab="overview"
       actions={
         <>
-          <ExportButton />
+          <ExportButton what="summary" />
           <NewContractButton />
         </>
       }
@@ -89,11 +109,12 @@ export function OverviewTab() {
           <MoneyIn />
         </div>
         <div className="order-1 xl:order-2">
-          <NeedsAttention onFix={setFixing} onSign={setSigning} />
+          <NeedsAttention onFix={setFixing} onSign={setSigning} onReview={setReviewing} />
         </div>
       </div>
       {fixing && <FixClaimDialog claimNo={fixing} onOpenChange={(o) => !o && setFixing(null)} />}
       {signing && <SignDialog contractNo={signing} onOpenChange={(o) => !o && setSigning(null)} />}
+      {reviewing && <ApproveRefundDialog cnNo={reviewing} onOpenChange={(o) => !o && setReviewing(null)} />}
     </BillingFrame>
   )
 }
@@ -102,7 +123,15 @@ export function OverviewTab() {
 export function InvoicesTab() {
   const [collecting, setCollecting] = React.useState<string | null>(null)
   return (
-    <BillingFrame tab="invoices" actions={<ExportButton />}>
+    <BillingFrame
+      tab="invoices"
+      actions={
+        <>
+          <ExportButton what="invoices" />
+          <NewInvoiceButton />
+        </>
+      }
+    >
       <InvoicesList onCollect={setCollecting} />
       {collecting && <RecordPaymentDialog invoiceNo={collecting} onOpenChange={(o) => !o && setCollecting(null)} />}
     </BillingFrame>
@@ -123,7 +152,7 @@ export function ClaimsTab() {
       tab="claims"
       actions={
         <>
-          <ExportButton />
+          <ExportButton what="claims" />
           {billCan(role, "claims") && (
             <Button onClick={() => setSubmitting(true)} disabled={batch.count === 0}>
               <Icon name="send-2" size={18} />
@@ -158,7 +187,7 @@ export function ContractsTab() {
       tab="contracts"
       actions={
         <>
-          <ExportButton />
+          <ExportButton what="contracts" />
           <NewContractButton />
         </>
       }

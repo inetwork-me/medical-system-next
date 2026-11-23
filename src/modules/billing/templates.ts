@@ -141,7 +141,7 @@ export function clausesOf(c: Contract): Clause[] {
   // clause the user added. Optional ones already covered by a template clause aren't repeated.
   const optional = (texts: Record<string, Bi>, skip: string[] = []) => [
     ...c.clauses.filter((x) => texts[x.key] && !skip.includes(x.key)).map((x) => ({ ...x, text: texts[x.key] })),
-    ...c.clauses.filter((x) => x.key.startsWith("custom-")),
+    ...c.clauses.filter((x) => x.key.startsWith("custom-") || x.key.startsWith("lib-")),
   ]
   if (c.kind === "staff" && c.terms.staff) return [...staffClauses(c), ...optional(STAFF_OPTIONAL)]
   if (c.kind === "partner" && c.terms.partner) return partnerClauses(c)

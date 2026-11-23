@@ -144,12 +144,14 @@ export function InvoicePaper({ inv, className }: { inv: Invoice; className?: str
               : payerName(inv)}
           </Info>
           <Info label={t("field.visit")}>
-            {t("visit", {
-              date: date(inv.visitAt),
-              clinic: b(inv.clinic),
-            })}
+            {inv.visitId
+              ? t("visit", {
+                  date: date(inv.visitAt),
+                  clinic: b(inv.clinic),
+                })
+              : "—"}
           </Info>
-          <Info label={t("field.doctor")}>{doctorName(inv.doctor)}</Info>
+          <Info label={t("field.doctor")}>{inv.doctor ? doctorName(inv.doctor) : "—"}</Info>
           <Info label={t("field.claim")}>{inv.claimNo ? <Latin>{inv.claimNo}</Latin> : "—"}</Info>
         </div>
 
@@ -221,6 +223,11 @@ export function InvoicePaper({ inv, className }: { inv: Invoice; className?: str
             <SumRow label={t("sum.balance")} value={money(tt.balance)} tone={tt.balance > 0 ? "destructive" : undefined} last />
           </div>
         </div>
+
+        {inv.note && (
+          // New invoice · Note: printed on the invoice for the patient.
+          <p className="rounded-lg bg-muted p-3 text-sm text-foreground">{b(inv.note)}</p>
+        )}
 
         <footer className="flex flex-col gap-0.5 text-xs text-muted-foreground">
           <p>

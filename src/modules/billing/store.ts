@@ -3,7 +3,9 @@
 import * as React from "react"
 
 import { CLAIMS, CONTRACTS, CREDIT_NOTES, INSURERS, INVOICES, type Claim, type Contract, type CreditNote, type Insurer, type Invoice } from "./data"
+import { ARCHIVE_CONTRACTS, ARCHIVE_CREDIT_NOTES, ARCHIVE_INVOICES } from "./archive"
 import type { BillRole } from "./roles"
+import type { ManualInvoiceInput } from "./rules"
 
 /**
  * Billing session store: the design's records with this session's changes (payments, claims sent / fixed,
@@ -22,13 +24,19 @@ type State = {
   /** Credit notes issued in this session (newest first) and later changes to any credit note (ZATCA answer). */
   addedCreditNotes: CreditNote[]
   creditNotes: Record<string, CreditNote>
+  /** New invoice (by hand): issued invoices and their claims (newest first), and the saved draft (not reported). */
+  addedInvoices: Invoice[]
+  addedClaims: Claim[]
+  invoiceDraft: ManualInvoiceInput | null
+  /** Export log (PDPL: every export is recorded — who, what, when, and whether patient names went out). */
+  exports: ExportLog[]
   /** The other ready claims (aggregates) went out with a batch. */
   batchSent: boolean
   role: BillRole
 }
 
 const KEY = "ms.billing.session"
-const EMPTY: State = { invoices: {}, claims: {}, insurers: {}, contracts: {}, addedContracts: [], addedInsurers: [], addedCreditNotes: [], creditNotes: {}, batchSent: false, role: "lead" }
+const EMPTY: State = { invoices: {}, claims: {}, insurers: {}, contracts: {}, addedContracts: [], addedInsurers: [], addedCreditNotes: [], creditNotes: {}, addedInvoices: [], addedClaims: [], invoiceDraft: null, exports: [], batchSent: false, role: "lead" }
 let state: State = EMPTY
 let loaded = false
 const listeners = new Set<() => void>()
@@ -72,11 +80,14 @@ function merged<T>(base: T[], key: (x: T) => string, pick: (s: State) => Record<
     return list
   }
 }
-const invoicesOf = merged(INVOICES, (x) => x.no, (s) => s.invoices)
-const claimsOf = merged(CLAIMS, (x) => x.no, (s) => s.claims)
+const invoicesOf = merged(INVOICES, (x) => x.no, (s) => s.invoices, (s) => s.addedInvoices ?? [])
+const claimsOf = merged(CLAIMS, (x) => x.no, (s) => s.claims, (s) => s.addedClaims ?? [])
 const insurersOf = merged(INSURERS, (x) => x.id, (s) => s.insurers, (s) => s.addedInsurers ?? [])
 const contractsOf = merged(CONTRACTS, (x) => x.no, (s) => s.contracts, (s) => s.addedContracts)
-const creditNotesOf = merged(CREDIT_NOTES, (x) => x.no, (s) => s.creditNotes ?? {}, (s) => s.addedCreditNotes ?? [])
+const creditNotesOf = merged([...CREDIT_NOTES, ...ARCHIVE_CREDIT_NOTES], (x) => x.no, (s) => s.creditNotes ?? {}, (s) => s.addedCreditNotes ?? [])
+/** The lists (Show more) and record lookups also reach the rest of the month (archive.ts); the counts don't need it. */
+const allInvoicesOf = merged([...INVOICES, ...ARCHIVE_INVOICES], (x) => x.no, (s) => s.invoices, (s) => s.addedInvoices ?? [])
+const allContractsOf = merged([...CONTRACTS, ...ARCHIVE_CONTRACTS], (x) => x.no, (s) => s.contracts, (s) => s.addedContracts)
 
 function useSlice<T>(select: (s: State) => T): T {
   const snap = React.useSyncExternalStore(subscribe, read, serverState)
@@ -93,17 +104,37 @@ export const useCreditNote = (no: string) => useCreditNotes().find((x) => x.no =
 export const getCreditNotes = () => creditNotesOf(read())
 export const getCreditNote = (no: string) => creditNotesOf(read()).find((x) => x.no === no)
 
-export const useInvoice = (no: string) => useInvoices().find((x) => x.no === no)
+export const useAllInvoices = () => useSlice(allInvoicesOf)
+export const useAllContracts = () => useSlice(allContractsOf)
+export const useInvoice = (no: string) => useAllInvoices().find((x) => x.no === no)
+export const getInvoices = () => allInvoicesOf(read())
+export const useInvoiceDraft = () => useSlice((s) => s.invoiceDraft ?? null)
+
+/** Issue invoice (by hand): the invoice and, for insured patients, its claim, in one commit; the draft is cleared. */
+export function saveManualInvoice(inv: Invoice, claim?: Claim) {
+  load()
+  commit({
+    ...state,
+    addedInvoices: [inv, ...(state.addedInvoices ?? []).filter((x) => x.no !== inv.no)],
+    addedClaims: claim ? [claim, ...(state.addedClaims ?? []).filter((x) => x.no !== claim.no)] : (state.addedClaims ?? []),
+    invoiceDraft: null,
+  })
+}
+/** Save draft (New invoice): kept in this session only; nothing is reported. `null` clears it. */
+export function saveInvoiceDraft(d: ManualInvoiceInput | null) {
+  load()
+  commit({ ...state, invoiceDraft: d })
+}
 export const useClaim = (no: string) => useClaims().find((x) => x.no === no)
 export const useInsurer = (id: string) => useInsurers().find((x) => x.id === id)
-export const useContract = (no: string) => useContracts().find((x) => x.no === no)
+export const useContract = (no: string) => useAllContracts().find((x) => x.no === no)
 
 /** Read straight from the store (event handlers right after a change; stub callbacks). */
-export const getInvoice = (no: string) => invoicesOf(read()).find((x) => x.no === no)
+export const getInvoice = (no: string) => allInvoicesOf(read()).find((x) => x.no === no)
 export const getClaim = (no: string) => claimsOf(read()).find((x) => x.no === no)
 export const getClaims = () => claimsOf(read())
 export const getInsurer = (id: string) => insurersOf(read()).find((x) => x.id === id)
-export const getContract = (no: string) => contractsOf(read()).find((x) => x.no === no)
+export const getContract = (no: string) => allContractsOf(read()).find((x) => x.no === no)
 export const getContracts = () => contractsOf(read())
 
 export function saveInvoice(x: Invoice) {
@@ -149,6 +180,18 @@ export function saveCreditIssue(cn: CreditNote, inv: Invoice, claim?: Claim) {
     claims: claim ? { ...state.claims, [claim.no]: claim } : state.claims,
   })
 }
+/** Approve / reject a refund: the credit note (decision + events) and, when approved, the invoice's refunded amount. */
+export function saveRefundDecision(cn: CreditNote, inv?: Invoice) {
+  saveCreditNote(cn)
+  if (inv) saveInvoice(inv)
+}
+export type ExportLog = { at: string; by: string; what: string; period: string; format: string; rows: number; names: boolean; filter: string }
+/** Record an export (newest first). */
+export function logExport(x: ExportLog) {
+  load()
+  commit({ ...state, exports: [x, ...(state.exports ?? [])] })
+}
+export const useExportLog = () => useSlice((s) => s.exports ?? [])
 export function setBatchSent() {
   load()
   commit({ ...state, batchSent: true })

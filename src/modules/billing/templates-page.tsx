@@ -20,7 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BILL_TODAY, STAFF, type ContractKind, type ContractTemplate, type TemplateVersion } from "./data"
-import { CONTRACTS_HREF, newContractHref, templatesHref } from "./href"
+import { CONTRACTS_HREF, newContractHref, templateEditHref, templatesHref } from "./href"
 import { KindChip } from "./parts"
 import { canDraft } from "./roles"
 import { currentUser } from "./session"
@@ -262,7 +262,7 @@ export function TemplatePreview({ rowKey }: { rowKey: string }) {
     if (!r) return
     if (r.created) toast.success(tt("versionToast", { v: r.version }), { description: tt("versionToastText") })
     else toast.info(tt("versionExists", { v: r.version }), { description: tt("versionExistsText") })
-    router.replace(templatesHref(`${tpl.id}@${r.version}`), { scroll: false })
+    router.push(templateEditHref(tpl.id, r.version))
   }
   const duplicate = () => {
     const d = duplicateTemplate(tpl.id, me, { en: "(copy)", ar: "(نسخة)" })

@@ -35,6 +35,28 @@ export function useSoon() {
   return () => toast.info(t("title"), { description: t("text") })
 }
 
+/**
+ * Show more (Invoices, Contracts): the next 20 rows go below the ones already shown — the page doesn't move — and the
+ * counter follows ("Showing 28 of 214"). Starts over when the filter or the search changes (`reset`). → `more-loaded`.
+ */
+export const SHOW_MORE_STEP = 20
+export function useShowMore(reset: string) {
+  const t = useTranslations("billing.showMore")
+  const [extra, setExtra] = React.useState(0)
+  const [key, setKey] = React.useState(reset)
+  if (key !== reset) {
+    setKey(reset)
+    setExtra(0)
+  }
+  const more = (left: number) => {
+    const n = Math.min(SHOW_MORE_STEP, left)
+    if (n <= 0) return
+    setExtra((e) => e + SHOW_MORE_STEP)
+    toast.info(t("toast", { n }), { description: t("toastText") })
+  }
+  return { extra, more }
+}
+
 /* ------------------------------------------------------------------ status badges */
 
 const INVOICE_TONE: Record<InvoiceStatus, StatusTone> = { unpaid: "destructive", part: "warning", paid: "success", refunded: "neutral" }

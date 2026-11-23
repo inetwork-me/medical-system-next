@@ -67,7 +67,8 @@
     "export": "Export",
     "newContract": "New contract",
     "newAgreement": "New agreement",
-    "sendClaims": "{n, plural, =0 {Send claims} one {Send # claim} other {Send # claims}}"
+    "sendClaims": "{n, plural, =0 {Send claims} one {Send # claim} other {Send # claims}}",
+    "newInvoice": "New invoice"
   },
   "method": {
     "cash": "Cash",
@@ -789,7 +790,84 @@
     "paperEnds": "ends {date}",
     "employeeSigner": "{role} · {mobile}",
     "backInsurers": "Back to insurers",
-    "sentInsurerToast": "Sent to {insurer} for signature"
+    "sentInsurerToast": "Sent to {insurer} for signature",
+    "insurerLineShort": "CCHI licence {licence} · {city}",
+    "removeNamed": "Remove {name}",
+    "otherSide": "The other side",
+    "removedToast": "Removed",
+    "removedToastText": "You can add it back any time",
+    "clausesAddedToast": "{n, plural, one {1 clause added} other {# clauses added}}",
+    "clausesAddedText": "At the end · drag them to reorder",
+    "signerAddedToast": "Signer added",
+    "signerAddedText": "{name} signs {n}",
+    "signerAddedApproves": "{name} approves {n}",
+    "signerAddedCopy": "{name} gets a copy once everyone signs",
+    "choose": {
+      "title": {
+        "staff": "Choose the employee",
+        "partner": "Choose the partner",
+        "insurer": "Choose the insurer"
+      },
+      "search": "Search",
+      "use": {
+        "staff": "Use this employee",
+        "partner": "Use this company",
+        "insurer": "Use this insurer"
+      },
+      "hint": {
+        "staff": "Not listed? Add them from Doctors or HR first.",
+        "partner": "New company? Type its CR number and we fill the rest from the commercial register.",
+        "insurer": "Only insurers licensed by CCHI show here."
+      },
+      "cancel": "Cancel"
+    },
+    "addClauses": {
+      "title": "Add clauses",
+      "text": "From the clause library or your own",
+      "from": "From",
+      "library": "Clause library",
+      "own": "Write my own",
+      "search": "Search",
+      "searchPlaceholder": "Search clauses…",
+      "inForm": "Already in this contract",
+      "none": "No clauses match",
+      "note": "Library clauses come in Arabic and English, checked by our lawyer.",
+      "ownTitle": "Clause title",
+      "ownTitleError": "Give the clause a title",
+      "ownText": "Clause text",
+      "ownTextError": "Write what the clause says",
+      "ownNote": "Your own clause prints as you write it. Ask our lawyer to check it before you send.",
+      "add": "{n, plural, =0 {Add clauses} one {Add 1 clause} other {Add # clauses}}",
+      "addOwn": "Add clause",
+      "cancel": "Cancel"
+    },
+    "signerDialog": {
+      "title": "Add a signer",
+      "text": "Signs with Nafath in the order you pick",
+      "name": "Name",
+      "nameError": "Enter their name",
+      "role": "Role",
+      "roleError": "Enter their role",
+      "mobile": "Mobile",
+      "mobileError": "Enter a Saudi mobile, like +966 55 902 1146",
+      "signsFor": "Signs for",
+      "otherSide": "The other side",
+      "does": "What they do",
+      "doesValue": {
+        "signs": "Signs",
+        "approves": "Approves only",
+        "copy": "Gets a copy"
+      },
+      "order": "Order",
+      "ordinal": "{n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
+      "ordinalWord": "{n, select, 1 {first} 2 {second} 3 {third} 4 {fourth} 5 {fifth} 6 {sixth} other {{n}th}}",
+      "orderFirst": "{n} · before {name}",
+      "orderAfter": "{n} · after {name}",
+      "note": "They get an SMS link when it's their turn and sign with Nafath.",
+      "noteCopy": "They get the signed copy by SMS once everyone signs.",
+      "add": "Add signer",
+      "cancel": "Cancel"
+    }
   },
   "overview": {
     "kpi": {
@@ -832,7 +910,10 @@
       "view": "View",
       "them": "{name} hasn't signed yet",
       "themText": "Sent {sent}{reminded, select, none {} other { · reminded {reminded}}}",
-      "open": "Open"
+      "open": "Open",
+      "refund": "Refund to approve · {name}",
+      "refundText": "{amount} {to} · asked by {name}",
+      "review": "Review"
     }
   },
   "templates": {
@@ -906,11 +987,11 @@
     "versionToastText": "It's a draft · publish it from the editor when it's ready",
     "versionExists": "Version {v} is already a draft",
     "versionExistsText": "Finish or publish it before starting another",
-    "duplicateToast": "Template duplicated",
-    "duplicateToastText": "{name} starts as a draft",
+    "duplicateToast": "Template copied",
+    "duplicateToastText": "Saved as a draft · rename it before publishing",
     "copy": "(copy)",
-    "createdToast": "Template created",
-    "createdToastText": "{name} starts as a draft",
+    "createdToast": "Template draft created",
+    "createdToastText": "Add its clauses, then publish it",
     "dialog": {
       "title": "New template",
       "text": "Starts as a draft",
@@ -940,7 +1021,8 @@
     "issued": "{no} · issued {date} · {time}",
     "status": {
       "refunded": "Refunded",
-      "issued": "Issued"
+      "issued": "Issued",
+      "approval": "Waiting for approval"
     },
     "field": {
       "patient": "Patient",
@@ -1021,10 +1103,17 @@
       "method": {
         "cash": "Cash at reception · {name}",
         "transfer": "Bank transfer · {name}",
-        "card": "Back to the card · {name}",
+        "card": "{brand, select, mada {Back to mada} applepay {Back to Apple Pay} other {Back to the card}} · {name}",
         "visitCredit": "Credit for the next visit · {name}"
       },
-      "receipt": "Download refund receipt"
+      "receipt": "Download refund receipt",
+      "waiting": "Waiting for approval",
+      "kept": "Kept as credit",
+      "to": "How",
+      "keptAs": "Credit for the next visit",
+      "pending": "Waiting for {name} ({role}) to approve · asked at {time}. The money goes back once {g, select, female {she} other {he}} approves.",
+      "rejected": "{name} rejected the refund: {note} The credit stays with the patient for the next visit.",
+      "review": "Review the refund"
     },
     "after": {
       "title": "Invoice after this",
@@ -1054,7 +1143,10 @@
         "transfer": "by bank transfer",
         "card": "to the card",
         "visitCredit": "as credit for the next visit"
-      }
+      },
+      "approvalRequested": "Refund of {amount} sent to {approver} for approval · {name}",
+      "refundApproved": "Refund approved · {name}",
+      "refundRejected": "Refund rejected, kept as credit · {name}"
     },
     "dialog": {
       "title1": "Issue a credit note",
@@ -1083,12 +1175,13 @@
         "cash": "Cash",
         "transfer": "Bank transfer",
         "card": "Back to the card",
-        "visitCredit": "Credit for next visit"
+        "visitCredit": "Credit for next visit",
+        "cardTo": "{brand, select, mada {Back to mada} applepay {Back to Apple Pay} other {Back to the card}}"
       },
       "noteCash": "{sex, select, f {She} other {He}} paid {how}, so it can't go back to a card. Refunds over {limit} need the finance manager's approval.",
       "noteCard": "{sex, select, f {She} other {He}} paid {how}, so it goes back to the same card through the terminal. Refunds over {limit} need the finance manager's approval.",
       "noteNone": "Nothing goes back: {sex, select, f {she} other {he}} paid less than the new share. The balance drops to {owes}.",
-      "overLimit": "{amount} is over {limit}: the finance manager approves it before it's issued.",
+      "overLimit": "Over {limit}, so {name} ({role}) approves it first. The credit note is issued now; the money goes back once {g, select, female {she} other {he}} approves.",
       "receipt": "Print a refund receipt for the patient to sign",
       "nphies": "{insurer}'s part ({amount}) comes off claim {claim} through NPHIES.",
       "nphiesNoClaim": "{insurer}'s part ({amount}) comes off what {insurer} owes for this invoice.",
@@ -1096,7 +1189,309 @@
       "issue": "Issue credit note",
       "approval": "Send for approval",
       "failed": "Couldn't issue the credit note",
-      "failedText": "Nothing was saved. Try again."
+      "failedText": "Nothing was saved. Try again.",
+      "noteFor": "Note for {name}",
+      "approvalToast": "Sent for approval",
+      "approvalToastText": "{name} gets it now · the credit note is issued"
+    }
+  },
+  "refundApproval": {
+    "title": "Approve the refund",
+    "text": "{no} · {name}",
+    "patient": "Patient",
+    "patientF": "Patient",
+    "selfPay": "{name} · self-pay",
+    "invoice": "Invoice",
+    "invoiceValue": "{no} · {date}",
+    "reason": "Reason",
+    "refund": "Refund",
+    "backToLabel": "Back to",
+    "askedBy": "Asked by",
+    "askedByF": "Asked by",
+    "askedValue": "{name} · {role} · {time}",
+    "note": "Your note",
+    "noteError": "Tell {name} why you're rejecting it",
+    "info": {
+      "card": "Approving sends it to the card machine provider. The money arrives in 3 to 5 working days.",
+      "cash": "Approving marks it as due: reception hands the cash back to the patient.",
+      "transfer": "Approving sends it to finance for the bank transfer to the patient's IBAN.",
+      "visitCredit": "Approving keeps it as credit for the patient's next visit."
+    },
+    "reject": "Reject",
+    "approve": "Approve refund",
+    "onlyFinance": "Only the finance manager can approve or reject refunds.",
+    "approvedToast": "Refund approved",
+    "approvedText": "{amount} {to} in 3 to 5 working days",
+    "approvedDue": "{amount} {to} · it's due now",
+    "rejectedToast": "Refund rejected",
+    "rejectedText": "{name} gets your note · the credit note stays",
+    "backTo": {
+      "card": "{brand, select, mada {back to mada} applepay {back to Apple Pay} other {back to the card}}",
+      "cash": "back in cash",
+      "transfer": "back by bank transfer",
+      "visitCredit": "as credit for the next visit"
+    },
+    "cardEnding": "{brand, select, mada {mada card} applepay {Apple Pay card} other {Card}} ending in {last4}",
+    "cardOnly": "{brand, select, mada {mada card} applepay {Apple Pay} other {The card}}"
+  },
+  "newInvoice": {
+    "title": "New invoice",
+    "back": "Back to invoices",
+    "saveDraft": "Save draft",
+    "issue": "Issue invoice",
+    "onlyBilling": "Only billing staff and the finance manager can issue invoices by hand. You can still save a draft.",
+    "patientTitle": "Patient and visit",
+    "patientText": "Most invoices come from visits · use this for anything else",
+    "patient": "Patient",
+    "patientPick": "Search by name or MRN",
+    "patientSearch": "Name or MRN…",
+    "patientEmpty": "No patient matches",
+    "visit": "Visit",
+    "visitValue": "{date} · {clinic} · {doctor}",
+    "noVisit": "No visit · walk-in or other",
+    "payerTitle": "Who pays",
+    "payerText": "Filled from the patient's file",
+    "payer": "Payer",
+    "payerValue": {
+      "insurance": "Insurance",
+      "cash": "Cash",
+      "company": "Company"
+    },
+    "insurer": "Insurer",
+    "insurerPick": "Choose the insurer and class",
+    "insurerValue": "{name} · class {cls}",
+    "policyNo": "Policy no.",
+    "copay": "Co-pay {pct} · from the {insurer} agreement",
+    "copayCapped": "Co-pay {pct}, up to SAR {cap} a visit · from the {insurer} agreement",
+    "cashNote": "The patient pays the whole invoice.",
+    "company": "Company",
+    "companyPick": "Choose the company account",
+    "companyNote": "The company account pays the whole invoice; nothing is collected from the patient.",
+    "servicesTitle": "Services",
+    "servicesText": "Prices from the price list · VAT {rate}",
+    "line": {
+      "service": "Service",
+      "qty": "Qty",
+      "qtyOf": "Quantity of {name}",
+      "price": "Price",
+      "vat": "VAT",
+      "total": "Total",
+      "remove": "Remove",
+      "removeNamed": "Remove {name}"
+    },
+    "addService": "Add a service · search the price list by name or code",
+    "serviceSearch": "Service name or code…",
+    "serviceEmpty": "Nothing in the price list matches",
+    "noteTitle": "Note",
+    "noteText": "Optional · printed on the invoice",
+    "noteLabel": "Note to the patient",
+    "removedToast": "Removed",
+    "removedToastText": "You can add it back any time",
+    "draftToast": "Invoice draft saved",
+    "draftToastText": "Not reported to ZATCA until you issue it",
+    "issuedToast": "Invoice issued",
+    "issuedText": "{no} · reported to ZATCA",
+    "issuedClaim": "{no} · reported to ZATCA · claim ready for {insurer}",
+    "issuedPreauth": "{no} · reported to ZATCA · the claim waits for {insurer}'s pre-authorization",
+    "zatcaFailed": "Not reported yet",
+    "zatcaFailedText": "ZATCA didn't answer. The invoice is saved; we'll try again.",
+    "error": {
+      "summary": "Some details are missing. Check the fields marked in red.",
+      "patient": "Choose the patient",
+      "insurer": "Choose the insurer and class",
+      "policyNo": "Enter the policy no.",
+      "company": "Choose the company",
+      "lines": "Add at least one service"
+    },
+    "summary": {
+      "title": "Invoice summary",
+      "text": "Updates as you add services",
+      "subtotal": "Subtotal",
+      "vat": "VAT {rate}",
+      "vatMixed": "VAT",
+      "total": "Total",
+      "insurerPays": "{insurer} pays",
+      "companyPays": "{company} pays",
+      "patient": "Patient pays",
+      "patientPct": "Patient pays · {pct}",
+      "patientCap": "Patient pays · cap",
+      "zatca": "It's reported to ZATCA as soon as you issue it. After that, only a credit note can change it."
+    }
+  },
+  "templateEditor": {
+    "titleDraft": "{name} · draft v{v}",
+    "titleVersion": "{name} · v{v}",
+    "mobileTitle": "Template editor",
+    "back": "Back to templates",
+    "backToList": "Back to templates",
+    "notFound": "We couldn't find this template version",
+    "notFoundText": "It may have been published or removed. Open it again from Templates.",
+    "save": "Save draft",
+    "publishBtn": "Publish",
+    "error": "Every clause needs a title in English and Arabic. The first one missing is open below.",
+    "empty": "No clauses yet",
+    "emptyText": "Add clauses from the library or write your own.",
+    "savedToast": "Draft saved",
+    "savedToastText": "Version {v} stays in use until you publish",
+    "savedToastTextNew": "Nothing is used until you publish",
+    "publishedToast": "Version {v} published",
+    "publishedToastText": "New contracts use it from now",
+    "status": {
+      "draft": "Draft · version {v} of {name} · based on v{base} · {saved}",
+      "draftNew": "Draft · version {v} of {name} · {saved}",
+      "readOnly": "Version {v} of {name} · read-only (only drafts can be edited)",
+      "readOnlyDraft": "Draft · version {v} of {name} · read-only for your role",
+      "notSaved": "not saved yet",
+      "savedNow": "saved just now",
+      "savedAgo": "saved {n} min ago",
+      "unsaved": "unsaved changes"
+    },
+    "list": {
+      "title": "Clauses",
+      "text": "Drag to reorder · {n} in this version",
+      "add": "Add",
+      "move": "Move {name} (arrow keys)",
+      "new": "New",
+      "locked": "Locked",
+      "untitled": "Untitled clause",
+      "note": "Locked clauses can't be removed from a contract."
+    },
+    "clause": {
+      "title": "Clause {n} · {name}",
+      "edited": "Changed in this version",
+      "added": "New in this version",
+      "same": "Same as v{v}",
+      "draft": "In this draft",
+      "remove": "Remove",
+      "titleIn": {
+        "en": "Title · English",
+        "ar": "Title · Arabic"
+      },
+      "textIn": {
+        "en": "Text · English",
+        "ar": "Text · Arabic"
+      },
+      "titleError": "Write the title",
+      "insert": "Insert a blank · filled from New contract",
+      "locked": "Locked in every contract",
+      "lockedText": "People drafting a contract can't remove or edit it",
+      "showChanges": "Show changes to the other side",
+      "showChangesText": "Highlights what changed since v{v} when they open it"
+    },
+    "changes": {
+      "title": "Changes from v{v}",
+      "edited": "Edited",
+      "added": "Added",
+      "removed": "Removed",
+      "line": "Clause {n} · {name}",
+      "none": "No changes yet"
+    },
+    "publish": {
+      "title": "Publish version {v}?",
+      "changes": "Changes",
+      "changesValue": "{edited, plural, =0 {} one {1 clause edited} other {# clauses edited}}{added, plural, =0 {} other { · }}{added, plural, =0 {} one {1 added} other {# added}}{removed, plural, =0 {} other { · }}{removed, plural, =0 {} one {1 removed} other {# removed}}",
+      "noChanges": "Same clauses as before",
+      "newContracts": "New contracts",
+      "newContractsValue": "Use version {v} from now",
+      "signedOn": "Signed on v{v}",
+      "signedValue": "{n} · stay as they are",
+      "draftsOn": "Drafts on v{v}",
+      "draftsValue": "{n} · we'll ask to update them",
+      "draftsNone": "None",
+      "email": "Email HR and the clinic managers",
+      "archived": "Version {v} is archived but kept, with every contract signed on it.",
+      "cancel": "Cancel",
+      "publish": "Publish"
+    }
+  },
+  "showMore": {
+    "toast": "{n} more loaded",
+    "toastText": "Keep scrolling to see them"
+  },
+  "export": {
+    "title": "Export",
+    "text": "A file of what you see, for finance or the auditor",
+    "whatLabel": "What",
+    "what": {
+      "summary": "Billing summary",
+      "invoices": "Invoices",
+      "claims": "Insurance claims",
+      "contracts": "Contracts"
+    },
+    "periodLabel": "Period",
+    "period": {
+      "thisMonth": "This month · {from} to {to}",
+      "last7": "Last 7 days · {from} to {to}",
+      "lastMonth": "Last month · {month}",
+      "thisYear": "This year · {year}"
+    },
+    "formatLabel": "Format",
+    "onlyFilter": "Only what the filter shows ({filter})",
+    "vatColumn": "VAT on its own column",
+    "names": "Patient names",
+    "note": "Names are left out unless you tick them, to protect patient data (PDPL). Every export is logged.",
+    "noteLogged": "Every export is logged.",
+    "cancel": "Cancel",
+    "download": "Download",
+    "readyToast": "Export ready",
+    "readyToastText": "{file} · saved to Downloads",
+    "failed": "Couldn't make the file",
+    "failedText": "Nothing was saved. Try again.",
+    "pdfNote": "{n, plural, one {1 row} other {# rows}} · exported from the Medical System",
+    "filterName": {
+      "invoices": {
+        "all": "All",
+        "unpaid": "Unpaid",
+        "part": "Partly paid",
+        "paid": "Paid",
+        "refunded": "Refunded"
+      },
+      "claims": {
+        "all": "All",
+        "toFix": "To fix",
+        "ready": "Ready",
+        "review": "In review",
+        "paid": "Paid"
+      },
+      "contracts": {
+        "all": "All",
+        "staff": "Staff",
+        "partner": "Partners",
+        "insurer": "Insurers",
+        "toSign": "To sign"
+      }
+    },
+    "col": {
+      "invoice": "Invoice",
+      "date": "Date",
+      "mrn": "MRN",
+      "patient": "Patient",
+      "payer": "Payer",
+      "subtotal": "Subtotal",
+      "vat": "VAT",
+      "total": "Total",
+      "patientPays": "Patient pays",
+      "paid": "Paid",
+      "balance": "Balance",
+      "status": "Status",
+      "claim": "Claim",
+      "insurer": "Insurer",
+      "amount": "Amount",
+      "contract": "Contract",
+      "type": "Type",
+      "party": "Party",
+      "start": "Starts",
+      "end": "Ends",
+      "measure": "Measure",
+      "value": "Value"
+    },
+    "summary": {
+      "invoices": "Invoices this month",
+      "unpaid": "Unpaid by patients",
+      "claimsReview": "Claims in review",
+      "claimsPaid": "Claims paid this month",
+      "contracts": "Contracts",
+      "toSign": "Contracts to sign"
     }
   }
 }

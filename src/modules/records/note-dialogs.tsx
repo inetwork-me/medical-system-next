@@ -25,7 +25,7 @@ import { KvBox, Latin, Strip, ltrRun, useB, useWhen } from "./parts"
 import { recCan } from "./roles"
 import { addAddendum, addDiagnosis, mainDiagnosis, searchIcd, signNote } from "./rules"
 import { ME } from "./session"
-import { addEncounter, addProblem, getNote, getNotes, saveNote, useEncounter, useNote, useRecRole } from "./store"
+import { addEncounter, addProblem, getNote, getNotes, saveNote, useEncounter, useNote, usePrescriptions, useRecRole } from "./store"
 
 const REASONS: AddendumReason[] = ["lateResult", "correction", "moreInfo", "patientCall"]
 
@@ -58,6 +58,7 @@ export function SignNoteDialog({
   const role = useRecRole()
   const stored = useNote(noteId)
   const e = useEncounter(stored?.encounter ?? "")
+  const rx = usePrescriptions().find((r) => r.encounter === stored?.encounter)
   const [reviewed, setReviewed] = React.useState(initial?.reviewed ?? false)
   const [pin, setPin] = React.useState(initial?.pin ?? "")
   const [tried, setTried] = React.useState(initial?.tried ?? false)
@@ -70,8 +71,10 @@ export function SignNoteDialog({
   const allowed = n.author === ME && recCan(role, "signNote") && !n.signedAt
   const main = mainDiagnosis(n)
   const sep = locale === "ar" ? "، " : ", "
-  const newMeds = n.medicines.filter((m) => m.isNew).length
-  const check = checkMedicines(p, n.medicines.map((m) => m.drug), CURRENT_MEDS[e.patient] ?? [])
+  // Medicines: the visit's prescription when there is one (sent separately, whenever the doctor chooses).
+  const meds = rx ? rx.lines.map((l) => ({ drug: l.drug, isNew: l.isNew })) : n.medicines
+  const newMeds = meds.filter((m) => m.isNew).length
+  const check = checkMedicines(p, meds.map((m) => m.drug), CURRENT_MEDS[e.patient] ?? [])
   const medsOk = check.allergy.length === 0
 
   const pinError = tried && !validPinShape(pin) ? t("pinError") : wrong ? t("pinWrong") : undefined
@@ -94,7 +97,8 @@ export function SignNoteDialog({
       saveNote(signNote({ ...cur, ...draft }, REC_NOW))
       onOpenChange(false)
       onSigned?.()
-      toast.success(t("toast"), { description: t("toastText") })
+      // Signing never sends the prescription: it's saved and sent when the doctor chooses.
+      toast.success(t("toast"), { description: t(rx?.status === "draft" ? "toastTextRxDraft" : "toastText") })
     } catch {
       toast.error(t("failed"), { description: t("failedText"), retry: () => void sign() })
     } finally {
@@ -113,9 +117,9 @@ export function SignNoteDialog({
     [t("orders"), n.orders.length ? n.orders.map((o) => b(o.short)).join(sep) : t("none")],
     [
       t("medicines"),
-      n.medicines.length ? (
+      meds.length ? (
         <span key="m" className={medsOk ? "text-success" : "text-warning-soft-foreground"}>
-          {t(medsOk ? "medicinesChecked" : "medicinesAllergy", { n: n.medicines.length, fresh: newMeds })}
+          {t(medsOk ? "medicinesChecked" : "medicinesAllergy", { n: meds.length, fresh: newMeds })}
         </span>
       ) : (
         t("none")

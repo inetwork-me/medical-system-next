@@ -238,7 +238,8 @@
     "noPast": "First visit.",
     "restrictedTitle": "This file is restricted",
     "restrictedText": "You're not in {name}'s care team. Give a reason to open it: the privacy officer is told and access lasts 4 hours.",
-    "restrictedOpen": "Give a reason"
+    "restrictedOpen": "Give a reason",
+    "openPrescription": "Open prescription"
   },
   "sign": {
     "title": "Sign the visit note",
@@ -265,9 +266,10 @@
     "confirm": "Sign and lock",
     "signing": "Signing…",
     "toast": "Note signed and locked",
-    "toastText": "Orders and the prescription are on their way",
+    "toastText": "Orders are on their way",
     "failed": "Couldn't sign the note",
-    "failedText": "Nothing was signed. Try again."
+    "failedText": "Nothing was signed. Try again.",
+    "toastTextRxDraft": "Orders are on their way · the prescription stays a draft until you send it"
   },
   "addDiagnosis": {
     "title": "Add a diagnosis",

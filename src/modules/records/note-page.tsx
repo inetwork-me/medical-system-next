@@ -39,12 +39,13 @@ import { NOTES_HREF, prescriptionHref, reportHref } from "./href"
 import { ReferralDialog, SickLeaveDialog, draftReportFrom } from "./doc-dialogs"
 import { patientOf } from "./lookup"
 import { AddDiagnosisDialog, AddendumDialog, SignNoteDialog } from "./note-dialogs"
-import { InitialsAvatar, Latin, OrderStatusBadge, PatientName, Strip, useB, useSoon } from "./parts"
+import { InitialsAvatar, Latin, OrderStatusBadge, PatientName, RxStatusBadge, Strip, useB, useSoon } from "./parts"
+import { sigOf } from "./rules"
 import { recCan } from "./roles"
 import { canAddendum, canEditNote, needsBreakGlass, noteStatus, removeDiagnosis, vitalTone, type VitalKey } from "./rules"
 import { RestrictedFileDialog } from "./access-dialogs"
 import { ME } from "./session"
-import { getNote, logAccessOnce, saveNote, useAddedProblems, useEncounter, useGrants, useNote, useRecRole } from "./store"
+import { getNote, logAccessOnce, saveNote, useAddedProblems, useEncounter, useGrants, useNote, usePrescriptions, useRecRole } from "./store"
 
 const FOLLOW_UPS: FollowUp[] = ["none", "w1", "w2", "w4", "w4r", "m3", "asNeeded"]
 const OUTCOMES: Outcome[] = ["home", "admitted", "referred", "er"]
@@ -349,6 +350,12 @@ function PlanCard({
   const b = useB()
   const locale = useLocale()
   const label = "text-xs font-medium text-foreground"
+  // The prescription is the doctor's own record of the medicines: once there is one for this visit it is what the
+  // plan shows (saved or sent whenever the doctor chooses, signed note or not); before that, the note's medicines.
+  const rx = usePrescriptions().find((r) => r.encounter === n.encounter)
+  const meds = rx
+    ? rx.lines.map((l) => ({ drug: l.drug, sig: sigOf(l, drugOf(l.drug)?.form ?? { en: "tablet", ar: "حبوب" }), isNew: l.isNew }))
+    : n.medicines
   return (
     <Card title={t("plan")} subtitle={t("planText")} labelledBy="rec-plan">
       <div className="flex flex-col gap-2">
@@ -364,10 +371,13 @@ function PlanCard({
         )}
       </div>
       <div className="flex flex-col gap-2">
-        <span className={label}>{t("medicines")}</span>
-        {n.medicines.length ? (
+        <span className={cn(label, "flex items-center gap-2")}>
+          {t("medicines")}
+          {rx && <RxStatusBadge status={rx.status} />}
+        </span>
+        {meds.length ? (
           <ul className="rounded-lg border">
-            {n.medicines.map((m) => {
+            {meds.map((m) => {
               const d = drugOf(m.drug)
               return (
                 <li key={m.drug} className="flex items-center gap-3 border-b px-3 py-2.5 last:border-b-0">
@@ -388,10 +398,10 @@ function PlanCard({
         ) : (
           <p className="text-sm text-muted-foreground">{t("noMedicines")}</p>
         )}
-        {editable && onPrescription && (
+        {onPrescription && (
           <Button variant="outline" onClick={onPrescription}>
             <Icon name="health" size={20} />
-            {t(n.medicines.length ? "editPrescription" : "addPrescription")}
+            {t(!rx ? (meds.length ? "editPrescription" : "addPrescription") : rx.status === "draft" ? "editPrescription" : "openPrescription")}
           </Button>
         )}
       </div>

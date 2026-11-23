@@ -62,6 +62,14 @@
       "claims": "المطالبات",
       "insurers": "شركات التأمين",
       "contracts": "العقود"
+    },
+    "records": {
+      "overview": "نظرة عامة",
+      "notes": "ملاحظات الزيارات",
+      "documents": "المستندات",
+      "requests": "الطلبات",
+      "completion": "اكتمال الملفات",
+      "access": "سجل الدخول"
     }
   },
   "header": {

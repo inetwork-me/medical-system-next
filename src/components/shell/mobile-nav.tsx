@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
-import { activeTab, enabledModules } from "@/lib/modules"
+import { activeTab, enabledModules, moduleHome } from "@/lib/modules"
 import { bi } from "@/lib/mock/bi"
 import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
 import { Icon } from "@/components/ds/icon"
@@ -88,7 +88,7 @@ export function BottomNav({ className }: { className?: string }) {
         {slots.map((m) => {
           const active = current?.id === m.id
           return (
-            <Link key={m.id} href={m.href} aria-current={active ? "page" : undefined} className={itemCls}>
+            <Link key={m.id} href={moduleHome(m)} aria-current={active ? "page" : undefined} className={itemCls}>
               <Indicator active={active} dot={!!NAV_BADGES[m.id]}>
                 <Icon name={m.icon} size={24} variant={active ? "bold" : "linear"} />
               </Indicator>
@@ -166,7 +166,7 @@ function MoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
               {tiles.map((m) => (
                 <Link
                   key={m.id}
-                  href={m.href}
+                  href={moduleHome(m)}
                   onClick={close}
                   className="flex flex-col items-center gap-2 rounded-xl bg-muted px-1 pt-3.5 pb-3 text-center outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 >

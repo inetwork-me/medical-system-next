@@ -62,6 +62,14 @@
       "claims": "Claims",
       "insurers": "Insurers",
       "contracts": "Contracts"
+    },
+    "records": {
+      "overview": "Overview",
+      "notes": "Visit notes",
+      "documents": "Documents",
+      "requests": "Requests",
+      "completion": "Chart completion",
+      "access": "Access log"
     }
   },
   "header": {

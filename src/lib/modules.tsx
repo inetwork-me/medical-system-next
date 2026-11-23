@@ -19,6 +19,13 @@ export function moduleTabs(m: ModuleDef): ModuleTab[] {
   return (m.tabs ?? []).filter((t) => !hidden.includes(`${m.id}.${t.key}`))
 }
 
+/** Where a module's nav item goes: its home tab, or the first tab left on when the home tab is off for the branch. */
+export function moduleHome(m: ModuleDef): string {
+  const tabs = moduleTabs(m)
+  if (!m.tabs?.length || tabs.some((t) => t.href === m.href)) return m.href
+  return tabs[0]?.href ?? m.href
+}
+
 /** Is a module tab or record tab ("patients.eyes") on for the active branch? Off with its module, too. */
 export function isTabEnabled(id: ModuleId, key: string) {
   return isModuleEnabled(id) && !branchConfig().hiddenTabs.includes(`${id}.${key}`)

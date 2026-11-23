@@ -115,7 +115,26 @@ export const MODULES: ModuleDef[] = [
       { key: "reports", href: "/clinics/reports", ownTitle: true },
     ],
   },
-  { id: "records", icon: "clipboard-text", href: "/records", group: "clinical", labelKey: "records", shortLabelKey: "recordsShort", mobile: "more", built: false },
+  // Medical records (design v6.0): opens Overview. Each tab can be hidden per branch ("records.access", …); hiding one
+  // removes its tab, its count and every link into it.
+  {
+    id: "records",
+    icon: "clipboard-text",
+    href: "/records",
+    group: "clinical",
+    labelKey: "records",
+    shortLabelKey: "recordsShort",
+    mobile: "more",
+    built: true,
+    tabs: [
+      { key: "overview", href: "/records" },
+      { key: "notes", href: "/records/notes", ownTitle: true },
+      { key: "documents", href: "/records/documents", ownTitle: true },
+      { key: "requests", href: "/records/requests", ownTitle: true },
+      { key: "completion", href: "/records/completion", ownTitle: true },
+      { key: "access", href: "/records/access", ownTitle: true },
+    ],
+  },
   // Lab (design v4.9): renamed from "Lab results"; opens the Worklist.
   {
     id: "lab",

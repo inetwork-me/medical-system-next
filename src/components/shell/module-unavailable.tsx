@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server"
 
 import { Link } from "@/i18n/navigation"
 import { moduleById, type ModuleId } from "@/config/modules"
+import { moduleHome } from "@/lib/modules"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/ds/states"
 import { PageContainer } from "@/components/shell/page"
@@ -24,7 +25,7 @@ export async function ModuleUnavailable({ id, tab }: { id: ModuleId; tab?: strin
           className="py-16"
           actions={
             <Button asChild variant="outline">
-              <Link href={tab ? m.href : "/dashboard"}>{tab ? t("unavailable.module", { module: t(`nav.${m.labelKey}` as "nav.lab") }) : t("unavailable.home")}</Link>
+              <Link href={tab ? moduleHome(m) : "/dashboard"}>{tab ? t("unavailable.module", { module: t(`nav.${m.labelKey}` as "nav.lab") }) : t("unavailable.home")}</Link>
             </Button>
           }
         />

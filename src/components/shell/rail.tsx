@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
 import { NAV_GROUPS, type ModuleDef } from "@/config/modules"
-import { activeTab, enabledModules, moduleTabs } from "@/lib/modules"
+import { activeTab, enabledModules, moduleHome, moduleTabs } from "@/lib/modules"
 import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -91,7 +91,7 @@ function RailModule({ m, active }: { m: ModuleDef; active: boolean }) {
   const [open, setOpen] = React.useState(false)
 
   if (tabs.length < 2) {
-    return <RailLink href={m.href} icon={m.icon} label={label(m)} active={active} dot={!!NAV_BADGES[m.id]} />
+    return <RailLink href={moduleHome(m)} icon={m.icon} label={label(m)} active={active} dot={!!NAV_BADGES[m.id]} />
   }
 
   const current = active ? activeTab(m, pathname) : undefined

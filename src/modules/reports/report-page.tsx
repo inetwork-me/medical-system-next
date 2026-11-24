@@ -351,7 +351,7 @@ export function ReportSide({ report: r, onSchedule, onShare }: { report: SavedRe
         text={when ? t("emailWhen", { when, time, format }) : t("notScheduled")}
         end={
           onSchedule && (
-            <Button variant="ghost" size="sm" onClick={onSchedule}>
+            <Button variant="outline" size="sm" onClick={onSchedule}>
               <Icon name={when ? "edit-2" : "add"} size={18} />
               {when ? t("edit") : t("scheduleShort")}
             </Button>
@@ -380,7 +380,7 @@ export function ReportSide({ report: r, onSchedule, onShare }: { report: SavedRe
         text={t("sharedText")}
         end={
           onShare && (
-            <Button variant="ghost" size="sm" onClick={onShare}>
+            <Button variant="outline" size="sm" onClick={onShare}>
               <Icon name="share" size={18} />
               {t("share")}
             </Button>

@@ -70,6 +70,16 @@
       "requests": "الطلبات",
       "completion": "اكتمال الملفات",
       "access": "سجل الدخول"
+    },
+    "reports": {
+      "overview": "نظرة عامة",
+      "operations": "التشغيل",
+      "finance": "المالية",
+      "clinical": "السريري",
+      "doctors": "الأطباء",
+      "library": "المكتبة",
+      "schedules": "الجدولة",
+      "returns": "الإقرارات الرسمية"
     }
   },
   "header": {

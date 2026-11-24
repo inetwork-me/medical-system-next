@@ -70,6 +70,16 @@
       "requests": "Requests",
       "completion": "Chart completion",
       "access": "Access log"
+    },
+    "reports": {
+      "overview": "Overview",
+      "operations": "Operations",
+      "finance": "Finance",
+      "clinical": "Clinical",
+      "doctors": "Doctors",
+      "library": "Library",
+      "schedules": "Schedules",
+      "returns": "Official returns"
     }
   },
   "header": {

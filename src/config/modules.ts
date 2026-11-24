@@ -171,7 +171,27 @@ export const MODULES: ModuleDef[] = [
       { key: "contracts", href: "/billing/contracts", ownTitle: true },
     ],
   },
-  { id: "reports", icon: "chart-2", href: "/reports", group: "admin", labelKey: "reports", mobile: "more", built: false },
+  // Reports (design v7.0): opens Overview. Each tab can be hidden per branch ("reports.returns", …); hiding one removes
+  // its tab, its count and every link into it.
+  {
+    id: "reports",
+    icon: "chart-2",
+    href: "/reports",
+    group: "admin",
+    labelKey: "reports",
+    mobile: "more",
+    built: true,
+    tabs: [
+      { key: "overview", href: "/reports" },
+      { key: "operations", href: "/reports/operations", ownTitle: true },
+      { key: "finance", href: "/reports/finance", ownTitle: true },
+      { key: "clinical", href: "/reports/clinical", ownTitle: true },
+      { key: "doctors", href: "/reports/doctors", ownTitle: true },
+      { key: "library", href: "/reports/library", ownTitle: true },
+      { key: "schedules", href: "/reports/schedules", ownTitle: true },
+      { key: "returns", href: "/reports/returns", ownTitle: true },
+    ],
+  },
   { id: "messages", icon: "message", href: "/messages", group: "admin", labelKey: "messages", mobile: "bottom", built: false },
 ]
 

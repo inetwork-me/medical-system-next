@@ -17,7 +17,7 @@ export const BRANCHES: Record<string, BranchConfig> = {
   // Example: a cash-only branch — Billing without insurance claims or insurer partners, contracts handled at HQ.
   "cash-branch": { hiddenModules: [], hiddenTabs: ["billing.claims", "billing.insurers", "billing.contracts"] },
   // Example: a satellite clinic whose records office and privacy review sit at HQ (only the clinical tabs stay).
-  "satellite-clinic": { hiddenModules: [], hiddenTabs: ["records.overview", "records.requests", "records.access"] },
+  "satellite-clinic": { hiddenModules: [], hiddenTabs: ["records.overview", "records.requests", "records.access", "reports.returns"] },
 }
 
 export const ACTIVE_BRANCH = process.env.NEXT_PUBLIC_BRANCH ?? "main"

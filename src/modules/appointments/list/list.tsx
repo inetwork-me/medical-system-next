@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
+import { useSearchParams } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 import { bi } from "@/lib/mock/bi"
@@ -36,7 +37,9 @@ export function AppointmentsList() {
   const t = useTranslations("appointments.list")
   const dates = useDates()
   const list = useAppointmentsOn()(TODAY)
-  const [chip, setChip] = React.useState<Chip>("all")
+  // `?status=noShow` opens the list on that chip (Reports drill-down: No-shows by clinic › Open).
+  const asked = useSearchParams().get("status") as Chip | null
+  const [chip, setChip] = React.useState<Chip>(asked && CHIPS.includes(asked) ? asked : "all")
   const [page, setPage] = React.useState(1)
   const [all, setAll] = React.useState(false)
   const [exporting, setExporting] = React.useState(false)

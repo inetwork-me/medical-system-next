@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { setLocaleFrom } from "@/i18n/set-locale"
 import { getTranslations } from "next-intl/server"
 
@@ -11,5 +12,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 /** Appointments · List: today's appointments (KPIs, status chips, table / compact rows, row actions). */
 export default async function AppointmentsListPage({ params }: { params: Promise<{ locale: string }> }) {
   await setLocaleFrom(params)
-  return <AppointmentsList />
+  return (
+    <Suspense>
+      <AppointmentsList />
+    </Suspense>
+  )
 }

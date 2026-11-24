@@ -65,6 +65,7 @@
     },
     "records": {
       "overview": "Overview",
+      "visits": "Visits",
       "notes": "Visit notes",
       "documents": "Documents",
       "requests": "Requests",

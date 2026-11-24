@@ -63,7 +63,7 @@ for (let i = 0; i < 31; i++) {
   const hour = 8 + ((i * 5) % 9)
   const at = `2026-11-${String(day).padStart(2, "0")}T${String(hour).padStart(2, "0")}:${i % 2 ? "30" : "10"}`
   const [kind, code, reason] = KINDS[i % KINDS.length]
-  const id = `V-2611-${1700 - i * 13}`
+  const id = `V-2611-${String(1700 - i * 13).padStart(5, "0")}`
   ARCHIVE_ENCOUNTERS.push({ id, patient: key, doctor: "khaled", clinic: CARDIO, kind, reason, at })
   const signedAt = `${at.slice(0, 11)}${String(Math.min(hour + 2, 20)).padStart(2, "0")}:05`
   ARCHIVE_NOTES.push({

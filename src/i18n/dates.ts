@@ -61,6 +61,8 @@ export function dateFormatter(locale: string) {
     monthLong: (d: Date | string) => fmt({ month: "long", year: "numeric" }).format(toDate(d)),
     /** Nov (chart axes) */
     month: (d: Date | string) => fmt({ month: "short" }).format(toDate(d)),
+    /** "November" / "نوفمبر". */
+    monthName: (d: Date | string) => fmt({ month: "long" }).format(toDate(d)),
   }
 }
 

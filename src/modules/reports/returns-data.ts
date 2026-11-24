@@ -25,8 +25,13 @@ export const AUTHORITY: Record<Authority, { name: Bi; portal: Bi; signer: RepRol
   ZATCA: { name: bi("ZATCA", "الزكاة"), portal: bi("ZATCA portal", "بوابة الزكاة"), signer: "finance" },
 }
 
-/** A rule's finding: fix it in the module list (`fix`) or explain it with a note that goes with the return. */
-export type Check = { id: string; text: Bi; fix?: { href: string; label: Bi; module: ModuleId }; explain?: boolean }
+/**
+ * A rule's finding: fix it in the module list (`fix`) or explain it with a note that goes with the return. A check
+ * with a visit-data `rule` (nationality · id · diagnosis) is counted live from Medical records › Visits for the
+ * return's period and branch (it leaves the list when nothing is missing), and its button opens Visits · missing data.
+ */
+export type VisitRule = "nationality" | "id" | "diagnosis"
+export type Check = { id: string; text: Bi; rule?: VisitRule; fix?: { href: string; label: Bi; module: ModuleId }; explain?: boolean }
 
 /** A line of "What goes in": the value, its change vs last month, and whether a check flagged it. */
 export type Section = { id: string; name: Bi; value: Bi; change?: string; vs?: Bi; warn?: boolean }
@@ -59,6 +64,9 @@ export type OfficialReturn = {
   vs?: Bi
   /** The period code the portal puts in the reference (MOH-2611-0442). */
   code: string
+  /** Visit-data checks: the month ("2026-11") and the branch the return covers. */
+  month?: string
+  branch?: string
   checks: Check[]
   sections: Section[]
   past: PastReturn[]
@@ -114,12 +122,15 @@ export const RETURNS: OfficialReturn[] = [
     preparedBy: "fahad",
     signer: "ghamdi",
     scope: bi("November 2026 · Riyadh main branch", "نوفمبر 2026 · فرع الرياض الرئيسي"),
+    month: "2026-11",
+    branch: "riyadh-main",
     vs: bi("Oct", "أكتوبر"),
     checks: [
       {
         id: "nationality",
+        rule: "nationality",
         text: bi("38 visits have no nationality", "38 زيارة ما فيها جنسية"),
-        fix: { href: "/patients", label: bi("Show visits", "اعرض الزيارات"), module: "patients" },
+        fix: { href: "/records/visits/missing", label: bi("Show visits", "اعرض الزيارات"), module: "records" },
         explain: true,
       },
       { id: "dental", text: bi("Dental procedures are 22% higher than October", "إجراءات الأسنان أعلى من أكتوبر بـ ⁦22%⁩"), explain: true },

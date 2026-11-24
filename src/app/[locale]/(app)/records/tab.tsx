@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server"
 import { isTabEnabled } from "@/lib/modules"
 import { ModuleUnavailable } from "@/components/shell/module-unavailable"
 
-export type RecordsTab = "overview" | "notes" | "documents" | "requests" | "completion" | "access"
+export type RecordsTab = "overview" | "visits" | "notes" | "documents" | "requests" | "completion" | "access"
 
 /** Page title: the module ("Medical records") for Overview, the tab's page title for the others. */
 export async function recordsTitle(tab: RecordsTab) {

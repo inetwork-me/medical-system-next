@@ -217,16 +217,16 @@ const enc = (id: string, patient: PatientKey, doctor: UserKey, kind: Bi, reason:
 const FOLLOW = bi("Follow-up", "متابعة")
 
 export const ENCOUNTERS: Encounter[] = [
-  enc("V-2611-2041", "dosari", "khaled", FOLLOW, bi("hypertension", "ضغط الدم"), "2026-11-23T09:40"),
-  enc("V-2611-2047", "otaibi", "khaled", bi("New patient", "مريض جديد"), bi("chest pain", "ألم بالصدر"), "2026-11-23T10:20"),
-  enc("V-2611-2036", "khaldi", "khaled", FOLLOW, bi("atrial fibrillation", "رجفان أذيني"), "2026-11-23T08:55"),
-  enc("V-2611-2033", "shehri", "khaled", FOLLOW, bi("coronary disease", "مرض الشريان التاجي"), "2026-11-23T08:30"),
-  enc("V-2611-1988", "qahtani", "khaled", bi("Echo review", "مراجعة إيكو"), bi("echo review", "مراجعة إيكو"), "2026-11-22T16:10"),
-  enc("V-2611-1962", "ahmed", "khaled", FOLLOW, bi("palpitations", "خفقان"), "2026-11-22T11:30"),
-  enc("V-2611-1890", "harbi", "sami", bi("Cardiac cath", "قسطرة قلبية"), bi("cardiac cath", "قسطرة قلبية"), "2026-11-20T09:00"),
-  enc("V-2611-1851", "amri", "zaki", FOLLOW, bi("follow-up", "متابعة"), "2026-11-19T10:30", bi("Pediatrics", "الأطفال")),
-  enc("V-2611-2001", "saud", "rayan", bi("ER visit", "زيارة طوارئ"), bi("chest pain", "ألم بالصدر"), "2026-11-23T02:05", bi("Emergency", "الطوارئ")),
-  enc("V-2611-1777", "mutairi", "hala", bi("Dermatology", "الجلدية"), bi("skin biopsy", "خزعة جلد"), "2026-11-17T12:00", bi("Dermatology", "الجلدية")),
+  enc("V-2611-08412", "dosari", "khaled", FOLLOW, bi("hypertension", "ضغط الدم"), "2026-11-23T09:40"),
+  enc("V-2611-08419", "otaibi", "khaled", bi("New patient", "مريض جديد"), bi("chest pain", "ألم بالصدر"), "2026-11-23T10:20"),
+  enc("V-2611-08405", "khaldi", "khaled", FOLLOW, bi("atrial fibrillation", "رجفان أذيني"), "2026-11-23T08:55"),
+  enc("V-2611-08397", "shehri", "khaled", FOLLOW, bi("coronary disease", "مرض الشريان التاجي"), "2026-11-23T08:30"),
+  enc("V-2611-08311", "qahtani", "khaled", bi("Echo review", "مراجعة إيكو"), bi("echo review", "مراجعة إيكو"), "2026-11-22T16:10"),
+  enc("V-2611-08256", "ahmed", "khaled", FOLLOW, bi("palpitations", "خفقان"), "2026-11-22T11:30"),
+  enc("V-2611-07802", "harbi", "sami", bi("Cardiac cath", "قسطرة قلبية"), bi("cardiac cath", "قسطرة قلبية"), "2026-11-20T09:00"),
+  enc("V-2611-07533", "amri", "zaki", FOLLOW, bi("follow-up", "متابعة"), "2026-11-19T10:30", bi("Pediatrics", "الأطفال")),
+  enc("V-2611-08364", "saud", "rayan", bi("ER visit", "زيارة طوارئ"), bi("chest pain", "ألم بالصدر"), "2026-11-23T02:05", bi("Emergency", "الطوارئ")),
+  enc("V-2611-07041", "mutairi", "hala", bi("Dermatology", "الجلدية"), bi("skin biopsy", "خزعة جلد"), "2026-11-17T12:00", bi("Dermatology", "الجلدية")),
 ]
 
 /* ------------------------------------------------------------------ ICD-10 */
@@ -328,7 +328,7 @@ const note = (id: string, encounter: string, createdAt: string, main: string, ex
 })
 
 export const NOTES: VisitNote[] = [
-  note("VN-2611-2041", "V-2611-2041", "2026-11-23T09:40", "I10", {
+  note("VN-2611-2041", "V-2611-08412", "2026-11-23T09:40", "I10", {
     subjective: bi(
       "Follow-up for high blood pressure. Home readings 140–150 over 90. Palpitations twice this month, a few minutes each, no chest pain or fainting. Takes ibuprofen for back pain.",
       "متابعة لارتفاع الضغط. قراءات البيت 140–150 على 90. جاه خفقان مرتين هالشهر، كل مرة دقايق، بدون ألم صدر أو إغماء. ياخذ آيبوبروفين لألم الظهر."
@@ -358,19 +358,19 @@ export const NOTES: VisitNote[] = [
       "قلّل الملح وامشِ 30 دقيقة يومياً. خذ الأسبرين قبل الآيبوبروفين بـ 30 دقيقة. قِس ضغطك في البيت وجيب القراءات معك."
     ),
   }),
-  note("VN-2611-2047", "V-2611-2047", "2026-11-23T10:20", "R07.4"),
-  note("VN-2611-2036", "V-2611-2036", "2026-11-23T08:55", "I48", { signedAt: "2026-11-23T09:10" }),
-  note("VN-2611-2033", "V-2611-2033", "2026-11-23T08:30", "I25.1", {
+  note("VN-2611-2047", "V-2611-08419", "2026-11-23T10:20", "R07.4"),
+  note("VN-2611-2036", "V-2611-08405", "2026-11-23T08:55", "I48", { signedAt: "2026-11-23T09:10" }),
+  note("VN-2611-2033", "V-2611-08397", "2026-11-23T08:30", "I25.1", {
     signedAt: "2026-11-23T08:48",
     addenda: [{ by: "khaled", at: "2026-11-23T10:05", why: "lateResult", text: bi("Troponin came back normal.", "التروبونين طلع طبيعي.") }],
   }),
-  note("VN-2611-1988", "V-2611-1988", "2026-11-22T16:10", "I34.0"),
-  note("VN-2611-1962", "V-2611-1962", "2026-11-22T11:30", "R00.2"),
+  note("VN-2611-1988", "V-2611-08311", "2026-11-22T16:10", "I34.0"),
+  note("VN-2611-1962", "V-2611-08256", "2026-11-22T11:30", "R00.2"),
   // Other clinics' notes ("All clinics"): signed, though their charts still miss a procedure note, a code or a review.
-  note("VN-2611-1890", "V-2611-1890", "2026-11-20T09:00", "I25.1", { author: "sami", signedAt: "2026-11-20T13:20" }),
-  { ...note("VN-2611-1851", "V-2611-1851", "2026-11-19T10:30", "", { author: "zaki", signedAt: "2026-11-19T12:05" }), diagnoses: [] },
-  note("VN-2611-1777", "V-2611-1777", "2026-11-17T12:00", "L98.9", { author: "hala", signedAt: "2026-11-17T14:40" }),
-  note("VN-2611-2001", "V-2611-2001", "2026-11-23T02:05", "R07.4", { author: "rayan", signedAt: "2026-11-23T03:10" }),
+  note("VN-2611-1890", "V-2611-07802", "2026-11-20T09:00", "I25.1", { author: "sami", signedAt: "2026-11-20T13:20" }),
+  { ...note("VN-2611-1851", "V-2611-07533", "2026-11-19T10:30", "", { author: "zaki", signedAt: "2026-11-19T12:05" }), diagnoses: [] },
+  note("VN-2611-1777", "V-2611-07041", "2026-11-17T12:00", "L98.9", { author: "hala", signedAt: "2026-11-17T14:40" }),
+  note("VN-2611-2001", "V-2611-08364", "2026-11-23T02:05", "R07.4", { author: "rayan", signedAt: "2026-11-23T03:10" }),
 ]
 
 /** Problem list, current medicines (incl. outside pharmacies) and past visits: the patient's record around the note. */
@@ -467,7 +467,7 @@ export type Prescription = {
 export const PRESCRIPTIONS: Prescription[] = [
   {
     no: "RX-2611-0388",
-    encounter: "V-2611-2041",
+    encounter: "V-2611-08412",
     patient: "dosari",
     doctor: "khaled",
     createdAt: "2026-11-23T10:02",
@@ -484,7 +484,7 @@ export const PRESCRIPTIONS: Prescription[] = [
   },
   {
     no: "RX-2611-0361",
-    encounter: "V-2611-1962",
+    encounter: "V-2611-08256",
     patient: "ahmed",
     doctor: "khaled",
     createdAt: "2026-11-22T11:52",
@@ -545,7 +545,7 @@ export const DOCUMENTS: RecDocument[] = [
     at: "2026-11-23T10:02",
     status: "draft",
     details: bi("3 medicines · SMS to the patient", "3 أدوية · برسالة للمريض"),
-    encounter: "V-2611-2041",
+    encounter: "V-2611-08412",
     doctor: "khaled",
   },
   {
@@ -555,7 +555,7 @@ export const DOCUMENTS: RecDocument[] = [
     at: "2026-11-23T09:15",
     status: "sent",
     details: bi("For his employer · 2 pages", "لجهة عمله · صفحتين"),
-    encounter: "V-2611-2036",
+    encounter: "V-2611-08405",
     doctor: "khaled",
     for: bi("His employer · SABIC HR", "جهة عمله · موارد سابك البشرية"),
     sections: [
@@ -595,7 +595,7 @@ export const DOCUMENTS: RecDocument[] = [
     at: "2026-11-23T08:50",
     status: "issued",
     details: bi("2 days · Seha ref. 4471902", "يومين · مرجع صحة 4471902"),
-    encounter: "V-2611-2033",
+    encounter: "V-2611-08397",
     doctor: "khaled",
     for: bi("Her employer", "جهة عملها"),
     seha: { ref: "4471902", from: "2026-11-23", days: 2, sector: "private", showDiagnosis: false },
@@ -614,7 +614,7 @@ export const DOCUMENTS: RecDocument[] = [
     at: "2026-11-22T17:05",
     status: "waiting",
     details: bi("Cardiac surgery · King Faisal Specialist", "جراحة القلب · التخصصي"),
-    encounter: "V-2611-1988",
+    encounter: "V-2611-08311",
     doctor: "khaled",
     for: bi("King Faisal Specialist · cardiac surgery", "التخصصي · جراحة القلب"),
     referral: { inside: false, to: bi("King Faisal Specialist · cardiac surgery", "التخصصي · جراحة القلب"), soon: "week", attach: true },
@@ -636,7 +636,7 @@ export const DOCUMENTS: RecDocument[] = [
     at: "2026-11-22T11:52",
     status: "sent",
     details: bi("1 medicine · picked up", "دواء واحد · استلمته"),
-    encounter: "V-2611-1962",
+    encounter: "V-2611-08256",
     doctor: "khaled",
   },
   {
@@ -646,7 +646,7 @@ export const DOCUMENTS: RecDocument[] = [
     at: "2026-11-20T15:30",
     status: "issued",
     details: bi("Day case · cardiac cath", "يوم واحد · قسطرة قلبية"),
-    encounter: "V-2611-1890",
+    encounter: "V-2611-07802",
     doctor: "sami",
     sections: [
       { key: "diagnosis", text: bi("I25.1 · Coronary disease.", "I25.1 · مرض الشريان التاجي.") },
@@ -908,12 +908,12 @@ export type CompletionItem = {
 }
 
 export const COMPLETION: CompletionItem[] = [
-  { id: "cc-1988", encounter: "V-2611-1988", missing: "unsigned", since: "2026-11-22T16:10", note: "VN-2611-1988" },
-  { id: "cc-1962", encounter: "V-2611-1962", missing: "unsigned", since: "2026-11-22T11:30", note: "VN-2611-1962" },
-  { id: "cc-1890", encounter: "V-2611-1890", missing: "procedureNote", since: "2026-11-20T09:00" },
-  { id: "cc-1851", encounter: "V-2611-1851", missing: "noCode", since: "2026-11-19T10:30", note: "VN-2611-1851" },
-  { id: "cc-1777", encounter: "V-2611-1777", missing: "resultNotReviewed", since: "2026-11-17T12:00", what: bi("Biopsy", "الخزعة") },
-  { id: "cc-2041", encounter: "V-2611-2041", missing: "unsigned", since: "2026-11-23T09:40", note: "VN-2611-2041" },
+  { id: "cc-1988", encounter: "V-2611-08311", missing: "unsigned", since: "2026-11-22T16:10", note: "VN-2611-1988" },
+  { id: "cc-1962", encounter: "V-2611-08256", missing: "unsigned", since: "2026-11-22T11:30", note: "VN-2611-1962" },
+  { id: "cc-1890", encounter: "V-2611-07802", missing: "procedureNote", since: "2026-11-20T09:00" },
+  { id: "cc-1851", encounter: "V-2611-07533", missing: "noCode", since: "2026-11-19T10:30", note: "VN-2611-1851" },
+  { id: "cc-1777", encounter: "V-2611-07041", missing: "resultNotReviewed", since: "2026-11-17T12:00", what: bi("Biopsy", "الخزعة") },
+  { id: "cc-2041", encounter: "V-2611-08412", missing: "unsigned", since: "2026-11-23T09:40", note: "VN-2611-2041" },
 ]
 
 /** Chart completion tiles: done this week and the on-time rate (the rest of the week). */

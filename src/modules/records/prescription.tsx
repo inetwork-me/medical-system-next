@@ -453,7 +453,7 @@ function MobileBar({ back }: { back: string }) {
 }
 
 /**
- * New prescription (`/records/notes/prescription?visit=V-2611-2041`): header Back · "Medical records / Visit notes"
+ * New prescription (`/records/notes/prescription?visit=V-2611-08412`): header Back · "Medical records / Visit notes"
  * over "New prescription · Fahad Al-Dosari"; Save draft · Send prescription. Banner; the checks (allergy +
  * interactions, stub); Medicines (cards, Add a medicine); Note to the pharmacist; side summary (first under 1120 px).
  * Send → checks again → pharmacy link (stub: SMS code) → prescription-sent; the visit note's medicines and advice

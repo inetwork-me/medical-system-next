@@ -65,6 +65,7 @@
     },
     "records": {
       "overview": "نظرة عامة",
+      "visits": "الزيارات",
       "notes": "ملاحظات الزيارات",
       "documents": "المستندات",
       "requests": "الطلبات",

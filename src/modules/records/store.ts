@@ -24,6 +24,7 @@ import {
 } from "./data"
 import { ARCHIVE_ACCESS, ARCHIVE_DOCUMENTS, ARCHIVE_ENCOUNTERS, ARCHIVE_NOTES, ARCHIVE_REQUESTS } from "./archive"
 import type { RecViewRole } from "./roles"
+import type { PatientIds } from "./visits-data"
 
 /**
  * Medical records session store: the design's records with this session's changes (notes signed, prescriptions
@@ -56,7 +57,14 @@ type State = {
   /** Problems added from Add diagnosis ("Add to his problem list"), per patient. */
   problems: Record<PatientKey, Problem[]>
   role: RecViewRole
+  /** Nationality / ID added to a patient's file (Add nationality): fills every visit of theirs. */
+  patientIds: Record<PatientKey, PatientIdsSaved>
+  /** Send list to reception: the patients and what's missing, for the reception team to complete. */
+  receptionTasks: ReceptionTask[]
 }
+
+export type PatientIdsSaved = PatientIds & { at: string; by: string; yakeen?: boolean }
+export type ReceptionTask = { id: string; at: string; by: string; rule: string; period: string; branch: string; patients: PatientKey[] }
 
 const KEY = "ms.records.session"
 const EMPTY: State = {
@@ -76,6 +84,8 @@ const EMPTY: State = {
   problems: {},
   grants: {},
   role: "lead",
+  patientIds: {},
+  receptionTasks: [],
 }
 let state: State = EMPTY
 let loaded = false
@@ -242,4 +252,20 @@ export const useRecRole = () => useSlice((s) => s.role)
 export function setRecRole(role: RecViewRole) {
   load()
   commit({ ...state, role })
+}
+
+/* ---------------------------------------------------------------- visits */
+
+const NO_IDS: Record<PatientKey, PatientIdsSaved> = {}
+const NO_TASKS: ReceptionTask[] = []
+/** Nationality / ID saved this session, per patient (patient fields: one save fills all their visits). */
+export const useSavedIds = () => useSlice((s) => s.patientIds ?? NO_IDS)
+export function savePatientIds(k: PatientKey, ids: PatientIdsSaved) {
+  load()
+  commit({ ...state, patientIds: { ...(state.patientIds ?? {}), [k]: { ...(state.patientIds?.[k] ?? {}), ...ids } } })
+}
+export const useReceptionTasks = () => useSlice((s) => s.receptionTasks ?? NO_TASKS)
+export function addReceptionTask(t: ReceptionTask) {
+  load()
+  commit({ ...state, receptionTasks: [t, ...(state.receptionTasks ?? [])] })
 }

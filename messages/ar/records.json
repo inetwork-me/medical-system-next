@@ -1032,5 +1032,363 @@
     },
     "cancel": "إلغاء",
     "create": "ابدأ الملاحظة"
+  },
+  "visits": {
+    "title": "الزيارات",
+    "subtitle": "كل زيارات المركز، من تسجيل الحضور لين الخروج",
+    "fixStrip": "{n, plural, one {زيارة وحدة هالشهر ما فيها جنسية} two {زيارتين هالشهر ما فيهم جنسية} few {⁦#⁩ زيارات هالشهر ما فيها جنسية} other {⁦#⁩ زيارة هالشهر ما فيها جنسية}}، والوزارة تحتاجها للإقرار الشهري.",
+    "fixNow": "صلّحها الحين",
+    "search": "دوّر مريض أو رقم ملف أو رقم زيارة…",
+    "clinic": "العيادة",
+    "allClinics": "كل العيادات",
+    "filter": {
+      "label": "اعرض",
+      "today": "اليوم · ⁦{n}⁩",
+      "here": "موجودين · ⁦{n}⁩",
+      "open": "ما سجّلوا خروج · ⁦{n}⁩",
+      "month": "هالشهر · ⁦{n, number, integer}⁩"
+    },
+    "filterShort": {
+      "today": "اليوم · ⁦{n}⁩",
+      "here": "موجودين · ⁦{n}⁩",
+      "open": "مفتوحة · ⁦{n}⁩"
+    },
+    "empty": "ما فيه زيارات تطابق",
+    "emptyText": "جرّب اسم أو رقم ملف أو رقم زيارة ثاني، أو امسح الفلاتر.",
+    "clear": "امسح الفلاتر",
+    "showing": {
+      "today": "يعرض ⁦{shown}⁩ من ⁦{total}⁩ اليوم",
+      "here": "يعرض ⁦{shown}⁩ من ⁦{total}⁩ موجودين",
+      "open": "يعرض ⁦{shown}⁩ من ⁦{total}⁩ ما سجّلوا خروج",
+      "month": "يعرض ⁦{shown}⁩ من ⁦{total, number, integer}⁩ هالشهر"
+    },
+    "showMore": "اعرض أكثر",
+    "showMoreN": "اعرض ⁦{n}⁩ زيادة",
+    "open": "افتح",
+    "openLabel": "افتح الزيارة ⁦{no}⁩ · {name}",
+    "cardLine": "{clinic} · {type} · ⁦{time}⁩",
+    "col": {
+      "visit": "الزيارة",
+      "checkedIn": "سجّل حضور",
+      "patient": "المريض",
+      "mrn": "رقم الملف",
+      "clinic": "العيادة",
+      "doctor": "الطبيب",
+      "clinicDoctor": "العيادة والطبيب",
+      "type": "النوع",
+      "payer": "الدفع",
+      "status": "الحالة",
+      "action": "الإجراء"
+    },
+    "status": {
+      "waiting": "ينتظر",
+      "withDoctor": "عند الطبيب",
+      "checkedOut": "طلع",
+      "notCheckedOut": "ما سجّل خروج"
+    },
+    "type": {
+      "followUp": "متابعة",
+      "new": "مريض جديد",
+      "urgent": "عاجلة",
+      "procedure": "إجراء",
+      "labOnly": "تحاليل بس"
+    },
+    "missing": {
+      "nationality": "ما فيه جنسية",
+      "id": "ما فيه رقم هوية",
+      "diagnosis": "ما فيه كود تشخيص"
+    },
+    "exportToast": "انصدّرت الزيارات",
+    "exportToastText": "التصدير ينسجل",
+    "exportFailed": "ما قدرنا نصدّر الزيارات",
+    "exportFailedText": "ما تحمّل شي. جرّب مرة ثانية.",
+    "id": {
+      "none": "ما انسجلت",
+      "passport": "جواز بس",
+      "endsIn": "{type} · تنتهي بـ ⁦{last}⁩",
+      "type": {
+        "national": "هوية وطنية",
+        "iqama": "إقامة",
+        "passport": "جواز",
+        "gcc": "هوية خليجية"
+      }
+    }
+  },
+  "visit": {
+    "mobileTitle": "الزيارة",
+    "title": "⁦{no}⁩ · {name}",
+    "back": "رجوع للزيارات",
+    "more": "إجراءات ثانية",
+    "backToList": "رجوع للزيارات",
+    "notFound": "ما لقينا هالزيارة",
+    "notFoundText": "يمكن تتبع فرع أو شهر ثاني.",
+    "noAccess": "هالزيارة مو في عيادتك",
+    "noAccessText": "الأطباء يشوفون زيارات عيادتهم بس.",
+    "restrictedTitle": "هالملف محمي",
+    "restrictedText": "أنت مو من الفريق المعالج لـ{name}. اكتب السبب عشان تفتحه: مسؤول الخصوصية يوصله تنبيه والدخول لمدة 4 ساعات.",
+    "restrictedOpen": "اكتب السبب",
+    "print": "اطبع الملخص",
+    "openNote": "افتح ملاحظة الزيارة",
+    "pdfToast": "تحمّل الملف",
+    "pdfToastText": "التحميل ينسجل",
+    "pdfFailed": "ما قدرنا نسوي الملف",
+    "pdfFailedText": "ما تحمّل شي. جرّب مرة ثانية.",
+    "went": {
+      "title": "مسار الزيارة",
+      "step": {
+        "booked": "انحجز",
+        "checkedIn": "سجّل حضور",
+        "vitals": "العلامات الحيوية",
+        "doctor": "عند الطبيب",
+        "checkedOut": "طلع",
+        "lab": "بالمختبر"
+      },
+      "bookedSub": "{date} · {via}",
+      "via": {
+        "app": "التطبيق",
+        "phone": "الجوال",
+        "reception": "الاستقبال"
+      },
+      "walkIn": "بدون موعد",
+      "checkedInSub": "⁦{time}⁩ · الاستقبال",
+      "vitalsSub": "⁦{time}⁩ · الممرضة {name}",
+      "notNeeded": "ما تحتاج",
+      "pending": "للحين",
+      "fromTo": "⁦{from}⁩ إلى ⁦{to}⁩",
+      "since": "من ⁦{time}⁩",
+      "checkedOutSub": "⁦{time}⁩ · دفع",
+      "checkedOutOnly": "⁦{time}⁩",
+      "notOut": "طلع بدون ما يسجّل خروج",
+      "waitedTotal": "انتظر ⁦{wait}⁩ دقيقة لين دخل على الطبيب · ⁦{total}⁩ دقيقة بالمجموع",
+      "waited": "انتظر ⁦{wait}⁩ دقيقة لين دخل على الطبيب",
+      "waiting": "صار له ⁦{wait}⁩ دقيقة ينتظر"
+    },
+    "details": {
+      "title": "تفاصيل الزيارة",
+      "no": "رقم الزيارة",
+      "date": "التاريخ",
+      "branch": "الفرع",
+      "clinic": "العيادة",
+      "clinicRoom": "{clinic} · غرفة ⁦{room}⁩",
+      "doctor": "الطبيب",
+      "type": "النوع",
+      "typeValue": "{type} · {how}",
+      "booked": "بموعد",
+      "walkIn": "بدون موعد",
+      "payer": "الدفع",
+      "payerClass": "{payer} · فئة {cls}",
+      "approval": "الموافقة",
+      "notNeeded": "ما تحتاج",
+      "dx": "التشخيص الرئيسي",
+      "dxMissing": "ما انكتب كود",
+      "dxLater": "بعد الطبيب"
+    },
+    "linked": {
+      "title": "وش صار في هالزيارة",
+      "subtitle": "كل شي مربوط بالزيارة {no}",
+      "none": "ما فيه شي مربوط بهالزيارة للحين.",
+      "note": "ملاحظة الزيارة",
+      "noteDraft": "مسودة · توقّع خلال 24 ساعة",
+      "noteOverdue": "ما انوقّعت من أكثر من 24 ساعة",
+      "noteSigned": "انوقّعت {date} الساعة ⁦{time}⁩",
+      "orders": "الطلبات · ⁦{n}⁩",
+      "orderDone": "{name} انسوّى",
+      "ordersInLab": "{n, plural, one {تحليل واحد} two {تحليلين} few {⁦#⁩ تحاليل} other {⁦#⁩ تحليل}} بالمختبر",
+      "orderBooked": "{name} {date}",
+      "inLab": "⁦{n}⁩ بالمختبر",
+      "allDone": "كلها خلصت",
+      "rx": "الوصفة",
+      "rxNotSent": "{n, plural, one {دواء واحد} two {دوائين} few {⁦#⁩ أدوية} other {⁦#⁩ دواء}} · ما انرسلت للحين",
+      "rxSent": "{n, plural, one {دواء واحد} two {دوائين} few {⁦#⁩ أدوية} other {⁦#⁩ دواء}} · انرسلت للصيدلية",
+      "invoice": "الفاتورة",
+      "invoiceInsured": "⁦{total}⁩ ر.س · {payer} تدفع ⁦{pct}%⁩",
+      "invoiceSelf": "⁦{total}⁩ ر.س · على حسابه",
+      "invoiceStatus": {
+        "paid": "مدفوعة",
+        "unpaid": "ما انتدفعت"
+      },
+      "claim": "المطالبة",
+      "claimSent": "انرسلت لـ{payer} عن طريق نفيس",
+      "claimStatus": {
+        "waiting": "بالانتظار",
+        "approved": "انقبلت",
+        "rejected": "انرفضت"
+      }
+    },
+    "returns": {
+      "title": "للإقرارات الرسمية",
+      "subtitle": "وش تحتاج الوزارة والمجلس من هالزيارة",
+      "nationality": "الجنسية",
+      "id": "الهوية",
+      "dx": "التشخيص الرئيسي",
+      "type": "نوع الزيارة",
+      "payer": "الدفع",
+      "missing": "ناقصة",
+      "later": "بعد الطبيب",
+      "payerClass": "{payer} · فئة {cls}",
+      "allFilled": "كله معبّى",
+      "missingN": "⁦{n}⁩ ناقص",
+      "addNationality": "أضف الجنسية",
+      "addId": "أضف رقم الهوية"
+    },
+    "activity": {
+      "title": "النشاط",
+      "booked": {
+        "app": "انحجز من التطبيق",
+        "phone": "انحجز بالجوال",
+        "reception": "انحجز من الاستقبال"
+      },
+      "checkedIn": {
+        "mm": "{name} سجّل حضوره",
+        "mf": "{name} سجّل حضورها",
+        "fm": "{name} سجّلت حضوره",
+        "ff": "{name} سجّلت حضورها"
+      },
+      "vitals": "الممرضة {name} أخذت العلامات الحيوية",
+      "opened": {
+        "m": "{name} فتح الملف",
+        "f": "{name} فتحت الملف"
+      },
+      "samples": "{name} سحب العينات",
+      "paid": "{name} استلم الدفع",
+      "out": "طلع",
+      "notOut": "ما سجّل خروج"
+    }
+  },
+  "addNationality": {
+    "title": "إضافة الجنسية",
+    "titleId": "إضافة رقم الهوية",
+    "cancel": "إلغاء",
+    "save": "احفظ",
+    "checking": "قاعد يتحقق عبر يقين…",
+    "patient": "المريض",
+    "visits": "الزيارات",
+    "visitsValue": "⁦{n}⁩ في {month} · {clinic}",
+    "visitsNone": "ما فيه زيارات في {month}",
+    "nationality": "الجنسية",
+    "nationalityPlaceholder": "اختر الجنسية",
+    "idType": "نوع الهوية",
+    "idTypePlaceholder": "اختر نوع الهوية",
+    "number": {
+      "national": "رقم الهوية الوطنية",
+      "iqama": "رقم الإقامة",
+      "passport": "رقم الجواز",
+      "gcc": "رقم الهوية الخليجية",
+      "any": "رقم الهوية"
+    },
+    "onFile": "موجود بالملف",
+    "yakeen": "تحقق منها عبر يقين لما أحفظ",
+    "yakeenPassport": "الجوازات ما تنتحقق عبر يقين",
+    "fills": {
+      "m": "{n, plural, one {تتعبى زيارته في {month}} two {تتعبى زيارتينه في {month}} =3 {تتعبى زياراته الثلاث في {month}} =4 {تتعبى زياراته الأربع في {month}} other {تتعبى زياراته الـ⁦#⁩ في {month}}}، وإقرار الوزارة يتحدث لحاله.",
+      "f": "{n, plural, one {تتعبى زيارتها في {month}} two {تتعبى زيارتينها في {month}} =3 {تتعبى زياراتها الثلاث في {month}} =4 {تتعبى زياراتها الأربع في {month}} other {تتعبى زياراتها الـ⁦#⁩ في {month}}}، وإقرار الوزارة يتحدث لحاله."
+    },
+    "fillsNone": "تنحفظ بملف المريض لزياراته الجاية.",
+    "fixStrip": "كمّل الناقص عشان تحفظ.",
+    "noMatchStrip": "يقين ما طابق رقم الهوية. تأكد منه، أو شيل علامة التحقق وتنحفظ مثل ما هي.",
+    "errors": {
+      "nationality": "اختر الجنسية",
+      "idType": "اختر نوع الهوية",
+      "idNumber": "اكتب رقم الهوية",
+      "nationalNotSaudi": "الهوية الوطنية للسعوديين: اختر إقامة أو نوع ثاني",
+      "iqamaSaudi": "السعودي له هوية وطنية مو إقامة",
+      "noMatch": "هالرقم في يقين لشخص ثاني، مو {name}",
+      "format": {
+        "national": "الهوية الوطنية ⁦10⁩ أرقام تبدأ بـ ⁦1⁩",
+        "iqama": "الإقامة ⁦10⁩ أرقام تبدأ بـ ⁦2⁩",
+        "gcc": "الهوية الخليجية من ⁦8⁩ لـ ⁦15⁩ رقم",
+        "passport": "رقم الجواز من ⁦6⁩ لـ ⁦9⁩ حروف أو أرقام"
+      }
+    },
+    "toast": "انحفظت الجنسية",
+    "toastText": "{n, plural, one {تعبّت زيارة وحدة} two {تعبّت زيارتين} few {تعبّت ⁦#⁩ زيارات} other {تعبّت ⁦#⁩ زيارة}} · باقي ⁦{left}⁩ لإقرار الوزارة",
+    "idToast": "انحفظ رقم الهوية",
+    "idToastText": "{n, plural, one {تعبّت زيارة وحدة} two {تعبّت زيارتين} few {تعبّت ⁦#⁩ زيارات} other {تعبّت ⁦#⁩ زيارة}} · باقي ⁦{left}⁩ بدون رقم هوية"
+  },
+  "missingView": {
+    "title": {
+      "nationality": "زيارات بدون جنسية",
+      "id": "زيارات بدون رقم هوية",
+      "diagnosis": "زيارات بدون كود تشخيص"
+    },
+    "short": {
+      "nationality": "بدون جنسية",
+      "id": "بدون رقم هوية",
+      "diagnosis": "بدون كود تشخيص"
+    },
+    "back": "رجوع للزيارات",
+    "more": "إجراءات ثانية",
+    "backToReturn": "ارجع للإقرار",
+    "allVisits": "كل الزيارات",
+    "send": "أرسل القائمة للاستقبال",
+    "sentToast": "انرسلت للاستقبال",
+    "sentToastText": "يكمّلونها بالزيارة الجاية أو بالجوال",
+    "noAccess": "الاستقبال وقسم الملفات يصلّحونها",
+    "noAccessText": "الجنسية والهوية يضيفها الاستقبال أو قسم الملفات.",
+    "subtitle": "{month} · {visits, plural, one {زيارة وحدة} two {زيارتين} few {⁦#⁩ زيارات} other {⁦#⁩ زيارة}} من {patients, plural, one {مريض واحد} two {مريضين} few {⁦#⁩ مرضى} other {⁦#⁩ مريض}}",
+    "info": {
+      "nationality": "الجنسية في ملف المريض. أضفها مرة وحدة وتتعبى كل زياراته، وإقرار الوزارة يتحدث لحاله.",
+      "id": "الهوية في ملف المريض. أضفها مرة وحدة وتتعبى كل زياراته، وإقرار الوزارة يتحدث لحاله.",
+      "diagnosis": "كود التشخيص الرئيسي يكتبه الطبيب في ملاحظة الزيارة. افتح الزيارة عشان تعرف مين يكتبه."
+    },
+    "tile": {
+      "missing": "زيارات ناقصة",
+      "fixed": "تصلّحت اليوم",
+      "due": "الإقرار مطلوب",
+      "nothing": "ولا وحدة للحين"
+    },
+    "patients": "{n, plural, one {مريض واحد} two {مريضين} few {⁦#⁩ مرضى} other {⁦#⁩ مريض}}",
+    "inDays": "{n, plural, =0 {اليوم} one {بكرة} two {بعد يومين} few {بعد ⁦#⁩ أيام} other {بعد ⁦#⁩ يوم}}",
+    "missingLine": "⁦{visits}⁩ · {patients, plural, one {مريض واحد} two {مريضين} few {⁦#⁩ مرضى} other {⁦#⁩ مريض}}",
+    "dueLine": "{date} · {n, plural, =0 {اليوم} one {بكرة} two {بعد يومين} few {بعد ⁦#⁩ أيام} other {بعد ⁦#⁩ يوم}}",
+    "search": "دوّر مريض أو رقم ملف…",
+    "filter": {
+      "label": "الناقص",
+      "nationality": "بدون جنسية · ⁦{n}⁩",
+      "id": "بدون رقم هوية · ⁦{n}⁩",
+      "diagnosis": "بدون كود تشخيص · ⁦{n}⁩"
+    },
+    "filterShort": {
+      "nationality": "الجنسية · ⁦{n}⁩",
+      "id": "الهوية · ⁦{n}⁩",
+      "diagnosis": "الكود · ⁦{n}⁩"
+    },
+    "noResults": "ما فيه مرضى يطابقون",
+    "noResultsText": "جرّب اسم أو رقم ملف ثاني.",
+    "clear": "امسح البحث",
+    "allDone": {
+      "nationality": "كل الزيارات فيها جنسية",
+      "id": "كل الزيارات فيها رقم هوية",
+      "diagnosis": "كل الزيارات فيها كود تشخيص"
+    },
+    "allDoneText": "ما فيه شي ناقص لهالإقرار.",
+    "showing": "يعرض ⁦{shown}⁩ من ⁦{total}⁩ مريض",
+    "showMore": "اعرض أكثر",
+    "showMoreN": "اعرض ⁦{n}⁩ زيادة",
+    "onDay": "⁦{n}⁩ · يوم {date}",
+    "lastDay": "⁦{n}⁩ · آخرها {date}",
+    "openVisit": "افتح الزيارة",
+    "openVisitLabel": "افتح زيارة {name}",
+    "add": "أضف",
+    "addAction": {
+      "nationality": "أضف الجنسية",
+      "id": "أضف رقم الهوية"
+    },
+    "addLabel": {
+      "nationality": "أضف الجنسية لـ{name}",
+      "id": "أضف رقم الهوية لـ{name}"
+    },
+    "col": {
+      "patient": "المريض",
+      "visits": "زيارات {month}",
+      "clinic": "العيادة",
+      "idOnFile": "الهوية بالملف",
+      "nationality": "الجنسية",
+      "id": "رقم الهوية",
+      "diagnosis": "كود التشخيص",
+      "action": "الإجراء"
+    },
+    "missing": "ناقصة",
+    "cardLine": "{n, plural, one {زيارة وحدة} =2 {⁦2⁩ زيارات} few {⁦#⁩ زيارات} other {⁦#⁩ زيارة}} · {clinic} · {id}"
   }
 }

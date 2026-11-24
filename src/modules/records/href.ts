@@ -4,6 +4,7 @@
  * off for the branch the page and every link into it are off too.
  */
 export const RECORDS_HREF = "/records"
+export const VISITS_HREF = "/records/visits"
 export const NOTES_HREF = "/records/notes"
 export const DOCUMENTS_HREF = "/records/documents"
 export const REQUESTS_HREF = "/records/requests"
@@ -15,6 +16,13 @@ const q = (base: string, params: Record<string, string | undefined>) => {
   return s ? `${base}?${s}` : base
 }
 
+/** Visit (inner page of Visits). */
+export const visitHref = (id: string) => q("/records/visits/visit", { id })
+/** Visits with missing data for an official return (inner page of Visits): the rule, the period, the branch and the return to go back to. */
+export const missingHref = (rule: string, period: string, extra?: { branch?: string; from?: string }) =>
+  q("/records/visits/missing", { rule, period, branch: extra?.branch, from: extra?.from })
+/** Visits tab with a filter ("today", "here", "open", "month"). */
+export const visitsHref = (filter?: string) => q(VISITS_HREF, { filter })
 /** Visit note (inner page of Visit notes). */
 export const noteHref = (id: string) => q("/records/notes/note", { id })
 /** New prescription for a visit (inner page of Visit notes › Visit note); `no` reopens a draft. */

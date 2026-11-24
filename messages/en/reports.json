@@ -633,7 +633,13 @@
       "explained": "Explained: {note}",
       "noteError": "Write the note first",
       "noteToast": "Note added",
-      "noteToastText": "It goes with the return as a comment"
+      "noteToastText": "It goes with the return as a comment",
+      "rule": {
+        "nationality": "{n, plural, one {# visit has} other {# visits have}} no nationality",
+        "id": "{n, plural, one {# visit has} other {# visits have}} no ID number",
+        "diagnosis": "{n, plural, one {# visit has} other {# visits have}} no diagnosis code",
+        "detail": "{n, plural, =0 {No warnings} one {# warning} other {# warnings}}"
+      }
     },
     "goes": {
       "title": "What goes in",

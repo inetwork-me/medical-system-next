@@ -1032,5 +1032,363 @@
     },
     "cancel": "Cancel",
     "create": "Start the note"
+  },
+  "visits": {
+    "title": "Visits",
+    "subtitle": "Every visit at the center, from check-in to check-out",
+    "fixStrip": "{n, plural, one {# visit this month has} other {# visits this month have}} no nationality. MOH needs it for the monthly return.",
+    "fixNow": "Fix now",
+    "search": "Search patient, MRN or visit no.…",
+    "clinic": "Clinic",
+    "allClinics": "All clinics",
+    "filter": {
+      "label": "Show",
+      "today": "Today · {n}",
+      "here": "Still here · {n}",
+      "open": "Not checked out · {n}",
+      "month": "This month · {n, number, integer}"
+    },
+    "filterShort": {
+      "today": "Today · {n}",
+      "here": "Here · {n}",
+      "open": "Open · {n}"
+    },
+    "empty": "No visits match",
+    "emptyText": "Try another name, MRN or visit number, or clear the filters.",
+    "clear": "Clear filters",
+    "showing": {
+      "today": "Showing {shown} of {total} today",
+      "here": "Showing {shown} of {total} still here",
+      "open": "Showing {shown} of {total} not checked out",
+      "month": "Showing {shown} of {total, number, integer} this month"
+    },
+    "showMore": "Show more",
+    "showMoreN": "Show {n} more",
+    "open": "Open",
+    "openLabel": "Open visit {no} · {name}",
+    "cardLine": "{time} · {clinic} · {type}",
+    "col": {
+      "visit": "Visit",
+      "checkedIn": "Checked in",
+      "patient": "Patient",
+      "mrn": "MRN",
+      "clinic": "Clinic",
+      "doctor": "Doctor",
+      "clinicDoctor": "Clinic and doctor",
+      "type": "Type",
+      "payer": "Payer",
+      "status": "Status",
+      "action": "Action"
+    },
+    "status": {
+      "waiting": "Waiting",
+      "withDoctor": "With doctor",
+      "checkedOut": "Checked out",
+      "notCheckedOut": "Not checked out"
+    },
+    "type": {
+      "followUp": "Follow-up",
+      "new": "New patient",
+      "urgent": "Urgent",
+      "procedure": "Procedure",
+      "labOnly": "Lab only"
+    },
+    "missing": {
+      "nationality": "No nationality",
+      "id": "No ID number",
+      "diagnosis": "No diagnosis code"
+    },
+    "exportToast": "Visits exported",
+    "exportToastText": "The export is logged",
+    "exportFailed": "Couldn't export the visits",
+    "exportFailedText": "Nothing was downloaded. Try again.",
+    "id": {
+      "none": "Not recorded",
+      "passport": "Passport only",
+      "endsIn": "{type} · ends in {last}",
+      "type": {
+        "national": "National ID",
+        "iqama": "Iqama",
+        "passport": "Passport",
+        "gcc": "GCC ID"
+      }
+    }
+  },
+  "visit": {
+    "mobileTitle": "Visit",
+    "title": "{no} · {name}",
+    "back": "Back to visits",
+    "more": "More actions",
+    "backToList": "Back to visits",
+    "notFound": "We couldn't find this visit",
+    "notFoundText": "It may belong to another branch or month.",
+    "noAccess": "This visit isn't in your clinic",
+    "noAccessText": "Doctors see the visits of their own clinic.",
+    "restrictedTitle": "This file is restricted",
+    "restrictedText": "You're not in {name}'s care team. Give a reason to open it: the privacy officer is told and access lasts 4 hours.",
+    "restrictedOpen": "Give a reason",
+    "print": "Print summary",
+    "openNote": "Open visit note",
+    "pdfToast": "PDF downloaded",
+    "pdfToastText": "The download is logged",
+    "pdfFailed": "Couldn't make the PDF",
+    "pdfFailedText": "Nothing was downloaded. Try again.",
+    "went": {
+      "title": "How the visit went",
+      "step": {
+        "booked": "Booked",
+        "checkedIn": "Checked in",
+        "vitals": "Vitals",
+        "doctor": "With doctor",
+        "checkedOut": "Checked out",
+        "lab": "At the lab"
+      },
+      "bookedSub": "{date} · {via}",
+      "via": {
+        "app": "app",
+        "phone": "phone",
+        "reception": "reception"
+      },
+      "walkIn": "Walk-in",
+      "checkedInSub": "{time} · reception",
+      "vitalsSub": "{time} · nurse {name}",
+      "notNeeded": "Not needed",
+      "pending": "Not yet",
+      "fromTo": "{from} to {to}",
+      "since": "Since {time}",
+      "checkedOutSub": "{time} · paid",
+      "checkedOutOnly": "{time}",
+      "notOut": "Left without checking out",
+      "waitedTotal": "Waited {wait} minutes to see the doctor · {total} minutes in total",
+      "waited": "Waited {wait} minutes to see the doctor",
+      "waiting": "Waiting {wait} minutes so far"
+    },
+    "details": {
+      "title": "Visit details",
+      "no": "Visit no.",
+      "date": "Date",
+      "branch": "Branch",
+      "clinic": "Clinic",
+      "clinicRoom": "{clinic} · room {room}",
+      "doctor": "Doctor",
+      "type": "Type",
+      "typeValue": "{type} · {how}",
+      "booked": "booked",
+      "walkIn": "walk-in",
+      "payer": "Payer",
+      "payerClass": "{payer} · class {cls}",
+      "approval": "Approval",
+      "notNeeded": "Not needed",
+      "dx": "Main diagnosis",
+      "dxMissing": "Not coded",
+      "dxLater": "After the doctor"
+    },
+    "linked": {
+      "title": "What happened in this visit",
+      "subtitle": "Everything linked to {no}",
+      "none": "Nothing is linked to this visit yet.",
+      "note": "Visit note",
+      "noteDraft": "Draft · sign within 24 hours",
+      "noteOverdue": "Not signed for over 24 hours",
+      "noteSigned": "Signed {date} at {time}",
+      "orders": "Orders · {n}",
+      "orderDone": "{name} done",
+      "ordersInLab": "{n, plural, one {# lab test} other {# lab tests}} in the lab",
+      "orderBooked": "{name} on {date}",
+      "inLab": "{n} in lab",
+      "allDone": "All done",
+      "rx": "Prescription",
+      "rxNotSent": "{n, plural, one {# medicine} other {# medicines}} · not sent yet",
+      "rxSent": "{n, plural, one {# medicine} other {# medicines}} · sent to the pharmacy",
+      "invoice": "Invoice",
+      "invoiceInsured": "SAR {total} · {payer} pays {pct}%",
+      "invoiceSelf": "SAR {total} · self-pay",
+      "invoiceStatus": {
+        "paid": "Paid",
+        "unpaid": "Unpaid"
+      },
+      "claim": "Claim",
+      "claimSent": "Sent to {payer} through NPHIES",
+      "claimStatus": {
+        "waiting": "Waiting",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      }
+    },
+    "returns": {
+      "title": "For official returns",
+      "subtitle": "What MOH and CCHI need from this visit",
+      "nationality": "Nationality",
+      "id": "ID",
+      "dx": "Main diagnosis",
+      "type": "Visit type",
+      "payer": "Payer",
+      "missing": "Missing",
+      "later": "After the doctor",
+      "payerClass": "{payer} · class {cls}",
+      "allFilled": "All filled",
+      "missingN": "{n} missing",
+      "addNationality": "Add nationality",
+      "addId": "Add ID number"
+    },
+    "activity": {
+      "title": "Activity",
+      "booked": {
+        "app": "Booked in the app",
+        "phone": "Booked by phone",
+        "reception": "Booked at reception"
+      },
+      "checkedIn": {
+        "mm": "{name} checked him in",
+        "mf": "{name} checked her in",
+        "fm": "{name} checked him in",
+        "ff": "{name} checked her in"
+      },
+      "vitals": "Nurse {name} took vitals",
+      "opened": {
+        "m": "{name} opened the file",
+        "f": "{name} opened the file"
+      },
+      "samples": "{name} took the samples",
+      "paid": "{name} took the payment",
+      "out": "Checked out",
+      "notOut": "Not checked out"
+    }
+  },
+  "addNationality": {
+    "title": "Add nationality",
+    "titleId": "Add ID number",
+    "cancel": "Cancel",
+    "save": "Save",
+    "checking": "Checking with Yakeen…",
+    "patient": "Patient",
+    "visits": "Visits",
+    "visitsValue": "{n} in {month} · {clinic}",
+    "visitsNone": "None in {month}",
+    "nationality": "Nationality",
+    "nationalityPlaceholder": "Pick a nationality",
+    "idType": "ID type",
+    "idTypePlaceholder": "Pick an ID type",
+    "number": {
+      "national": "National ID number",
+      "iqama": "Iqama number",
+      "passport": "Passport number",
+      "gcc": "GCC ID number",
+      "any": "ID number"
+    },
+    "onFile": "Already on file",
+    "yakeen": "Check it with Yakeen when I save",
+    "yakeenPassport": "Passports aren't checked with Yakeen",
+    "fills": {
+      "m": "This fills his {n, plural, one {# {month} visit} other {# {month} visits}}. The MOH return updates on its own.",
+      "f": "This fills her {n, plural, one {# {month} visit} other {# {month} visits}}. The MOH return updates on its own."
+    },
+    "fillsNone": "It's saved on the patient's file for their next visits.",
+    "fixStrip": "Fill in what's missing to save.",
+    "noMatchStrip": "Yakeen couldn't match the ID number. Check it, or untick the check to save it as it is.",
+    "errors": {
+      "nationality": "Pick the nationality",
+      "idType": "Pick the ID type",
+      "idNumber": "Enter the ID number",
+      "nationalNotSaudi": "A National ID is for Saudis: pick Iqama or another type",
+      "iqamaSaudi": "Saudis have a National ID, not an Iqama",
+      "noMatch": "Yakeen has a different person for this number, not {name}",
+      "format": {
+        "national": "A National ID is 10 digits starting with 1",
+        "iqama": "An Iqama is 10 digits starting with 2",
+        "gcc": "A GCC ID is 8 to 15 digits",
+        "passport": "A passport number is 6 to 9 letters or digits"
+      }
+    },
+    "toast": "Nationality saved",
+    "toastText": "{n, plural, one {# visit} other {# visits}} filled · {left} left for the MOH return",
+    "idToast": "ID number saved",
+    "idToastText": "{n, plural, one {# visit} other {# visits}} filled · {left} left without an ID number"
+  },
+  "missingView": {
+    "title": {
+      "nationality": "Visits without nationality",
+      "id": "Visits without an ID number",
+      "diagnosis": "Visits without a diagnosis code"
+    },
+    "short": {
+      "nationality": "No nationality",
+      "id": "No ID number",
+      "diagnosis": "No diagnosis code"
+    },
+    "back": "Back to visits",
+    "more": "More actions",
+    "backToReturn": "Back to the return",
+    "allVisits": "All visits",
+    "send": "Send list to reception",
+    "sentToast": "Sent to reception",
+    "sentToastText": "They complete it at the next visit or by phone",
+    "noAccess": "Reception and the records office fix these",
+    "noAccessText": "Nationality and ID are added by reception or the records office.",
+    "subtitle": "{month} · {visits, plural, one {# visit} other {# visits}} from {patients, plural, one {# patient} other {# patients}}",
+    "info": {
+      "nationality": "Nationality is on the patient's file. Add it once and all their visits are filled. The MOH return updates on its own.",
+      "id": "The ID is on the patient's file. Add it once and all their visits are filled. The MOH return updates on its own.",
+      "diagnosis": "The main diagnosis is coded by the doctor in the visit note. Open the visit to see who should code it."
+    },
+    "tile": {
+      "missing": "Visits missing it",
+      "fixed": "Fixed today",
+      "due": "Return due",
+      "nothing": "Nothing yet"
+    },
+    "patients": "{n, plural, one {# patient} other {# patients}}",
+    "inDays": "{n, plural, =0 {Today} one {Tomorrow} other {In # days}}",
+    "missingLine": "{visits} · {patients, plural, one {# patient} other {# patients}}",
+    "dueLine": "{date} · {n, plural, =0 {today} one {tomorrow} other {in # days}}",
+    "search": "Search patient or MRN…",
+    "filter": {
+      "label": "Missing",
+      "nationality": "No nationality · {n}",
+      "id": "No ID number · {n}",
+      "diagnosis": "No diagnosis code · {n}"
+    },
+    "filterShort": {
+      "nationality": "Nationality · {n}",
+      "id": "ID · {n}",
+      "diagnosis": "Code · {n}"
+    },
+    "noResults": "No patients match",
+    "noResultsText": "Try another name or MRN.",
+    "clear": "Clear search",
+    "allDone": {
+      "nationality": "Every visit has a nationality",
+      "id": "Every visit has an ID number",
+      "diagnosis": "Every visit has a diagnosis code"
+    },
+    "allDoneText": "Nothing is missing for this return.",
+    "showing": "Showing {shown} of {total} patients",
+    "showMore": "Show more",
+    "showMoreN": "Show {n} more",
+    "onDay": "{n} · on {date}",
+    "lastDay": "{n} · last {date}",
+    "openVisit": "Open visit",
+    "openVisitLabel": "Open the visit of {name}",
+    "add": "Add",
+    "addAction": {
+      "nationality": "Add nationality",
+      "id": "Add ID number"
+    },
+    "addLabel": {
+      "nationality": "Add nationality for {name}",
+      "id": "Add ID number for {name}"
+    },
+    "col": {
+      "patient": "Patient",
+      "visits": "Visits in {month}",
+      "clinic": "Clinic",
+      "idOnFile": "ID on file",
+      "nationality": "Nationality",
+      "id": "ID number",
+      "diagnosis": "Diagnosis code",
+      "action": "Action"
+    },
+    "missing": "Missing",
+    "cardLine": "{n, plural, one {# visit} other {# visits}} · {clinic} · {id}"
   }
 }

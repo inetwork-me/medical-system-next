@@ -128,6 +128,7 @@ export const MODULES: ModuleDef[] = [
     built: true,
     tabs: [
       { key: "overview", href: "/records" },
+      { key: "visits", href: "/records/visits", ownTitle: true },
       { key: "notes", href: "/records/notes", ownTitle: true },
       { key: "documents", href: "/records/documents", ownTitle: true },
       { key: "requests", href: "/records/requests", ownTitle: true },

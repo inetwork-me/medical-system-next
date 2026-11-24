@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: (await getTranslations("records.rx"))("mobileTitle") }
 }
 
-/** Medical records · New prescription (inner page of Visit notes › Visit note): `/records/notes/prescription?visit=V-2611-2041`. */
+/** Medical records · New prescription (inner page of Visit notes › Visit note): `/records/notes/prescription?visit=V-2611-08412`. */
 export default async function RecordsPrescriptionPage({ params }: { params: Promise<{ locale: string }> }) {
   await setLocaleFrom(params)
   return (

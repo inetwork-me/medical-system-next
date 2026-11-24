@@ -563,18 +563,18 @@ function DocStories() {
           ))}
         </div>
       </Box>
-      {dlg === "sl" && <SickLeaveDialog encounter="V-2611-2041" onOpenChange={close} />}
-      {dlg === "slErrors" && <SickLeaveDialog encounter="V-2611-2041" onOpenChange={close} initial={{ days: "0", tried: true }} />}
-      {dlg === "slNoWork" && <SickLeaveDialog encounter="V-2611-2041" onOpenChange={close} initial={{ sector: "none", diagnosis: true }} />}
+      {dlg === "sl" && <SickLeaveDialog encounter="V-2611-08412" onOpenChange={close} />}
+      {dlg === "slErrors" && <SickLeaveDialog encounter="V-2611-08412" onOpenChange={close} initial={{ days: "0", tried: true }} />}
+      {dlg === "slNoWork" && <SickLeaveDialog encounter="V-2611-08412" onOpenChange={close} initial={{ sector: "none", diagnosis: true }} />}
       {dlg === "ref" && (
         <ReferralDialog
-          encounter="V-2611-2041"
+          encounter="V-2611-08412"
           onOpenChange={close}
           initial={{ clinic: "echo", doctor: "sami", reason: "Palpitations with high blood pressure. Please check heart structure and pump function." }}
         />
       )}
-      {dlg === "refErrors" && <ReferralDialog encounter="V-2611-2041" onOpenChange={close} initial={{ tried: true }} />}
-      {dlg === "refOutside" && <ReferralDialog encounter="V-2611-2041" onOpenChange={close} initial={{ inside: false, hospital: "kfsh", soon: "week" }} />}
+      {dlg === "refErrors" && <ReferralDialog encounter="V-2611-08412" onOpenChange={close} initial={{ tried: true }} />}
+      {dlg === "refOutside" && <ReferralDialog encounter="V-2611-08412" onOpenChange={close} initial={{ inside: false, hospital: "kfsh", soon: "week" }} />}
     </>
   )
 }

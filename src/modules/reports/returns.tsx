@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
 import { useDates } from "@/i18n/dates"
-import { isModuleEnabled } from "@/lib/modules"
+import { isModuleEnabled, isTabEnabled } from "@/lib/modules"
 import { pdfDocument, type PdfBlock } from "@/lib/export/pdf"
 import { saveBlob } from "@/lib/export/files"
 import { ActionMenu } from "@/components/ds/action-menu"
@@ -25,7 +25,11 @@ import { PEOPLE, REP_NOW, REP_TODAY, addDays, daysBetween } from "./data"
 import { RETURNS_HREF, returnHref } from "./href"
 import { ltrRun, useB } from "./parts"
 import { Kv, SideCard } from "./report-page"
-import { AUTHORITY, FACILITY_CODE, RETURNS, type OfficialReturn, type ReturnStatus } from "./returns-data"
+import { AUTHORITY, FACILITY_CODE, RETURNS, type Check, type OfficialReturn, type ReturnStatus } from "./returns-data"
+import { missingHref } from "@/modules/records/href"
+import { inPeriod, missingCounts } from "@/modules/records/visit-rules"
+import { useVisitCtx } from "@/modules/records/visits"
+import { allVisits } from "@/modules/records/visits-data"
 import type { RepRole } from "./roles"
 import { addReturnNote, logReport, useRepRole, useReturnNotes, useSubmitted } from "./store"
 import { Strip } from "./strip"
@@ -34,12 +38,41 @@ import { SubmitReturnDialog } from "./submit-dialog"
 /* ------------------------------------------------------------------ state */
 
 /** A return as this session sees it: submitted here → submitted, with the portal's reference. */
-export type ReturnView = OfficialReturn & { state: ReturnStatus }
+export type ReturnView = OfficialReturn & { state: ReturnStatus; checks: (Check & { count?: number })[]; warnings?: number }
 
+/**
+ * Visit-data checks count live from Medical records › Visits (period + branch of the return): adding a nationality
+ * there updates the check, the warnings and the status without a reload; a check with nothing left drops out.
+ */
 export function useReturns(): ReturnView[] {
   const submitted = useSubmitted()
-  return React.useMemo(() => RETURNS.map((r) => (submitted[r.id] ? { ...r, state: "submitted" as const, submitted: submitted[r.id] } : { ...r, state: r.status })), [submitted])
+  const ctx = useVisitCtx()
+  return React.useMemo(
+    () =>
+      RETURNS.map((r) => {
+        const live = r.checks.some((c) => c.rule) && r.month && !submitted[r.id]
+        const counts = live ? missingCounts(allVisits().filter((v) => inPeriod(v, r.month!, r.branch)), ctx) : null
+        const checks = counts ? r.checks.flatMap((c) => (c.rule ? (counts[c.rule].visits ? [{ ...c, count: counts[c.rule].visits }] : []) : [c])) : r.checks
+        const warnings = counts ? checks.length : undefined
+        return submitted[r.id] ? { ...r, checks, state: "submitted" as const, submitted: submitted[r.id] } : { ...r, checks, warnings, state: r.status }
+      }),
+    [submitted, ctx]
+  )
 }
+
+/** A check's line: live visit-data checks say how many visits are left ("37 visits have no nationality"). */
+export function useCheckText() {
+  const t = useTranslations("reports.ret.checks.rule")
+  const b = useB()
+  return (c: ReturnView["checks"][number]) => (c.rule && c.count !== undefined ? t(c.rule, { n: c.count }) : b(c.text))
+}
+
+/** Where a check's button goes: visit-data rules open Visits · missing data for the return's period and branch. */
+export function checkHref(r: ReturnView, c: Check) {
+  if (c.rule && r.month) return missingHref(c.rule, r.month, { branch: r.branch, from: r.id })
+  return c.fix?.href ?? ""
+}
+const checkFixOn = (c: Check) => !!c.fix && isModuleEnabled(c.fix.module) && (!c.rule || isTabEnabled("records", "visits"))
 /** The tab count: returns that need someone (ready to submit, or a draft with warnings). */
 export const useOpenReturns = () => useReturns().filter((r) => r.state === "ready" || r.state === "draft").length
 
@@ -63,11 +96,13 @@ function useDueText() {
 function useStatusText() {
   const t = useTranslations("reports.returns")
   const b = useB()
+  const tw = useTranslations("reports.ret.checks.rule")
   const dates = useDates()
   return (r: ReturnView): { text: string; tone: StatusTone } => {
     if (r.state === "submitted") return { text: t("status.submitted", { date: dates.dayMonth(r.submitted!.at.slice(0, 10)) }), tone: "success" }
     const base = t(`status.${r.state}`)
-    const text = r.detail ? t("withDetail", { status: base, detail: b(r.detail) }) : base
+    const detail = r.warnings !== undefined ? (r.warnings ? tw("detail", { n: r.warnings }) : "") : r.detail ? b(r.detail) : ""
+    const text = detail ? t("withDetail", { status: base, detail }) : base
     return { text, tone: r.state === "collecting" ? "info" : "warning" }
   }
 }
@@ -298,6 +333,7 @@ const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 export function ReturnChecks({ r }: { r: ReturnView }) {
   const t = useTranslations("reports.ret.checks")
   const b = useB()
+  const checkText = useCheckText()
   const notes = useReturnNotes(r.id)
   const [editing, setEditing] = React.useState<string | null>(null)
   const [text, setText] = React.useState("")
@@ -337,15 +373,15 @@ export function ReturnChecks({ r }: { r: ReturnView }) {
                   <span className="flex min-w-0 flex-1 items-start gap-2 text-sm">
                     <Icon name="warning-2" size={18} className="mt-0.5 shrink-0" />
                     <span className="flex min-w-0 flex-col gap-1">
-                      <span>{b(c.text)}</span>
+                      <span>{checkText(c)}</span>
                       {note && editing !== c.id && <span className="text-xs text-foreground">{t("explained", { note })}</span>}
                     </span>
                   </span>
                   {!locked && editing !== c.id && (
                     <span className="flex shrink-0 flex-wrap gap-2 ps-6 @lg/ck:ps-0">
-                      {c.fix && isModuleEnabled(c.fix.module) && (
+                      {checkFixOn(c) && (
                         <Button size="sm" variant="outline" className="bg-card" asChild>
-                          <Link href={c.fix.href}>{b(c.fix.label)}</Link>
+                          <Link href={checkHref(r, c)}>{b(c.fix!.label)}</Link>
                         </Button>
                       )}
                       {c.explain && (
@@ -358,7 +394,7 @@ export function ReturnChecks({ r }: { r: ReturnView }) {
                 </div>
                 {editing === c.id && (
                   <div className="flex flex-col gap-2 ps-6">
-                    <Field label={t("noteLabel", { check: b(c.text) })} error={tried && !text.trim() ? t("noteError") : undefined}>
+                    <Field label={t("noteLabel", { check: checkText(c) })} error={tried && !text.trim() ? t("noteError") : undefined}>
                       {(fp) => <Textarea {...fp} value={text} onChange={(e) => setText(e.target.value)} placeholder={t("notePlaceholder")} className="min-h-[72px] text-foreground" maxLength={400} autoFocus />}
                     </Field>
                     <span className="flex gap-2">

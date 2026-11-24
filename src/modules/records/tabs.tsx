@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button"
 import { RecordsFrame } from "./frame"
 import { noteHref, notesHref, prescriptionHref, requestHref } from "./href"
 import { RequestsList } from "./requests"
+import { VisitsList, useExportVisits } from "./visits"
+import type { Visit } from "./visits-data"
 import { CompletionList, remindable, useRemind } from "./completion"
 import { AccessList, useExportLog } from "./access"
 import { MergeFilesDialog, RestrictedFileDialog, ReviewAccessDialog } from "./access-dialogs"
@@ -86,6 +88,26 @@ export function OverviewTab() {
       </div>
       {reviewing && <ReviewAccessDialog eventId={reviewing} onOpenChange={(o) => !o && setReviewing(null)} />}
       {merging && <MergeFilesDialog pairId={merging} onOpenChange={(o) => !o && setMerging(null)} />}
+    </RecordsFrame>
+  )
+}
+
+/** Visits: header "Medical records / Visits"; Export; the visits list (doctors: their clinic). */
+export function VisitsTab() {
+  const t = useTranslations("records.actions")
+  const exportVisits = useExportVisits()
+  const [rows, setRows] = React.useState<Visit[]>([])
+  return (
+    <RecordsFrame
+      tab="visits"
+      actions={
+        <Button variant="outline" onClick={() => exportVisits(rows)} disabled={rows.length === 0}>
+          <Icon name="export" size={18} />
+          {t("export")}
+        </Button>
+      }
+    >
+      <VisitsList onRows={setRows} />
     </RecordsFrame>
   )
 }

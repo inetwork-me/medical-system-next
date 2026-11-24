@@ -64,7 +64,23 @@ type State = {
 }
 
 export type PatientIdsSaved = PatientIds & { at: string; by: string; yakeen?: boolean }
-export type ReceptionTask = { id: string; at: string; by: string; rule: string; period: string; branch: string; patients: PatientKey[] }
+export type ReceptionTask = {
+  id: string
+  at: string
+  by: string
+  /** Who sent it, as the list says ("the records office"). */
+  role?: string
+  rule: string
+  period: string
+  branch: string
+  /** Finish by (the day before the return is due). */
+  due?: string
+  /** The return the list is for (Back to the MOH return). */
+  from?: string
+  patients: PatientKey[]
+  /** Calls that weren't answered, per patient ("No answer · 1"). */
+  calls?: Record<PatientKey, number>
+}
 
 const KEY = "ms.records.session"
 const EMPTY: State = {
@@ -268,4 +284,12 @@ export const useReceptionTasks = () => useSlice((s) => s.receptionTasks ?? NO_TA
 export function addReceptionTask(t: ReceptionTask) {
   load()
   commit({ ...state, receptionTasks: [t, ...(state.receptionTasks ?? [])] })
+}
+/** A call from the reception list that wasn't answered: it goes back on the list for tomorrow. */
+export function logReceptionCall(taskId: string, patient: PatientKey) {
+  load()
+  commit({
+    ...state,
+    receptionTasks: (state.receptionTasks ?? []).map((t) => (t.id === taskId ? { ...t, calls: { ...(t.calls ?? {}), [patient]: (t.calls?.[patient] ?? 0) + 1 } } : t)),
+  })
 }

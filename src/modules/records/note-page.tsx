@@ -95,7 +95,7 @@ function applyForm(n: VisitNote, f: Form, locale: string): Partial<VisitNote> {
  * Widget / Rec Banner: avatar, name (opens the patient page), "54 y · male · MRN-17654 · Bupa Arabia · class B";
  * flags: allergy (red), a risky current medicine (amber), last visit.
  */
-export function PatientBanner({ patientKey }: { patientKey: string }) {
+export function PatientBanner({ patientKey, flags }: { patientKey: string; flags?: { newPatient?: boolean; noId?: boolean } }) {
   const t = useTranslations("records.banner")
   const b = useB()
   const locale = useLocale()
@@ -133,7 +133,11 @@ export function PatientBanner({ patientKey }: { patientKey: string }) {
               </span>
             )
           })}
-          {last && <span className={cn(chip, "border bg-card text-foreground")}>{t("lastVisit", { date: dates.dayMonth(last.date) })}</span>}
+          {/* Visit page: a new patient, no ID on file, no allergies recorded (Visit · In progress). */}
+          {flags?.newPatient && <span className={cn(chip, "bg-accent text-primary")}>{t("newPatient")}</span>}
+          {flags?.noId && <span className={cn(chip, "bg-warning-soft text-warning-soft-foreground")}>{t("noId")}</span>}
+          {flags && p.allergies.length === 0 && <span className={cn(chip, "border bg-card text-foreground")}>{t("noAllergies")}</span>}
+          {last && !flags?.newPatient && <span className={cn(chip, "border bg-card text-foreground")}>{t("lastVisit", { date: dates.dayMonth(last.date) })}</span>}
         </div>
       </div>
     </section>

@@ -24,7 +24,7 @@ import { recCan, type RecViewRole } from "./roles"
 import { ME } from "./session"
 import { logAccess, useNotes, useRecRole, useSavedIds } from "./store"
 import { inPeriod, isToday, makeCtx, missingCounts, missingOf, type MissingRule, type VisitCtx } from "./visit-rules"
-import { CLINICS, CLINIC_IDS, DOCTOR_CLINIC, DRAWN_ORDER, PAYERS, allVisits, isStillHere, visitStatus, type ClinicId, type Visit, type VisitStatus } from "./visits-data"
+import { CLINICS, CLINIC_IDS, DOCTOR_CLINIC, LEFT_AFTER_HOURS, PAYERS, allVisits, isStillHere, visitStatus, type ClinicId, type Visit, type VisitStatus } from "./visits-data"
 
 /* ------------------------------------------------------------------ shared */
 
@@ -76,15 +76,16 @@ function inFilter(v: Visit, f: VisitsFilter) {
   return true
 }
 
-/** Today: the drawn rows first, then by check-in (newest first); other filters: newest first. */
-function byList(f: VisitsFilter) {
-  return (a: Visit, b: Visit) => {
-    if (f === "today") {
-      const ia = DRAWN_ORDER.indexOf(a.id)
-      const ib = DRAWN_ORDER.indexOf(b.id)
-      if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib)
-    }
-    return b.checked_in_at.localeCompare(a.checked_in_at)
+/** Newest check-in first. */
+const byList = (a: Visit, b: Visit) => b.checked_in_at.localeCompare(a.checked_in_at)
+
+/** Why a visit counts as not checked out: "Lab done 09:05 · over 2 h" / "Doctor done 10:05 · over 2 h" / "Open at the end of 21 Nov". */
+export function useNotOutReason() {
+  const t = useTranslations("records.visits.notOut")
+  const dates = useDates()
+  return (v: Visit) => {
+    if (v.checked_in_at.slice(0, 10) < REC_TODAY || !v.seen_to) return t("endOfDay", { date: dates.dayMonth(v.checked_in_at) })
+    return t(v.clinic === "lab" ? "lab" : "doctor", { time: v.seen_to.slice(11, 16), h: LEFT_AFTER_HOURS })
   }
 }
 
@@ -177,7 +178,7 @@ export function VisitsList({ onRows }: { onRows?: (rows: Visit[]) => void }) {
       const p = patientOf(v.patient)
       return [v.id, p.mrn, p.name.en].some((x) => x.toLowerCase().includes(q)) || p.name.ar.includes(raw)
     }
-    return inClinic.filter((v) => inFilter(v, filter) && matches(v)).sort(byList(filter))
+    return inClinic.filter((v) => inFilter(v, filter) && matches(v)).sort(byList)
   }, [inClinic, filter, q, raw])
   React.useEffect(() => onRows?.(rows), [rows, onRows])
 
@@ -297,6 +298,7 @@ function useMissingText() {
 
 function VisitsTable({ rows, ctx }: { rows: Visit[]; ctx: VisitCtx }) {
   const t = useTranslations("records.visits")
+  const reason = useNotOutReason()
   const ty = useTranslations("records.visits.type")
   const b = useB()
   const time = useVisitTime()
@@ -361,7 +363,11 @@ function VisitsTable({ rows, ctx }: { rows: Visit[]; ctx: VisitCtx }) {
                 <td className={td}>
                   <span className="flex flex-col items-start gap-1">
                     <VisitStatusBadge status={status} />
-                    {miss && <span className="text-xs text-warning-soft-foreground">{missing(miss)}</span>}
+                    {status === "notCheckedOut" ? (
+                      <span className="text-xs text-muted-foreground">{reason(v)}</span>
+                    ) : (
+                      miss && <span className="text-xs text-warning-soft-foreground">{missing(miss)}</span>
+                    )}
                   </span>
                 </td>
                 <td className={cn(td, "text-end")}>

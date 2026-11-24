@@ -19,8 +19,10 @@ const q = (base: string, params: Record<string, string | undefined>) => {
 /** Visit (inner page of Visits). */
 export const visitHref = (id: string) => q("/records/visits/visit", { id })
 /** Visits with missing data for an official return (inner page of Visits): the rule, the period, the branch and the return to go back to. */
-export const missingHref = (rule: string, period: string, extra?: { branch?: string; from?: string }) =>
-  q("/records/visits/missing", { rule, period, branch: extra?.branch, from: extra?.from })
+export const missingHref = (rule: string, period: string, extra?: { branch?: string; from?: string; fixed?: string }) =>
+  q("/records/visits/missing", { rule: rule === "diagnosis" ? "dx" : rule, period, branch: extra?.branch, from: extra?.from, fixed: extra?.fixed })
+/** Reception list (inner page of Visits): the task Send list to reception made (the latest when no id). */
+export const receptionHref = (task?: string) => q("/records/visits/reception", { task })
 /** Visits tab with a filter ("today", "here", "open", "month"). */
 export const visitsHref = (filter?: string) => q(VISITS_HREF, { filter })
 /** Visit note (inner page of Visit notes). */

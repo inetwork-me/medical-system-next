@@ -1,3 +1,4 @@
+import { DEMO_NOW, DEMO_TODAY } from "@/lib/mock/clock"
 import type { Bi } from "@/lib/mock/bi"
 
 /*
@@ -10,9 +11,9 @@ const bi = (en: string, ar: string): Bi => ({ en, ar })
 
 /* ------------------------------------------------------------------ clock */
 
-/** The demo clock: Sunday 22 Nov 2026, 10:40 (the dashboards cover 1–22 Nov, compared with October). */
-export const REP_TODAY = "2026-11-22"
-export const REP_NOW = `${REP_TODAY}T10:40`
+/** The demo clock, shared with Medical records (lib/mock/clock.ts): Monday 23 Nov 2026, 11:40. */
+export const REP_TODAY = DEMO_TODAY
+export const REP_NOW = DEMO_NOW
 /** All schedules and sends are in Riyadh time. */
 export const REP_TZ = "Asia/Riyadh"
 

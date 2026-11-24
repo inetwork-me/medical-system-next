@@ -46,18 +46,21 @@ export const BRANCH_NAMES: Record<string, Bi> = {
 }
 
 export type VisitType = "followUp" | "new" | "urgent" | "procedure" | "labOnly"
-export type Payer = "bupa" | "tawuniya" | "medgulf" | "self"
+export type Payer = "bupa" | "tawuniya" | "medgulf" | "rajhi" | "self"
 export const PAYERS: Record<Payer, Bi> = {
   bupa: bi("Bupa Arabia", "بوبا العربية"),
   tawuniya: bi("Tawuniya", "التعاونية"),
   medgulf: bi("MedGulf", "ميدغلف"),
+  rajhi: bi("Al Rajhi Takaful", "تكافل الراجحي"),
   self: bi("Self-pay", "على حسابه"),
 }
 /** "Bupa · class B" (For official returns) uses the short insurer name. */
-export const PAYER_SHORT: Record<Payer, Bi> = { bupa: bi("Bupa", "بوبا"), tawuniya: bi("Tawuniya", "التعاونية"), medgulf: bi("MedGulf", "ميدغلف"), self: bi("Self-pay", "على حسابه") }
+export const PAYER_SHORT: Record<Payer, Bi> = { bupa: bi("Bupa", "بوبا"), tawuniya: bi("Tawuniya", "التعاونية"), medgulf: bi("MedGulf", "ميدغلف"), rajhi: bi("Al Rajhi Takaful", "تكافل الراجحي"), self: bi("Self-pay", "على حسابه") }
 
-export type IdType = "national" | "iqama" | "passport" | "gcc"
+export type IdType = "national" | "iqama" | "border" | "passport" | "gcc"
+/** Add nationality offers these; Add ID number offers National ID · Iqama · Border no. · Passport. */
 export const ID_TYPES: IdType[] = ["national", "iqama", "passport", "gcc"]
+export const ID_TYPES_ADD: IdType[] = ["national", "iqama", "border", "passport"]
 
 /** Nationalities offered in Add nationality (ISO 3166 alpha-2). */
 export const NATIONALITIES: Record<string, Bi> = {
@@ -104,7 +107,7 @@ export const VISIT_DX: Record<string, Bi> = {
 
 /* ------------------------------------------------------------------ the visit */
 
-export type BookedVia = "app" | "phone" | "reception"
+export type BookedVia = "app" | "phone" | "callCentre" | "reception"
 
 export type Visit = {
   /** V-YYMM-nnnnn. */
@@ -135,8 +138,10 @@ export type Visit = {
   /** Who took the payment at check-out. */
   paid_by?: Bi
   /** The visit's invoice and claim (the numbers the visit shows; `opens` is the Billing sample page they open). */
-  invoice?: { no: string; total: number; insurerPct?: number; status: "paid" | "unpaid"; opens: string }
-  claim?: { no: string; status: "waiting" | "approved" | "rejected"; opens?: string }
+  /** The visit's Billing invoice (its number; amounts come from Billing). */
+  invoice?: string
+  /** Insurance claim: goes out in the nightly NPHIES batch, so it has no number until then. */
+  claim?: { no?: string; status: "batch" | "waiting" | "approved" | "rejected" }
 }
 
 export type VisitStatus = "waiting" | "withDoctor" | "checkedOut" | "notCheckedOut"
@@ -252,9 +257,10 @@ export const VISIT_PATIENTS: Record<string, RecPatient> = {
   mwangi: vp("PM", "Peter Mwangi", "بيتر موانغي", "MRN-24780", 42, "m"),
   zali: vp("ZA", "Zainab Ali", "زينب علي", "MRN-24796", 33, "f"),
   farouk: vp("OF", "Omar Farouk", "عمر فاروق", "MRN-24805", 57, "m"),
-  // A nationality but no ID on file (No ID number · 4 with Ahmed Hassan and Noor Begum).
-  abdo: vp("HA", "Hamza Abdo", "حمزة عبده", "MRN-24822", 34, "m"),
-  iyer: vp("LI", "Lakshmi Iyer", "لاكشمي آيير", "MRN-24839", 40, "f"),
+  // A nationality but no ID number on file (Visits · Missing ID number, with Nasser Al-Otaibi).
+  ymahmoud: vp("YM", "Yasser Mahmoud", "ياسر محمود", "MRN-25140", 39, "m"),
+  tqahtani: vp("TQ", "Tariq Al-Qahtani", "طارق القحطاني", "MRN-25333", 28, "m"),
+  abakr: vp("AB", "Ali Bakr", "علي بكر", "MRN-25019", 46, "m"),
 }
 
 /** The 14 undrawn patients missing a nationality: [key, clinic, visits (day of November)]. */
@@ -284,7 +290,8 @@ const idNo = (lead: "1" | "2", key: string, last3: string) => {
 /** Nationality and ID on file (the design's patients; generated ones are built with theirs). */
 export const BASE_IDS: Record<PatientKey, PatientIds> = {
   dosari: { nationality: "SA", idType: "national", idNumber: idNo("1", "dosari", "482") },
-  otaibi: { nationality: "SA", idType: "national", idNumber: idNo("1", "otaibi", "118") },
+  // New patient: checked in without an ID card (Visit · In progress).
+  otaibi: { nationality: "SA" },
   khaldi: { nationality: "SA", idType: "national", idNumber: idNo("1", "khaldi", "907") },
   shehri: { nationality: "SA", idType: "national", idNumber: idNo("1", "shehri", "317") },
   qahtani: { nationality: "SA", idType: "national", idNumber: idNo("1", "qahtani", "640") },
@@ -318,8 +325,9 @@ export const BASE_IDS: Record<PatientKey, PatientIds> = {
   mwangi: { idType: "passport", idNumber: "AK209331" },
   zali: { idType: "iqama", idNumber: idNo("2", "zali", "794") },
   farouk: { idType: "iqama", idNumber: idNo("2", "farouk", "350") },
-  abdo: { nationality: "YE" },
-  iyer: { nationality: "IN" },
+  ymahmoud: { nationality: "EG" },
+  tqahtani: { nationality: "SA" },
+  abakr: { nationality: "SD" },
 }
 
 /* ------------------------------------------------------------------ generated patients */
@@ -408,25 +416,25 @@ const DESIGN_TODAY: Visit[] = [
     seen_to: at(23, "10:05"),
     checked_out_at: at(23, "10:15"),
     paid_by: ALI,
-    invoice: { no: "INV-2611-0251", total: 310, insurerPct: 80, status: "paid", opens: "INV-2611-0236" },
-    claim: { no: "CLM-26-01822", status: "waiting" },
+    invoice: "INV-2611-0236",
+    claim: { status: "batch" },
   },
   {
     id: "V-2611-08419",
     patient: "otaibi",
     branch: BRANCH,
     clinic: "cardiology",
-    room: 4,
+    room: 2,
     doctor: "khaled",
     doctorName: DOCTOR_NAMES.khaled!,
     type: "new",
     payer: "tawuniya",
     payerClass: "A",
     booked_at: "2026-11-21T12:30",
-    booked_via: "phone",
+    booked_via: "callCentre",
     checked_in_at: at(23, "09:52"),
     checked_in_by: NORA,
-    vitals_at: at(23, "10:06"),
+    vitals_at: at(23, "10:01"),
     vitals_by: AMAL,
     seen_from: at(23, "10:20"),
   },
@@ -439,7 +447,7 @@ const DESIGN_TODAY: Visit[] = [
     doctor: "hala",
     doctorName: DOCTOR_NAMES.hala!,
     type: "followUp",
-    payer: "self",
+    payer: "rajhi",
     booked_at: "2026-11-17T12:40",
     booked_via: "reception",
     checked_in_at: at(23, "10:05"),
@@ -490,7 +498,6 @@ const DESIGN_TODAY: Visit[] = [
     payerClass: "B",
     booked_at: "2026-10-26T10:00",
     booked_via: "app",
-    // The design lists 08:40; her visit note was drawn at 08:30, so she checked in before it.
     checked_in_at: at(23, "08:20"),
     checked_in_by: NORA,
     vitals_at: at(23, "08:26"),
@@ -507,19 +514,21 @@ const DESIGN_TODAY: Visit[] = [
     clinic: "lab",
     doctorName: LAB_TEAM,
     type: "labOnly",
-    payer: "bupa",
-    payerClass: "B",
+    payer: "self",
     dx: "Z01.7",
     booked_at: "2026-11-20T13:10",
     booked_via: "reception",
     checked_in_at: at(23, "08:15"),
     checked_in_by: RECEPTION[1],
-    seen_from: at(23, "08:22"),
-    seen_to: at(23, "08:30"),
+    seen_from: at(23, "08:41"),
+    seen_to: at(23, "09:05"),
   },
 ]
-/** The drawn order of the Visits tab's first rows (the rest follow by check-in, newest first). */
-export const DRAWN_ORDER = DESIGN_TODAY.map((v) => v.id)
+/**
+ * Visits whose main diagnosis isn't coded yet (Visits · Missing diagnosis code): the doctor still has to code them
+ * in the visit note.
+ */
+export const UNCODED = new Set(["V-2611-08377", "V-2611-08105", "V-2611-07950"])
 
 /** A visit for an encounter that already has a visit note (timestamps around the note's time). */
 function fromEncounter(e: Encounter, id: string): Visit {
@@ -542,7 +551,8 @@ function fromEncounter(e: Encounter, id: string): Visit {
     approval: type === "procedure" ? "PA-2611-3307" : undefined,
     booked_at: type === "urgent" ? undefined : plus(`${e.at.slice(0, 10)}T08:00`, -60 * 24 * 3),
     booked_via: type === "urgent" ? undefined : "app",
-    checked_in_at: plus(e.at, -14),
+    // Today's earlier visits (Khaldi 08:55, the 02:05 ER visit) checked in before the drawn first page (08:15).
+    checked_in_at: e.at.slice(0, 10) === REC_TODAY && e.at.slice(11) > "08:15" ? at(23, "08:05") : plus(e.at, -14),
     checked_in_by: NORA,
     vitals_at: plus(e.at, -7),
     vitals_by: AMAL,
@@ -613,8 +623,11 @@ function build(): Visit[] {
     { patient: "smutairi", clinic: "cardiology", day: 9 },
     { patient: "begum", clinic: "lab", day: 4 },
     ...MISSING_MORE.flatMap(([patient, clinic, days]) => days.map((day) => ({ patient, clinic, day }))),
-    { patient: "abdo", clinic: "urgent", day: 16 },
-    { patient: "iyer", clinic: "family", day: 11 },
+    { patient: "ymahmoud", clinic: "family", day: 21 },
+    { patient: "ymahmoud", clinic: "family", day: 14 },
+    { patient: "tqahtani", clinic: "urgent", day: 16 },
+    { patient: "tqahtani", clinic: "urgent", day: 9 },
+    { patient: "abakr", clinic: "dental", day: 6 },
   ]
   const reserved = new Set(fixed.map((v) => Number(v.id.slice(7))))
   let seq = 0
@@ -625,17 +638,16 @@ function build(): Visit[] {
   }
   const r = rng(9031)
   const all: Visit[] = []
-  // Not checked out · 6: today's lab visit (drawn) + five earlier ones; No diagnosis code · 3: Yousef's (his note has
-  // no code) + two dental visits left uncoded.
+  // Not checked out · 6: today's lab visit (drawn) + five earlier ones.
   const notOut = new Set([5, 11, 16, 19, 21])
-  const noDxDays = new Set([7, 13])
   for (let day = 1; day <= LAST_DAY; day++) {
     const today = day === LAST_DAY
     const dayFixed = fixed.filter((v) => Number(v.checked_in_at.slice(8, 10)) === day)
     const dayPlaced = placed.filter((p) => p.day === day)
     const n = dayTarget(day) - dayFixed.length
     const rows: Visit[] = []
-    // Today: 19 still here among the generated rows (23 with the drawn ones), all after 10:30.
+    // Today: 19 still here among the generated rows (23 with the drawn ones). The list is newest first and its first
+    // page is drawn (10:24 → 08:15), so the rest of today checked in from 07:00 to 08:14 (procedures, long waits).
     let stillHere = today ? 19 : 0
     for (let i = 0; i < n; i++) {
       const pl = dayPlaced[i]
@@ -645,7 +657,7 @@ function build(): Visit[] {
       const doc = doctorFor(clinic, r())
       const payer = pl ? "self" : payerFor(r())
       // Clinics open 07:30–21:30 (today: 07:30–11:35 so far).
-      const span = today ? (stillHere > 0 && i >= n - 19 ? [630, 695] : [450, 600]) : [450, 1290]
+      const span = today ? [420, 494] : [450, 1290]
       const start = Math.floor(span[0] + r() * (span[1] - span[0]))
       const inAt = at(day, hm(start))
       const patient = pl?.patient ?? `g${Math.floor(r() * GEN_PATIENTS)}`
@@ -674,7 +686,7 @@ function build(): Visit[] {
       }
       if (here) {
         // The first eight are with the doctor, the rest wait.
-        if (stillHere >= 11) v.seen_from = plus(inAt, 15 + Math.floor(r() * 10))
+        if (stillHere >= 11) v.seen_from = at(day, hm(600 + Math.floor(r() * 95)))
         if (v.seen_from && v.seen_from > REC_NOW) v.seen_from = REC_NOW
       } else {
         const from = plus(inAt, lab ? 6 : 15 + Math.floor(r() * 25))
@@ -685,11 +697,6 @@ function build(): Visit[] {
           v.checked_out_at = plus(v.seen_to, 4 + Math.floor(r() * 10))
           v.paid_by = CASHIERS[Math.floor(r() * CASHIERS.length)]
         }
-      }
-      if (noDxDays.has(day) && i === 1) {
-        v.clinic = "dental"
-        v.type = "procedure"
-        v.dx = undefined
       }
       rows.push(v)
     }
@@ -713,6 +720,34 @@ export const visitById = (id: string) => allVisits().find((v) => v.id === id)
 
 /** The visit's main diagnosis code: its visit note's main diagnosis, else the visit's own. */
 export function mainDx(v: Visit, note?: VisitNote) {
+  if (UNCODED.has(v.id)) return undefined
+  // Still with the doctor: the code is the doctor's to add before the patient leaves ("The doctor adds it").
+  const st = visitStatus(v)
+  if (st === "waiting" || st === "withDoctor") return undefined
   if (note) return note.diagnoses.find((d) => d.type === "main")?.code || undefined
   return v.dx
+}
+
+/* ------------------------------------------------------------------ reception list */
+
+/** Mobile and next booked visit of the patients reception calls (Visits · Reception list). */
+export const RECEPTION_INFO: Record<PatientKey, { mobile: string; next?: { date: string; clinic: ClinicId } }> = {
+  kumar: { mobile: "055 214 4417" },
+  abdelrahman: { mobile: "050 381 2290", next: { date: "2026-11-26", clinic: "dental" } },
+  santos: { mobile: "054 770 1036" },
+  hassan: { mobile: "056 118 9024" },
+  fkhan: { mobile: "053 662 7781" },
+  smutairi: { mobile: "050 772 3815" },
+  begum: { mobile: "058 904 1152", next: { date: "2026-12-01", clinic: "lab" } },
+  patel: { mobile: "055 610 2284", next: { date: "2026-11-30", clinic: "family" } },
+  otaibi: { mobile: "050 611 2093" },
+}
+/** A patient's mobile: the list above, the file, or one built from the MRN. */
+export function mobileOf(k: PatientKey, fileMobile?: string) {
+  if (RECEPTION_INFO[k]) return RECEPTION_INFO[k].mobile
+  if (fileMobile) return fileMobile.replace(/^\+966 /, "0")
+  let h = 11
+  for (const c of k) h = (h * 33 + c.charCodeAt(0)) % 9999991
+  const d = String(h).padStart(7, "0")
+  return `05${d[0]} ${d.slice(1, 4)} ${d.slice(3, 7)}`
 }

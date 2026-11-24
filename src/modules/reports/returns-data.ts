@@ -85,7 +85,8 @@ export const RETURNS: OfficialReturn[] = [
     kind: bi("HESN · notifiable diseases", "حصن · الأمراض المبلّغ عنها"),
     period: bi("Week 47", "الأسبوع 47"),
     periodLong: bi("Week 47 · 16–22 Nov 2026", "الأسبوع 47 · 16–22 نوفمبر 2026"),
-    due: "2026-11-23",
+    // Due the Monday after week 47 closes; with the shared 23 Nov clock it stays "due tomorrow" as drawn.
+    due: "2026-11-24",
     status: "ready",
     detail: bi("3 cases", "3 حالات"),
     collected: "2026-11-22T23:00",

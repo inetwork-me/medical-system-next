@@ -10,6 +10,9 @@ import { baseIdsOf, mainDx, visitStatus, type ClinicId, type IdType, type Patien
 export type MissingRule = "nationality" | "id" | "diagnosis"
 export const RULES: MissingRule[] = ["nationality", "id", "diagnosis"]
 export const isRule = (x: string | null | undefined): x is MissingRule => !!x && (RULES as string[]).includes(x)
+/** The rule as the URL spells it (?rule=nationality|id|dx). */
+export const ruleParam = (r: MissingRule) => (r === "diagnosis" ? "dx" : r)
+export const ruleFromParam = (x: string | null | undefined): MissingRule | null => (x === "dx" ? "diagnosis" : isRule(x) ? x : null)
 
 /** What the rules look at: the patients' IDs (with this session's saves) and each visit's note. */
 export type VisitCtx = { ids: (k: PatientKey) => PatientIds; note: (visitId: string) => VisitNote | undefined }
@@ -42,7 +45,8 @@ export function missingOf(v: Visit, ctx: VisitCtx): MissingRule[] {
   const ids = ctx.ids(v.patient)
   const out: MissingRule[] = []
   if (!ids.nationality) out.push("nationality")
-  if (!ids.idType || !ids.idNumber) out.push("id")
+  // A missing ID counts on its own once the nationality is known (Add nationality fills both).
+  else if (!ids.idType || !ids.idNumber) out.push("id")
   if (finished(v) && !mainDx(v, ctx.note(v.id))) out.push("diagnosis")
   return out
 }
@@ -86,6 +90,7 @@ export function missingCounts(visits: Visit[], ctx: VisitCtx) {
 /** ID numbers: National ID 10 digits from 1, Iqama 10 digits from 2, GCC ID 8–15 digits, passport 6–9 letters / digits. */
 export function idNumberProblem(type: IdType, no: string): "format" | null {
   const v = no.trim()
+  if (type === "border") return /^[34]\d{9}$/.test(v) ? null : "format"
   if (type === "national") return /^1\d{9}$/.test(v) ? null : "format"
   if (type === "iqama") return /^2\d{9}$/.test(v) ? null : "format"
   if (type === "gcc") return /^\d{8,15}$/.test(v) ? null : "format"

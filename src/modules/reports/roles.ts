@@ -1,3 +1,5 @@
+import { can, type PermAction } from "@/lib/permissions"
+
 /**
  * Reports permissions (brief §4):
  * - managers see their area dashboards (Operations, Clinical, Doctors);
@@ -18,7 +20,18 @@ const MATRIX: Record<Exclude<RepRole, "lead">, RepAction[]> = {
   director: ["build", "schedule", "export", "share", "returns", "signOff"],
 }
 
+/** The permission-matrix action each reports action needs (Settings › Roles and access); the module role narrows it further. */
+const PERM: Record<RepAction, PermAction> = {
+  build: "create",
+  schedule: "create",
+  returns: "approve",
+  signOff: "approve",
+  export: "export",
+  share: "export",
+}
+
 export function repCan(role: RepRole, action: RepAction): boolean {
+  if (!can("reports", PERM[action])) return false
   if (role === "lead") return true
   return MATRIX[role].includes(action)
 }

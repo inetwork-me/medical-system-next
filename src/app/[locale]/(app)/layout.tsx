@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing"
 import { AppShell } from "@/components/shell/app-shell"
 import { SIDEBAR_COOKIE } from "@/components/shell/constants"
 import { AuthGate } from "@/components/auth/client-guards"
+import { PermissionsGate } from "@/components/shell/permissions"
 import { STATIC_EXPORT } from "@/lib/static"
 
 /** Signed-in area: every module page renders inside the responsive app shell. */
@@ -18,9 +19,11 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
   const collapsed = STATIC_EXPORT ? false : (await cookies()).get(SIDEBAR_COOKIE)?.value === "1"
 
   return (
-    <AppShell defaultCollapsed={collapsed}>
-      {STATIC_EXPORT && <AuthGate />}
-      {children}
-    </AppShell>
+    <PermissionsGate>
+      <AppShell defaultCollapsed={collapsed}>
+        {STATIC_EXPORT && <AuthGate />}
+        {children}
+      </AppShell>
+    </PermissionsGate>
   )
 }

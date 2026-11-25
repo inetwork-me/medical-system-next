@@ -1,4 +1,5 @@
 import type { ContractKind } from "./data"
+import { can, type PermAction } from "@/lib/permissions"
 
 /**
  * Billing permissions (brief §4):
@@ -44,7 +45,27 @@ const MATRIX: Record<Exclude<BillRole, "lead">, BillAction[]> = {
   doctor: [],
 }
 
+/** The permission-matrix action each billing action needs (Settings › Roles and access); the module role narrows it further. */
+const PERM: Record<BillAction, PermAction> = {
+  viewMoney: "view",
+  allContracts: "view",
+  collect: "create",
+  sendInvoice: "create",
+  upload: "create",
+  draftStaff: "create",
+  draftPartner: "create",
+  draftInsurer: "create",
+  creditNote: "create",
+  newInvoice: "create",
+  claims: "edit",
+  insurers: "edit",
+  sign: "approve",
+  approveRefund: "approve",
+  export: "export",
+}
+
 export function billCan(role: BillRole, action: BillAction): boolean {
+  if (!can("billing", PERM[action])) return false
   if (role === "lead") return true
   return MATRIX[role].includes(action)
 }

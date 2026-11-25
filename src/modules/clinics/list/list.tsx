@@ -11,6 +11,7 @@ import { StatCard } from "@/components/ds/stat-card"
 import { EmptyState } from "@/components/ds/states"
 import { toast } from "@/components/ds/toast"
 import { Button } from "@/components/ui/button"
+import { IfCan } from "@/components/shell/permissions"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useIsMobile } from "@/hooks/use-media-query"
@@ -72,16 +73,20 @@ export function ClinicsList() {
     <ClinicsFrame
       actions={
         <>
-          <Button variant="outline" onClick={exportList}>
-            <Icon name="export" size={24} />
-            {t("export")}
-          </Button>
-          <Button asChild>
-            <Link href="/clinics/new">
-              <Icon name="add" size={24} />
-              {t("addClinic")}
-            </Link>
-          </Button>
+          <IfCan module="clinics" action="export">
+            <Button variant="outline" onClick={exportList}>
+              <Icon name="export" size={24} />
+              {t("export")}
+            </Button>
+          </IfCan>
+          <IfCan module="clinics" action="create">
+            <Button asChild>
+              <Link href="/clinics/new">
+                <Icon name="add" size={24} />
+                {t("addClinic")}
+              </Link>
+            </Button>
+          </IfCan>
         </>
       }
     >

@@ -1,3 +1,5 @@
+import { can, type PermAction } from "@/lib/permissions"
+
 /**
  * Medical records permissions (brief §4):
  * - doctors write and sign their own notes and documents (prescriptions, sick leaves, referrals, reports);
@@ -36,7 +38,25 @@ const MATRIX: Record<Exclude<RecViewRole, "lead">, RecAction[]> = {
   reception: ["patientIds", "allClinics"],
 }
 
+/** The permission-matrix action each records action needs (Settings › Roles and access); the module role narrows it further. */
+const PERM: Record<RecAction, PermAction> = {
+  allClinics: "view",
+  writeNote: "create",
+  vitals: "create",
+  prescribe: "create",
+  documents: "create",
+  requests: "edit",
+  remind: "edit",
+  merge: "edit",
+  patientIds: "edit",
+  signNote: "approve",
+  release: "approve",
+  reviewAccess: "approve",
+  exportLog: "export",
+}
+
 export function recCan(role: RecViewRole, action: RecAction): boolean {
+  if (!can("records", PERM[action])) return false
   if (role === "lead") return true
   return MATRIX[role].includes(action)
 }

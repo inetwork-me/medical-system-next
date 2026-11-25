@@ -127,6 +127,26 @@
     "title": "{module} isn't available in this branch",
     "description": "This branch doesn't use this module. Ask your admin if you need it.",
     "home": "Back to home",
-    "module": "Back to {module}"
+    "module": "Back to {module}",
+    "tabText": "This branch doesn't use this tab. The rest of {module} works as usual.",
+    "goTo": "Go to {module}"
+  },
+  "noAccess": {
+    "title": "You don't have access to {module}",
+    "actionTitle": "You can't {action, select, create {add new items} edit {change items} approve {approve} export {export} other {do this}} in {module}",
+    "text": "Your role doesn't include it. Ask an admin to change your role; it applies at your next sign-in.",
+    "home": "Go to Dashboard"
+  },
+  "fallback": {
+    "dashboard": "Always on.",
+    "patients": "Always on.",
+    "appointments": "This branch takes bookings by phone. Past and upcoming visits stay on each patient's file.",
+    "doctors": "This branch lists its doctors under Clinics: open a clinic to see its doctors.",
+    "clinics": "This branch lists its clinics through Doctors: each doctor shows the clinic they work in.",
+    "lab": "This branch sends lab orders to Al Borg. Results come back to each patient's file.",
+    "billing": "The main branch issues this branch's invoices and claims.",
+    "records": "Notes and documents stay on each patient's file.",
+    "reports": "This branch's reports come from the main branch.",
+    "messages": "This branch reaches patients by phone and SMS."
   }
 }

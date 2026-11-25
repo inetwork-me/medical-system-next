@@ -168,6 +168,11 @@ const ICONS = {
   "user-tag": Iconsax.UserTag,
   "volume-slash": Iconsax.VolumeSlash,
   whatsapp: Iconsax.Whatsapp,
+  card: Iconsax.Card,
+  monitor: Iconsax.Monitor,
+  "routing-2": Iconsax.Routing2,
+  key: Iconsax.Key,
+  mobile: Iconsax.Mobile,
 } as const;
 
 export type IconName = keyof typeof ICONS;

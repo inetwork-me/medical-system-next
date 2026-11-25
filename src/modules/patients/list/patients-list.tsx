@@ -13,6 +13,7 @@ import { FilterChip, Pagination } from "@/components/ds/module-controls"
 import { EmptyState } from "@/components/ds/states"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { IfCan } from "@/components/shell/permissions"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -133,12 +134,14 @@ export function PatientsList() {
                 <Icon name="close-circle" size={20} />
                 <ClearLabel />
               </Button>
-              <Button asChild>
-                <Link href="/patients/new">
-                  <Icon name="user-add" size={20} />
-                  <AddLabel />
-                </Link>
-              </Button>
+              <IfCan module="patients" action="create">
+                <Button asChild>
+                  <Link href="/patients/new">
+                    <Icon name="user-add" size={20} />
+                    <AddLabel />
+                  </Link>
+                </Button>
+              </IfCan>
             </>
           }
         />

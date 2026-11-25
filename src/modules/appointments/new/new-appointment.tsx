@@ -9,6 +9,7 @@ import { Link, useRouter } from "@/i18n/navigation"
 import { useDates } from "@/i18n/dates"
 import { Field } from "@/components/ds/field"
 import { Icon } from "@/components/ds/icon"
+import { IfCan } from "@/components/shell/permissions"
 import { Segmented } from "@/components/ds/segmented"
 import { StatusBadge } from "@/components/ds/status-badge"
 import { toast } from "@/components/ds/toast"
@@ -403,10 +404,12 @@ function PatientPicker({ value, onChange, error }: { value: Patient | null; onCh
           <p className="text-xs text-muted-foreground">{t("none", { q: q.trim() })}</p>
         ))
       )}
-      <Link href="/patients/new" className="flex w-fit items-center gap-2 text-sm text-primary hover:underline">
-        <Icon name="user-add" size={24} className="text-foreground" />
-        {t("notRegistered")}
-      </Link>
+      <IfCan module="patients" action="create">
+        <Link href="/patients/new" className="flex w-fit items-center gap-2 text-sm text-primary hover:underline">
+          <Icon name="user-add" size={24} className="text-foreground" />
+          {t("notRegistered")}
+        </Link>
+      </IfCan>
     </div>
   )
 }

@@ -7,6 +7,8 @@ import { Link } from "@/i18n/navigation"
 import { Icon } from "@/components/ds/icon"
 import { ModuleTabsNav, PageContainer, PageHeader } from "@/components/shell/page"
 import { Button } from "@/components/ui/button"
+import { IfCan } from "@/components/shell/permissions"
+import { can } from "@/lib/permissions"
 import { TODAY } from "./data"
 import { AppointmentOverlays } from "./overlays"
 import { useAppointmentsOn } from "./store"
@@ -26,18 +28,20 @@ export function AppointmentsFrame({ onExport, children }: { onExport?: () => voi
         tabs={<ModuleTabsNav module="appointments" counts={{ calendar: count, list: count, waiting }} />}
         actions={
           <>
-            {onExport && (
+            {onExport && can("appointments", "export") && (
               <Button variant="outline" className="hidden md:inline-flex" onClick={onExport}>
                 <Icon name="export" size={24} />
                 {t("export")}
               </Button>
             )}
-            <Button asChild>
-              <Link href="/appointments/new">
-                <Icon name="calendar-add" size={24} />
-                {t("newAppointment")}
-              </Link>
-            </Button>
+            <IfCan module="appointments" action="create">
+              <Button asChild>
+                <Link href="/appointments/new">
+                  <Icon name="calendar-add" size={24} />
+                  {t("newAppointment")}
+                </Link>
+              </Button>
+            </IfCan>
           </>
         }
       />

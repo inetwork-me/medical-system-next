@@ -1,7 +1,8 @@
 import type { ReactNode } from "react"
 
 import { branchConfig } from "@/config/branches"
-import { MODULES, type ModuleDef, type ModuleId, type ModuleTab } from "@/config/modules"
+import { MODULE_FALLBACKS, MODULES, type ModuleDef, type ModuleId, type ModuleTab } from "@/config/modules"
+import { can } from "@/lib/permissions"
 
 /** Is a module switched on for the active branch? */
 export function isModuleEnabled(id: ModuleId) {
@@ -11,6 +12,14 @@ export function isModuleEnabled(id: ModuleId) {
 /** Enabled modules, in registry order. */
 export function enabledModules(): ModuleDef[] {
   return MODULES.filter((m) => isModuleEnabled(m.id))
+}
+
+/**
+ * Modules the signed-in user sees in the navigation: on for the branch and granted View in the permission matrix
+ * (Settings › Roles and access). Dashboard is always there.
+ */
+export function visibleModules(): ModuleDef[] {
+  return enabledModules().filter((m) => can(m.id, "view"))
 }
 
 /** Enabled tabs of a module ("patients.payments" can be hidden per branch). */
@@ -33,7 +42,7 @@ export function isTabEnabled(id: ModuleId, key: string) {
 
 /** Renders children only when that tab is on — wrap every button that opens a specialty tab or workspace. */
 export function IfTab({ module, tab, children, fallback = null }: { module: ModuleId; tab: string; children: ReactNode; fallback?: ReactNode }) {
-  return <>{isTabEnabled(module, tab) ? children : fallback}</>
+  return <>{isTabEnabled(module, tab) && can(module, "view") ? children : fallback}</>
 }
 
 /**
@@ -41,7 +50,8 @@ export function IfTab({ module, tab, children, fallback = null }: { module: Modu
  * e.g. <IfModule id="appointments"><Button>Book visit</Button></IfModule>.
  */
 export function IfModule({ id, children, fallback = null }: { id: ModuleId; children: ReactNode; fallback?: ReactNode }) {
-  return <>{isModuleEnabled(id) ? children : fallback}</>
+  // A control into a module the user may not view would lead to "no access": hide it like a branch-hidden module.
+  return <>{isModuleEnabled(id) && can(id, "view") ? children : fallback}</>
 }
 
 /** Longest-prefix match of a pathname (without locale) against module hrefs. */
@@ -61,4 +71,18 @@ export function activeTab(m: ModuleDef, pathname: string): ModuleTab | undefined
       .sort((a, b) => b.href.length - a.href.length)[0] ??
     tabs.find((t) => t.href === m.href)
   )
+}
+
+/** Where links into an off module go instead: its declared replacement when that one is on and visible, else nowhere (hide). */
+export function fallbackHref(id: ModuleId): string | undefined {
+  const f = MODULE_FALLBACKS[id]
+  if (!f.href || !f.via) return undefined
+  return isModuleEnabled(f.via) && can(f.via, "view") ? f.href : undefined
+}
+
+/** The module tab a path belongs to, even when that tab is off for the branch (for the "not here" page). */
+export function tabForPath(m: ModuleDef, pathname: string): ModuleTab | undefined {
+  return (m.tabs ?? [])
+    .filter((t) => pathname === t.href || (t.href !== m.href && pathname.startsWith(t.href + "/")))
+    .sort((a, b) => b.href.length - a.href.length)[0]
 }

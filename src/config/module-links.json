@@ -1,0 +1,21 @@
+{
+  "nav": 4,
+  "modules": {
+    "patients": 15,
+    "appointments": 14,
+    "clinics": 2,
+    "records": 4,
+    "billing": 9,
+    "reports": 2,
+    "doctors": 1
+  },
+  "tabs": {
+    "patients.eyes": 2,
+    "patients.dental": 2,
+    "billing.claims": 3,
+    "reports.returns": 1,
+    "billing.invoices": 1,
+    "records.completion": 1,
+    "records.visits": 1
+  }
+}

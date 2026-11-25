@@ -1,4 +1,5 @@
 import type { LabRole } from "./data"
+import { can, type PermAction } from "@/lib/permissions"
 
 /**
  * Lab permissions (brief §4):
@@ -37,7 +38,25 @@ const MATRIX: Record<Exclude<LabRole, "lead">, LabAction[]> = {
 }
 
 /** Can this role do that? "lead" (demo login) can do everything a lab role can, plus order. */
+/** The permission-matrix action each lab action needs (Settings › Roles and access); the module role narrows it further. */
+const PERM: Record<LabAction, PermAction> = {
+  view: "view",
+  order: "create",
+  collect: "edit",
+  receive: "edit",
+  reject: "edit",
+  enter: "edit",
+  submit: "edit",
+  logCall: "edit",
+  send: "edit",
+  catalog: "edit",
+  validate: "approve",
+  release: "approve",
+  print: "export",
+}
+
 export function labCan(role: LabRole, action: LabAction): boolean {
+  if (!can("lab", PERM[action])) return false
   if (role === "lead") return true
   return MATRIX[role].includes(action)
 }

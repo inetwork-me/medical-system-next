@@ -1,3 +1,4 @@
+import { org } from "@/lib/org"
 import type { Bi } from "@/lib/mock/bi"
 
 const bi = (en: string, ar: string): Bi => ({ en, ar })
@@ -32,10 +33,19 @@ export function daysBetween(a: string, b: string = BILL_TODAY) {
 
 /** The tax-invoice and contract letterhead (seller details reported to ZATCA). */
 export const CENTER = {
-  name: bi("Al Noor Medical Center", "مجمع النور الطبي"),
-  short: bi("Al Noor", "النور"),
-  vatNo: "300512456700003",
-  cr: "1010567890",
+  /** Name, short name, VAT and CR come from Settings › General (lib/org). */
+  get name() {
+    return org().name
+  },
+  get short() {
+    return org().short
+  },
+  get vatNo() {
+    return org().vat
+  },
+  get cr() {
+    return org().cr
+  },
   city: bi("Riyadh", "الرياض"),
   billingEmail: "billing@alnoor.sa",
   hrEmail: "hr@alnoor.sa",

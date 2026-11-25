@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
 import { NAV_GROUPS, type ModuleDef } from "@/config/modules"
-import { activeTab, enabledModules, moduleHome, moduleTabs } from "@/lib/modules"
+import { activeTab, visibleModules, moduleHome, moduleTabs } from "@/lib/modules"
 import { bi } from "@/lib/mock/bi"
 import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
 import { Icon, type IconName } from "@/components/ds/icon"
@@ -20,8 +20,8 @@ import { useNav } from "./use-shell"
  * Used on desktop (≥1024) and inside the tablet overlay.
  */
 export function SidebarPanel({ onNavigate }: { onNavigate?: () => void }) {
-  const { current, t } = useNav()
-  const mods = enabledModules()
+  const { current, t, inSettings } = useNav()
+  const mods = visibleModules()
 
   return (
     <div className="flex h-full flex-col gap-6 px-3 pt-5 pb-4">
@@ -41,7 +41,7 @@ export function SidebarPanel({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
       <div className="flex flex-col gap-0.5">
-        <NavRow href="/settings" icon="setting-2" label={t("nav.settings")} onNavigate={onNavigate} />
+        <NavRow href="/settings" icon="setting-2" label={t("nav.settings")} active={inSettings} onNavigate={onNavigate} />
         <NavRow href="/logout" icon="logout" label={t("nav.logout")} onNavigate={onNavigate} destructive />
       </div>
       <UserCard />

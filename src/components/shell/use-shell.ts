@@ -28,7 +28,9 @@ export function useNav() {
   const current = activeModule(pathname)
   const label = (m: ModuleDef, short = false) => t(`nav.${(short && m.shortLabelKey) || m.labelKey}` as "nav.dashboard")
   const tabLabel = (m: ModuleDef, key: string) => t(`tabs.${m.id}.${key}` as "tabs.patients.list")
-  return { pathname, current, label, tabLabel, t }
+  /** Settings pages (not a branch module): the sidebar / rail footer item and the mobile More slot show as active. */
+  const inSettings = pathname === "/settings" || pathname.startsWith("/settings/")
+  return { pathname, current, label, tabLabel, t, inSettings }
 }
 
 export const isRtl = (locale: string) => locale === "ar"

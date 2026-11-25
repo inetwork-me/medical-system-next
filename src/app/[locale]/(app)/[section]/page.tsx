@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ds/states"
 import { PageContainer } from "@/components/shell/page"
 
 /** Account pages that exist in the menus but aren't designed yet. */
-const ACCOUNT = { settings: { icon: "setting-2", key: "settings" }, profile: { icon: "profile-circle", key: "profile" }, help: { icon: "info-circle", key: "help" } } as const
+const ACCOUNT = { profile: { icon: "profile-circle", key: "profile" }, help: { icon: "info-circle", key: "help" } } as const
 
 function resolve(section: string) {
   const m = MODULES.find((x) => !x.built && x.href === `/${section}`)

@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
 import { Icon } from "@/components/ds/icon"
 import { Button } from "@/components/ui/button"
+import { IfCan } from "@/components/shell/permissions"
 import { ModuleTabsNav, PageContainer, PageHeader } from "@/components/shell/page"
 import { allPatients, filterPatients } from "@/modules/patients/data"
 import { ExportDialog } from "@/modules/patients/list/export-dialog"
@@ -28,16 +29,20 @@ export function PatientsFrame({ children }: { tab: "list" | "reports" | "payment
         tabs={<ModuleTabsNav module="patients" counts={{ list: total.toLocaleString("en-US") }} />}
         actions={
           <>
-            <Button variant="outline" onClick={() => setExportOpen(true)}>
-              <Icon name="export" size={20} />
-              {t("export")}
-            </Button>
-            <Button asChild>
-              <Link href="/patients/new">
-                <Icon name="user-add" size={20} />
-                {t("addPatient")}
-              </Link>
-            </Button>
+            <IfCan module="patients" action="export">
+              <Button variant="outline" onClick={() => setExportOpen(true)}>
+                <Icon name="export" size={20} />
+                {t("export")}
+              </Button>
+            </IfCan>
+            <IfCan module="patients" action="create">
+              <Button asChild>
+                <Link href="/patients/new">
+                  <Icon name="user-add" size={20} />
+                  {t("addPatient")}
+                </Link>
+              </Button>
+            </IfCan>
           </>
         }
       />

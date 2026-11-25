@@ -33,6 +33,7 @@ import {
 import type { Bi } from "@/lib/mock/bi"
 import { round2 } from "./money"
 import { currentUserId } from "./session"
+import { nextNumber } from "@/lib/numbering"
 
 /*
  * Billing rules (brief §4), pure functions over the data model. Screens never compute money or statuses themselves.
@@ -165,9 +166,8 @@ export const paidByCard = (inv: Invoice) => inv.payments.length > 0 && inv.payme
 
 /** The next CN-YYMM-NNNN for the month of `at` (numbers run on across the month's credit notes). */
 export function nextCreditNo(existing: string[], at: string) {
-  const ym = `${at.slice(2, 4)}${at.slice(5, 7)}`
-  const top = existing.filter((n) => n.startsWith(`CN-${ym}-`)).reduce((m, n) => Math.max(m, Number(n.slice(-4))), 0)
-  return `CN-${ym}-${String(top + 1).padStart(4, "0")}`
+  // Format from Settings › Numbering and formats (CN-{YYMM}-{4} by default).
+  return nextNumber("credit", existing, at)
 }
 
 /**
@@ -518,9 +518,8 @@ export type ManualInvoiceInput = {
 
 /** The next INV-YYMM-NNNN of the month (numbers run on across the month's invoices). */
 export function nextInvoiceNo(existing: string[], at: string) {
-  const ym = `${at.slice(2, 4)}${at.slice(5, 7)}`
-  const top = existing.filter((n) => n.startsWith(`INV-${ym}-`)).reduce((m, n) => Math.max(m, Number(n.slice(-4))), 0)
-  return `INV-${ym}-${String(top + 1).padStart(4, "0")}`
+  // Format from Settings › Numbering and formats (INV-{YYMM}-{4} by default).
+  return nextNumber("invoice", existing, at)
 }
 
 /** The next CLM-YY-NNNNN (the claims register runs on through the year). */

@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
-import { activeTab, enabledModules, moduleHome } from "@/lib/modules"
+import { activeTab, visibleModules, moduleHome } from "@/lib/modules"
 import { bi } from "@/lib/mock/bi"
 import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
 import { Icon } from "@/components/ds/icon"
@@ -70,10 +70,10 @@ export function MobileAppBar({ className }: { className?: string }) {
  * dot badge for unread. Hidden on form pages (they render a <MobileActionBar>).
  */
 export function BottomNav({ className }: { className?: string }) {
-  const { current, label, t } = useNav()
+  const { current, label, t, inSettings } = useNav()
   const [more, setMore] = React.useState(false)
-  const slots = enabledModules().filter((m) => m.mobile === "bottom")
-  const moreActive = current?.mobile === "more"
+  const slots = visibleModules().filter((m) => m.mobile === "bottom")
+  const moreActive = current?.mobile === "more" || inSettings
 
   return (
     <>
@@ -137,7 +137,7 @@ function MoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
   const locale = useLocale()
   const tc = useTranslations("common.language")
   const { other, switchLocale } = useLocaleSwitch()
-  const tiles = enabledModules().filter((m) => m.mobile === "more")
+  const tiles = visibleModules().filter((m) => m.mobile === "more")
   const close = () => onOpenChange(false)
   const row = "flex h-13 w-full items-center gap-3 px-3.5 text-sm font-medium text-foreground outline-none hover:bg-muted/60 focus-visible:bg-muted/60"
 
@@ -148,7 +148,7 @@ function MoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
           <DrawerTitle>{t("more.title")}</DrawerTitle>
         </DrawerHeader>
         <DrawerBody className="flex flex-col gap-4">
-          <Link href="/profile" onClick={close} className="flex items-center gap-3 rounded-xl border p-3 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
+          <Link href="/settings/account" onClick={close} className="flex items-center gap-3 rounded-xl border p-3 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
             <Avatar>
               <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>
             </Avatar>

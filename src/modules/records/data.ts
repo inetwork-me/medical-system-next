@@ -1,3 +1,4 @@
+import { org } from "@/lib/org"
 import { bi as pick, type Bi } from "@/lib/mock/bi"
 import { DEMO_NOW, DEMO_TODAY } from "@/lib/mock/clock"
 
@@ -56,10 +57,17 @@ export function addHours(iso: string, n: number) {
 /* ------------------------------------------------------------------ center */
 
 export const CENTER = {
-  name: bi("Al Noor Medical Center", "مجمع النور الطبي"),
-  short: bi("Al Noor", "النور"),
+  /** Name, short name and CR come from Settings › General (lib/org). */
+  get name() {
+    return org().name
+  },
+  get short() {
+    return org().short
+  },
   clinic: bi("Cardiology clinic", "عيادة القلب"),
-  cr: "1010567890",
+  get cr() {
+    return org().cr
+  },
   city: bi("Riyadh", "الرياض"),
   verifyHost: "alnoor.sa/verify",
 }

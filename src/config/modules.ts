@@ -216,6 +216,35 @@ export const MODULES: ModuleDef[] = [
 
 export const NAV_GROUPS: NavGroup[] = ["main", "clinical", "admin"]
 
+/**
+ * The modular rule (Settings › Modules per branch, brief §4): every module declares what replaces it at a branch where it's
+ * off. Links into an off module go to `href` (when that module is on) or disappear; a deep link or bookmark lands on a page
+ * that says what replaces it (text: shell.json → "fallback.<id>"). Dashboard and Patients are always on.
+ */
+export type ModuleFallback = { alwaysOn?: true; href?: string; via?: ModuleId }
+export const MODULE_FALLBACKS: Record<ModuleId, ModuleFallback> = {
+  dashboard: { alwaysOn: true },
+  patients: { alwaysOn: true },
+  // Bookings by phone only: booking controls disappear; the patient file keeps past visits.
+  appointments: {},
+  // Doctor lists come from Clinics (each clinic's Doctors tab), and the other way round.
+  doctors: { href: "/clinics", via: "clinics" },
+  clinics: { href: "/doctors", via: "doctors" },
+  // Lab orders go to the send-out partner; results land in the patient file.
+  lab: { href: "/patients", via: "patients" },
+  // Invoices are issued by the main branch.
+  billing: {},
+  // Notes stay on the patient file.
+  records: { href: "/patients", via: "patients" },
+  // Reports come from the main branch.
+  reports: {},
+  // Phone and SMS only.
+  messages: {},
+}
+
+/** Record tabs switched as one row in Settings (Eyes and dental). */
+export const EYES_DENTAL = ["eyes", "dental"] as const
+
 export const moduleById = (id: ModuleId) => MODULES.find((m) => m.id === id)!
 
 /** Placeholder routes for modules that aren't built yet: /appointments, /doctors, … */

@@ -1,3 +1,5 @@
+import { can, type PermAction } from "@/lib/permissions"
+
 /**
  * Messages permissions (brief §4 · Permissions):
  * - everyone has chat, their own mailbox, Partners and Templates;
@@ -35,7 +37,17 @@ const MATRIX: Record<Exclude<MsgRole, "lead">, MsgAction[]> = {
   privacy: ["logs"],
 }
 
+/** The permission-matrix action each messages action needs (Settings › Roles and access); the module role narrows it further. */
+const PERM: Record<MsgAction, PermAction> = {
+  patientMessages: "create",
+  templates: "create",
+  personalMailbox: "create",
+  admin: "edit",
+  logs: "export",
+}
+
 export function msgCan(role: MsgRole, action: MsgAction): boolean {
+  if (!can("messages", PERM[action])) return false
   if (role === "lead") return true
   return MATRIX[role].includes(action)
 }

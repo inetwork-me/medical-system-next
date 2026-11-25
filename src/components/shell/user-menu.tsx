@@ -25,7 +25,7 @@ function useItems(): Item[] {
   const tc = useTranslations("common.language")
   const { other, switchLocale } = useLocaleSwitch()
   return [
-    { icon: "profile-circle", label: t("profile"), href: "/profile" },
+    { icon: "profile-circle", label: t("profile"), href: "/settings/account" },
     { icon: "setting-2", label: t("settings"), href: "/settings" },
     { icon: "language-square", label: tc("other"), onSelect: switchLocale, lang: other },
     { icon: "info-circle", label: t("help"), href: "/help" },

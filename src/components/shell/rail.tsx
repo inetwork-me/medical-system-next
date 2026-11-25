@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
 import { NAV_GROUPS, type ModuleDef } from "@/config/modules"
-import { activeTab, enabledModules, moduleHome, moduleTabs } from "@/lib/modules"
+import { activeTab, visibleModules, moduleHome, moduleTabs } from "@/lib/modules"
 import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -21,8 +21,8 @@ import { useNav } from "./use-shell"
  * (prototype: rail "Patients" → "collapsed + tree flyout").
  */
 export function Rail() {
-  const { current, t } = useNav()
-  const mods = enabledModules()
+  const { current, t, inSettings } = useNav()
+  const mods = visibleModules()
   const groups = NAV_GROUPS.map((g) => mods.filter((m) => m.group === g)).filter((g) => g.length)
 
   return (
@@ -47,7 +47,7 @@ export function Rail() {
         ))}
       </nav>
       <div className="flex flex-col gap-1">
-        <RailLink href="/settings" icon="setting-2" label={t("nav.settings")} />
+        <RailLink href="/settings" icon="setting-2" label={t("nav.settings")} active={inSettings} />
         <RailLink href="/logout" icon="logout" label={t("nav.logout")} destructive />
       </div>
       <Avatar>

@@ -81,6 +81,14 @@
       "library": "Library",
       "schedules": "Schedules",
       "returns": "Official returns"
+    },
+    "messages": {
+      "inbox": "Inbox",
+      "chat": "Chat",
+      "patients": "Patient messages",
+      "partners": "Partners",
+      "templates": "Templates",
+      "accounts": "Mail accounts"
     }
   },
   "header": {

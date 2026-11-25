@@ -150,6 +150,24 @@ const ICONS = {
   video: Iconsax.Video,
   "wallet-money": Iconsax.WalletMoney,
   "warning-2": Iconsax.Warning2,
+  // Messages (design v8.0)
+  buildings: Iconsax.Buildings,
+  calendar: Iconsax.Calendar,
+  "direct-inbox": Iconsax.DirectInbox,
+  flag: Iconsax.Flag,
+  forward: Iconsax.Forward,
+  google: Iconsax.Google,
+  hashtag: Iconsax.Hashtag,
+  "link-2": Iconsax.Link2,
+  "message-add": Iconsax.MessageAdd,
+  "message-text": Iconsax.MessageText,
+  "messages-2": Iconsax.Messages2,
+  "paperclip-2": Iconsax.Paperclip2,
+  "pen-tool": Iconsax.PenTool,
+  "security-user": Iconsax.SecurityUser,
+  "user-tag": Iconsax.UserTag,
+  "volume-slash": Iconsax.VolumeSlash,
+  whatsapp: Iconsax.Whatsapp,
 } as const;
 
 export type IconName = keyof typeof ICONS;

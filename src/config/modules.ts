@@ -193,7 +193,25 @@ export const MODULES: ModuleDef[] = [
       { key: "returns", href: "/reports/returns", ownTitle: true },
     ],
   },
-  { id: "messages", icon: "message", href: "/messages", group: "admin", labelKey: "messages", mobile: "bottom", built: false },
+  // Messages (design v8.0): opens Inbox. Each tab can be hidden per branch ("messages.patients", …); Mail accounts is
+  // admin-only on top of that (roles.ts). Inner pages live under their tab path so the nav keeps the tab active.
+  {
+    id: "messages",
+    icon: "message",
+    href: "/messages",
+    group: "admin",
+    labelKey: "messages",
+    mobile: "bottom",
+    built: true,
+    tabs: [
+      { key: "inbox", href: "/messages" },
+      { key: "chat", href: "/messages/chat", ownTitle: true },
+      { key: "patients", href: "/messages/patients", ownTitle: true },
+      { key: "partners", href: "/messages/partners", ownTitle: true },
+      { key: "templates", href: "/messages/templates", ownTitle: true },
+      { key: "accounts", href: "/messages/accounts", ownTitle: true },
+    ],
+  },
 ]
 
 export const NAV_GROUPS: NavGroup[] = ["main", "clinical", "admin"]

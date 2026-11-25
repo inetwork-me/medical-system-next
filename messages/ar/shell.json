@@ -81,6 +81,14 @@
       "library": "المكتبة",
       "schedules": "الجدولة",
       "returns": "الإقرارات الرسمية"
+    },
+    "messages": {
+      "inbox": "البريد",
+      "chat": "المحادثات",
+      "patients": "رسائل المرضى",
+      "partners": "الشركاء",
+      "templates": "القوالب",
+      "accounts": "حسابات البريد"
     }
   },
   "header": {

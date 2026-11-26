@@ -126,7 +126,7 @@ export function PersonalInfo({ className }: { className?: string }) {
   const address = record.missing.includes("address") ? null : b(p.city ?? REGIONS[p.region].long)
   const rows: [IconName, string, React.ReactNode | null][] = [
     ["user", t("page.info.gender"), p.gender === "unset" ? null : t(`gender.single.${p.gender}`)],
-    ["calendar-2", t("page.info.birth"), record.missing.includes("birthDate") ? null : `${date(d.birthDate)} · ${t("page.years", { n: p.age })}`],
+    ["calendar-2", t("page.info.birth"), record.missing.includes("birthDate") ? null : `${date(d.birthDate)} · ${t("page.years", { n: p.age })}${d.birthEstimated ? ` · ${t("birth.estimatedTag")}` : ""}`],
     ["call", t("page.info.phone"), p.mobile && <bdi dir="ltr">{p.mobile}</bdi>],
     ["personalcard", t("page.info.nationalId"), d.nationalId && <bdi dir="ltr">{`${d.nationalId.slice(0, 1)}•••••••${d.nationalId.slice(-2)}`}</bdi>],
     ["global", t("page.info.nationality"), record.missing.includes("nationality") ? null : b(d.nationality)],

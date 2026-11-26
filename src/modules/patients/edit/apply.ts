@@ -23,6 +23,8 @@ export function applyForm(r: PatientRecord, f: EditForm): PatientRecord {
       ...r.details,
       nationalId: f.idNumber.replace(/\s/g, "") || null,
       birthDate: f.birthDate || r.details.birthDate,
+      birthHijri: f.birthHijri || r.details.birthHijri,
+      birthEstimated: f.birthDate ? f.birthEstimated : r.details.birthEstimated,
       nationality: optionLabel("nationality", f.nationality) ?? r.details.nationality,
       district: f.district ? { en: f.district, ar: f.district } : null,
       insurance,

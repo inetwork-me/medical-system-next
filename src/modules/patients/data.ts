@@ -321,6 +321,9 @@ export type PatientDetails = {
   whatsapp: string | null
   nationalId: string | null
   birthDate: string
+  /** Hijri (Umm al-Qura) birth date and the estimated flag, when set from the birth date picker. */
+  birthHijri?: string
+  birthEstimated?: boolean
   nationality: Bi
   district: Bi | null
   insurance: Bi | null

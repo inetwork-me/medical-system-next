@@ -628,7 +628,9 @@
       "idHelper": "We check it against existing files.",
       "adult": "{age, plural, one {# year old · adult} other {# years old · adult}}",
       "minor": "{age, plural, one {# year old · minor} other {# years old · minor}}",
-      "insuranceCard": "Insurance card"
+      "insuranceCard": "Insurance card",
+      "birthHijri": "Date of birth · Hijri",
+      "birthEstimated": "Date of birth is estimated"
     },
     "errors": {
       "required": "Required.",
@@ -1392,5 +1394,41 @@
       "noPhone": "No mobile number on this file.",
       "dayAt": "{day} at {time}"
     }
+  },
+  "birth": {
+    "title": "Date of birth",
+    "subYear": "Pick the year first",
+    "subYearHijri": "Pick the Hijri year",
+    "subMonth": "{year} · now the month",
+    "subDay": "{month} {year} · now the day",
+    "calendar": "Calendar",
+    "gregorian": "Gregorian",
+    "hijri": "Hijri",
+    "typeIt": "Or type it",
+    "typePh": "DD/MM/YYYY",
+    "typePhHijri": "DD/MM/YYYY · Hijri",
+    "typedInvalid": "That's not a date · use DD/MM/YYYY",
+    "future": "That's in the future",
+    "year": "Year",
+    "month": "Month",
+    "day": "Day",
+    "prev": "Previous",
+    "next": "Next",
+    "onlyYear": "Only the year is known · saved as estimated",
+    "summary": "{date} · {age} years old · {group}",
+    "estimatedSummary": "Around 1 Jul {year} · ≈ {age} years old · estimated",
+    "hijriLine": "Hijri: {date}",
+    "gregorianLine": "Gregorian: {date}",
+    "groups": {
+      "child": "child",
+      "adult": "adult",
+      "senior": "senior"
+    },
+    "guardian": "Under 18 · the guardian section appears",
+    "over120": "Over 120 years · check the year",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "estimatedValue": "{year} · estimated",
+    "estimatedTag": "estimated"
   }
 }

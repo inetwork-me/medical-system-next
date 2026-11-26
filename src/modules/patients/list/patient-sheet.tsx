@@ -51,7 +51,7 @@ function SheetBodyContent({ patient: p }: { patient: Patient }) {
     [t("sheet.facts.phone"), p.mobile, true],
     [t("sheet.facts.whatsapp"), d.whatsapp, true],
     [t("sheet.facts.nationalId"), d.nationalId ? `${d.nationalId.slice(0, 1)}•••••••${d.nationalId.slice(-2)}` : null, true],
-    [t("sheet.facts.birth"), `${date(d.birthDate)} · ${t("sheet.years", { n: p.age })}`],
+    [t("sheet.facts.birth"), `${date(d.birthDate)} · ${t("sheet.years", { n: p.age })}${d.birthEstimated ? ` · ${t("birth.estimatedTag")}` : ""}`],
     [t("sheet.facts.nationality"), bi(d.nationality, locale)],
     [t("sheet.facts.region"), [bi(p.city ?? REGIONS[p.region].long, locale), d.district && bi(d.district, locale)].filter(Boolean).join(" · ")],
     [t("sheet.facts.insurance"), d.insurance && bi(d.insurance, locale)],

@@ -11,6 +11,7 @@ import { IfModule } from "@/lib/modules"
 import { parseDay, useDates } from "@/i18n/dates"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { DatePicker } from "@/components/ds/pickers"
+import { BirthDateField } from "../edit/birth-date"
 import { Segmented } from "@/components/ds/segmented"
 import { DropZone, UploadItem, toMb } from "@/components/ds/upload"
 import { MobileActionBar, PageContainer } from "@/components/shell/page"
@@ -50,6 +51,8 @@ const EMPTY: FullForm = {
   nameAr: "",
   gender: "unset",
   birthDate: "",
+  birthHijri: "",
+  birthEstimated: false,
   nationality: "sa",
   classification: "regular",
   mobile: "",
@@ -492,6 +495,7 @@ function StepCard({
   const t = useTranslations("patients.new")
   const tf = useTranslations("patients.edit.fields")
   const te = useTranslations("patients.edit")
+  const tb = useTranslations("patients.birth")
   const { form, set } = useFormCtx()
   const age = ageFrom(form.birthDate ?? "")
   const insurance = form.payment !== "selfPay"
@@ -539,12 +543,16 @@ function StepCard({
                 />
               )}
             </F>
-            <F k="birthDate" required helper={age !== null && age >= 0 ? tf(age < 18 ? "minor" : "adult", { age }) : undefined}>
+            <F k="birthDate" required helper={age !== null && age >= 0 ? `${tf(age < 18 ? "minor" : "adult", { age })}${form.birthEstimated ? ` · ${tb("estimatedTag")}` : ""}` : undefined}>
               {(c) => (
-                <DatePicker
+                <BirthDateField
                   {...c}
-                  value={form.birthDate ? parseDay(form.birthDate) : undefined}
-                  onChange={(d) => set("birthDate", d ? d.toISOString().slice(0, 10) : "")}
+                  value={{ birthDate: form.birthDate, birthHijri: form.birthHijri, birthEstimated: form.birthEstimated }}
+                  onChange={(v) => {
+                    set("birthDate", v.birthDate)
+                    set("birthHijri", v.birthHijri)
+                    set("birthEstimated", v.birthEstimated)
+                  }}
                   placeholder={tf("birthPlaceholder")}
                 />
               )}
@@ -676,7 +684,7 @@ function Review({ onEdit }: { onEdit: (s: Step) => void }) {
       rows: [
         [t("new.review.name"), b({ en: f.nameEn || "—", ar: f.nameAr || f.nameEn || "—" })],
         [t("new.review.genderAge"), `${f.gender === "unset" ? "—" : t(`gender.single.${f.gender}`)} · ${age !== null ? t("new.summary.years", { n: age }) : "—"}`],
-        [t("new.review.birth"), f.birthDate ? dates.numeric(f.birthDate) : "—"],
+        [t("new.review.birth"), f.birthDate ? (f.birthEstimated ? t("birth.estimatedValue", { year: f.birthDate.slice(0, 4) }) : dates.numeric(f.birthDate)) : "—"],
         [t("new.review.nationality"), L("nationality", f.nationality)],
         [L("idType", f.idType), ltr(f.idNumber)],
       ],

@@ -2,6 +2,7 @@ import type { Bi } from "@/lib/mock/bi"
 import type { IconName } from "@/components/ds/icon"
 import { TODAY, type Gender, type Patient, type RegionKey } from "../data"
 import type { PatientRecord } from "../profile/record"
+import { isoOf, toHijri, ymdOf } from "@/lib/hijri"
 
 /**
  * Edit patient form (Patients · Patient edit). Plain state + a pure validator; the same model will back the
@@ -13,6 +14,10 @@ export type EditForm = {
   nameAr: string
   gender: Gender
   birthDate: string // ISO day, "" when unknown
+  /** The same day in Hijri (Umm al-Qura), "YYYY-MM-DD"; both are stored (birth date picker, design v9.1). */
+  birthHijri: string
+  /** Only the year was known: saved as 1 July and shown as estimated next to the age. */
+  birthEstimated: boolean
   nationality: string
   classification: string
   mobile: string
@@ -186,6 +191,8 @@ export function initialForm(p: Patient, r: PatientRecord, locale: string): EditF
     nameAr: p.name.ar,
     gender: p.gender,
     birthDate: r.missing.includes("birthDate") ? "" : d.birthDate,
+    birthHijri: r.missing.includes("birthDate") ? "" : (d.birthHijri ?? isoOf(toHijri(ymdOf(d.birthDate)))),
+    birthEstimated: !!d.birthEstimated,
     nationality: r.missing.includes("nationality") ? "" : "sa",
     classification: p.tags.includes("vip") ? "vip" : "regular",
     mobile: toIntl(p.mobile),

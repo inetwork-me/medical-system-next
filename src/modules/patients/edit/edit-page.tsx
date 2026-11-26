@@ -10,6 +10,7 @@ import { Link, useRouter } from "@/i18n/navigation"
 import { useDates, parseDay } from "@/i18n/dates"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { DatePicker } from "@/components/ds/pickers"
+import { BirthDateField } from "./birth-date"
 import { Segmented } from "@/components/ds/segmented"
 import { EmptyState } from "@/components/ds/states"
 import { StatusBadge } from "@/components/ds/status-badge"
@@ -410,6 +411,7 @@ function Section({ sectionKey, icon, missing, children }: { sectionKey: SectionK
 
 function SectionFields({ sectionKey }: { sectionKey: SectionKey }) {
   const t = useTranslations("patients.edit.fields")
+  const tb = useTranslations("patients.birth")
   const { form, set } = useFormCtx()
   const age = ageFrom(form.birthDate)
   switch (sectionKey) {
@@ -431,12 +433,16 @@ function SectionFields({ sectionKey }: { sectionKey: SectionKey }) {
               />
             )}
           </F>
-          <F k="birthDate" required helper={age !== null && age >= 0 ? t("age", { age }) : undefined}>
+          <F k="birthDate" required helper={age !== null && age >= 0 ? `${t("age", { age })}${form.birthEstimated ? ` · ${tb("estimatedTag")}` : ""}` : undefined}>
             {(c) => (
-              <DatePicker
+              <BirthDateField
                 {...c}
-                value={form.birthDate ? parseDay(form.birthDate) : undefined}
-                onChange={(d) => set("birthDate", d ? d.toISOString().slice(0, 10) : "")}
+                value={{ birthDate: form.birthDate, birthHijri: form.birthHijri, birthEstimated: form.birthEstimated }}
+                onChange={(v) => {
+                  set("birthDate", v.birthDate)
+                  set("birthHijri", v.birthHijri)
+                  set("birthEstimated", v.birthEstimated)
+                }}
                 placeholder={t("birthPlaceholder")}
               />
             )}

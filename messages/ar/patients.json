@@ -628,7 +628,9 @@
       "idHelper": "نتحقق منه مع الملفات الموجودة.",
       "adult": "{age, plural, one {عمره سنة · بالغ} two {عمره سنتين · بالغ} few {عمره # سنوات · بالغ} other {عمره # سنة · بالغ}}",
       "minor": "{age, plural, one {عمره سنة · قاصر} two {عمره سنتين · قاصر} few {عمره # سنوات · قاصر} other {عمره # سنة · قاصر}}",
-      "insuranceCard": "بطاقة التأمين"
+      "insuranceCard": "بطاقة التأمين",
+      "birthHijri": "تاريخ الميلاد · هجري",
+      "birthEstimated": "تاريخ الميلاد تقريبي"
     },
     "errors": {
       "required": "مطلوب.",
@@ -1392,5 +1394,41 @@
       "noPhone": "ما فيه رقم جوال بهالملف.",
       "dayAt": "{day} الساعة {time}"
     }
+  },
+  "birth": {
+    "title": "تاريخ الميلاد",
+    "subYear": "اختر السنة أول",
+    "subYearHijri": "اختر السنة الهجرية",
+    "subMonth": "{year} · الحين الشهر",
+    "subDay": "{month} {year} · الحين اليوم",
+    "calendar": "التقويم",
+    "gregorian": "ميلادي",
+    "hijri": "هجري",
+    "typeIt": "أو اكتبه",
+    "typePh": "يوم/شهر/سنة",
+    "typePhHijri": "يوم/شهر/سنة هجري",
+    "typedInvalid": "هذا مو تاريخ · اكتبه يوم/شهر/سنة",
+    "future": "هذا تاريخ جاي",
+    "year": "السنة",
+    "month": "الشهر",
+    "day": "اليوم",
+    "prev": "السابق",
+    "next": "التالي",
+    "onlyYear": "يعرف السنة بس · ينحفظ تقريبي",
+    "summary": "{date} · عمره {age} سنة · {group}",
+    "estimatedSummary": "تقريباً 1 يوليو {year} · عمره ≈ {age} سنة · تقريبي",
+    "hijriLine": "بالهجري: {date}",
+    "gregorianLine": "بالميلادي: {date}",
+    "groups": {
+      "child": "طفل",
+      "adult": "بالغ",
+      "senior": "كبير سن"
+    },
+    "guardian": "أقل من 18 · يطلع قسم ولي الأمر",
+    "over120": "أكثر من 120 سنة · تأكد من السنة",
+    "cancel": "إلغاء",
+    "apply": "تطبيق",
+    "estimatedValue": "{year} · تقريبي",
+    "estimatedTag": "تقريبي"
   }
 }

@@ -128,7 +128,7 @@ export const ADDONS: { id: AddonId; icon: "eye" | "location" | "sms"; name: Bi; 
 
 export type SubInvoice = { no: string; amount: number; date: Bi | string; what: Bi; paid: boolean }
 export const SUB_INVOICES: SubInvoice[] = [
-  { no: "SUB-2603-001", amount: 57600, date: "2026-03-01", what: bi("Clinic Pro · yearly", "عيادة برو · سنوي"), paid: true },
+  { no: "SUB-2603-001", amount: 48000, date: "2026-03-01", what: bi("Clinic Pro · yearly", "عيادة برو · سنوي"), paid: true },
   { no: "SUB-2609-014", amount: 350, date: "2026-09-12", what: bi("SMS bundle · 10,000", "باقة رسائل · 10,000"), paid: true },
   { no: "SUB-2611-022", amount: 350, date: "2026-11-18", what: bi("SMS bundle · 10,000", "باقة رسائل · 10,000"), paid: true },
 ]

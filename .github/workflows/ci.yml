@@ -28,6 +28,8 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Types
-        run: npx tsc --noEmit
+        run: |
+          npx next typegen
+          npx tsc --noEmit
       - name: Build
         run: npm run build

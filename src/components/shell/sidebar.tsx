@@ -8,9 +8,10 @@ import { Link } from "@/i18n/navigation"
 import { NAV_GROUPS, type ModuleDef } from "@/config/modules"
 import { activeTab, visibleModules, moduleHome, moduleTabs } from "@/lib/modules"
 import { bi } from "@/lib/mock/bi"
-import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
+import { NAV_BADGES } from "@/lib/mock/shell"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useSessionUser } from "./session"
 import { useNav } from "./use-shell"
 
 /**
@@ -170,15 +171,16 @@ function SidebarModule({ m, active, onNavigate }: { m: ModuleDef; active: boolea
 }
 
 function UserCard() {
+  const user = useSessionUser()
   const locale = useLocale()
   return (
     <div className="flex items-center gap-2.5 rounded-lg border border-sidebar-border p-2">
       <Avatar>
-        <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>
+        <AvatarFallback>{user.initials}</AvatarFallback>
       </Avatar>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-foreground">{bi(SESSION_USER.name, locale)}</p>
-        <p className="truncate text-xs text-muted-foreground">{bi(SESSION_USER.role, locale)}</p>
+        <p className="truncate text-sm font-medium text-foreground">{bi(user.name, locale)}</p>
+        <p className="truncate text-xs text-muted-foreground">{bi(user.role, locale)}</p>
       </div>
     </div>
   )

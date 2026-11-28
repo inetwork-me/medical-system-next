@@ -5,7 +5,6 @@ import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
 import { bi } from "@/lib/mock/bi"
-import { SESSION_USER } from "@/lib/mock/shell"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
@@ -16,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useSessionUser } from "./session"
 import { useLocaleSwitch } from "./use-shell"
 
 type Item = { icon: IconName; label: string; href?: string; onSelect?: () => void; destructive?: boolean; lang?: string }
@@ -38,6 +38,7 @@ function useItems(): Item[] {
  * 260 wide, rounded-xl, shadow-md; header = avatar + name + e-mail; items 36px with 16 icons; Log out in destructive.
  */
 export function UserMenuButton() {
+  const user = useSessionUser()
   const t = useTranslations("shell.header")
   const locale = useLocale()
   const items = useItems()
@@ -46,19 +47,19 @@ export function UserMenuButton() {
       <DropdownMenuTrigger asChild>
         <button type="button" aria-label={t("accountMenu")} className="cursor-pointer rounded-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
           <Avatar>
-            <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>
+            <AvatarFallback>{user.initials}</AvatarFallback>
           </Avatar>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-65 overflow-hidden rounded-xl p-0">
         <div className="flex items-center gap-2.5 border-b p-3">
           <Avatar>
-            <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>
+            <AvatarFallback>{user.initials}</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-foreground">{bi(SESSION_USER.name, locale)}</p>
+            <p className="truncate text-sm font-medium text-foreground">{bi(user.name, locale)}</p>
             <p className="truncate text-xs text-muted-foreground">
-              <bdi dir="ltr">{SESSION_USER.email}</bdi>
+              <bdi dir="ltr">{user.email}</bdi>
             </p>
           </div>
         </div>
@@ -98,6 +99,7 @@ function MenuEntry({ it }: { it: Item }) {
 
 /** Mobile (prototype: app-bar avatar → bottom sheet): name + "role · branch" header, same items as a list. */
 export function MobileUserMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  const user = useSessionUser()
   const locale = useLocale()
   const items = useItems()
   const close = () => onOpenChange(false)
@@ -105,9 +107,9 @@ export function MobileUserMenu({ open, onOpenChange }: { open: boolean; onOpenCh
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>{bi(SESSION_USER.name, locale)}</DrawerTitle>
+          <DrawerTitle>{bi(user.name, locale)}</DrawerTitle>
           <DrawerDescription>
-            {bi(SESSION_USER.role, locale)} · {bi(SESSION_USER.branch, locale)}
+            {bi(user.role, locale)} · {bi(user.branch, locale)}
           </DrawerDescription>
         </DrawerHeader>
         <ul className="flex flex-col">

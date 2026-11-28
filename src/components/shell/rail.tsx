@@ -7,11 +7,12 @@ import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
 import { NAV_GROUPS, type ModuleDef } from "@/config/modules"
 import { activeTab, visibleModules, moduleHome, moduleTabs } from "@/lib/modules"
-import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
+import { NAV_BADGES } from "@/lib/mock/shell"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { useSessionUser } from "./session"
 import { useNav } from "./use-shell"
 
 /**
@@ -21,6 +22,7 @@ import { useNav } from "./use-shell"
  * (prototype: rail "Patients" → "collapsed + tree flyout").
  */
 export function Rail() {
+  const user = useSessionUser()
   const { current, t, inSettings } = useNav()
   const mods = visibleModules()
   const groups = NAV_GROUPS.map((g) => mods.filter((m) => m.group === g)).filter((g) => g.length)
@@ -51,7 +53,7 @@ export function Rail() {
         <RailLink href="/logout" icon="logout" label={t("nav.logout")} destructive />
       </div>
       <Avatar>
-        <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>
+        <AvatarFallback>{user.initials}</AvatarFallback>
       </Avatar>
     </div>
   )

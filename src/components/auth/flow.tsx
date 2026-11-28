@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import type { ApiBranch } from "@/lib/api"
-import { LOGIN_ATTEMPTS } from "@/lib/auth-utils"
+import { CODE_ATTEMPTS, LOGIN_ATTEMPTS } from "@/lib/auth-utils"
 import { DEMO_ACCOUNT } from "@/lib/mock/auth"
 
 /**
@@ -22,12 +22,18 @@ type FlowState = {
   resetTarget: string
   /** Sign in on the API: the temp tokens live here, in memory only (never storage, cookie or URL). A reload drops them. */
   twoFactorToken: string | null
+  /** The code step, from the API: masked email the code went to, tries left, seconds before a resend. */
+  codeSentTo: string | null
+  codeTriesLeft: number
+  resendIn: number
   branchToken: string | null
   branches: ApiBranch[]
   /** Sign in on the API: when the account lock ends (ms since epoch), from the API's retry_after. */
   lockedUntil: number | null
   /** Shown once on the sign-in page: the code or branch step ran out of time. */
   expired: boolean
+  /** Shown once on the sign-in page: the code was wrong until the API ended the step. */
+  codeTriesUsed: boolean
 }
 
 const initial: FlowState = {
@@ -37,10 +43,14 @@ const initial: FlowState = {
   signupMobile: "0554182290",
   resetTarget: DEMO_ACCOUNT.email,
   twoFactorToken: null,
+  codeSentTo: null,
+  codeTriesLeft: CODE_ATTEMPTS,
+  resendIn: 0,
   branchToken: null,
   branches: [],
   lockedUntil: null,
   expired: false,
+  codeTriesUsed: false,
 }
 
 const Ctx = React.createContext<{ state: FlowState; set: (patch: Partial<FlowState>) => void } | null>(null)

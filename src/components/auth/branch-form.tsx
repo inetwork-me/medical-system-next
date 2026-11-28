@@ -43,7 +43,7 @@ export function BranchForm({ next }: { next?: string }) {
       finish()
     } catch (err) {
       setLoading(false)
-      if (err instanceof ApiError && err.code === "unauthenticated") {
+      if (err instanceof ApiError && (err.code === "step_expired" || err.code === "unauthenticated")) {
         // The step ran out of time or was used up: start again.
         set({ branchToken: null, branches: [], expired: true })
         return

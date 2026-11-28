@@ -5,8 +5,9 @@ import { useTranslations } from "next-intl"
 import { toast } from "@/components/ds/toast"
 
 import { useRouter } from "@/i18n/navigation"
-import { ApiError, verifyTwoFactor } from "@/lib/api"
+import { resendCode, verifyTwoFactor } from "@/lib/api"
 import type { AuthMode } from "@/lib/auth-mode"
+import { resendProblem, verifyProblem } from "@/lib/auth-code"
 import { CODE_ATTEMPTS, formatMobile, isEmail, maskMobile, normalizeSaudiMobile } from "@/lib/auth-utils"
 import { DEMO_ACCOUNT, mockSend, mockVerifyCode } from "@/lib/mock/auth"
 import { SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/session"
@@ -30,7 +31,8 @@ const BACK: Record<Kind, { href: string; key: "backToSignIn" | "back" }> = {
  *
  * mode "api" (login only): the code is checked by POST /api/login/2fa with the temp token kept in memory (flow provider).
  * Until SMS is connected the code goes by email (D50): the page opens in its email state and the phone link is switched off.
- * Tries, resend and the rest of this page are AUTH-02. Opened without the step in memory it goes back to sign in.
+ * The tries, the wait before a resend and the address the code went to (masked) all come from the API; the page does not count.
+ * After the last wrong try the API ends the step and the page goes back to sign in. Opened without the step in memory it goes back to sign in.
  * mode "mock" (and sign-up / reset): the old demo behaviour.
  */
 export function VerifyForm({ kind, next, mode = "mock" }: { kind: Kind; next?: string; mode?: AuthMode }) {
@@ -45,6 +47,7 @@ export function VerifyForm({ kind, next, mode = "mock" }: { kind: Kind; next?: s
   const [shake, setShake] = React.useState(0)
   const [loading, setLoading] = React.useState(false)
   const [viaEmail, setViaEmail] = React.useState(api)
+  const [wait, setWait] = React.useState({ seconds: api ? state.resendIn : 45, key: 0 })
 
   const target = (() => {
     if (kind === "signup") return formatMobile(state.signupMobile)
@@ -52,7 +55,7 @@ export function VerifyForm({ kind, next, mode = "mock" }: { kind: Kind; next?: s
       const m = normalizeSaudiMobile(state.resetTarget)
       return m ? maskMobile(m) : state.resetTarget
     }
-    if (api) return isEmail(state.identifier) ? state.identifier : t("otp.login.yourEmail")
+    if (api) return state.codeSentTo ?? ""
     if (viaEmail) return isEmail(state.identifier) ? state.identifier : DEMO_ACCOUNT.email
     return maskMobile(normalizeSaudiMobile(state.identifier) ?? DEMO_ACCOUNT.mobile)
   })()
@@ -76,26 +79,20 @@ export function VerifyForm({ kind, next, mode = "mock" }: { kind: Kind; next?: s
       } else setError(t("login.network"))
     } catch (e) {
       setLoading(false)
-      const code = e instanceof ApiError ? e.code : "network"
-      if (code === "unauthenticated") {
+      const p = verifyProblem(e)
+      if (p.kind === "expired") {
         // The step ran out of time or was used up: sign in again.
         set({ twoFactorToken: null, expired: true })
-        return
-      }
-      if (code === "validation") {
-        // Wrong code. The count is shown only; the API decides when the step is used up (AUTH-02 brings its real number).
-        const left = Math.max(0, tries - 1)
-        setTries(left)
-        setError(left > 0 ? t("otp.wrong", { count: left }) : t("otp.noTriesLeft"))
+      } else if (p.kind === "over") {
+        // The API ended the step after the last wrong try: say so on the sign-in page.
+        set({ twoFactorToken: null, codeTriesUsed: true })
+      } else if (p.kind === "wrong") {
+        setTries(p.triesLeft)
+        setError(t("otp.wrong", { count: p.triesLeft }))
         setShake((n) => n + 1)
-        return
-      }
-      if (code === "too_many_requests") {
-        const seconds = e instanceof ApiError ? (e.retryAfter ?? 60) : 60
-        setError(t("login.tooMany", seconds <= 60 ? { unit: "seconds", count: Math.max(1, seconds) } : { unit: "minutes", count: Math.ceil(seconds / 60) }))
-        return
-      }
-      setError(t("login.network"))
+      } else if (p.kind === "tooMany") {
+        setError(t("login.tooMany", p.seconds <= 60 ? { unit: "seconds", count: Math.max(1, p.seconds) } : { unit: "minutes", count: Math.ceil(p.seconds / 60) }))
+      } else setError(t("login.network"))
     }
   }
 
@@ -122,7 +119,28 @@ export function VerifyForm({ kind, next, mode = "mock" }: { kind: Kind; next?: s
     else router.push("/forgot-password/new")
   }
 
+  async function resendApi() {
+    const token = state.twoFactorToken
+    if (!token) return
+    try {
+      const sent = await resendCode(token)
+      set({ codeSentTo: sent.codeSentTo, codeTriesLeft: sent.triesLeft })
+      setTries(sent.triesLeft)
+      setWait((w) => ({ seconds: sent.resendIn, key: w.key + 1 }))
+      setError(undefined)
+      setCode("")
+      toast.success(t("otp.resent"))
+    } catch (e) {
+      const p = resendProblem(e)
+      if (p.kind === "expired") set({ twoFactorToken: null, expired: true })
+      else if (p.kind === "wait") setWait((w) => ({ seconds: p.seconds, key: w.key + 1 }))
+      else if (p.kind === "tooMany") setWait((w) => ({ seconds: p.seconds, key: w.key + 1 }))
+      else setError(p.kind === "failed" ? t("otp.resendFailed") : t("login.network"))
+    }
+  }
+
   async function resend() {
+    if (api) return resendApi()
     await mockSend()
     setTries(CODE_ATTEMPTS)
     setError(undefined)
@@ -157,7 +175,7 @@ export function VerifyForm({ kind, next, mode = "mock" }: { kind: Kind; next?: s
         error={error}
         shakeKey={shake}
         onResend={resend}
-        resendOff={api}
+        wait={api ? wait : undefined}
       />
       {/* Mock only: nothing is sent, so say so and offer the demo code. */}
       {!api && (

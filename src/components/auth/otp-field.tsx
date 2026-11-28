@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { RESEND_SECONDS } from "@/lib/auth-utils"
 import { Icon } from "@/components/ds/icon"
-import { Unavailable } from "./parts"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 
 /**
@@ -21,7 +20,7 @@ export function OtpField({
   error,
   shakeKey,
   onResend,
-  resendOff,
+  wait,
 }: {
   value: string
   onChange: (v: string) => void
@@ -30,11 +29,14 @@ export function OtpField({
   /** Changes on every failed attempt to replay the shake. */
   shakeKey?: number
   onResend: () => void
-  /** Resend is not connected yet (D49): the row stays, switched off, with "Not available yet". */
-  resendOff?: boolean
+  /**
+   * On the API the wait is the server's: the countdown restarts from `seconds` whenever `key` changes, and the link shows
+   * only when it reaches 0 (a wrong code does not open it). Without `wait` it is the mock behaviour (45 s, or after an error).
+   */
+  wait?: { seconds: number; key: number }
 }) {
   const t = useTranslations("auth.otp")
-  const [left, setLeft] = React.useState(RESEND_SECONDS)
+  const [left, setLeft] = React.useState(wait ? wait.seconds : RESEND_SECONDS)
   const id = React.useId()
 
   React.useEffect(() => {
@@ -43,7 +45,14 @@ export function OtpField({
     return () => clearTimeout(timer)
   }, [left])
 
-  const canResend = left <= 0 || !!error
+  // The server's wait restarts the countdown (state adjusted while rendering, not in an effect).
+  const [seenKey, setSeenKey] = React.useState(wait?.key)
+  if (wait && seenKey !== wait.key) {
+    setSeenKey(wait.key)
+    setLeft(wait.seconds)
+  }
+
+  const canResend = left <= 0 || (!wait && !!error)
   return (
     <div className="flex flex-col gap-2.5">
       <div key={shakeKey} className={cn(shakeKey && "animate-shake motion-reduce:animate-none")}>
@@ -70,14 +79,6 @@ export function OtpField({
           {error}
         </p>
       )}
-      {resendOff ? (
-        <Unavailable reason="notAvailable" align="start">
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            {t("didntGet")}
-            <span className="text-sm font-medium opacity-50">{t("resend")}</span>
-          </span>
-        </Unavailable>
-      ) : (
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground" aria-live="polite">
         {canResend ? (
           <>
@@ -85,7 +86,7 @@ export function OtpField({
             <button
               type="button"
               onClick={() => {
-                setLeft(RESEND_SECONDS)
+                if (!wait) setLeft(RESEND_SECONDS)
                 onResend()
               }}
               className="cursor-pointer rounded-sm text-sm font-medium text-primary outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
@@ -98,12 +99,11 @@ export function OtpField({
             <Icon name="clock" size={16} />
             {t("resendIn")}
             <span className="font-medium text-foreground tabular-nums" dir="ltr">
-              00:{String(left).padStart(2, "0")}
+              {String(Math.floor(left / 60)).padStart(2, "0")}:{String(left % 60).padStart(2, "0")}
             </span>
           </>
         )}
       </div>
-      )}
     </div>
   )
 }

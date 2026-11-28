@@ -11,6 +11,13 @@ export type ApiErrorCode =
   | "too_many_requests"
   | "csrf_origin"
   | "invalid_code"
+  | "code_tries_exhausted"
+  | "step_expired"
+  | "resend_wait"
+  | "resend_unavailable"
+  | "send_failed"
+  | "branch_forbidden"
+  | "branch_inactive"
   | "validation"
   | "unauthenticated"
   | "forbidden"
@@ -27,6 +34,13 @@ const KNOWN: readonly string[] = [
   "too_many_requests",
   "csrf_origin",
   "invalid_code",
+  "code_tries_exhausted",
+  "step_expired",
+  "resend_wait",
+  "resend_unavailable",
+  "send_failed",
+  "branch_forbidden",
+  "branch_inactive",
 ]
 
 export class ApiError extends Error {
@@ -36,10 +50,12 @@ export class ApiError extends Error {
   readonly retryAfter?: number
   /** Wrong-password tries left before the lock (401 invalid_credentials). */
   readonly attemptsLeft?: number
+  /** Wrong-code tries left (422 invalid_code). */
+  readonly triesLeft?: number
   /** Field errors of a 422. */
   readonly fieldErrors?: Record<string, string[]>
 
-  constructor(status: number, code: ApiErrorCode, extra: { retryAfter?: number; attemptsLeft?: number; fieldErrors?: Record<string, string[]> } = {}) {
+  constructor(status: number, code: ApiErrorCode, extra: { retryAfter?: number; attemptsLeft?: number; triesLeft?: number; fieldErrors?: Record<string, string[]> } = {}) {
     // The message is for developers and logs: the code, never text from the API.
     super(`API error ${status} ${code}`)
     this.name = "ApiError"
@@ -47,6 +63,7 @@ export class ApiError extends Error {
     this.code = code
     this.retryAfter = extra.retryAfter
     this.attemptsLeft = extra.attemptsLeft
+    this.triesLeft = extra.triesLeft
     this.fieldErrors = extra.fieldErrors
   }
 }
@@ -59,6 +76,7 @@ export function apiErrorFrom(status: number, body: unknown, retryAfterHeader?: s
   const sent = b && typeof b.code === "string" ? b.code : null
   const retryAfter = num(b?.retry_after) ?? (retryAfterHeader && /^\d+$/.test(retryAfterHeader) ? Number(retryAfterHeader) : undefined)
   const attemptsLeft = num(b?.attempts_left)
+  const triesLeft = num(b?.tries_left)
 
   let code: ApiErrorCode
   if (sent && KNOWN.includes(sent)) code = sent as ApiErrorCode
@@ -72,7 +90,7 @@ export function apiErrorFrom(status: number, body: unknown, retryAfterHeader?: s
 
   const raw = b?.errors
   const fieldErrors = status === 422 && raw && typeof raw === "object" ? (raw as Record<string, string[]>) : undefined
-  return new ApiError(status, code, { retryAfter, attemptsLeft, fieldErrors })
+  return new ApiError(status, code, { retryAfter, attemptsLeft, triesLeft, fieldErrors })
 }
 
 export const networkError = () => new ApiError(0, "network")

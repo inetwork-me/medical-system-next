@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
 import { Icon, type IconName } from "@/components/ds/icon"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useLocaleSwitch } from "@/components/shell/use-shell"
 
 /** Ghost sm language switch: names the other language in its own script (prototype: → twin screen). */
@@ -126,3 +127,28 @@ export function SubmitButton({ loading, children }: { loading?: boolean; childre
 
 /** Value that must stay LTR inside Arabic copy (phone numbers, e-mails). */
 export const LtrTarget = (chunks: React.ReactNode) => <bdi dir="ltr" className="font-medium text-foreground">{chunks}</bdi>
+
+/**
+ * A control that does not work yet (D49, D50): it stays visible and switched off, with its reason as a tooltip (mouse, keyboard)
+ * and as small text under it (touch screens have no hover). "notAvailable" = not built yet; "thirdParty" = waits for an
+ * outside service that is not connected. Put the disabled control inside.
+ */
+export function Unavailable({ reason, align = "center", className, children }: { reason: "notAvailable" | "thirdParty"; align?: "start" | "center"; className?: string; children: React.ReactNode }) {
+  const t = useTranslations("common.availability")
+  const id = React.useId()
+  return (
+    <div className={cn("flex flex-col gap-1.5", className)}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span tabIndex={0} aria-describedby={id} className="block w-full cursor-not-allowed rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
+            {children}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{t(reason)}</TooltipContent>
+      </Tooltip>
+      <p id={id} className={cn("text-xs text-muted-foreground", align === "center" && "text-center")}>
+        {t(reason)}
+      </p>
+    </div>
+  )
+}

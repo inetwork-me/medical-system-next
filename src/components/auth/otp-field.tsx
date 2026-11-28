@@ -4,8 +4,9 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
-import { RESEND_SECONDS } from "@/lib/mock/auth"
+import { RESEND_SECONDS } from "@/lib/auth-utils"
 import { Icon } from "@/components/ds/icon"
+import { Unavailable } from "./parts"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 
 /**
@@ -20,6 +21,7 @@ export function OtpField({
   error,
   shakeKey,
   onResend,
+  resendOff,
 }: {
   value: string
   onChange: (v: string) => void
@@ -28,6 +30,8 @@ export function OtpField({
   /** Changes on every failed attempt to replay the shake. */
   shakeKey?: number
   onResend: () => void
+  /** Resend is not connected yet (D49): the row stays, switched off, with "Not available yet". */
+  resendOff?: boolean
 }) {
   const t = useTranslations("auth.otp")
   const [left, setLeft] = React.useState(RESEND_SECONDS)
@@ -66,6 +70,14 @@ export function OtpField({
           {error}
         </p>
       )}
+      {resendOff ? (
+        <Unavailable reason="notAvailable" align="start">
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            {t("didntGet")}
+            <span className="text-sm font-medium opacity-50">{t("resend")}</span>
+          </span>
+        </Unavailable>
+      ) : (
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground" aria-live="polite">
         {canResend ? (
           <>
@@ -91,6 +103,7 @@ export function OtpField({
           </>
         )}
       </div>
+      )}
     </div>
   )
 }

@@ -110,5 +110,9 @@
     "cantPick": "can't be picked",
     "noMatch": "No matches",
     "waitingAfter": " · {n} on the waiting list"
+  },
+  "availability": {
+    "notAvailable": "Not available yet",
+    "thirdParty": "Third-party service, not connected yet"
   }
 }

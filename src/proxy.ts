@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 import { routing } from "./i18n/routing"
 import { API_SESSION_COOKIE, verifySessionCookie } from "./lib/api/session-cookie"
+import { setForwardedHeaders, trustedHops } from "./lib/api/forwarded"
 import { tenantFromHost } from "./lib/api/tenant"
 import { authMode } from "./lib/auth-mode"
 import { HSTS, buildCsp } from "./lib/csp"
@@ -30,6 +31,13 @@ function forwardToApi(req: NextRequest) {
   headers.delete("x-tenant-subdomain")
   const tenant = tenantFromHost(req.headers.get("host"))
   if (tenant) headers.set("x-tenant-subdomain", tenant)
+  // The API trusts this server as a proxy (TRUSTED_PROXIES) and reads the browser's address from these headers; see lib/api/forwarded.ts.
+  const https = req.nextUrl.protocol === "https:" || req.headers.get("x-forwarded-proto") === "https"
+  setForwardedHeaders(headers, {
+    host: req.headers.get("host"),
+    protocol: https ? "https:" : "http:",
+    hops: trustedHops(process.env.HIS_TRUSTED_HOPS),
+  })
   // Origin and Cookie stay as the browser sent them: the API needs both (CSRF origin check, his_session).
   return NextResponse.rewrite(new URL(req.nextUrl.pathname + req.nextUrl.search, base), { request: { headers } })
 }

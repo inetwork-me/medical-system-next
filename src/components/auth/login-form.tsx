@@ -72,7 +72,7 @@ export function LoginForm({ next, mode }: { next?: string; mode: AuthMode }) {
     setLoading(true)
     setProblem(null)
     setWrong(false)
-    set({ expired: false })
+    set({ expired: false, codeTriesUsed: false })
     let result: SignInResult
     try {
       result = await signIn(v, password, keep)
@@ -88,7 +88,7 @@ export function LoginForm({ next, mode }: { next?: string; mode: AuthMode }) {
     if (result.kind === "signed_in") return finish()
     setLoading(false)
     if (result.kind === "two_factor") {
-      set({ twoFactorToken: result.tempToken })
+      set({ twoFactorToken: result.tempToken, codeSentTo: result.codeSentTo, codeTriesLeft: result.triesLeft, resendIn: result.resendIn })
       router.push(withNext("/login/verify"))
     } else {
       set({ branchToken: result.branchTempToken, branches: result.branches })
@@ -148,9 +148,9 @@ export function LoginForm({ next, mode }: { next?: string; mode: AuthMode }) {
   return (
     <form onSubmit={submit} noValidate className="contents">
       <AuthTitle title={t("login.title")} subtitle={t("login.subtitle")} />
-      {api && state.expired && !alert && (
+      {api && (state.expired || state.codeTriesUsed) && !alert && (
         <AuthAlert tone="info" icon="info-circle">
-          {t("login.expired")}
+          {state.codeTriesUsed ? t("login.codeTriesUsed") : t("login.expired")}
         </AuthAlert>
       )}
       {alert && (

@@ -130,3 +130,52 @@ test("logs out and the app is closed again", async ({ page }) => {
   await page.goto("/en/dashboard")
   await expect(page).toHaveURL(/\/en\/login\?next=%2Fdashboard/)
 })
+
+/**
+ * AUTH-02, the code page. Needs an account with two-step on (email method): E2E_USER_2FA and E2E_PASSWORD (in the load seed,
+ * staff number n % 10 == 3). The code goes by email and a test cannot read it, so only the wrong-code path is driven: the
+ * tries and the wait come from the API, and after the last wrong try the page goes back to sign in. It uses up the tries of
+ * that sign-in only, never the account lock (the password was right).
+ */
+const USER_2FA = process.env.E2E_USER_2FA ?? ""
+
+test.describe("code page (two-step account)", () => {
+  test.skip(!USER_2FA, "set E2E_USER_2FA to an account with two-step on to run the code page tests")
+
+  async function toCodePage(page: Page) {
+    await page.goto("/en/login")
+    await page.locator("input[autocomplete=username]").fill(USER_2FA)
+    await page.locator("input[type=password]").fill(PASSWORD)
+    await page.getByRole("button", { name: en.login.submit, exact: true }).click()
+    await page.waitForURL(/\/en\/login\/verify/)
+  }
+
+  test("shows the masked email, counts tries from the API, then returns to sign in", async ({ page }) => {
+    await toCodePage(page)
+    await expect(page.getByRole("heading", { name: en.otp.login.titleEmail })).toBeVisible()
+    // The address the code went to is masked: no full local part.
+    await expect(page.getByText(/\*\*\*@/)).toBeVisible()
+    // The resend link is behind the server's wait; the phone link is switched off.
+    await expect(page.getByText(en.otp.resendIn)).toBeVisible()
+
+    const otp = page.getByLabel(en.otp.label)
+    await otp.fill("000001")
+    await expect(page.getByRole("alert").filter({ hasText: /2 tries left/ })).toBeVisible()
+    await otp.fill("000002")
+    await expect(page.getByRole("alert").filter({ hasText: /1 try left/ })).toBeVisible()
+    await otp.fill("000003")
+    await page.waitForURL(/\/en\/login(\?|$)/)
+    await expect(page.getByText(en.login.codeTriesUsed)).toBeVisible()
+  })
+
+  test("the code page in Arabic is right to left and shows no English", async ({ page }) => {
+    await page.goto("/ar/login")
+    await page.locator("input[autocomplete=username]").fill(USER_2FA)
+    await page.locator("input[type=password]").fill(PASSWORD)
+    await page.getByRole("button", { name: ar.login.submit, exact: true }).click()
+    await page.waitForURL(/\/ar\/login\/verify/)
+    expect(await page.evaluate(() => document.documentElement.dir)).toBe("rtl")
+    await expect(page.getByRole("heading", { name: ar.otp.login.titleEmail })).toBeVisible()
+    await expect(page.getByText(ar.otp.resendIn)).toBeVisible()
+  })
+})

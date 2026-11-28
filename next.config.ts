@@ -19,6 +19,24 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // Security headers on every response of the server build (the static export has no server to send them).
+  // Content-Security-Policy and Strict-Transport-Security depend on the request (nonce, https): src/proxy.ts sets them.
+  ...(staticExport
+    ? {}
+    : {
+        async headers() {
+          return [
+            {
+              source: "/:path*",
+              headers: [
+                { key: "X-Frame-Options", value: "DENY" },
+                { key: "X-Content-Type-Options", value: "nosniff" },
+                { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+              ],
+            },
+          ]
+        },
+      }),
   ...(staticExport
     ? {
         output: "export" as const,

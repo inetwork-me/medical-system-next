@@ -31,8 +31,12 @@ jobs:
         run: |
           npx next typegen
           npx tsc --noEmit
+      - name: Unit tests
+        run: npm run test:unit
       - name: Build
         run: npm run build
+      - name: Server checks (headers, route protection, API proxy)
+        run: npm run check:server
 
   e2e:
     runs-on: ubuntu-latest

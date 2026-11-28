@@ -148,5 +148,9 @@
     "records": "Notes and documents stay on each patient's file.",
     "reports": "This branch's reports come from the main branch.",
     "messages": "This branch reaches patients by phone and SMS."
+  },
+  "session": {
+    "loading": "Loading your account…",
+    "error": "We couldn't load your account. Check your connection and try again."
   }
 }

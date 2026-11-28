@@ -112,6 +112,15 @@ export function writeSignedIn(s: SignedIn) {
   for (const l of listeners) l()
 }
 
+/** Sign out: forget the snapshot (the session ended or the user logged out). */
+export function clearSignedIn() {
+  cache = null
+  try {
+    sessionStorage.removeItem(KEY)
+  } catch {}
+  for (const l of listeners) l()
+}
+
 export function subscribeSignedIn(l: () => void) {
   listeners.add(l)
   return () => {

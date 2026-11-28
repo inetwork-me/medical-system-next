@@ -7,10 +7,11 @@ import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/navigation"
 import { activeTab, visibleModules, moduleHome } from "@/lib/modules"
 import { bi } from "@/lib/mock/bi"
-import { NAV_BADGES, SESSION_USER } from "@/lib/mock/shell"
+import { NAV_BADGES } from "@/lib/mock/shell"
 import { Icon } from "@/components/ds/icon"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { useSessionUser } from "./session"
 import { usePageTitleValue } from "./page-title"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerBody } from "@/components/ui/drawer"
 import { MobileSearch } from "./header-search"
@@ -23,6 +24,7 @@ import { useLocaleSwitch, useNav } from "./use-shell"
  * ghost icon buttons: search (→ top panel), language (→ other locale), notifications (→ bottom sheet).
  */
 export function MobileAppBar({ className }: { className?: string }) {
+  const user = useSessionUser()
   const { current, label, tabLabel, pathname, t } = useNav()
   const tab = current ? activeTab(current, pathname) : undefined
   // Tabs with their own title (Header v2: "Doctors › Credentials") show that title here too.
@@ -43,7 +45,7 @@ export function MobileAppBar({ className }: { className?: string }) {
           className="cursor-pointer rounded-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
         >
           <Avatar size="sm">
-            <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>
+            <AvatarFallback>{user.initials}</AvatarFallback>
           </Avatar>
         </button>
         <p className="ms-1 min-w-0 flex-1 truncate text-lg font-semibold text-foreground">{title}</p>
@@ -133,6 +135,7 @@ function Indicator({ active, dot, children }: { active?: boolean; dot?: boolean;
  * Dark mode (switch; postponed), Settings, Log out (destructive).
  */
 function MoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  const user = useSessionUser()
   const { label, t } = useNav()
   const locale = useLocale()
   const tc = useTranslations("common.language")
@@ -150,12 +153,12 @@ function MoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
         <DrawerBody className="flex flex-col gap-4">
           <Link href="/settings/account" onClick={close} className="flex items-center gap-3 rounded-xl border p-3 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
             <Avatar>
-              <AvatarFallback>{SESSION_USER.initials}</AvatarFallback>
+              <AvatarFallback>{user.initials}</AvatarFallback>
             </Avatar>
             <span className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-sm font-medium text-foreground">{bi(SESSION_USER.name, locale)}</span>
+              <span className="truncate text-sm font-medium text-foreground">{bi(user.name, locale)}</span>
               <span className="truncate text-xs text-muted-foreground">
-                {bi(SESSION_USER.role, locale)} · {bi(SESSION_USER.facility, locale)}
+                {bi(user.role, locale)} · {bi(user.facility, locale)}
               </span>
             </span>
             <Icon name="arrow-right-1" size={16} className="text-muted-foreground" />

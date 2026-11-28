@@ -1,6 +1,6 @@
 // Checks the server build (run `npm run build` first, then `npm run check:server`):
 //  · security headers and the CSP nonce on page responses
-//  · route protection in both modes (HIS_AUTH_MODE=mock default, HIS_AUTH_MODE=api with a signed cookie)
+//  · route protection in both modes (default api mode with a signed cookie, HIS_AUTH_MODE=mock)
 //  · the /api proxy: tenant header from the host (a client-sent one is removed), Origin and cookie forwarded
 // It starts a fake API on a free port and `next start` on others; nothing outside this machine is called and no .env file is read.
 import { spawn } from "node:child_process"
@@ -77,8 +77,8 @@ const fakePort = fake.address().port
 const apiPort = await freePort()
 const mockPort = await freePort()
 const servers = [
-  start({ HIS_API_URL: `http://127.0.0.1:${fakePort}`, HIS_AUTH_MODE: "api", HIS_SESSION_COOKIE_KEY: KEY }, apiPort),
-  start({ HIS_AUTH_MODE: "", HIS_API_URL: "", HIS_SESSION_COOKIE_KEY: "" }, mockPort),
+  start({ HIS_API_URL: `http://127.0.0.1:${fakePort}`, HIS_AUTH_MODE: "", HIS_SESSION_COOKIE_KEY: KEY }, apiPort),
+  start({ HIS_AUTH_MODE: "mock", HIS_API_URL: "", HIS_SESSION_COOKIE_KEY: "" }, mockPort),
 ]
 
 try {
@@ -106,7 +106,7 @@ try {
   const https = await get(apiPort, "/en/login", { headers: { "x-forwarded-proto": "https" } })
   check("page: HSTS on https", /max-age=\d+/.test(String(https.headers["strict-transport-security"] ?? "")))
 
-  // --- route protection, api mode
+  // --- route protection, api mode (the default: HIS_AUTH_MODE is not set for this server)
   const next = "/en/login?next=%2Fdashboard"
   const anon = await get(apiPort, "/en/dashboard")
   check("api mode: no cookie -> sign-in", anon.status === 307 && anon.headers.location?.endsWith(next), `${anon.status} ${anon.headers.location}`)
@@ -119,6 +119,12 @@ try {
   check("api mode: expired his_session -> sign-in", expired.status === 307, String(expired.status))
   const good = await get(apiPort, "/en/dashboard", { headers: { cookie: `his_session=${cookieFor(future)}` } })
   check("api mode: valid his_session -> page", good.status === 200, String(good.status))
+  const signedInLogin = await get(apiPort, "/en/login", { headers: { cookie: `his_session=${cookieFor(future)}` } })
+  check("api mode: signed in on /login -> dashboard", signedInLogin.status === 307 && signedInLogin.headers.location?.endsWith("/en/dashboard"), `${signedInLogin.status} ${signedInLogin.headers.location}`)
+  const forgedLogin = await get(apiPort, "/en/login", { headers: { cookie: `his_session=${cookieFor(future, "wrong-key")}` } })
+  check("api mode: forged cookie on /login -> sign-in page", forgedLogin.status === 200, String(forgedLogin.status))
+  const staleMockLogin = await get(apiPort, "/en/login", { headers: { cookie: "ms_session=1" } })
+  check("api mode: ms_session=1 on /login -> sign-in page", staleMockLogin.status === 200, String(staleMockLogin.status))
   const pub = await get(apiPort, "/en/forgot-password")
   check("api mode: public page stays public", pub.status === 200, String(pub.status))
 
@@ -126,6 +132,8 @@ try {
   const mockAnon = await get(mockPort, "/en/dashboard")
   check("mock mode: no cookie -> sign-in", mockAnon.status === 307, String(mockAnon.status))
   const mockIn = await get(mockPort, "/en/dashboard", { headers: { cookie: "ms_session=1" } })
+  const mockLogin = await get(mockPort, "/en/login", { headers: { cookie: "ms_session=1" } })
+  check("mock mode: /login stays reachable", mockLogin.status === 200, String(mockLogin.status))
   check("mock mode: ms_session=1 -> page (today's behaviour)", mockIn.status === 200, String(mockIn.status))
   const mockApi = await get(mockPort, "/api/user")
   check("api address not set: /api answers 503 JSON", mockApi.status === 503, String(mockApi.status))

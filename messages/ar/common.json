@@ -110,5 +110,9 @@
     "cantPick": "ما ينفع تختاره",
     "noMatch": "ما فيه نتائج",
     "waitingAfter": " · {n} بقائمة الانتظار"
+  },
+  "availability": {
+    "notAvailable": "مو متاح للحين",
+    "thirdParty": "خدمة طرف ثالث، مو مربوطة للحين"
   }
 }

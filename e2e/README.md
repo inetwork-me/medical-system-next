@@ -49,3 +49,13 @@ test("sign-in shows its title", async ({ page }) => {
 - Prefer roles and labels (`getByRole`, `getByLabel`) over CSS selectors.
 - Do not test flows that will change when the API replaces the mock data; test what the user sees and does.
 - Never point tests at production or at an outside service.
+
+## Real sign-in against the API
+
+`sign-in-api.spec.ts` runs only when `E2E_API=1` and `E2E_BASE_URL` are set (CI skips it: there is no API there). Start the API and the front-end (server build, `HIS_AUTH_MODE=api`, the same `HIS_SESSION_COOKIE_KEY` as the API), then:
+
+```
+E2E_API=1 E2E_BASE_URL=http://demo.localhost:3010 E2E_USER=<email> E2E_PASSWORD=<password> npx playwright test e2e/sign-in-api.spec.ts --project=desktop
+```
+
+The address must be a tenant address (the first label is the tenant). The credentials come from your environment and are never committed.

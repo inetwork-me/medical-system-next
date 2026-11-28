@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { routing } from "./i18n/routing"
 import { API_SESSION_COOKIE, verifySessionCookie } from "./lib/api/session-cookie"
 import { tenantFromHost } from "./lib/api/tenant"
+import { authMode } from "./lib/auth-mode"
 import { HSTS, buildCsp } from "./lib/csp"
 import { SESSION_COOKIE, isPublicPath } from "./lib/session"
 
@@ -12,8 +13,9 @@ import { SESSION_COOKIE, isPublicPath } from "./lib/session"
  * file aside). It does four jobs:
  *  1. `/api/*` goes to the API (`HIS_API_URL`), with the tenant taken from the address the browser used.
  *  2. Pages: the /en · /ar prefix (next-intl).
- *  3. Route protection: HIS_AUTH_MODE=api checks the signed `his_session` cookie (HMAC + expiry, no network call);
- *     "mock" (default until sign-in is on the API) keeps today's `ms_session` check.
+ *  3. Route protection: HIS_AUTH_MODE=api (the default) checks the signed `his_session` cookie (HMAC + expiry, no network call);
+ *     "mock" keeps the old `ms_session` check, for working without the API. A signed-in visitor of a sign-in page goes to
+ *     the dashboard.
  *  4. Security headers on every page: a Content-Security-Policy with a fresh nonce, and HSTS on https.
  * Variables (server only): HIS_API_URL, HIS_SESSION_COOKIE_KEY, HIS_AUTH_MODE. See .env.example.
  */
@@ -33,7 +35,7 @@ function forwardToApi(req: NextRequest) {
 }
 
 async function isSignedIn(req: NextRequest) {
-  if (process.env.HIS_AUTH_MODE === "api") {
+  if (authMode() === "api") {
     return verifySessionCookie(req.cookies.get(API_SESSION_COOKIE)?.value, process.env.HIS_SESSION_COOKIE_KEY)
   }
   return req.cookies.has(SESSION_COOKIE)
@@ -56,10 +58,18 @@ export default async function proxy(req: NextRequest) {
   const [, maybeLocale, ...rest] = pathname.split("/")
   if ((routing.locales as readonly string[]).includes(maybeLocale)) {
     const path = "/" + rest.join("/")
-    if (!isPublicPath(path) && !(await isSignedIn(req))) {
+    const signedIn = await isSignedIn(req)
+    if (!isPublicPath(path) && !signedIn) {
       const url = req.nextUrl.clone()
       url.pathname = `/${maybeLocale}/login`
       url.search = `?next=${encodeURIComponent(path + req.nextUrl.search)}`
+      return withSecurityHeaders(NextResponse.redirect(url), csp, https)
+    }
+    // Already signed in (a valid cookie): the sign-in pages have nothing to show.
+    if (authMode() === "api" && signedIn && (path === "/login" || path.startsWith("/login/"))) {
+      const url = req.nextUrl.clone()
+      url.pathname = `/${maybeLocale}/dashboard`
+      url.search = ""
       return withSecurityHeaders(NextResponse.redirect(url), csp, https)
     }
   }

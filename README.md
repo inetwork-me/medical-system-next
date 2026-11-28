@@ -19,6 +19,6 @@ npm run dev -- -p 3200   # http://localhost:3200/en  ·  /ar
 
 - One client: `src/lib/api` (`api` for signed-in calls, `publicApi` for sign-in). It calls same-origin `/api/...` and never holds a token: the API sets an httpOnly cookie, `his_session`.
 - `src/proxy.ts` forwards `/api/*` to the API, sets the tenant from the first label of the address (`demo.localhost:3010` is tenant `demo`), and checks the signed cookie before a page loads.
-- Server settings (see `.env.example`; real values go in your own `.env.local`, never in git): `HIS_API_URL`, `HIS_SESSION_COOKIE_KEY` (same value as on the API), `HIS_AUTH_MODE` (`mock` or `api`).
+- Server settings (see `.env.example`; real values go in your own `.env.local`, never in git): `HIS_API_URL`, `HIS_SESSION_COOKIE_KEY` (same value as on the API), `HIS_AUTH_MODE` (`api` by default, or `mock` to work without the API). On Windows point `HIS_API_URL` at `http://127.0.0.1:8010`, not `localhost` (IPv6 is tried first and adds about 220 ms per request).
 - The static export (`npm run build:pages`) has no server: it keeps the mock sign-in and sample user.
 - Checks: `npm run test:unit` (cookie verifier, tenant rule, client errors), `npm run check:server` (after `npm run build`: headers, route protection and the proxy, against a fake API).

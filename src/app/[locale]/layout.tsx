@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Providers } from "@/components/providers";
 import { dirOf, routing } from "@/i18n/routing";
 import { inter, plexArabic } from "@/lib/fonts";
+import { STATIC_EXPORT } from "@/lib/static";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -23,6 +25,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  // Every page is rendered per request so Next can put the proxy's CSP nonce on its scripts (the static export has no request).
+  if (!STATIC_EXPORT) await connection();
   const dir = dirOf(locale);
 
   return (

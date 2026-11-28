@@ -4,6 +4,12 @@
  */
 export const SESSION_COOKIE = "ms_session"
 
+/**
+ * Real session (HIS_AUTH_MODE=api): the cookie `his_session` is set by the API, httpOnly, and signed. The proxy verifies the
+ * signature and expiry (src/lib/api/session-cookie.ts); the browser never reads it. The name is also in session-cookie.ts.
+ */
+export { API_SESSION_COOKIE } from "./api/session-cookie"
+
 /** Paths (without locale) reachable without a session. */
 export const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/logout", "/dev"]
 

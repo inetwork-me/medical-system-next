@@ -14,3 +14,11 @@ npm run dev -- -p 3200   # http://localhost:3200/en  ·  /ar
 - Copy: `messages/{en,ar}/<namespace>.json`. Arabic is Saudi conversational tone, taken from the design scripts.
 - Icons: `<Icon name="…">` in `src/components/ds/icon.tsx` uses the file's icon names.
 - Dev token sheet: `/en/dev/tokens` (dev only).
+
+## Talking to the API
+
+- One client: `src/lib/api` (`api` for signed-in calls, `publicApi` for sign-in). It calls same-origin `/api/...` and never holds a token: the API sets an httpOnly cookie, `his_session`.
+- `src/proxy.ts` forwards `/api/*` to the API, sets the tenant from the first label of the address (`demo.localhost:3010` is tenant `demo`), and checks the signed cookie before a page loads.
+- Server settings (see `.env.example`; real values go in your own `.env.local`, never in git): `HIS_API_URL`, `HIS_SESSION_COOKIE_KEY` (same value as on the API), `HIS_AUTH_MODE` (`mock` or `api`).
+- The static export (`npm run build:pages`) has no server: it keeps the mock sign-in and sample user.
+- Checks: `npm run test:unit` (cookie verifier, tenant rule, client errors), `npm run check:server` (after `npm run build`: headers, route protection and the proxy, against a fake API).
